@@ -1,0 +1,2 @@
+module BcoursesHelper
+end
