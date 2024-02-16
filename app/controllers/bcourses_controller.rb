@@ -6,7 +6,8 @@ class BcoursesController < ApplicationController
     canvas_url = "https://bcourses.berkeley.edu"
     
     # Assuming LMS::Canvas.new expects a token directly. Adjust as needed for actual API wrapper usage.
-    api = LMS::Canvas.new(canvas_url, auth.access_token)
+    canvas_api_key = Rails.application.credentials.dig(:development, :canvas, :dev_api_key)   # this will be obtained from omniauth in later iterations
+    api = LMS::Canvas.new(canvas_url, canvas_api_key)
 
     # byebug
     # Fetch courses list
