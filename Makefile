@@ -10,6 +10,7 @@ env:
 	@echo 'db environment updated'
 
 dev: env
+	@command -v overmind > /dev/null 2>&1 || { echo >&2 "please install overmind first"; exit 1; }
 	@yarn run dev
 
 db-migrate: env
