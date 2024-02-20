@@ -10,11 +10,5 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_16_023813) do
-  create_table "authentications", force: :cascade do |t|
-    t.string "bcourse_token"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
+ActiveRecord::Schema[7.1].define(version: 2024_02_20_081032) do
 end

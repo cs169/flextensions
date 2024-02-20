@@ -2,7 +2,6 @@ class BcoursesController < ApplicationController
   require 'lms_api'
 
   def index
-    auth = Authentication.first
     canvas_url = "https://bcourses.berkeley.edu"
     
     # Assuming LMS::Canvas.new expects a token directly. Adjust as needed for actual API wrapper usage.
