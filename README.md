@@ -7,7 +7,7 @@ Back end/API for UC Berkeley EECS "Flextensions" software
 
 ### Environment Variables
 
-For the environment variables, you will need to configure on your local system (and any deployment machines) the following environment variables:
+For the environment variables, you will need to configure on your local system (and any deployment machines) the following environment variables (recommended through a `.env` file at root):
 
 - DB_PORT (default: 5432)
 - DB_USER (default: postgres)
