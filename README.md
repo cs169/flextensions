@@ -1,4 +1,5 @@
-# flextensions
+# Flextensions
+
 Back end/API for UC Berkeley EECS "Flextensions" software
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage)
@@ -35,10 +36,7 @@ Changing only the user and password then running `$make env` should be sufficien
 
 ### Stand Up Server
 
-In order to stand up the server with [Overmind](https://github.com/DarthSim/overmind) in dev, run:
+In order to stand up the server you must first install [Overmind](https://github.com/DarthSim/overmind).
+  Development has been tested with overmind 2.4.0
 
-```bash
-make dev
-```
-
-*NOTE:* The Overmind binary is stored in `bin/overmind` and needs to be maintained manually.
+With Overmind, you can run `$make dev` or `$make`
