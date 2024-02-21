@@ -65,7 +65,6 @@ end
 
 group :test do
     gem 'rspec-rails'
-    # gem 'rails-controller-testing'
     gem 'guard-rspec'
     gem 'simplecov', :require => false
     gem 'cucumber-rails', :require => false
