@@ -22,6 +22,8 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.3.0
+    - run: bin/rails db:create
+    - run: bin/rails db:migrate
     - name: Build and test with RSpec
       run: |
         gem install bundler
