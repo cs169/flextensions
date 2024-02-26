@@ -13,6 +13,10 @@ dev: env
 	@command -v overmind > /dev/null 2>&1 || { echo >&2 "please install overmind first"; exit 1; }
 	@yarn run dev
 
+test: env
+	@echo 'Running rspec tests'
+	@bundle exec rspec
+
 db-migrate: env
 	bin/rails db:migrate
 
