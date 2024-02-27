@@ -1,7 +1,7 @@
 module Api::V1
-  class PingController < Api::V1::BaseController
+  class PingController < BaseController
     def ping
-      render status: :ok, body: 'pong'
+      render :json => 'pong'.to_json
     end
   end
 end
