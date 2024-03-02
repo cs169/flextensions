@@ -23,8 +23,34 @@ RSpec.describe "Bcourses", type: :request do
       end
     end
 
-    context 'when API call fails' do
-      let(:error_message) { "Failed to fetch courses: Error" }
+    context 'when token is expired' do
+      let(:error_message) { "Token expired and needs refresh: Refresh token required" }
+      before do
+        allow(api_mock).to receive(:api_get_request).and_raise(LMS::Canvas::RefreshTokenRequired, 'Refresh token required')
+      end
+
+      it 'renders the index template with a token refresh error message' do
+        get bcourses_path
+        expect(response).to be_successful
+        expect(response.body).to include(error_message)
+      end
+    end
+
+    context 'when there is a network connection error' do
+      let(:error_message) { "Network connection error: Connection refused" }
+      before do
+        allow(api_mock).to receive(:api_get_request).and_raise(SocketError, 'Connection refused')
+      end
+
+      it 'renders the index template with a network error message' do
+        get bcourses_path
+        expect(response).to be_successful
+        expect(response.body).to include(error_message)
+      end
+    end
+
+    context 'when API call fails due to a StandardError (Unexpected Error)' do
+      let(:error_message) { "An unexpected error occurred: Error" }
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(StandardError, 'Error')
       end
@@ -35,5 +61,6 @@ RSpec.describe "Bcourses", type: :request do
         expect(response.body).to include(error_message)
       end
     end
+    
   end
 end

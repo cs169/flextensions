@@ -12,7 +12,14 @@ class BcoursesController < ApplicationController
     # Fetch courses list
     courses_url = "#{canvas_url}/api/v1/courses"
     @courses = api.api_get_request(courses_url)
-  rescue StandardError => e
-    @error = "Failed to fetch courses: #{e.message}"
+  rescue LMS::Canvas::RefreshTokenRequired => e
+    @error = "Token expired and needs refresh: #{e.message}"
+    # In the future, we'll redirect to the Omni-auth page that requests a new token
+  rescue SocketError, Errno::ECONNREFUSED => e
+    @error = "Network connection error: #{e.message}"
+  rescue Net::ReadTimeout, Net::OpenTimeout => e
+    @error = "Network timeout: #{e.message}"
+  rescue => e
+    @error = "An unexpected error occurred: #{e.message}"
   end
 end
