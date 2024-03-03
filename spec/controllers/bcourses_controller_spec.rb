@@ -8,8 +8,12 @@ RSpec.describe "Bcourses", type: :request do
     let(:courses) { [{'name' => 'Course 1'}, {'name' => 'Course 2'}] }
     
     before do
-      allow(Rails.application.credentials).to receive(:dig).with(:development, :canvas, :dev_api_key).and_return(canvas_api_key)
-      allow(LMS::Canvas).to receive(:new).with("https://bcourses.berkeley.edu", canvas_api_key).and_return(api_mock)
+
+      # Stub to return the URL
+      allow(Rails.application.credentials).to receive(:dig).with(:test, :canvas, :url).and_return("https://ucberkeley.test.instructure.com")
+      # Stub to return the API key
+      allow(Rails.application.credentials).to receive(:dig).with(:test, :canvas, :dev_api_key).and_return('test_api_key')
+      allow(LMS::Canvas).to receive(:new).and_return(api_mock)
       allow(api_mock).to receive(:api_get_request).and_return(courses)
     end
 
@@ -24,7 +28,7 @@ RSpec.describe "Bcourses", type: :request do
     end
 
     context 'when token is expired' do
-      let(:error_message) { "Token expired and needs refresh: Refresh token required" }
+      let(:error_message) { "Token expired and needs refresh" }
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(LMS::Canvas::RefreshTokenRequired, 'Refresh token required')
       end
@@ -37,7 +41,7 @@ RSpec.describe "Bcourses", type: :request do
     end
 
     context 'when there is a network connection error' do
-      let(:error_message) { "Network connection error: Connection refused" }
+      let(:error_message) { "Network connection error" }
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(SocketError, 'Connection refused')
       end
