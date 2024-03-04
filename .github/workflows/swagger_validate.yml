@@ -1,0 +1,19 @@
+name: swagger
+
+on: [push, pull_request]
+
+jobs:
+  swagger:
+    runs-on: ubuntu-latest
+    name: Swagger Editor Validator Service
+    services:
+      swagger-editor:
+        image: swaggerapi/swagger-editor
+        ports:
+          - 80:8080
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate Swagger Spec 
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          definition-file: app/assets/swagger.json
