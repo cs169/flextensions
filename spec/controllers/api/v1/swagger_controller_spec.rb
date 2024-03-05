@@ -5,7 +5,7 @@ module Api
       let(:fileContents) { '{}' }
       before :each do
         allow(Rails).to receive(:root).and_return('')
-        allow(File).to receive(:read).with('app/assets/swagger.json').and_return(fileContents)
+        allow(File).to receive(:read).with('app/assets/swagger/swagger.json').and_return(fileContents)
       end
       it 'returns the file content' do
         get :read
