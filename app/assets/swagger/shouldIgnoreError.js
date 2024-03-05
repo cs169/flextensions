@@ -4,10 +4,10 @@
  * @returns {boolean} whether or not to ignore the error.
  */
 const shouldIgnoreError = (err) => {
-    const example = err.location.match(/Structural\ error(.*)at\ openapi/);
+    const example = err.location.match(/Structural\ error\ at(.*)openapi/);
     console.debug(example);
     // This error is because the validator is still based on swagger-editor instead of swagger-editor-next.
-    if (/Structural\ error at openapi/.test(err.location)) {
+    if (/Structural\ error\ at(.*)openapi/.test(err.location)) {
         return true;
     }
     return false;
