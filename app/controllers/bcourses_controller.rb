@@ -3,10 +3,10 @@ class BcoursesController < ApplicationController
 
   def index
     # For dev,test,staging, they share the same canvas_test_url
-    canvas_url = Rails.application.credentials.canvas_url
+    canvas_url = Rails.application.credentials.canvas.url
     # Assuming LMS::Canvas.new expects a token directly. Adjust as needed for actual API wrapper usage.
-    canvas_dev_api_key = Rails.application.credentials.canvas_dev_api_key   # this will be obtained from omniauth in later iterations
-    api = LMS::Canvas.new(canvas_url, canvas_dev_api_key)
+    canvas_api_key = Rails.application.credentials.canvas.api_key   # this will be obtained from omniauth in later iterations
+    api = LMS::Canvas.new(canvas_url, canvas_api_key)
 
     # byebug
     # Fetch courses list

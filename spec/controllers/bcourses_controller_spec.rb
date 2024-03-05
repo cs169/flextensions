@@ -10,9 +10,9 @@ RSpec.describe "Bcourses", type: :request do
     before do
 
       # Stub to return the URL
-      allow(Rails.application.credentials).to receive(:canvas_url).and_return("https://ucberkeley.test.instructure.com")
+      allow(Rails.application.credentials.canvas).to receive(:url).and_return("https://ucberkeley.test.instructure.com")
       # Stub to return the API key
-      allow(Rails.application.credentials).to receive(:canvas_dev_api_key).and_return('test_api_key')
+      allow(Rails.application.credentials.canvas).to receive(:api_key).and_return('test_api_key')
       allow(LMS::Canvas).to receive(:new).and_return(api_mock)
       allow(api_mock).to receive(:api_get_request).and_return(courses)
     end
