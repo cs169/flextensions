@@ -8,7 +8,8 @@ const shouldIgnoreError = (err) => {
     console.debug(err);
     console.debug({ ...err });
     console.debug(err.location);
-    if (/.*Structural error at openapi.*/.test(err.location)) {
+    console.debug(typeof err.location);
+    if (err.location.contains('openapi')) {
         return true;
     }
     return false;
