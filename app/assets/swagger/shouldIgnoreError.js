@@ -7,8 +7,7 @@ const shouldIgnoreError = (err) => {
     // This error is because the validator is still based on swagger-editor instead of swagger-editor next.
     if (
         err.location == 'Structural error at openapi' &&
-        err.message ==
-            'should match pattern "^3\\.0\\.\\d(-.+)?$"\npattern: ^3\\.0\\.\\d(-.+)?$'
+        /should match pattern "^3\\.0\\.\\d(-.+)?$"/.test(err.message)
     ) {
         return true;
     }
