@@ -6,7 +6,7 @@
 const shouldIgnoreError = (err) => {
     // This error is because the validator is still based on swagger-editor instead of swagger-editor-next.
     console.debug({ ...err });
-    if (/.*/.test(err.location)) {
+    if (/.*Structural error at openapi.*/.test(err.location)) {
         return true;
     }
     return false;
