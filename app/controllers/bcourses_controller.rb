@@ -8,7 +8,6 @@ class BcoursesController < ApplicationController
     canvas_api_key = Rails.application.credentials.canvas.api_key   # this will be obtained from omniauth in later iterations
     api = LMS::Canvas.new(canvas_url, canvas_api_key)
 
-    # byebug
     # Fetch courses list
     courses_url = "#{canvas_url}/api/v1/courses"
     @courses = api.api_get_request(courses_url)
