@@ -9,7 +9,7 @@ on:
 jobs:
   swagger:
     runs-on: ubuntu-latest
-    name: Swagger Docs Validation
+    name: Validate Spec
     services:
       swagger-editor:
         image: swaggerapi/swagger-editor:next-v5
