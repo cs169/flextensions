@@ -9,7 +9,7 @@ const shouldIgnoreError = (err) => {
     console.debug({ ...err });
     console.debug(err.location);
     console.debug(typeof err.location);
-    if (err.location.contains('openapi')) {
+    if (/openapi/.test(err.location)) {
         return true;
     }
     return false;
