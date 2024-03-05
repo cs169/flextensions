@@ -8,7 +8,7 @@ jobs:
     name: Swagger Editor Validator Service
     services:
       swagger-editor:
-        image: swaggerapi/swagger-editor
+        image: swaggerapi/swagger-editor:next-v5
         ports:
           - 80:8080
     steps:
