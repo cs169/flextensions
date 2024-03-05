@@ -9,7 +9,7 @@ const shouldIgnoreError = (err) => {
     console.debug({ ...err });
     console.debug(err.location);
     console.debug(typeof err.location);
-    if (/Structural\serror.*openapi/.test(err.location)) {
+    if (/Structural\ error.*openapi/.test(err.location)) {
         return true;
     }
     return false;
