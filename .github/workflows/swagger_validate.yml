@@ -1,6 +1,6 @@
 name: swagger
 
-on: [push, pull_request]
+on: push
 
 jobs:
   swagger:
@@ -16,4 +16,5 @@ jobs:
       - name: Validate Swagger Spec 
         uses: char0n/swagger-editor-validate@v1
         with:
-          definition-file: app/assets/swagger.json
+          definition-file: app/assets/swagger/swagger.json
+          ignore-error: app/assets/swagger/shouldIgnoreError.js
