@@ -88,6 +88,7 @@ GEM
       autoprefixer-rails (>= 9.1.0)
       popper_js (>= 2.11.8, < 3)
     builder (3.2.4)
+    byebug (11.1.3)
     capybara (3.40.0)
       addressable
       matrix
@@ -169,6 +170,9 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    httparty (0.21.0)
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.0.1)
@@ -190,6 +194,9 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    lms-api (1.24.0)
+      activesupport (>= 3.0)
+      httparty
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -206,6 +213,7 @@ GEM
     minitest (5.22.2)
     msgpack (1.7.2)
     multi_test (1.1.0)
+    multi_xml (0.6.0)
     mutex_m (0.2.0)
     nenv (0.3.0)
     net-imap (0.4.10)
@@ -378,6 +386,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   bootstrap (~> 5.3.2)
+  byebug
   cucumber-rails
   cucumber-rails-training-wheels
   database_cleaner
@@ -388,6 +397,7 @@ DEPENDENCIES
   jbuilder
   jquery-rails
   json
+  lms-api
   pg
   puma (>= 5.0)
   rails (~> 7.1.3)
