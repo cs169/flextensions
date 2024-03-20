@@ -16,7 +16,7 @@ module Api
       end
 
       ##
-      # Validator definnitons.
+      # Validator definitions.
       # TODO: this should be exported to its own (validator) class.
       # TODO: this validation should also check the config file for the name of lms's.
       #
