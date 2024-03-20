@@ -134,11 +134,6 @@
         }
       }
     },
-
-
-
-
-
     "/users": {
       "get": {
         "summary": "List of users",
