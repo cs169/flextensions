@@ -3,7 +3,7 @@ require 'rails_helper'
 module Api
     module V1
 
-        RSpec.describe AssignmentsController, type: :controller do
+        describe AssignmentsController, type: :controller do
 
             describe "GET #index" do
                 it "throws a 501 error" do

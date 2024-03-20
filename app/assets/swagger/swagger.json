@@ -67,7 +67,7 @@
     },
     "/courses/{course_id}/platforms/{platform_id}/assignments": {
       "get": {
-        "summary": "Get all assignments from one (course,platform)",
+        "summary": "Get all assignments from one (course, platform)",
         "tags": [
           "assignments"
         ],
@@ -103,7 +103,7 @@
         }
       },
       "post": {
-        "summary": "Create a new assignment from one (course,platform) on our side",
+        "summary": "Create a new assignment from one (course, platform)",
         "tags": [
           "assignments"
         ],
@@ -155,7 +155,7 @@
     },
     "/courses/{course_id}/platforms/{platform_id}/assignments/{assignment_id}": {
       "delete": {
-        "summary": "Delete an assignment from one (course,platform) on our side",
+        "summary": "Delete an assignment from one (course, platform)",
         "tags": [
           "assignments"
         ],
