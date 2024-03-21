@@ -65,6 +65,75 @@
         }
       }
     },
+    "/courses": {
+      "get": {
+        "summary": "List of courses for the current user",
+        "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+          "summary": "Create a new course",
+          "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete a course",
+        "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
     "/courses/{course_id}/platforms/{platform_id}/assignments": {
       "get": {
         "summary": "Get all assignments from one (course, platform)",

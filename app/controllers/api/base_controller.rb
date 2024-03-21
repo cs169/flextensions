@@ -1,5 +1,5 @@
 module Api
-  class BaseController < ApplicationController
+  class BaseController < ActionController::API
     before_action :accessControlAllowOrigin
 
     private
