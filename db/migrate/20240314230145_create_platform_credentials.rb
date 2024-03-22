@@ -1,4 +1,4 @@
-class CreatePlatformcredentials < ActiveRecord::Migration[7.1]
+class CreatePlatformCredentials < ActiveRecord::Migration[7.1]
   def change
     create_table :platform_credentials do |t|
       t.references :user, foreign_key: true

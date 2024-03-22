@@ -1,4 +1,4 @@
-class CreateUsertocourses < ActiveRecord::Migration[7.1]
+class CreateUserToCourses < ActiveRecord::Migration[7.1]
   def change
     create_table :user_to_courses do |t|
       t.references :user, foreign_key: true

@@ -1,4 +1,4 @@
-class CreateCoursetoplatforms < ActiveRecord::Migration[7.1]
+class CreateCourseToPlatforms < ActiveRecord::Migration[7.1]
   def change
     create_table :course_to_platforms do |t|
       t.references :platform, foreign_key: true
