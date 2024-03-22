@@ -5,9 +5,10 @@ class CreateExtensions < ActiveRecord::Migration[7.1]
       t.string :student_email
       t.datetime :initial_due_date
       t.datetime :new_due_date
-      t.references :last_processed_by, foreign_key: {to_table: users}
+      t.references :users, foreign_key: true
 
       t.timestamps
     end
+    rename_column :extensions, :users_id, :last_processed_by_id
   end
 end

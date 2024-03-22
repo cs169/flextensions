@@ -42,10 +42,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.string "student_email"
     t.datetime "initial_due_date"
     t.datetime "new_due_date"
-    t.bigint "last_processed_by_user_id"
+    t.bigint "last_processed_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assignment_id"], name: "index_extensions_on_assignment_id"
+    t.index ["last_processed_by_id"], name: "index_extensions_on_last_processed_by_id"
   end
 
   create_table "platform_credentials", force: :cascade do |t|
@@ -87,6 +88,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
   add_foreign_key "course_to_platforms", "courses"
   add_foreign_key "course_to_platforms", "platforms"
   add_foreign_key "extensions", "assignments"
+  add_foreign_key "extensions", "users", column: "last_processed_by_id"
   add_foreign_key "platform_credentials", "users"
   add_foreign_key "user_to_courses", "courses"
   add_foreign_key "user_to_courses", "users"
