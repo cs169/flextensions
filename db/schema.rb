@@ -80,6 +80,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "assignments", "platforms"
