@@ -15,20 +15,20 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
   enable_extension "plpgsql"
 
   create_table "assignments", force: :cascade do |t|
-    t.bigint "platform_id"
+    t.bigint "lms_id"
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["platform_id"], name: "index_assignments_on_platform_id"
+    t.index ["lms_id"], name: "index_assignments_on_lms_id"
   end
 
-  create_table "course_to_platforms", force: :cascade do |t|
-    t.bigint "platform_id"
+  create_table "course_to_lmss", force: :cascade do |t|
+    t.bigint "lms_id"
     t.bigint "course_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["course_id"], name: "index_course_to_platforms_on_course_id"
-    t.index ["platform_id"], name: "index_course_to_platforms_on_platform_id"
+    t.index ["course_id"], name: "index_course_to_lmss_on_course_id"
+    t.index ["lms_id"], name: "index_course_to_lmss_on_lms_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -49,19 +49,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.index ["last_processed_by_id"], name: "index_extensions_on_last_processed_by_id"
   end
 
-  create_table "platform_credentials", force: :cascade do |t|
+  create_table "lms_credentials", force: :cascade do |t|
     t.bigint "user_id"
-    t.string "platform_name"
+    t.string "lms_name"
     t.string "username"
     t.string "password"
     t.string "token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_platform_credentials_on_user_id"
+    t.index ["user_id"], name: "index_lms_credentials_on_user_id"
   end
 
-  create_table "platforms", force: :cascade do |t|
-    t.string "platform_name"
+  create_table "lmss", force: :cascade do |t|
+    t.string "lms_name"
     t.boolean "use_auth_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -84,12 +84,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  add_foreign_key "assignments", "platforms"
-  add_foreign_key "course_to_platforms", "courses"
-  add_foreign_key "course_to_platforms", "platforms"
+  add_foreign_key "assignments", "lmss", column: "lms_id"
+  add_foreign_key "course_to_lmss", "courses"
+  add_foreign_key "course_to_lmss", "lmss", column: "lms_id"
   add_foreign_key "extensions", "assignments"
   add_foreign_key "extensions", "users", column: "last_processed_by_id"
-  add_foreign_key "platform_credentials", "users"
+  add_foreign_key "lms_credentials", "users"
   add_foreign_key "user_to_courses", "courses"
   add_foreign_key "user_to_courses", "users"
 end
