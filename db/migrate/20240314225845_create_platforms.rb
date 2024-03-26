@@ -1,7 +1,7 @@
-class CreatePlatforms < ActiveRecord::Migration[7.1]
+class CreateLMSs < ActiveRecord::Migration[7.1]
   def change
-    create_table :platforms do |t|
-      t.string :platform_name
+    create_table :lmss do |t|
+      t.string :lms_name
       t.boolean :use_auth_token
 
       t.timestamps
