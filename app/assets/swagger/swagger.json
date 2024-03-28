@@ -134,9 +134,9 @@
       }
     }
   },
-    "/courses/{course_id}/platforms/{platform_id}/assignments": {
+    "/courses/{course_id}/lmss/{lms_id}/assignments": {
       "get": {
-        "summary": "Get all assignments from one (course, platform)",
+        "summary": "Get all assignments from one (course, lms)",
         "tags": [
           "assignments"
         ],
@@ -150,7 +150,7 @@
             }
           },
           {
-            "name": "platform_id",
+            "name": "lms_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -172,7 +172,7 @@
         }
       },
       "post": {
-        "summary": "Create a new assignment from one (course, platform)",
+        "summary": "Create a new assignment from one (course, lms)",
         "tags": [
           "assignments"
         ],
@@ -186,7 +186,7 @@
             }
           },
           {
-            "name": "platform_id",
+            "name": "lms_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -222,9 +222,9 @@
         }
       }
     },
-    "/courses/{course_id}/platforms/{platform_id}/assignments/{assignment_id}": {
+    "/courses/{course_id}/lmss/{lms_id}/assignments/{assignment_id}": {
       "delete": {
-        "summary": "Delete an assignment from one (course, platform)",
+        "summary": "Delete an assignment from one (course, lms)",
         "tags": [
           "assignments"
         ],
@@ -238,7 +238,7 @@
             }
           },
           {
-            "name": "platform_id",
+            "name": "lms_id",
             "in": "path",
             "required": true,
             "schema": {
