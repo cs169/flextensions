@@ -1,4 +1,4 @@
-quire 'rails_helper'
+require 'rails_helper'
 
 module Api
     module V1
