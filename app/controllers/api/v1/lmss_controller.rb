@@ -1,6 +1,6 @@
 module Api
   module V1
-    class LmsController < BaseController
+    class LmssController < BaseController
       before_action :validate_name!, only: [:create]
 
       def create

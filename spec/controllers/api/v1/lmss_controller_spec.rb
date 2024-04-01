@@ -1,7 +1,7 @@
 require 'rails_helper'
 module Api
   module V1
-    describe LmsController do
+    describe LmssController do
       let(:mock_course_id) { 16 }
       let(:mock_course_name) { 'testCourseName' }
       describe 'create' do
