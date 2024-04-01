@@ -203,7 +203,7 @@
         }
       }
     },
-    "/courses/{course_id}/user/{user_id}": {
+    "/courses/{course_id}/users/{user_id}": {
       "parameters": [
         {
           "in": "path",
