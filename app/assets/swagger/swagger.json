@@ -222,6 +222,81 @@
           }
         }
       }
+    },
+    "/courses/{course_id}/lms/{lms_name}/assignments/{assignment_id}/extensions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "lms_name",
+          "description": "name of lms",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Creates an extension for the specified assignment",
+        "tags": [
+          "extension"
+        ],
+        "requestBody": {
+          "description": "Required info for the extension: Student ID and new due date",
+          "content": {
+            "application/json": {
+              "schema": {
+                "SID": "string",
+                "New Due Date": "datetime"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Gets all extensions for the specified assignment",
+        "tags": [
+          "extension"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
