@@ -21,7 +21,7 @@ RSpec.describe "Bcourses", type: :request do
       it 'renders the index template with courses' do
         get bcourses_path
         expect(response).to be_successful
-        puts response.body
+        # puts response.body
         expect(response.body).to include('Course 1')
         expect(response.body).to include('Course 2')
       end
