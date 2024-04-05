@@ -223,7 +223,7 @@
         }
       }
     },
-    "/courses/{course_id}/lms/{lms_name}/assignments/{assignment_id}/extensions": {
+    "/courses/{course_id}/lmss/{lms_name}/assignments/{assignment_id}/extensions": {
       "parameters": [
         {
           "in": "path",
@@ -259,8 +259,10 @@
           "content": {
             "application/json": {
               "schema": {
-                "SID": "string",
-                "New Due Date": "datetime"
+              },
+              "example": {
+                "SID": "1234567890",
+                "New Due Date": "01/01/2000"
               }
             }
           },

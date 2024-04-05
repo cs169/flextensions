@@ -8,6 +8,10 @@ module Api
         def index
           render :json => 'not yet implemented'.to_json, status: 501
         end
+
+        def delete
+          render :json => 'not yet implemented'.to_json, status: 501
+        end
   
       end
     end
