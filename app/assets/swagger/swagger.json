@@ -165,7 +165,7 @@
         }
       }
     },
-    "/courses/{course_id}/lms/{lms_name}": {
+    "/courses/{course_id}/lmss/{lms_id}": {
       "parameters": [
         {
           "in": "path",
@@ -223,7 +223,7 @@
         }
       }
     },
-    "/courses/{course_id}/lmss/{lms_name}/assignments/{assignment_id}/extensions": {
+    "/courses/{course_id}/lmss/{lms_id}/assignments/{assignment_id}/extensions": {
       "parameters": [
         {
           "in": "path",
@@ -236,11 +236,20 @@
         },
         {
           "in": "path",
-          "name": "lms_name",
-          "description": "name of lms",
+          "name": "lms_id",
+          "description": "id of lms",
           "required": true,
           "schema": {
             "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignment_id",
+          "description": "id of assignment_id",
+          "required": true,
+          "schema": {
+            "type": "integer"
           }
         },
         {
