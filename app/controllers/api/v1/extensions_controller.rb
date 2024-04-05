@@ -9,7 +9,7 @@ module Api
           render :json => 'not yet implemented'.to_json, status: 501
         end
 
-        def delete
+        def destroy
           render :json => 'not yet implemented'.to_json, status: 501
         end
   

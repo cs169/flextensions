@@ -14,7 +14,7 @@ module Api
         it 'throws a 501 error' do
           post :create, params: {
             course_id: :mock_course_id,
-            lmss_id: :mock_lms_id,
+            lms_id: :mock_lms_id,
             assignment_id: :mock_assignment_id
           }
           expect(response.status).to eq(501)
@@ -24,7 +24,7 @@ module Api
       it 'throws a 501 error' do
         post :index, params: {
           course_id: :mock_course_id,
-          lmss_id: :mock_lms_id,
+          lms_id: :mock_lms_id,
           assignment_id: :mock_assignment_id
         }
         expect(response.status).to eq(501)
@@ -32,11 +32,11 @@ module Api
   end
   describe 'destroy' do
     it 'throws a 501 error' do
-      delete :delete, params: {
+      delete :destroy, params: {
         course_id: :mock_course_id,
-        lmss_id: :mock_lms_id,
+        lms_id: :mock_lms_id,
         assignment_id: :mock_assignment_id,
-        extension_id: :mock_extension_id
+        id: :mock_extension_id
       }
       expect(response.status).to eq(501)
     end
