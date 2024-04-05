@@ -255,7 +255,10 @@
         {
           "in": "header",
           "name": "Authorization",
-          "required": true
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
         }
       ],
       "post": {
