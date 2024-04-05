@@ -7,4 +7,3 @@ namespace :v1 do
     end
   end
 end
-
