@@ -65,6 +65,26 @@
         }
       }
     },
+    "/users": {
+      "post": {
+          "summary": "Create a new user",
+          "tags": [
+          "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/courses": {
       "get": {
         "summary": "List of courses for the current user",
