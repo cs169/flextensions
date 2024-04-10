@@ -56,7 +56,185 @@
             "description": "Valid OpenAPI JSON Spec",
             "content": {
               "application/json": {
-                "schema":{
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+          "summary": "Create a new user",
+          "tags": [
+          "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses": {
+      "get": {
+        "summary": "List of courses for the current user",
+        "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+          "summary": "Create a new course",
+          "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete a course",
+        "tags": [
+          "courses"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lms": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Index of all lms providers for the specified class",
+        "tags": [
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lms/{lms_name}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "lms_name",
+          "description": "name of lms",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Adds the specified LMS to the course",
+        "tags": [
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes the specified LMS to the course",
+        "tags": [
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
                   "type": "object"
                 }
               }
