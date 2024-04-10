@@ -55,6 +55,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.string "username"
     t.string "password"
     t.string "token"
+    t.string "refresh_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_lms_credentials_on_user_id"

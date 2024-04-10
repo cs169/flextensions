@@ -6,6 +6,7 @@ class CreateLmsCredentials < ActiveRecord::Migration[7.1]
       t.string :username
       t.string :password
       t.string :token
+      t.string :refresh_token
 
       t.timestamps
     end
