@@ -10,24 +10,24 @@ default: &default
 
 development:
   <<: *default
-  database: flextentions_dev
+  database: flextensions_dev
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: flextentions_test
+  database: flextensions_test
 
 staging:
   adapter: postgresql
   pool: 5
   timeout: 5000
-  database: flextentions_stage
+  database: flextensions_stage
 
 # MAKE SURE THE ENVIRONMENT CONFIG IS SET UP FOR PROD
 production:
   adapter: postgresql
   pool: 5
   timeout: 5000
-  database: flextentions_prod
+  database: flextensions_prod
