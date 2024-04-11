@@ -8,6 +8,6 @@
   "scripts": {
     "dev": "overmind s -f Procfile.dev"
   },
-  "author": "CS169l flextentions development team",
+  "author": "CS169l flextensions development team",
   "license": "BSD-2-Clause"
 }
