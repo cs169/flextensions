@@ -65,9 +65,7 @@
         }
       }
     },
-    // 1.
     "/users": {
-      // 1.1
       "post": {
         "summary": "Create a new user",
         "tags": [
@@ -141,46 +139,6 @@
       ],
       "post": {
         "summary": "Add an existing user to the specificed course",
-        "tags": [
-          "courses", "users"
-        ],
-        "responses": {
-          "501": {
-            "description": "This endpoint has not yet been implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/courses/{course_id}/users/{user_id}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "course_id",
-          "description": "id of course",
-          "required": true,
-          "schema": {
-            "type": "integer"
-          }
-        },
-        {
-          "in": "path",
-          "name": "user_id",
-          "description": "id of user",
-          "required": true,
-          "schema": {
-            "type": "integer"
-          }
-        }
-      ],
-      "delete": {
-        "summary": "Delete the specified user from the specified course",
         "tags": [
           "courses", "users"
         ],
