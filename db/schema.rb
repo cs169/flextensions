@@ -85,9 +85,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  add_foreign_key "assignments", "lmss", column: "lms_id"
+  add_foreign_key "assignments", "lmss"
   add_foreign_key "course_to_lmss", "courses"
-  add_foreign_key "course_to_lmss", "lmss", column: "lms_id"
+  add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"
   add_foreign_key "extensions", "users", column: "last_processed_by_id"
   add_foreign_key "lms_credentials", "users"

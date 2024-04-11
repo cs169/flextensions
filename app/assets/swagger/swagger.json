@@ -33,7 +33,7 @@
         "responses": {
           "200": {
             "description": "Pong",
-            "content":{
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "string",
@@ -105,8 +105,8 @@
         }
       },
       "post": {
-          "summary": "Create a new course",
-          "tags": [
+        "summary": "Create a new course",
+        "tags": [
           "courses"
         ],
         "responses": {
@@ -317,6 +317,140 @@
         "summary": "Gets all extensions for the specified assignment",
         "tags": [
           "extension"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}/assignments": {
+      "get": {
+        "summary": "Get all assignments from one (course, lms)",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new assignment from one (course, lms)",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignment_uid": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}/assignments/{assignment_id}": {
+      "delete": {
+        "summary": "Delete an assignment from one (course, lms)",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "501": {
