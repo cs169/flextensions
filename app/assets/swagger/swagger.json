@@ -33,7 +33,7 @@
         "responses": {
           "200": {
             "description": "Pong",
-            "content":{
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "string",
@@ -65,6 +65,139 @@
         }
       }
     },
+    // 1.
+    "/users": {
+      // 1.1
+      "post": {
+        "summary": "Create a new user",
+        "tags": [
+          "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/users": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "List of users under the specificed course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "courses/{course_id}/add_user/{user_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "description": "id of user",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Add an existing user to the specificed course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/users/{user_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "description": "id of user",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete the specified user from the specified course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/courses": {
       "get": {
         "summary": "List of courses for the current user",
@@ -85,8 +218,8 @@
         }
       },
       "post": {
-          "summary": "Create a new course",
-          "tags": [
+        "summary": "Create a new course",
+        "tags": [
           "courses"
         ],
         "responses": {
@@ -134,11 +267,207 @@
         }
       }
     },
-    "/users": {
+    "/courses/{course_id}/lms": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
       "get": {
-        "summary": "List of users",
+        "summary": "Index of all lms providers for the specified class",
         "tags": [
-          "users"
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "lms_name",
+          "description": "name of lms",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Adds the specified LMS to the course",
+        "tags": [
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes the specified LMS to the course",
+        "tags": [
+          "lms"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}/assignments/{assignment_id}/extensions": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "lms_id",
+          "description": "id of lms",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "assignment_id",
+          "description": "id of assignment_id",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "header",
+          "name": "Authorization",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Creates an extension for the specified assignment",
+        "tags": [
+          "extension"
+        ],
+        "requestBody": {
+          "description": "Required info for the extension: Student ID and new due date",
+          "content": {
+            "application/json": {
+              "schema": {
+              },
+              "example": {
+                "SID": "1234567890",
+                "New Due Date": "01/01/2000"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Gets all extensions for the specified assignment",
+        "tags": [
+          "extension"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}/assignments": {
+      "get": {
+        "summary": "Get all assignments from one (course, lms)",
+        "tags": [
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "501": {
@@ -154,80 +483,87 @@
         }
       },
       "post": {
-          "summary": "Create a new user",
-          "tags": [
-          "users"
-        ],
-        "responses": {
-          "501": {
-            "description": "This endpoint has not yet been implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/courses/{course_id}/users": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "course_id",
-          "description": "id of course",
-          "required": true,
-          "schema": {
-            "type": "integer"
-          }
-        }
-      ],
-      "post": {
-        "summary": "Create a user for the course identified by the course_id",
+        "summary": "Create a new assignment from one (course, lms)",
         "tags": [
-          "course", "users"
+          "assignments"
         ],
-        "responses": {
-          "501": {
-            "description": "This endpoint has not yet been implemented yet",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assignment_uid": {
+                    "type": "string"
+                  }
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/courses/{course_id}/users/{user_id}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "course_id",
-          "description": "id of course",
-          "required": true,
-          "schema": {
-            "type": "integer"
           }
         },
-        {
-          "in": "path",
-          "name": "user_id",
-          "description": "id of user",
-          "required": true,
-          "schema": {
-            "type": "integer"
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         }
-      ],
+      }
+    },
+    "/courses/{course_id}/lmss/{lms_id}/assignments/{assignment_id}": {
       "delete": {
-        "summary": "Delete the user identified by user_id from the course identified by the course_id",
+        "summary": "Delete an assignment from one (course, lms)",
         "tags": [
-          "course", "users"
+          "assignments"
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lms_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assignment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "501": {
@@ -243,6 +579,5 @@
         }
       }
     }
-
   }
 }
