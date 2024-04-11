@@ -12,7 +12,7 @@
 
 
 ActiveSupport::Inflector.inflections(:en) do |inflect|
-  inflect.plural /^(lms)$/i, "\\1s"
+  inflect.irregular "lms", "lmss"
 end
 
 # These inflection rules are supported but not enabled by default:

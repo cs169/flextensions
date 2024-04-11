@@ -4,6 +4,10 @@ namespace :v1 do
   resources :users, only: [:create, :destroy, :index]
   resources :courses, only: [:create, :destroy, :index] do
     put 'add_user/:user_id', action: :add_user
-    resources :lmss, only: [:create, :destroy, :index]
+    resources :lmss, only: [:create, :destroy, :index] do
+      resources :assignments, only: [:create, :destroy, :index] do
+        resources :extensions, only: [:create, :destroy, :index]
+      end
+    end
   end
 end
