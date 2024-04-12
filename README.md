@@ -2,7 +2,7 @@
 
 Back end/API for UC Berkeley EECS "Flextensions" software
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/d47f20a638d46d3c09efb9d98c19d622bde170b8e5dd937457c4560618735626/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage)
 
 ## Installation
 
