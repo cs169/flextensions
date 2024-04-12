@@ -116,7 +116,7 @@
         }
       }
     },
-    "courses/{course_id}/add_user/{user_id}": {
+    "/courses/{course_id}/add_user/{user_id}": {
       "parameters": [
         {
           "in": "path",
@@ -269,8 +269,8 @@
         },
         {
           "in": "path",
-          "name": "lms_name",
-          "description": "name of lms",
+          "name": "lms_id",
+          "description": "id of lms",
           "required": true,
           "schema": {
             "type": "string"
