@@ -156,6 +156,46 @@
         }
       }
     },
+    "/courses/{course_id}/users/{user_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "description": "id of user",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete the specified user from the specificed course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "This endpoint has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      } 
+    },
     "/courses": {
       "get": {
         "summary": "List of courses for the current user",
