@@ -1,0 +1,2 @@
+class Lms < ApplicationRecord
+end
