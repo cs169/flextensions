@@ -3,21 +3,21 @@ default: &default
   pool: 5
   timeout: 5000
   host: localhost
-  port: <%= '5432' %>
-  username: <%= 'postgres' %>
-  password: <%= 'password' %>
-  database: <%= 'postgres' %>
+  port: <%= ENV['DB_PORT'] || '5432' %>
+  username: <%= ENV['DB_USER'] || ENV['USER'] || 'postgres' %>
+  password: <%= ENV['DB_PASSWORD'] || 'password' %>
+  database: <%= ENV['DB_NAME'] || 'postgres' %>
 
 development:
   <<: *default
-  database: flextentions_dev
+  database: flextensions_dev
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: flextentions_test
+  database: flextensions_test
 
 staging:
   adapter: postgresql
