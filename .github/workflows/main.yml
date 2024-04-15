@@ -32,7 +32,7 @@ jobs:
         bundle exec rspec
     - name: Download and install Code Climate test reporter
       run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
         chmod +x ./cc-test-reporter
     - name: Run before-build command
       run: ./cc-test-reporter before-build
