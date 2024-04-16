@@ -138,7 +138,7 @@
         }
       ],
       "post": {
-        "summary": "Add an existing user to the specificed course",
+        "summary": "Add an existing user to the specified course",
         "tags": [
           "courses", "users"
         ],
