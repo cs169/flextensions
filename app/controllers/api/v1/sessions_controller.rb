@@ -1,4 +1,4 @@
-module api
+module Api
     module V1
 
 class SessionsController < ApplicationController
@@ -15,5 +15,6 @@ class SessionsController < ApplicationController
       redirect_to root_path, alert: "Authentication failed, please try again."
     end
   end
+end
 end
   
