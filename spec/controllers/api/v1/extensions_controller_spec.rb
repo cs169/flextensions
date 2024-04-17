@@ -1,46 +1,65 @@
 require 'rails_helper'
 module Api
   module V1
-    describe ExtensionsController do
+    RSpec.describe ExtensionsController, type: :controller do
       let(:mock_course_id) { 16 }
-      let(:mock_lms_id) { 1 }
       let(:mock_assignment_id) { 9 }
-      let(:mock_extension_id) {5}
+      let(:mock_extension_id) { 5 }
+      let(:mock_student_id) { 123 }
+      let(:mock_reason) { 'extra time needed' }
+      let(:mock_new_due_date) { '2023-12-25' }
+      let(:mock_unlock_date) { '2023-12-20' }
+      let(:mock_lock_date) { '2024-01-01' }
 
-      
-
-    ### TODO: check that it's properly handling post body as well as params.
-      describe 'create' do
-        it 'throws a 501 error' do
-          post :create, params: {
-            course_id: :mock_course_id,
-            lms_id: :mock_lms_id,
-            assignment_id: :mock_assignment_id
-          }
-          expect(response.status).to eq(501)
-        end
-    end
-    describe 'index' do
-      it 'throws a 501 error' do
-        post :index, params: {
-          course_id: :mock_course_id,
-          lms_id: :mock_lms_id,
-          assignment_id: :mock_assignment_id
-        }
-        expect(response.status).to eq(501)
+      before do
+        request.headers.merge!({'Authorization' => 'Bearer some_valid_token'})
       end
-  end
-  describe 'destroy' do
-    it 'throws a 501 error' do
-      delete :destroy, params: {
-        course_id: :mock_course_id,
-        lms_id: :mock_lms_id,
-        assignment_id: :mock_assignment_id,
-        id: :mock_extension_id
-      }
-      expect(response.status).to eq(501)
-    end
-end
+
+      describe 'POST #create' do
+        context 'with valid parameters' do
+          it 'creates a new extension and returns a success status' do
+            post :create, params: {
+              course_id: mock_course_id,
+              assignment_id: mock_assignment_id,
+              student_id: mock_student_id,
+              reason: mock_reason,
+              new_due_date: mock_new_due_date,
+              unlock_date: mock_unlock_date,
+              lock_date: mock_lock_date
+            }
+            expect(response).to have_http_status(:success)
+          end
+        end
+
+        context 'with invalid parameters' do
+          it 'returns an error status' do
+            post :create, params: {}
+            expect(response).to have_http_status(:bad_request)
+          end
+        end
+      end
+
+      describe 'GET #index' do
+        it 'returns a list of extensions' do
+          get :index, params: {
+            course_id: mock_course_id,
+            assignment_id: mock_assignment_id
+          }
+          expect(response).to have_http_status(:success)
+          expect(JSON.parse(response.body)).to be_an_instance_of(Array)
+        end
+      end
+
+      describe 'DELETE #destroy' do
+        it 'deletes an extension and returns a success status' do
+          delete :destroy, params: {
+            course_id: mock_course_id,
+            assignment_id: mock_assignment_id,
+            id: mock_extension_id
+          }
+          expect(response).to have_http_status(:success)
+        end
+      end
     end
   end
 end
