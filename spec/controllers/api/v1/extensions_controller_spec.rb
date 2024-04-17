@@ -8,8 +8,6 @@ module Api
       let(:mock_student_id) { 123 }
       let(:mock_reason) { 'extra time needed' }
       let(:mock_new_due_date) { '2023-12-25' }
-      let(:mock_unlock_date) { '2023-12-20' }
-      let(:mock_lock_date) { '2024-01-01' }
 
       before do
         request.headers.merge!({'Authorization' => 'Bearer some_valid_token'})
@@ -24,8 +22,6 @@ module Api
               student_id: mock_student_id,
               reason: mock_reason,
               new_due_date: mock_new_due_date,
-              unlock_date: mock_unlock_date,
-              lock_date: mock_lock_date
             }
             expect(response).to have_http_status(:success)
           end
