@@ -12,6 +12,7 @@ namespace :v1 do
       # Authentication routes under API
       get '/auth/:provider/callback', to: 'sessions#create'
       get '/auth/failure', to: 'sessions#failure'
+      get '/login', to: 'sessions#new'
       
     end
   end

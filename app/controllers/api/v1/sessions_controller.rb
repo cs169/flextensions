@@ -1,3 +1,6 @@
+module api
+    module V1
+
 class SessionsController < ApplicationController
     def create
       auth = request.env['omniauth.auth']
@@ -12,4 +15,5 @@ class SessionsController < ApplicationController
       redirect_to root_path, alert: "Authentication failed, please try again."
     end
   end
+end
   

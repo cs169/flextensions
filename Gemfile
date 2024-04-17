@@ -48,6 +48,7 @@ gem 'omniauth-canvas'
 
 # OmniAuth
 gem 'omniauth'
+gem "omniauth-rails_csrf_protection"
 
 
 
