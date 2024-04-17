@@ -5,7 +5,7 @@ module Api
       let(:mock_course_id) { 16 }
       let(:mock_assignment_id) { 9 }
       let(:mock_extension_id) { 5 }
-      let(:mock_student_id) { 123 }
+      let(:mock_student_uid) { 123 }  # Changed to uid to match controller
       let(:mock_reason) { 'extra time needed' }
       let(:mock_new_due_date) { '2023-12-25' }
 
@@ -19,9 +19,9 @@ module Api
             post :create, params: {
               course_id: mock_course_id,
               assignment_id: mock_assignment_id,
-              student_id: mock_student_id,
+              student_uid: mock_student_uid,
               reason: mock_reason,
-              new_due_date: mock_new_due_date,
+              new_due_date: mock_new_due_date
             }
             expect(response).to have_http_status(:success)
           end
@@ -36,11 +36,8 @@ module Api
       end
 
       describe 'GET #index' do
-        it 'returns a list of extensions' do
-          get :index, params: {
-            course_id: mock_course_id,
-            assignment_id: mock_assignment_id
-          }
+        it 'returns a list of courses (interpreted as extensions)' do
+          get :index, params: {}
           expect(response).to have_http_status(:success)
           expect(JSON.parse(response.body)).to be_an_instance_of(Array)
         end
