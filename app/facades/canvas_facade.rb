@@ -86,7 +86,7 @@ class CanvasFacade < ExtensionFacadeBase
       title:       title,
       due_at:      dueDate,
       unlock_at:   unlockDate,
-      lock_at:     lockDate
+      lock_at:     lockDate,
     })
   end
 
@@ -107,7 +107,7 @@ class CanvasFacade < ExtensionFacadeBase
       title:       title,
       due_at:      dueDate,
       unlock_at:   unlockDate,
-      lock_at:     lockDate
+      lock_at:     lockDate,
   })
   end
 
@@ -141,7 +141,7 @@ class CanvasFacade < ExtensionFacadeBase
       overrideTitle,
       newDueDate,
       get_current_formatted_time(),
-      newDueDate
+      newDueDate,
     )
 
     # Either successful or error that is not explicitly handled here.
@@ -174,9 +174,9 @@ class CanvasFacade < ExtensionFacadeBase
         currOverride.id,
         currOverride.student_ids,
         overrideTitle,
+        newDueDate,
         get_current_formatted_time(),
         newDueDate,
-        newDueDate
       )
     end
     remove_student_from_override(courseId, currOverride, studentId)
@@ -186,7 +186,7 @@ class CanvasFacade < ExtensionFacadeBase
       [studentId],overrideTitle,
       newDueDate,
       get_current_formatted_time(),
-      newDueDate
+      newDueDate,
     )
   end
 
@@ -210,7 +210,7 @@ class CanvasFacade < ExtensionFacadeBase
       raise FailedPipelineError.new(
         'Update Student Extension',
         'Get Existing Student Override',
-        'Parse Canvas Response'
+        'Parse Canvas Response',
       )
     end
 

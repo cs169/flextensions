@@ -19,7 +19,7 @@ describe CanvasFacade do
     due_at:        mockDate,
     unlock_at:     mockDate,
     lock_at:       mockDate,
-    student_ids:   [mockStudentId]
+    student_ids:   [mockStudentId],
   } }
 
   describe('initialization') do
@@ -213,7 +213,7 @@ describe CanvasFacade do
       expect(facade.delete_assignment_override(
         mockCourseId,
         mockAssignmentId,
-        mockOverrideId
+        mockOverrideId,
       ).body).to eq('{}')
       stubs.verify_stubbed_calls
     end
@@ -241,7 +241,7 @@ describe CanvasFacade do
         mockCourseId,
         mockStudentId,
         mockAssignmentId,
-        mockDate
+        mockDate,
       ).body).to eq('{}')
     end
 
@@ -251,7 +251,7 @@ describe CanvasFacade do
         mockCourseId,
         mockStudentId,
         mockAssignmentId,
-        mockDate
+        mockDate,
       ) }.to raise_error(FailedPipelineError)
     end
 
@@ -314,7 +314,7 @@ describe CanvasFacade do
         :get_existing_student_override,
         mockCourseId,
         mockStudentId,
-        mockAssignmentId
+        mockAssignmentId,
       ) }.to raise_error(FailedPipelineError)
     end
 
@@ -330,7 +330,7 @@ describe CanvasFacade do
         :get_existing_student_override,
         mockCourseId,
         mockStudentId,
-        mockAssignmentId
+        mockAssignmentId,
       ).student_ids[0]).to eq(mockStudentId)
     end
 
@@ -345,7 +345,7 @@ describe CanvasFacade do
         :get_existing_student_override,
         mockCourseId,
         mockStudentId,
-        mockAssignmentId
+        mockAssignmentId,
       )).to eq(nil)
     end
   end
@@ -384,7 +384,7 @@ describe CanvasFacade do
         :remove_student_from_override,
         mockCourseId,
         mockOverrideStruct,
-        mockStudentId
+        mockStudentId,
       ))
     end
 
@@ -403,7 +403,7 @@ describe CanvasFacade do
         :remove_student_from_override,
         mockCourseId,
         mockOverrideStruct,
-        mockStudentId
+        mockStudentId,
       ) }.to raise_error(FailedPipelineError)
     end
   end
