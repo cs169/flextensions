@@ -11,7 +11,7 @@ module Api
 
       # Create an assignment override (extension) for a student
       def create
-        response = @canvas_facade.provision_exension(
+        response = @canvas_facade.provision_extension(
           params[:course_id],
           params[:assignment_id],
           # Array of one student ID
