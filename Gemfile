@@ -78,6 +78,7 @@ group :test do
     gem 'cucumber-rails-training-wheels'
     gem 'database_cleaner'
     gem 'timecop'
+    gem 'webmock'
 end
 
 group :development do

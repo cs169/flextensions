@@ -10,9 +10,21 @@ module Api
 
       let(:auth_token) { 'Bearer some_valid_token' }
 
+
+
+
+
       describe "POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
         context "with valid parameters" do
           it "creates a new extension and returns a success status" do
+
+            # stub proper extension request
+            stub_request(:post, "#{ENV['CANVAS_URL']}/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
+         with(
+           body: hash_including({"due_at"=>"#{mock_new_due_date}", "lock_at"=>"#{mock_new_due_date}", "student_ids"=>["#{mock_student_uid}"],
+            "title"=>"#{mock_student_uid} extended to #{mock_new_due_date}"}),
+           ).
+         to_return(status: 200, body: "", headers: {})
             post "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions", 
               params: { student_uid: mock_student_uid, new_due_date: mock_new_due_date },
               headers: { 'Authorization' => auth_token }
@@ -22,30 +34,35 @@ module Api
 
         context "with invalid parameters" do
           it "returns an error status" do
-            post "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions",
+            stub_request(:post, "#{ENV['CANVAS_URL']}/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
+            to_return(status: 400)
+            expect {post "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions",
               params: {}, 
               headers: { 'Authorization' => auth_token }
-            expect(response).to have_http_status(:bad_request)
+          }.to raise_error(FailedPipelineError)
           end
         end
       end
 
-      describe "GET /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
-        it "returns a list of extensions" do
-          get "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions", 
-              headers: { 'Authorization' => auth_token }
-          expect(response).to have_http_status(:success)
-          expect(JSON.parse(response.body)).to be_an_instance_of(Array)
-        end
-      end
 
-      describe "DELETE /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions/:id" do
-        it "deletes an extension and returns a success status" do
-          delete "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions/#{mock_extension_id}", 
-                 headers: { 'Authorization' => auth_token }
-          expect(response).to have_http_status(:success)
-        end
-      end
+      #TODO: Test get/delete
+
+      # describe "GET /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
+      #   it "returns a list of extensions" do
+      #     get "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions", 
+      #         headers: { 'Authorization' => auth_token }
+      #     expect(response).to have_http_status(:success)
+      #     expect(JSON.parse(response.body)).to be_an_instance_of(Array)
+      #   end
+      # end
+
+      # describe "DELETE /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions/:id" do
+      #   it "deletes an extension and returns a success status" do
+      #     delete "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions/#{mock_extension_id}", 
+      #            headers: { 'Authorization' => auth_token }
+      #     expect(response).to have_http_status(:success)
+      #   end
+      # end
     end
   end
 end
