@@ -18,7 +18,6 @@ jobs:
       RAILS_ENV: test
       RUBY_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      CANVAS_URL: http://bcourses.test.instructure.com/
     steps:
     - uses: actions/checkout@v1
     - name: Install Ruby
