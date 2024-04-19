@@ -81,7 +81,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param   [String]     lockDate     the date the override should lock the assignment.
   # @return  [Faraday::Response] information about the new override.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
-    @canvasApi.post("/courses/#{courseId}/assignments/#{assignmentId}/overrides", {
+    @canvasApi.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
       student_ids: studentIds,
       title:       title,
       due_at:      dueDate,

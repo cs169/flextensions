@@ -19,7 +19,7 @@ module Api
           it "creates a new extension and returns a success status" do
 
             # stub proper extension request
-            stub_request(:post, "#{ENV['CANVAS_URL']}/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
+            stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
          with(
            body: hash_including({"due_at"=>"#{mock_new_due_date}", "lock_at"=>"#{mock_new_due_date}", "student_ids"=>["#{mock_student_uid}"],
             "title"=>"#{mock_student_uid} extended to #{mock_new_due_date}"}),
@@ -34,7 +34,7 @@ module Api
 
         context "with invalid parameters" do
           it "returns an error status" do
-            stub_request(:post, "#{ENV['CANVAS_URL']}/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
+            stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{mock_course_id}/assignments/#{mock_assignment_id}/overrides").
             to_return(status: 400)
             expect {post "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions",
               params: {}, 
