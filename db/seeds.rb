@@ -8,9 +8,13 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+LmsCredential.destroy_all
+Extension.destroy_all
 Assignment.destroy_all
-Lms.destroy_all
+CourseToLms.destroy_all
+UserToCourse.destroy_all
 Course.destroy_all
+Lms.destroy_all
 User.destroy_all
 
 canvas = Lms.create!({
@@ -18,26 +22,42 @@ canvas = Lms.create!({
     use_auth_token: true
 })
 
-p "Canvas ID: #{canvas.id}"
-
 
 test_assignment = Assignment.create!({
   lms_id: canvas.id,
   name: "Test Assignment"
 })
 
-p "Test Assignment ID: #{test_assignment.id}"
-
 
 test_course = Course.create!({
   course_name: "Test Course",
 })
 
-p "Test Course ID: #{test_course.id}"
-
-
-test_user = User.create!({
-  email: "testuser@gmail.com",
+test_course_to_lms = CourseToLms.create!({
+  lms_id: canvas.id,
+  course_id: test_course.id
 })
 
-p "Test User ID: #{test_user.id}"
+test_user = User.create!({
+  email: "testuser@example.com",
+})
+
+test_user_to_course = UserToCourse.create!({
+  user_id: test_user.id,
+  course_id: test_course.id,
+  role: "test"
+})
+
+test_extension = Extension.create!({
+  assignment_id: test_assignment.id,
+  student_email: "teststudent@example.com",
+  initial_due_date: DateTime.iso8601('2024-04-20'),
+  new_due_date: DateTime.iso8601('2024-04-30'),
+  last_processed_by_id: test_user.id
+})
+
+test_lms_credential = LmsCredential.create!({
+  user_id: test_user.id,
+  lms_name: "canvas",
+  token: "test token"
+})
