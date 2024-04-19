@@ -2,6 +2,7 @@ module Api
   module V1
     class CoursesController < BaseController
       require 'lms_api'
+      include ActionController::Flash
 
       def create
         # 0. Get the course_id from the POST endpoint url
