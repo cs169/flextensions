@@ -2,25 +2,69 @@ require 'rails_helper'
 module Api
   module V1
     describe LmssController do
-      let(:mock_course_id) { 16 }
-      let(:mock_course_name) { 'testCourseName' }
-      describe 'create' do
-        it 'throws a 501 error' do
-          post :create, params: {
-            course_id: :mock_course_id,
-            name: :mock_course_name,
-          }
-          expect(response.status).to eq(501)
+      def json_response
+        JSON.parse(response.body)
+      end
+
+      before do
+        # Manually create a course and LMS in the database
+        @course = Course.create!(course_name: "Mock CS169 Course")
+        @lms = Lms.create!(lms_name: "Mock Canvas", use_auth_token: true)
+      end
+
+      after do
+        # Clean up the specifically created data
+        CourseToLms.delete_all
+        Course.delete_all
+        Lms.delete_all
+      end
+
+      describe 'POST #create' do
+        context 'when valid parameters are provided' do
+          it 'creates a new course_to_lms association and returns status :created' do
+            post :create, params: { course_id: @course.id, lms_id: @lms.id }
+            expect(response).to have_http_status(:created)
+            expect(json_response['course_id']).to eq(@course.id)
+            expect(json_response['lms_id']).to eq(@lms.id)
+          end
         end
 
-        it 'throws a 401 error if the name is not specified' do
-          post :create, params: {
-            course_id: :mock_course_id,
-          }
-          expect(response.status).to eq(401)
-          expect(response.body).to eq('name parameter is required')
+
+        context 'when lms_id is missing' do
+          it 'returns status :bad_request' do
+            post :create, params: { course_id: @course.id }
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include('course_id and lms_id are required')
+          end
+        end
+
+        context 'when course does not exist' do
+          it 'returns status :not_found' do
+            post :create, params: { course_id: -1, lms_id: @lms.id }
+            expect(response).to have_http_status(:not_found)
+            expect(response.body).to include('Course not found')
+          end
+        end
+
+        context 'when lms does not exist' do
+          it 'returns status :not_found' do
+            post :create, params: { course_id: @course.id, lms_id: -1 }
+            expect(response).to have_http_status(:not_found)
+            expect(response.body).to include('Lms not found')
+          end
+        end
+
+        context 'when the association already exists' do
+          it 'returns status :ok' do
+            CourseToLms.create!(course_id: @course.id, lms_id: @lms.id)
+            post :create, params: { course_id: @course.id, lms_id: @lms.id }
+            expect(response).to have_http_status(:ok)
+            expect(response.body).to include('The association between the specified course and LMS already exists.')
+          end
         end
       end
+
+
 
       describe 'index' do
         it 'throws a 501 error' do
