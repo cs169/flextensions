@@ -14,6 +14,7 @@ For the environment variables, you will need to configure on your local system (
 - DB_USER (default: postgres)
 - DB_PASSWORD (default: password)
 - DB_NAME (default: postgres)
+- CANVAS_URL (no default; will error if not included)
 
 Changing only the user and password then running `$make env` should be sufficient.
 

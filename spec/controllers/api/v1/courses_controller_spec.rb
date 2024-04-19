@@ -22,6 +22,14 @@ module Api
           expect(response.status).to eq(501)
         end
       end
+
+      describe 'add_user' do
+        it 'throws a 501 error' do
+          put :add_user, params: { course_id: 16, user_id: 16 }
+          expect(response.status).to eq(501)
+        end
+      end
     end
+
   end
 end

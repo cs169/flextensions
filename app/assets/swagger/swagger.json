@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Flextensions API v1",
-    "description": "Official Flextentions API Documentation.",
+    "description": "Official Flextensions API Documentation.",
     "version": "0.0.0",
     "contact": {
       "name": "Armando Fox",
@@ -67,8 +67,8 @@
     },
     "/users": {
       "post": {
-          "summary": "Create a new user",
-          "tags": [
+        "summary": "Create a new user",
+        "tags": [
           "users"
         ],
         "responses": {
@@ -84,6 +84,117 @@
           }
         }
       }
+    },
+    "/courses/{course_id}/users": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "get": {
+        "summary": "List of users under the specified course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "The enpoint to list all users under the specified has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/add_user/{user_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "description": "id of user",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Add an existing user to the specified course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "The endpoint to add an existing user to the specified course has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/courses/{course_id}/users/{user_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "course_id",
+          "description": "id of course",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "in": "path",
+          "name": "user_id",
+          "description": "id of user",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete the specified user from the specified course",
+        "tags": [
+          "courses", "users"
+        ],
+        "responses": {
+          "501": {
+            "description": "The endpoint to delete the specified user from the specified course has not yet been implemented yet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      } 
     },
     "/courses": {
       "get": {
@@ -198,8 +309,8 @@
         },
         {
           "in": "path",
-          "name": "lms_name",
-          "description": "name of lms",
+          "name": "lms_id",
+          "description": "id of lms",
           "required": true,
           "schema": {
             "type": "string"
