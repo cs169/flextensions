@@ -3,9 +3,9 @@ module Api
   module V1
     describe CoursesController do
       describe 'create' do
-        it 'throws a 501 error' do
-          post :create
-          expect(response.status).to eq(501)
+        it 'creates course successfully' do
+          post :create, params: { course: { name: 'Course Name' } }
+          expect(flash[:success]).to eq("Course created successfully")
         end
       end
 
