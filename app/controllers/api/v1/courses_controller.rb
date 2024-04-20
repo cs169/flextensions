@@ -12,14 +12,21 @@ module Api
           return
         end
 
-        new_course = Course.new(
-          course_name: course_name
-        )
-        if new_course.save
-          render json: new_course, status: :created
+        new_course = Course.create(course_name: course_name)
+        if new_course.persisted?
+          flash[:success] = "Course created successfully"
         else
-          render json: new_course.errors, status: :unprocessable_entity
+          flash.now[:error] = "Failed to create course"
         end
+
+        # new_course = Course.new(
+        #   course_name: course_name
+        # )
+        # if new_course.save
+        #   render json: new_course, status: :created
+        # else
+        #   render json: new_course.errors, status: :unprocessable_entity
+        # end
       end
 
       def index
