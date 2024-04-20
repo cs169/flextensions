@@ -10,6 +10,7 @@ module Api
         # Manually create a course and LMS in the database
         @course = Course.create!(course_name: "Mock CS169 Course")
         @lms = Lms.create!(lms_name: "Mock Canvas", use_auth_token: true)
+        @external_course_id = "mock_external_course_id"
       end
 
       after do
@@ -22,7 +23,7 @@ module Api
       describe 'POST #create' do
         context 'when valid parameters are provided' do
           it 'creates a new course_to_lms association and returns status :created' do
-            post :create, params: { course_id: @course.id, lms_id: @lms.id }
+            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
             expect(response).to have_http_status(:created)
             expect(json_response['course_id']).to eq(@course.id)
             expect(json_response['lms_id']).to eq(@lms.id)
@@ -32,7 +33,7 @@ module Api
 
         context 'when lms_id is missing' do
           it 'returns status :bad_request' do
-            post :create, params: { course_id: @course.id }
+            post :create, params: { course_id: @course.id, external_course_id: @external_course_id}
             expect(response).to have_http_status(:bad_request)
             expect(response.body).to include('course_id and lms_id are required')
           end
@@ -40,7 +41,7 @@ module Api
 
         context 'when course does not exist' do
           it 'returns status :not_found' do
-            post :create, params: { course_id: -1, lms_id: @lms.id }
+            post :create, params: { course_id: -1, lms_id: @lms.id, external_course_id: @external_course_id}
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('Course not found')
           end
@@ -48,7 +49,7 @@ module Api
 
         context 'when lms does not exist' do
           it 'returns status :not_found' do
-            post :create, params: { course_id: @course.id, lms_id: -1 }
+            post :create, params: { course_id: @course.id, lms_id: -1, external_course_id: @external_course_id}
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('Lms not found')
           end
@@ -56,8 +57,8 @@ module Api
 
         context 'when the association already exists' do
           it 'returns status :ok' do
-            CourseToLms.create!(course_id: @course.id, lms_id: @lms.id)
-            post :create, params: { course_id: @course.id, lms_id: @lms.id }
+            CourseToLms.create!(course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id)
+            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
             expect(response).to have_http_status(:ok)
             expect(response.body).to include('The association between the specified course and LMS already exists.')
           end
