@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_20_211809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,6 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_assignment_id"
     t.index ["lms_id"], name: "index_assignments_on_lms_id"
   end
 
@@ -27,6 +28,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.bigint "course_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_course_id"
     t.index ["course_id"], name: "index_course_to_lmss_on_course_id"
     t.index ["lms_id"], name: "index_course_to_lmss_on_lms_id"
   end
@@ -45,6 +47,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.bigint "last_processed_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_extension_id"
     t.index ["assignment_id"], name: "index_extensions_on_assignment_id"
     t.index ["last_processed_by_id"], name: "index_extensions_on_last_processed_by_id"
   end
@@ -58,6 +61,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_14_230145) do
     t.string "refresh_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_user_id"
     t.index ["user_id"], name: "index_lms_credentials_on_user_id"
   end
 
