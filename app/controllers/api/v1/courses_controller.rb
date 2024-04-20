@@ -29,17 +29,7 @@ module Api
       end
 
       def index
-        # render :json => 'The index method of CoursesController is not yet implemented'.to_json, status: 501
-        courses = Course.all
-        courses_json = courses.map do |course|
-          {
-            id: course.id,
-            course_name: course.course_name,
-            created_at: course.created_at,
-            updated_at: course.updated_at
-          }
-        end
-        render json: courses_json
+        render :json => 'The index method of CoursesController is not yet implemented'.to_json, status: 501
       end
 
       def destroy
