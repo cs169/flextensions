@@ -7,7 +7,7 @@ module Api
       def create
         course_name = params[:course_name]
         existing_course = Course.find_by(course_name: course_name)
-        if existing_entry
+        if existing_course
           render json: { messgae: 'A course with the same course name already exists.'}
           return
         end
