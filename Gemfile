@@ -43,6 +43,14 @@ gem "bootsnap", require: false
 
 gem "lms-api"
 
+# OmniAuth Canvas
+gem 'omniauth-canvas'
+
+# OmniAuth
+gem 'omniauth'
+gem "omniauth-rails_csrf_protection"
+
+
 
 
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
