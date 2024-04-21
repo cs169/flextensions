@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_04_20_211809) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_20_232708) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "assignments", force: :cascade do |t|
-    t.bigint "lms_id"
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "external_assignment_id"
-    t.index ["lms_id"], name: "index_assignments_on_lms_id"
+    t.bigint "course_to_lms_id", null: false
+    t.index ["course_to_lms_id"], name: "index_assignments_on_course_to_lms_id"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -89,7 +89,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_20_211809) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
-  add_foreign_key "assignments", "lmss"
+  add_foreign_key "assignments", "course_to_lmss"
   add_foreign_key "course_to_lmss", "courses"
   add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"
