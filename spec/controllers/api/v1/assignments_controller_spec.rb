@@ -11,7 +11,7 @@ module Api
       let(:mock_course_to_lms) { CourseToLms.create!(course_id: mock_course.id, lms_id: mock_lms.id) }
 
       let(:valid_params) { { name: "Test Assignment", external_assignment_id: "123ABC", course_id: mock_course.id, lms_id: mock_lms.id } }
-      
+
       before do
         mock_course
         mock_lms
@@ -46,7 +46,7 @@ module Api
           it 'returns status :not_found' do
             post :create, params: { course_id: -1, lms_id: -1, name: "Test Assignment", external_assignment_id: "123ABC" }
             expect(response).to have_http_status(:not_found)
-            expect(response.body).to include('Course to LMS association not found')
+            expect(response.body).to include('No such Course_LMS association')
           end
         end
 
@@ -55,7 +55,7 @@ module Api
             Assignment.create!(course_to_lms_id: mock_course_to_lms.id, name: "Test Assignment", external_assignment_id: "123ABC")
             post :create, params: valid_params
             expect(response).to have_http_status(:ok)
-            expect(response.body).to include('The assignment with the specified external ID already exists.')
+            expect(response.body).to include('Record already exists')
           end
         end
 
