@@ -17,6 +17,7 @@ module Api
           flash[:success] = "Course created successfully"
           render json: new_course, status: :created
         else
+          flash[:error] = "Failed to save the new course to the database"
           render json: new_course.errors, status: :unprocessable_entity
         end
       end
