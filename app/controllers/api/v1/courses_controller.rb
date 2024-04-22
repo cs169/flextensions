@@ -8,25 +8,17 @@ module Api
         course_name = params[:course_name]
         existing_course = Course.find_by(course_name: course_name)
         if existing_course
-          render json: { messgae: 'A course with the same course name already exists.'}
+          render json: { message: 'A course with the same course name already exists.'}, status: :unprocessable_entity
           return
         end
 
         new_course = Course.create(course_name: course_name)
-        if new_course.persisted?
+        if new_course.save
           flash[:success] = "Course created successfully"
+          render json: new_course, status: :created
         else
-          flash.now[:error] = "Failed to create course"
+          render json: new_course.errors, status: :unprocessable_entity
         end
-
-        # new_course = Course.new(
-        #   course_name: course_name
-        # )
-        # if new_course.save
-        #   render json: new_course, status: :created
-        # else
-        #   render json: new_course.errors, status: :unprocessable_entity
-        # end
       end
 
       def index
