@@ -1,6 +1,7 @@
 module Api
   module V1
     class UsersController < BaseController
+      include ActionController::Flash
 
       def create
         email = params[:email]
