@@ -3,7 +3,23 @@ module Api
     class UsersController < BaseController
 
       def create
-        render :json => 'the create method of UsersController is not yet implemented'.to_json, status: 501
+        email = params[:email]
+
+        # Check if the user already exists by email
+        existing_user = User.find_by(email: email)
+        if existing_user
+          render json: { message: 'A user with this email already exists.' }, status: :conflict
+          return
+        end
+
+        # Create a new user with the given email
+        new_user = User.create(email: email)
+
+        if new_user.persisted?
+          render json: { message: 'User created successfully', user: new_user }, status: :created
+        else
+          render json: { message: 'Failed to create user', errors: new_user.errors.full_messages }, status: :unprocessable_entity
+        end
       end
   
       def index
