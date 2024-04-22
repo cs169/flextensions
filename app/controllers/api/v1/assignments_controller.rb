@@ -9,11 +9,12 @@ module Api
 
       # POST /courses/:course_id/lms/:lms_id/assignments
       def create
+        # Check if the course_to_lms association exists
         course_to_lms = fetch_course_to_lms(params[:course_id], params[:lms_id])
         return unless course_to_lms
-
+        # Check if the assignment already exists
         return if assignment_exists?(course_to_lms, params[:name], params[:external_assignment_id])
-
+        # Create and render the assignment
         create_and_render_assignment(course_to_lms, params[:name], params[:external_assignment_id])
       end
 
