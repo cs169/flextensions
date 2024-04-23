@@ -6,6 +6,5 @@ class User < ApplicationRecord
     # Associasions
     has_many :lms_credentials, dependent: :destroy
     has_many :user_to_courses
-    has_many :lms_credentials
-    has_one :extensions
+    has_many :extensions
   end
