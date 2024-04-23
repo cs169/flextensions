@@ -13,10 +13,10 @@ module Api
           return
         end
 
-        # Create a new user with the given email
-        new_user = User.create(email: email)
+        # Build a new user object with the given email
+        new_user = User.new(email: email)
 
-        if new_user.persisted?
+        if new_user.save
           render json: { message: 'User created successfully', user: new_user }, status: :created
         else
           render json: { message: 'Failed to create user', errors: new_user.errors.full_messages }, status: :unprocessable_entity
