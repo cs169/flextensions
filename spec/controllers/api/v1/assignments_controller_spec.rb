@@ -33,6 +33,28 @@ module Api
       end
 
       describe "POST /api/v1/courses/:course_id/lmss/:lms_id/assignments" do
+        context 'when one or more parameters are missing' do
+          it 'returns status :bad_request when name is missing' do
+            post :create, params: valid_params.except(:name)
+            expect(response).to have_http_status(:bad_request)
+            expect(json_response["error"]).to include('Params required')
+          end
+        end
+
+        context 'when course_id or lms_id are not integers' do
+          it 'returns status :bad_request if course_id is not an integer' do
+            post :create, params: valid_params.merge(course_id: 'abc')
+            expect(response).to have_http_status(:bad_request)
+            expect(json_response["error"]).to include('course_id and lms_id must be integers')
+          end
+      
+          it 'returns status :bad_request if lms_id is not an integer' do
+            post :create, params: valid_params.merge(lms_id: 'xyz')
+            expect(response).to have_http_status(:bad_request)
+            expect(json_response["error"]).to include('course_id and lms_id must be integers')
+          end
+        end
+        
         context 'when valid parameters are provided' do
           it 'creates a new assignment and returns status :created' do
             post :create, params: valid_params
@@ -44,7 +66,10 @@ module Api
 
         context 'when course_to_lms does not exist' do
           it 'returns status :not_found' do
-            post :create, params: { course_id: -1, lms_id: -1, name: "Test Assignment", external_assignment_id: "123ABC" }
+            # Ensure this course_to_lms does not exist
+            selected_course = CourseToLms.find_by(course_id: 0, lms_id: 0)
+            selected_course.destroy if selected_course
+            post :create, params: { course_id: 0, lms_id: 0, name: "Test Assignment", external_assignment_id: "123ABC" }
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('No such Course_LMS association')
           end
