@@ -2,10 +2,30 @@ require 'rails_helper'
 module Api
   module V1
     describe CoursesController do
-      describe 'create' do
-        it 'throws a 501 error' do
-          post :create
-          expect(response.status).to eq(501)
+      describe 'POST #create' do
+        context "when the new course is successfully created" do
+          let(:course_name) { "New Course" }
+          
+          it "creates and saves a new course" do
+            post :create, params: { course_name: course_name }
+  
+            expect(response).to have_http_status(:created)
+            expect(Course.find_by(course_name: course_name)).to be_present
+            expect(flash[:success]).to eq("Course created successfully")
+            expect(JSON.parse(response.body)['course_name']).to eq('New Course')
+          end
+        end
+  
+        context "when a course with the same name already exists" do
+          let!(:existing_course) { Course.create(course_name: "Existing Course") }
+  
+          it "does not create a new course with the same name and returns an error" do
+            post :create, params: { course_name: existing_course.course_name }
+  
+            expect(Course.find_by(course_name: existing_course.course_name)).to be_present
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(JSON.parse(response.body)).to eq({ "message" => "A course with the same course name already exists." })
+          end
         end
       end
 
@@ -30,6 +50,5 @@ module Api
         end
       end
     end
-
   end
 end
