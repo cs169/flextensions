@@ -1,8 +1,24 @@
 module Api
   module V1
     class CoursesController < BaseController
+      include ActionController::Flash
+
       def create
-        render :json => 'The create method of CoursesController is not yet implemented'.to_json, status: 501
+        course_name = params[:course_name]
+        existing_course = Course.find_by(course_name: course_name)
+        if existing_course
+          render json: { message: 'A course with the same course name already exists.'}, status: :unprocessable_entity
+          return
+        end
+
+        new_course = Course.create(course_name: course_name)
+        if new_course.save
+          flash[:success] = "Course created successfully"
+          render json: new_course, status: :created
+        else
+          flash[:error] = "Failed to save the new course to the database"
+          render json: new_course.errors, status: :unprocessable_entity
+        end
       end
 
       def index
