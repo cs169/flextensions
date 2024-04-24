@@ -44,9 +44,36 @@ module Api
       end
 
       describe 'add_user' do
-        it 'throws a 501 error' do
-          put :add_user, params: { course_id: 16, user_id: 16 }
-          expect(response.status).to eq(501)
+        let(:test_course) { Course.create(course_name: "Test Course") }
+        let(:test_user) { User.create(email: "testuser@example.com") }
+
+        context "Provided parameters are valid" do
+          it "adds an existing user to an existing course" do
+            post :add_user, params: { course_id: test_course.id, user_id: test_user.id, role: "ta" }
+            expect(response).to have_http_status(:created)
+            expect(flash["success"]).to eq("User added to the course successfully.")
+          end
+        end
+
+        context "Provided parameter are invalid" do
+          it "returns an error if course is not existed in the courses table" do
+            post :add_user, params: { course_id: 123456, user_id: test_user.id, role: "ta" }
+            expect(response).to have_http_status(:not_found)
+            expect(JSON.parse(response.body)["error"]).to eq("The course does not exist.")
+          end
+
+          it "returns an error if user is not existed in the users table" do
+            post :add_user, params: { course_id: test_course.id, user_id: 123456, role: "ta" }
+            expect(response).to have_http_status(:not_found)
+            expect(JSON.parse(response.body)["error"]).to eq("The user does not exist.")
+          end
+
+          it "returns an error if the user is already associated with the course" do
+            post :add_user, params: { course_id: test_course.id, user_id: test_user.id, role: "student" }
+            post :add_user, params: { course_id: test_course.id, user_id: test_user.id, role: "student" }
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(JSON.parse(response.body)["error"]).to eq("The user is already added to the course.")
+          end
         end
       end
     end
