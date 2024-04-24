@@ -1,4 +1,5 @@
 class Course < ApplicationRecord
+
   # Associations
   has_many :course_to_lmss
   has_many :lmss, through: :course_to_lmss
@@ -7,4 +8,5 @@ class Course < ApplicationRecord
   
   # Validations
   validates :course_name, presence: true
+
 end
