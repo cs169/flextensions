@@ -4,32 +4,37 @@ module Api
         before_action :set_facade
   
         def index
-          #Incorrect.
-          response = @canvas_facade.get_all_courses
-          render json: response.body, status: response.status
+          render :json => 'The index method of ExtensionsController is not yet implemented'.to_json, status: 501
         end
   
         def create
-          @lms = Lms.where(lms_name: "Canvas").take
+          @lms = Lms.find(params[:lms_id])
           @course = Course.find(params[:course_id])
           @assignment = Assignment.find(params[:assignment_id])
           @course_to_lms = CourseToLms.where(lms_id: @lms.id, course_id: @course.id).take
+
+          #Get External Assignment object to find initial due date
+          assignment_response = @canvas_facade.get_assignment(@course_to_lms.external_course_id.to_i, @assignment.external_assignment_id.to_i)
+          if (assignment_response.status != 200)
+            render json: assignment_response.to_json, status: 500
+            return
+          end
+          assignment_json = JSON.parse(assignment_response.body)
+
+          #Get External User object to find student email
+          # TODO
+
+          #Provision Extension
           response = @canvas_facade.provision_extension(
             @course_to_lms.external_course_id.to_i,
             params[:student_uid].to_i,
             @assignment.external_assignment_id.to_i,
             params[:new_due_date]
           )
-
           if (response.status == 200) 
             assignment_override = JSON.parse(response.body)
             # if request succeeds, create a new Extension object
-            assignment_response = @canvas_facade.get_assignment(@course_to_lms.external_course_id.to_i, @assignment.external_assignment_id.to_i)
-            if (assignment_response.status != 200)
-              render json: assignment_response.to_json, status: 500
-              return
-            end
-            assignment_json = JSON.parse(assignment_response.body)
+            
             @extension = Extension.new(
             assignment_id: @assignment.id, # foreign key to local assignment
             student_email: nil, # requires another api request to find student data (sid is given in first response). This currently doesn't exist in CanvasFacade
@@ -42,7 +47,7 @@ module Api
             if @extension.save
               render json: @extension.to_json, status: 200
             else
-              render status: 500
+              render json: {"error": "Extension requested, but local save failed"}.to_json, status: 500
             end
           else
             render json: response.body, status: response.status
@@ -52,13 +57,14 @@ module Api
         end
   
         def destroy
+          render :json => 'The index method of CoursesController is not yet implemented'.to_json, status: 501
           #needs updating with external ids
-          response = @canvas_facade.delete_assignment_override(
-            params[:course_id].to_i,
-            params[:assignment_id].to_i,
-            params[:override_id].to_i
-          )
-          render json: response.body, status: response.status
+          # response = @canvas_facade.delete_assignment_override(
+          #   params[:course_id].to_i,
+          #   params[:assignment_id].to_i,
+          #   params[:override_id].to_i
+          # )
+          # render json: response.body, status: response.status
         end
   
         private
