@@ -3,32 +3,36 @@ module Api
     class LmssController < BaseController
       before_action :validate_ids!, only: [:create]
 
+      def index
+        render json: 'not yet implemented', status: 501
+      end
+
+      def destroy
+        render json: 'not yet implemented', status: 501
+      end
+
       # POST /courses/:course_id/lmss
       def create
-        course_id = params[:course_id]  # course_id from the URL
-        lms_id = params[:lms_id]      # lms_id from the body
-        external_course_id = params[:external_course_id]  # external_course_id from the body
+        course_id = params[:course_id]
+        lms_id = params[:lms_id]
+        external_course_id = params[:external_course_id]
 
-        # Ensure the course exists
+        # Ensure that the course and LMS exist
         unless Course.exists?(course_id)
           render json: { error: 'Course not found' }, status: :not_found
           return
         end
-
-        # Ensure the lms exists
         unless Lms.exists?(lms_id)
           render json: { error: 'Lms not found' }, status: :not_found
           return
         end
-
-        # Check if the entry already exists
+        # Ensure that the association does not already exist
         existing_entry = CourseToLms.find_by(course_id: course_id, lms_id: lms_id, external_course_id: external_course_id)
         if existing_entry
           render json: { message: 'The association between the specified course and LMS already exists.' }, status: :ok
           return
         end
-
-        # Create the course_to_lms entry
+        # Create the association
         course_to_lms = CourseToLms.new(
           course_id: course_id,
           lms_id: lms_id,
@@ -42,22 +46,21 @@ module Api
         end
       end
 
-      def index
-        render :json => 'not yet implemented'.to_json, status: 501
-      end
+      private
 
-      def destroy
-        render :json => 'not yet implemented'.to_json, status: 501
-      end
-
-      ##
-      # Validator definitions.
-      # TODO: this should be exported to its own (validator) class.
-      # TODO: this validation should also check the config file for the name of lms's.
-      #
+      # Improved validate_ids! to include integer validation
       def validate_ids!
-        if params[:course_id].blank? || params[:lms_id].blank? || params[:external_course_id].blank?
+        required_params = [:course_id, :lms_id, :external_course_id]
+        missing_params = required_params.select { |param| params[param].blank? }
+
+        if missing_params.any?
           render json: { error: 'course_id and lms_id are required' }, status: :bad_request
+          return
+        end
+
+        unless params[:course_id].to_s.match?(/\A\d+\z/) && params[:lms_id].to_s.match?(/\A\d+\z/)
+          render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
+          return
         end
       end
     end

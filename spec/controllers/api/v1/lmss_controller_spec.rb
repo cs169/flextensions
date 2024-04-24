@@ -21,15 +21,14 @@ module Api
       end
 
       describe 'POST #create' do
-        context 'when valid parameters are provided' do
-          it 'creates a new course_to_lms association and returns status :created' do
-            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
-            expect(response).to have_http_status(:created)
-            expect(json_response['course_id']).to eq(@course.id)
-            expect(json_response['lms_id']).to eq(@lms.id)
+
+        context 'when course_id and lms_id are not integers' do
+          it 'returns status :bad_request' do
+            post :create, params: { course_id: 'not_an_int', lms_id: 'also_not_an_int', external_course_id: @external_course_id }
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include('course_id and lms_id must be integers')
           end
         end
-
 
         context 'when lms_id is missing' do
           it 'returns status :bad_request' do
@@ -39,9 +38,28 @@ module Api
           end
         end
 
+        context 'when valid parameters are provided' do
+          it 'creates a new course_to_lms association and returns status :created' do
+            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
+            expect(response).to have_http_status(:created)
+            expect(json_response['course_id']).to eq(@course.id)
+            expect(json_response['lms_id']).to eq(@lms.id)
+          end
+        end
+        context 'when course_to_lms fails to save' do
+          it 'returns status :unprocessable_entity' do
+            allow_any_instance_of(CourseToLms).to receive(:save).and_return(false)
+            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
+
         context 'when course does not exist' do
           it 'returns status :not_found' do
-            post :create, params: { course_id: -1, lms_id: @lms.id, external_course_id: @external_course_id}
+            # Ensure that the course does not exist
+            selected_course = Course.find_by(id: @course.id)
+            selected_course.destroy if selected_course
+            post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('Course not found')
           end
@@ -49,7 +67,11 @@ module Api
 
         context 'when lms does not exist' do
           it 'returns status :not_found' do
-            post :create, params: { course_id: @course.id, lms_id: -1, external_course_id: @external_course_id}
+            # Ensure that the LMS does not exist
+            selected_lms = Lms.find_by(id: @lms.id)
+            selected_lms.destroy if selected_lms
+
+            post :create, params: { course_id: @course.id, lms_id: 1, external_course_id: @external_course_id}
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('Lms not found')
           end
