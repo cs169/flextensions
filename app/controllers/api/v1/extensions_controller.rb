@@ -4,7 +4,7 @@ module Api
         before_action :set_facade
   
         def index
-          render :json => 'The index method of ExtensionsController is not yet implemented'.to_json, status: 501
+          render body: 'The index method of ExtensionsController is not yet implemented', status: 501
         end
   
         def create
@@ -57,7 +57,7 @@ module Api
         end
   
         def destroy
-          render :json => 'The index method of CoursesController is not yet implemented'.to_json, status: 501
+          render body: 'The index method of CoursesController is not yet implemented'.to_json, status: 501
           #needs updating with external ids
           # response = @canvas_facade.delete_assignment_override(
           #   params[:course_id].to_i,
