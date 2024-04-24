@@ -1,4 +1,7 @@
 class Extension < ApplicationRecord
+    #Relationship with Assignment
     belongs_to :assignment
 
-  end
+    #Relationship with User
+    has_one :user
+end
