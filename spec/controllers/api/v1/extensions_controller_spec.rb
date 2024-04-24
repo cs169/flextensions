@@ -46,7 +46,7 @@ module Api
         end
 
         context "with missing parameters" do
-          it "returns an error status" do
+          it "raises an error" do
             stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}/overrides").
             to_return(status: 400)
 
@@ -60,8 +60,8 @@ module Api
           end
         end
 
-        context "with invalid parameters" do
-          it "returns an error status" do
+        context "when canvas returns 500" do
+          it "returns a 500 status" do
             stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}/overrides").
             to_return(status: 500, body: {"errors":["unknown student ids"]}.to_json)
 
