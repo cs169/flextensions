@@ -12,13 +12,12 @@ module Api
         end
 
         new_course = Course.create(course_name: course_name)
-        if new_course.save
-          flash[:success] = "Course created successfully"
-          render json: new_course, status: :created
-        else
-          flash[:error] = "Failed to save the new course to the database"
-          render json: new_course.errors, status: :unprocessable_entity
-        end
+        new_course.save
+        render_response(new_course, 
+          "Course created successfully", 
+          "Failed to save the new course to the database"
+        )
+
       end
 
       def index
@@ -55,14 +54,25 @@ module Api
 
         # Add the user to the course with the desired role
         new_user_to_course = UserToCourse.new(course_id: course_id, user_id: user_id, role: role)
-        if new_user_to_course.save
-          flash[:success] = "User added to the course successfully."
-          render json: new_user_to_course, status: :created
+        new_user_to_course.save
+        render_response(new_user_to_course, 
+          "User added to the course successfully.", 
+          "Failed to add the user the to course."
+        )
+
+      end
+
+      private
+      def render_response(object, success_message, error_message)
+        if object.save
+          flash[:success] = success_message
+          render json: object, status: :created
         else
-          flash[:error] = "Failed to add the user the to course."
-          render json: new_user_to_course.errors, status: :unprocessable_entity
+          flash[:error] = error_message
+          render json: { error: object.errors.full_messages }, status: :unprocessable_entity
         end
       end
+
     end
   end
 end
