@@ -22,6 +22,14 @@ module Api
 
       describe 'POST #create' do
 
+        context 'when lms_id is missing' do
+          it 'returns status :bad_request' do
+            post :create, params: { course_id: @course.id, external_course_id: @external_course_id}
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include('param is missing or the value is empty: lms_id')
+          end
+        end
+
         context 'when course_id and lms_id are not integers' do
           it 'returns status :bad_request' do
             post :create, params: { course_id: 'not_an_int', lms_id: 'also_not_an_int', external_course_id: @external_course_id }
@@ -29,15 +37,7 @@ module Api
             expect(response.body).to include('course_id and lms_id must be integers')
           end
         end
-
-        context 'when lms_id is missing' do
-          it 'returns status :bad_request' do
-            post :create, params: { course_id: @course.id, external_course_id: @external_course_id}
-            expect(response).to have_http_status(:bad_request)
-            expect(response.body).to include('course_id and lms_id are required')
-          end
-        end
-
+        
         context 'when valid parameters are provided' do
           it 'creates a new course_to_lms association and returns status :created' do
             post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id}

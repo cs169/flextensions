@@ -4,11 +4,11 @@ module Api
       before_action :validate_ids!, only: [:create]
 
       def index
-        render json: 'not yet implemented', status: 501
+        render json: { message: 'not yet implemented'}, status: 501
       end
 
       def destroy
-        render json: 'not yet implemented', status: 501
+        render json: { message: 'not yet implemented'}, status: 501
       end
 
       # POST /courses/:course_id/lmss
@@ -50,17 +50,16 @@ module Api
 
       # Improved validate_ids! to include integer validation
       def validate_ids!
-        required_params = [:course_id, :lms_id, :external_course_id]
-        missing_params = required_params.select { |param| params[param].blank? }
-
-        if missing_params.any?
-          render json: { error: 'course_id and lms_id are required' }, status: :bad_request
+        begin
+          params.require([:course_id, :lms_id, :external_course_id])
+        rescue ActionController::ParameterMissing => e
+          render json: { error: e.message }, status: :bad_request
           return
-        end
-
-        unless params[:course_id].to_s.match?(/\A\d+\z/) && params[:lms_id].to_s.match?(/\A\d+\z/)
-          render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
-          return
+        else
+          unless params[:course_id].to_s.match?(/\A\d+\z/) && params[:lms_id].to_s.match?(/\A\d+\z/)
+            render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
+            return
+          end
         end
       end
     end
