@@ -8,11 +8,7 @@ module Api
         end
   
         def create
-          @lms = Lms.find(params[:lms_id])
-          @course = Course.find(params[:course_id])
-          @assignment = Assignment.find(params[:assignment_id])
-          @course_to_lms = CourseToLms.where(lms_id: @lms.id, course_id: @course.id).take
-
+          find_extension_params
           #Get External Assignment object to find initial due date
           assignment_response = @canvas_facade.get_assignment(@course_to_lms.external_course_id.to_i, @assignment.external_assignment_id.to_i)
           if (assignment_response.status != 200)
@@ -73,6 +69,13 @@ module Api
           Rails.logger.info "Using CANVAS_URL: #{ENV['CANVAS_URL']}"
           #not sure if auth key will be in the request headers or in cookie
           @canvas_facade = CanvasFacade.new(request.headers['Authorization'])
+        end
+
+        def find_extension_params
+          @lms = Lms.find(params[:lms_id])
+          @course = Course.find(params[:course_id])
+          @assignment = Assignment.find(params[:assignment_id])
+          @course_to_lms = CourseToLms.where(lms_id: @lms.id, course_id: @course.id).take
         end
       end
     end
