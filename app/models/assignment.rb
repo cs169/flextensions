@@ -4,4 +4,5 @@ class Assignment < ApplicationRecord
   
     validates :name, presence: true
     validates :external_assignment_id, presence: true
+    has_many :extensions
   end
