@@ -21,25 +21,21 @@ module Api
           # TODO
 
           #Provision Extension
-          response = @canvas_facade.provision_extension(
-            @course_to_lms.external_course_id.to_i,
-            params[:student_uid].to_i,
-            @assignment.external_assignment_id.to_i,
-            params[:new_due_date]
-          )
+          response = @canvas_facade.provision_extension(@course_to_lms.external_course_id.to_i, params[:student_uid].to_i, @assignment.external_assignment_id.to_i, params[:new_due_date])
           if (response.status == 200) 
             assignment_override = JSON.parse(response.body)
             # if request succeeds, create a new Extension object
             
-            @extension = Extension.new(
-            assignment_id: @assignment.id, # foreign key to local assignment
-            student_email: nil, # requires another api request to find student data (sid is given in first response). This currently doesn't exist in CanvasFacade
-            initial_due_date: assignment_json["due_at"], # also requires an api request to find assignment data (assignment id is given in first response)
+
+
+            #assignment_id: foreign key to local assignment
+            #student_email: requires another api request to find student data (sid is given in first response). This currently doesn't exist in CanvasFacade
+            #initial_due_date: also requires an api request to find assignment data (assignment id is given in first response)
             #Note that the assignment.due_at shows the due date as it is for whoever's logged in (which if it's a teacher, should be the original due date) but the actual original due date is never saved anywhere
-            new_due_date: assignment_override["due_at"],
-            external_extension_id: assignment_override["id"],
-            last_processed_by_id: nil # Requires login/sessions to be properly implemented
-            )
+            #new_due_date:
+            #external_extension_id:
+            #last_processed_by_id: Requires login/sessions to be properly implemented
+            @extension = Extension.new(assignment_id: @assignment.id, student_email: nil, initial_due_date: assignment_json["due_at"], new_due_date: assignment_override["due_at"], external_extension_id: assignment_override["id"], last_processed_by_id: nil)
             if @extension.save
               render json: @extension.to_json, status: 200
             else
