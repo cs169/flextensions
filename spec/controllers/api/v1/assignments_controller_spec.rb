@@ -37,7 +37,7 @@ module Api
           it 'returns status :bad_request when name is missing' do
             post :create, params: valid_params.except(:name)
             expect(response).to have_http_status(:bad_request)
-            expect(json_response["error"]).to include('Params required')
+            expect(json_response["error"]).to include('param is missing or the value is empty: name')
           end
         end
 
