@@ -55,6 +55,14 @@ module Api
           end
         end
         
+        context 'save is unsuccessful' do
+          it 'returns status :unprocessable_entity' do
+            allow_any_instance_of(Assignment).to receive(:save).and_return(false)
+            post :create, params: valid_params
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+        end
+        
         context 'when valid parameters are provided' do
           it 'creates a new assignment and returns status :created' do
             post :create, params: valid_params
