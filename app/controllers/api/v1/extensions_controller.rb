@@ -22,7 +22,7 @@ module Api
 
           #Provision Extension
           response = @canvas_facade.provision_extension(@course_to_lms.external_course_id.to_i, params[:student_uid].to_i, @assignment.external_assignment_id.to_i, params[:new_due_date])
-          if (response.status == 200) 
+          if (response.success?) 
             assignment_override = JSON.parse(response.body)
             # if request succeeds, create a new Extension object
             

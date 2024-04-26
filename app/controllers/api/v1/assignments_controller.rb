@@ -2,6 +2,7 @@ module Api
   module V1
     class AssignmentsController < ApplicationController
       before_action :validate_ids!, only: [:create]
+      skip_before_action :verify_authenticity_token
 
       def index
         render json: { message: 'not yet implemented'} , status: 501
@@ -11,7 +12,6 @@ module Api
       def create
         # Check if the course_to_lms association exists
         course_to_lms = CourseToLms.find_by(course_id: params[:course_id], lms_id: params[:lms_id])
-
         unless course_to_lms
           render json: { error: 'No such Course_LMS association' }, status: :not_found
           return
@@ -22,7 +22,7 @@ module Api
           render json: { message: 'Record already exists' }, status: :ok
           return
         end
-
+        
         # Create and render the assignment
         assignment = Assignment.new(course_to_lms_id: course_to_lms.id, name: params[:name], external_assignment_id: params[:external_assignment_id])
         if assignment.save
