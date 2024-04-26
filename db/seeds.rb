@@ -23,13 +23,6 @@ canvas = Lms.create!({
 })
 
 
-test_assignment = Assignment.create!({
-  lms_id: canvas.id,
-  name: "Test Assignment",
-  external_assignment_id: "11111"
-})
-
-
 test_course = Course.create!({
   course_name: "Test Course",
 })
@@ -38,6 +31,12 @@ test_course_to_lms = CourseToLms.create!({
   lms_id: canvas.id,
   course_id: test_course.id,
   external_course_id: "22222"
+})
+
+test_assignment = Assignment.create!({
+  course_to_lms_id: test_course_to_lms.id,
+  name: "Test Assignment",
+  external_assignment_id: "11111"
 })
 
 test_user = User.create!({
@@ -77,7 +76,7 @@ real_course_to_lms = CourseToLms.create!({
 })
 
 real_assignment = Assignment.create!({
-  lms_id: canvas.id,
+  course_to_lms_id: real_course_to_lms.id,
   name: "Seed Data Testing",
   external_assignment_id: "8741483"
 })

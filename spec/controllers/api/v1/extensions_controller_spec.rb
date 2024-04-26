@@ -13,7 +13,7 @@ module Api
           @assignment = Assignment.take
           @extension = Extension.take
           @lms = Lms.take
-          @course_to_lms = CourseToLms.where(lms_id: @lms.id, course_id: @course.id).take
+          @course_to_lms = CourseToLms.find(@assignment.course_to_lms_id)
           @mock_student_uid = 123
           @mock_new_due_date = '2024-04-16T16:00:00Z'
 

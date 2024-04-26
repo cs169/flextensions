@@ -71,7 +71,7 @@ module Api
           @lms = Lms.find(params[:lms_id])
           @course = Course.find(params[:course_id])
           @assignment = Assignment.find(params[:assignment_id])
-          @course_to_lms = CourseToLms.where(lms_id: @lms.id, course_id: @course.id).take
+          @course_to_lms = CourseToLms.find(@assignment.course_to_lms_id)
         end
       end
     end

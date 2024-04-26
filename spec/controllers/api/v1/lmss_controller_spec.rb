@@ -15,9 +15,14 @@ module Api
 
       after do
         # Clean up the specifically created data
-        CourseToLms.delete_all
-        Course.delete_all
-        Lms.delete_all
+        LmsCredential.destroy_all
+        Extension.destroy_all
+        Assignment.destroy_all
+        CourseToLms.destroy_all
+        UserToCourse.destroy_all
+        Course.destroy_all
+        Lms.destroy_all
+        User.destroy_all
       end
 
       describe 'POST #create' do
