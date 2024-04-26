@@ -7,5 +7,4 @@ class CourseToLms < ApplicationRecord
   # Validations
   validates :course_id, presence: true
   validates :lms_id, presence: true
-
 end
