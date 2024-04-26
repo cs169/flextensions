@@ -30,11 +30,11 @@ module Api
           end
         end
 
-        context 'when course_id and lms_id are not integers' do
+        context 'when course_id and lms_id are not invalid' do
           it 'returns status :bad_request' do
-            post :create, params: { course_id: 'not_an_int', lms_id: 'also_not_an_int', external_course_id: @external_course_id }
+            post :create, params: { course_id: '-1', lms_id: '-1', external_course_id: @external_course_id }
             expect(response).to have_http_status(:bad_request)
-            expect(response.body).to include('course_id and lms_id must be integers')
+            expect(response.body).to include('Invalid course_id or lms_id')
           end
         end
         

@@ -1,6 +1,7 @@
 module Api
   module V1
     class LmssController < BaseController
+    include CanvasValidationHelper
       before_action :validate_ids!, only: [:create]
 
       def index
@@ -56,8 +57,8 @@ module Api
           render json: { error: e.message }, status: :bad_request
           return
         else
-          unless params[:course_id].to_s.match?(/\A\d+\z/) && params[:lms_id].to_s.match?(/\A\d+\z/)
-            render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
+          unless is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
+            render json: { error: 'Invalid course_id or lms_id' }, status: :bad_request
             return
           end
         end
