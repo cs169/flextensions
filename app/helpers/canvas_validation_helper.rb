@@ -20,6 +20,15 @@ module CanvasValidationHelper
   end
 
   ##
+  # Checks if the provided lms id is valid.
+  #
+  # @param [Integer] lmsId the lms id to check.
+  # @return [Boolean] whether the provided id is valid.
+  def is_valid_lms_id(lmsId)
+    lmsId.is_a?(Integer) && lmsId > 0
+  end
+
+  ##
   # Checks if the provided assignment id is valid.
   #
   # @param [Integer] assignmentId the assignment id to check.
