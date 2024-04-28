@@ -41,3 +41,13 @@ In order to stand up the server you must first install [Overmind](https://github
   Development has been tested with overmind 2.4.0
 
 With Overmind, you can run `$make dev` or `$make`
+
+## Notes
+There are now two separate instances of Canvas, each with it's own triad of prod/test/beta environments:
+1. [bcourses.berkeley.edu](bcourses.berkeley.edu)
+2. [ucberkeleysandbox.instructure.com](ucberkeleysandbox.instructure.com)
+
+We recommend developing in this order:
+1. [ucberkeleysandbox.instructure.com](ucberkeleysandbox.instructure.com) (no risk) - this is the one for which this repo currently has oauth2 keys (secrets)
+2. [bcourses.test.instructure.com](bcourses.test.instructure.com) (no risk of impacting courses, but contains real data)
+3. [bcourses.berkeley.edu](bcourses.berkeley.edu)
