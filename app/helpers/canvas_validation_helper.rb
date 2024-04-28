@@ -10,7 +10,7 @@ module CanvasValidationHelper
     courseId.is_a?(Integer) && courseId > 0
   end
 
- ##
+  ##
   # Checks if the provided lms id is valid.
   #
   # @param [Integer] lmsId the lms id to check.

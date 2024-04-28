@@ -49,7 +49,6 @@ module Api
 
       private
 
-      # Improved validate_ids! to include integer validation
       def validate_ids!
         begin
           params.require([:course_id, :lms_id, :external_course_id])
