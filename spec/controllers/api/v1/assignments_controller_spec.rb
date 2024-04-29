@@ -1,7 +1,11 @@
 require 'rails_helper'
 module Api
   module V1
+<<<<<<< HEAD
     RSpec.describe AssignmentsController do
+=======
+    describe AssignmentsController do
+>>>>>>> cd1ed11c6a939e11006a70ff90e8b5cd10375780
       def json_response
         JSON.parse(response.body)
       end
@@ -79,9 +83,9 @@ module Api
         context 'when course_to_lms does not exist' do
           it 'returns status :not_found' do
             # Ensure this course_to_lms does not exist
-            selected_course = CourseToLms.find_by(course_id: 0, lms_id: 0)
+            selected_course = CourseToLms.find_by(course_id: 1, lms_id: 1)
             selected_course.destroy if selected_course
-            post :create, params: { course_id: 0, lms_id: 0, name: "Test Assignment", external_assignment_id: "123ABC" }
+            post :create, params: { course_id: 1, lms_id: 1, name: "Test Assignment", external_assignment_id: "123ABC" }
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('No such Course_LMS association')
           end

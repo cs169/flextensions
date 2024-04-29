@@ -22,7 +22,6 @@ module Api
           render json: { message: 'Record already exists' }, status: :ok
           return
         end
-        
         # Create and render the assignment
         assignment = Assignment.new(course_to_lms_id: course_to_lms.id, name: params[:name], external_assignment_id: params[:external_assignment_id])
         if assignment.save
@@ -50,7 +49,7 @@ module Api
         
       
         # Validate that course_id and lms_id are integers
-        unless params[:course_id].to_s.match?(/\A\d+\z/) && params[:lms_id].to_s.match?(/\A\d+\z/)
+        unless is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
           render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
           return
         end
