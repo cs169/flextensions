@@ -145,8 +145,6 @@ class CanvasFacade < ExtensionFacadeBase
       get_current_formatted_time(),
       newDueDate,
     )
-    puts createOverrideResponse.status
-    puts createOverrideResponse.body
     # Either successful or error that is not explicitly handled here.
     if (createOverrideResponse.status != 400)
       return createOverrideResponse

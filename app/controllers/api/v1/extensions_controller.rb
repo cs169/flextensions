@@ -4,7 +4,7 @@ module Api
         before_action :set_facade
   
         def index
-          render body: 'The index method of ExtensionsController is not yet implemented', status: 501
+          render json: { message: 'not yet implemented'}, status: 501
         end
   
         def create
@@ -17,16 +17,11 @@ module Api
           end
           assignment_json = JSON.parse(assignment_response.body)
 
-          #Get External User object to find student email
-          # TODO
-
           #Provision Extension
           response = @canvas_facade.provision_extension(@course_to_lms.external_course_id.to_i, params[:student_uid].to_i, @assignment.external_assignment_id.to_i, params[:new_due_date])
           if (response.success?) 
             assignment_override = JSON.parse(response.body)
             # if request succeeds, create a new Extension object
-            
-
 
             #assignment_id: foreign key to local assignment
             #student_email: requires another api request to find student data (sid is given in first response). This currently doesn't exist in CanvasFacade
@@ -49,14 +44,7 @@ module Api
         end
   
         def destroy
-          render body: 'The index method of CoursesController is not yet implemented'.to_json, status: 501
-          #needs updating with external ids
-          # response = @canvas_facade.delete_assignment_override(
-          #   params[:course_id].to_i,
-          #   params[:assignment_id].to_i,
-          #   params[:override_id].to_i
-          # )
-          # render json: response.body, status: response.status
+          render json: { message: 'not yet implemented'}, status: 501
         end
   
         private

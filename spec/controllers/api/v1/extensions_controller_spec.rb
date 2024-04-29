@@ -29,17 +29,17 @@ module Api
          with(
            body: {assignment_override: hash_including({"due_at"=>"#{@mock_new_due_date}", "lock_at"=>"#{@mock_new_due_date}", "student_ids"=>["#{@mock_student_uid}"],
             "title"=>"#{@mock_student_uid} extended to #{@mock_new_due_date}"})},
-            headers: {"Authorization"=> "Bearer #{@auth_token}"}
+            headers: {"Authorization": "Bearer #{@auth_token}"}
          ).
-          to_return(status: 200, body: {"due_at"=>@mock_new_due_date, "id"=>"3333"}.to_json, headers: {})
+          to_return(status: 200, body: {"due_at": @mock_new_due_date, "id": "3333"}.to_json, headers: {})
 
           #stub assignment get request
           stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}")
-            .to_return(status: 200, body: {"due_at"=> '2024-04-13T16:00:00Z'}.to_json, headers: {})
+            .to_return(status: 200, body: {"due_at": '2024-04-13T16:00:00Z'}.to_json, headers: {})
             
           request.headers.merge!({'Authorization': @auth_token})
           post :create, params: {
-              "course_id"=> @course.id, "lms_id"=> @lms.id, "assignment_id"=> @assignment.id, "student_uid"=>@mock_student_uid, "new_due_date"=>@mock_new_due_date
+              "course_id": @course.id, "lms_id": @lms.id, "assignment_id": @assignment.id, "student_uid": @mock_student_uid, "new_due_date": @mock_new_due_date
             }
             expect(response).to have_http_status(:success)
           end
@@ -52,10 +52,10 @@ module Api
 
             #stub assignment get request
             stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}")
-            .to_return(status: 200, body: {"due_at"=> '2024-04-13T16:00:00Z'}.to_json, headers: {})
+            .to_return(status: 200, body: {"due_at": '2024-04-13T16:00:00Z'}.to_json, headers: {})
             
             expect {post :create,
-              params: {"course_id"=> @course.id, "lms_id"=> @lms.id, "assignment_id"=> @assignment.id}
+              params: {"course_id": @course.id, "lms_id": @lms.id, "assignment_id": @assignment.id}
           }.to raise_error(FailedPipelineError)
           end
         end
@@ -63,14 +63,14 @@ module Api
         context "when canvas returns 500" do
           it "returns a 500 status" do
             stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}/overrides").
-            to_return(status: 500, body: {"errors":["unknown student ids"]}.to_json)
+            to_return(status: 500, body: {"errors": ["unknown student ids"]}.to_json)
 
             #stub assignment get request
             stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}")
-            .to_return(status: 200, body: {"due_at"=> '2024-04-13T16:00:00Z'}.to_json, headers: {})
+            .to_return(status: 200, body: {"due_at": '2024-04-13T16:00:00Z'}.to_json, headers: {})
             
             post :create,
-              params: {"course_id"=> @course.id, "lms_id"=> @lms.id, "assignment_id"=> @assignment.id, "student_uid"=>9999, "new_due_date"=>7}
+              params: {"course_id": @course.id, "lms_id": @lms.id, "assignment_id": @assignment.id, "student_uid": 9999, "new_due_date": 7}
             expect(response).to have_http_status(500)
           end
         end
@@ -81,11 +81,11 @@ module Api
             # stub proper extension request
             stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}/overrides").
          with(
-           body: hash_including({"due_at"=>"#{@mock_new_due_date}", "lock_at"=>"#{@mock_new_due_date}", "student_ids"=>["#{@mock_student_uid}"],
-            "title"=>"#{@mock_student_uid} extended to #{@mock_new_due_date}"}),
-            headers: {"Authorization"=> "Bearer #{@auth_token}"}
+           body: hash_including({"due_at": "#{@mock_new_due_date}", "lock_at": "#{@mock_new_due_date}", "student_ids": ["#{@mock_student_uid}"],
+            "title": "#{@mock_student_uid} extended to #{@mock_new_due_date}"}),
+            headers: {"Authorization": "Bearer #{@auth_token}"}
            ).
-          to_return(status: 200, body: {"due_at"=>@mock_new_due_date, "id"=>"3333"}.to_json, headers: {})
+          to_return(status: 200, body: {"due_at": @mock_new_due_date, "id": "3333"}.to_json, headers: {})
 
           #stub assignment get request to fail
           stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}")
@@ -93,7 +93,7 @@ module Api
             
           request.headers.merge!({'Authorization': @auth_token})
           post :create, params: {
-              "course_id"=> @course.id, "lms_id"=> @lms.id, "assignment_id"=> @assignment.id, "student_uid"=>@mock_student_uid, "new_due_date"=>@mock_new_due_date
+              "course_id": @course.id, "lms_id": @lms.id, "assignment_id": @assignment.id, "student_uid": @mock_student_uid, "new_due_date": @mock_new_due_date
             }
             expect(response).to have_http_status(:error)
           end
@@ -101,26 +101,6 @@ module Api
 
 
       end
-
-
-      #TODO: Test get/delete
-
-      # describe "GET /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
-      #   it "returns a list of extensions" do
-      #     get "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions", 
-      #         headers: { 'Authorization' => auth_token }
-      #     expect(response).to have_http_status(:success)
-      #     expect(JSON.parse(response.body)).to be_an_instance_of(Array)
-      #   end
-      # end
-
-      # describe "DELETE /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions/:id" do
-      #   it "deletes an extension and returns a success status" do
-      #     delete "/api/v1/courses/#{mock_course_id}/lmss/1/assignments/#{mock_assignment_id}/extensions/#{mock_extension_id}", 
-      #            headers: { 'Authorization' => auth_token }
-      #     expect(response).to have_http_status(:success)
-      #   end
-      # end
     end
   end
 end
