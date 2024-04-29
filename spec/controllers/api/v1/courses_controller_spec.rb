@@ -5,23 +5,23 @@ module Api
       describe 'POST #create' do
         context "when the new course is successfully created" do
           let(:course_name) { "New Course" }
-          
+
           it "creates and saves a new course" do
             post :create, params: { course_name: course_name }
-  
+
             expect(response).to have_http_status(:created)
             expect(Course.find_by(course_name: course_name)).to be_present
             expect(flash[:success]).to eq("Course created successfully")
             expect(JSON.parse(response.body)['course_name']).to eq('New Course')
           end
         end
-  
+
         context "when a course with the same name already exists" do
           let!(:existing_course) { Course.create(course_name: "Existing Course") }
-  
+
           it "does not create a new course with the same name and returns an error" do
             post :create, params: { course_name: existing_course.course_name }
-  
+
             expect(Course.find_by(course_name: existing_course.course_name)).to be_present
             expect(response).to have_http_status(:unprocessable_entity)
             expect(JSON.parse(response.body)).to eq({ "message" => "A course with the same course name already exists." })
@@ -45,7 +45,7 @@ module Api
 
       describe 'add_user' do
         let(:test_course) { Course.create(course_name: "Test Course") }
-        let(:test_user) { User.create(email: "testuser@example.com") }
+        let(:test_user) { User.create!(email: "testuniqueuser@example.com") }
 
         context "Provided parameters are valid" do
           it "adds an existing user to an existing course" do
