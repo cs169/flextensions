@@ -1,6 +1,8 @@
 module Api
   module V1
     class AssignmentsController < ApplicationController
+      include CanvasValidationHelper
+      
       before_action :validate_ids!, only: [:create]
       skip_before_action :verify_authenticity_token
 
