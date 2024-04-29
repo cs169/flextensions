@@ -27,10 +27,10 @@ module Api
             # stub proper extension request
             stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/#{@course_to_lms.external_course_id}/assignments/#{@assignment.external_assignment_id}/overrides").
          with(
-           body: hash_including({"due_at"=>"#{@mock_new_due_date}", "lock_at"=>"#{@mock_new_due_date}", "student_ids"=>["#{@mock_student_uid}"],
-            "title"=>"#{@mock_student_uid} extended to #{@mock_new_due_date}"}),
+           body: {assignment_override: hash_including({"due_at"=>"#{@mock_new_due_date}", "lock_at"=>"#{@mock_new_due_date}", "student_ids"=>["#{@mock_student_uid}"],
+            "title"=>"#{@mock_student_uid} extended to #{@mock_new_due_date}"})},
             headers: {"Authorization"=> "Bearer #{@auth_token}"}
-           ).
+         ).
           to_return(status: 200, body: {"due_at"=>@mock_new_due_date, "id"=>"3333"}.to_json, headers: {})
 
           #stub assignment get request

@@ -119,12 +119,14 @@ describe CanvasFacade do
     it 'has correct request body' do
       expect(conn).to receive(:post).with(
         createAssignmentOverrideUrl,
+        {assignment_override: 
         {
           student_ids: [mockStudentId],
           title:       mockTitle,
           due_at:      mockDate,
           unlock_at:   mockDate,
           lock_at:     mockDate,
+        }
         }
       )
 
