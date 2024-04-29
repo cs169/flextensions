@@ -1,11 +1,7 @@
 require 'rails_helper'
 module Api
   module V1
-<<<<<<< HEAD
-    RSpec.describe AssignmentsController do
-=======
     describe AssignmentsController do
->>>>>>> cd1ed11c6a939e11006a70ff90e8b5cd10375780
       def json_response
         JSON.parse(response.body)
       end
