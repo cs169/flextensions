@@ -83,12 +83,12 @@ class CanvasFacade < ExtensionFacadeBase
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvasApi.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
       assignment_override: {
-      student_ids: studentIds,
-      title:       title,
-      due_at:      dueDate,
-      unlock_at:   unlockDate,
-      lock_at:     lockDate,
-  }
+        student_ids: studentIds,
+        title:       title,
+        due_at:      dueDate,
+        unlock_at:   unlockDate,
+        lock_at:     lockDate,
+      }
     })
   end
 
