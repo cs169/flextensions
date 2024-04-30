@@ -19,10 +19,14 @@ module Api
       end
 
       after do
-        Assignment.delete_all
-        CourseToLms.delete_all
-        Course.delete_all
-        Lms.delete_all
+        LmsCredential.destroy_all
+        Extension.destroy_all
+        Assignment.destroy_all
+        CourseToLms.destroy_all
+        UserToCourse.destroy_all
+        Course.destroy_all
+        Lms.destroy_all
+        User.destroy_all
       end
 
       describe "GET /api/v1/courses/:course_id/lmss/:lms_id/assignments" do

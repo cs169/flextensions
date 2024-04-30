@@ -82,11 +82,13 @@ class CanvasFacade < ExtensionFacadeBase
   # @return  [Faraday::Response] information about the new override.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvasApi.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
-      student_ids: studentIds,
-      title:       title,
-      due_at:      dueDate,
-      unlock_at:   unlockDate,
-      lock_at:     lockDate,
+      assignment_override: {
+        student_ids: studentIds,
+        title:       title,
+        due_at:      dueDate,
+        unlock_at:   unlockDate,
+        lock_at:     lockDate,
+      }
     })
   end
 
@@ -143,7 +145,6 @@ class CanvasFacade < ExtensionFacadeBase
       get_current_formatted_time(),
       newDueDate,
     )
-
     # Either successful or error that is not explicitly handled here.
     if (createOverrideResponse.status != 400)
       return createOverrideResponse

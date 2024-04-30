@@ -12,6 +12,7 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+require 'webmock/rspec'
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'codeclimate-test-reporter'
