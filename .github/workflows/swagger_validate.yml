@@ -1,0 +1,25 @@
+name: Swagger
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request: {}
+
+jobs:
+  swagger:
+    runs-on: ubuntu-latest
+    name: Validate Spec
+    services:
+      swagger-editor:
+        image: swaggerapi/swagger-editor:next-v5
+        ports:
+          - 80:8080
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate Swagger Spec
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          definition-file: app/assets/swagger/swagger.json
+          ignore-error: app/assets/swagger/shouldIgnoreError.js
