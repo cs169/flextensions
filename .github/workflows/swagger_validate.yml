@@ -23,3 +23,7 @@ jobs:
         with:
           definition-file: app/assets/swagger/swagger.json
           ignore-error: app/assets/swagger/shouldIgnoreError.js
+        env:
+          SWAGGER_EDITOR_URL: https://editor.swagger.io/
+        run: |
+          node src/index.js --no-sandbox
