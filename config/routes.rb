@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'offering/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'
   get "home/index"
@@ -10,6 +11,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
+  get '/offering', to: 'offering#index', as: 'ofering'
   namespace :api do
     draw('api/v1')
   end
