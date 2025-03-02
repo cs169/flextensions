@@ -2,18 +2,19 @@ class LoginController < ApplicationController
     def login; end
 
     def canvas
-        redirect_to canvas_authorize_url
+        redirect_to canvas_authorize_url, allow_other_host: true
     end
     
     private def canvas_authorize_url
     query_params = {
       client_id: "26530~GXwfzFr2E4aerMfCKBDDkWuKuRuwk9RxCTVRc2Z3CeunPnxvXf8vFaYXe4GUP2BQ",
       response_type: 'code',
-      redirect_uri: 'https://sp25-02-flextensions-4f5b4fbccd7f.herokuapp.com/offerings'
+      redirect_uri: :canvas_callback
       #session_canvas_callback_url
     }
-    
-    "#{ENV['CANVAS_URL']}/login/oauth2/auth?#{query_params.to_query}"
+    #canvas_callback
+    "https://ucberkeleysandbox.instructure.com/login/oauth2/auth?#{query_params.to_query}"
+    #Login button errors atm because the client id is unknown for now.
   end
 
     def bcourses
