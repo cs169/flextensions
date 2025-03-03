@@ -7,14 +7,15 @@ class LoginController < ApplicationController
     
     private def canvas_authorize_url
     query_params = {
-      client_id: "26530~GXwfzFr2E4aerMfCKBDDkWuKuRuwk9RxCTVRc2Z3CeunPnxvXf8vFaYXe4GUP2BQ",
+      client_id: "fake_client_id",
       response_type: 'code',
       redirect_uri: :canvas_callback
       #session_canvas_callback_url
     }
     #canvas_callback
-    "https://ucberkeleysandbox.instructure.com/login/oauth2/auth?#{query_params.to_query}"
+    #"https://ucberkeleysandbox.instructure.com/login/oauth2/auth?#{query_params.to_query}"
     #Login button errors atm because the client id is unknown for now.
+    :canvas_callback
   end
 
     def bcourses

@@ -83,8 +83,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_20_232708) do
 
   create_table "users", force: :cascade do |t|
     t.string "email"
+    t.string "canvas_uid"
+    t.string "name"
+    t.string "canvas_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["canvas_uid"], name: "index_users_on_canvas_uid", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
