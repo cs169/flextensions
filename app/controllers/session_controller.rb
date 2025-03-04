@@ -1,25 +1,39 @@
 class SessionController < ApplicationController
     def create
-        # Replace with your manually generated Canvas API token
-        manual_token = ENV['MANUAL_TOKEN']
-    
+        if params[:error].present? || params[:code].blank?
+            redirect_to root_path, alert: "Authentication failed. Please try again."
+            return
+        end
+        canvas_code = params[:code]
+        
+        token = get_access_token(canvas_code)
         # Fetch user profile from Canvas API using the token
         response = Faraday.get("https://ucberkeleysandbox.instructure.com/api/v1/users/self?include[]=email") do |req|
-            req.headers["Authorization"] = "Bearer #{manual_token}"
+            req.headers["Authorization"] = "Bearer #{token}"
           end
           
     
         if response.success?
             user_data = JSON.parse(response.body)
-            find_or_create_user(user_data, manual_token)
+            find_or_create_user(user_data, token)
             redirect_to offerings_path, notice: "Logged in!"
         else
             redirect_to root_path, alert: "Authentication failed. Invalid token."
         end
     end
 
+    private def get_access_token(code)
+        client = OAuth2::Client.new(
+          ENV['CANVAS_CLIENT_ID'],
+          ENV['APP_KEY'],
+          site: "https://ucberkeleysandbox.instructure.com",
+          token_url: "/login/oauth2/token"
+        )
+        token = client.auth_code.get_token(code, redirect_uri: :canvas_callback)
+        puts(token)
+        return token.token
+    end
     private def find_or_create_user(user_data, token)
-        puts(user_data)
         # Find or create user in database
         user = User.find_or_initialize_by(canvas_uid: user_data["id"])
         user.assign_attributes(
@@ -28,6 +42,7 @@ class SessionController < ApplicationController
           canvas_token: token, # Store the token to use for API requests
           #canvas_token_expires_at: Time.current + 1.hours 
         )
+        session[:user_info] = user_data
         user.save!
   
         # Store user ID in session for authentication
