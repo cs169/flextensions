@@ -18,7 +18,11 @@ For the environment variables, you will need to configure on your local system (
 - DB_PASSWORD (default: password)
 - DB_NAME (default: postgres)
 - CANVAS_URL (no default; will error if not included)
--
+
+#The following are for authentication purposes
+CANVAS_CLIENT_ID (Private, depending on the developer key)
+APP_KEY = (Private, depending on the developer key)
+CANVAS_REDIRECT_URI = (Private, depending on the developer key and the environment)
 
 Changing only the user and password then running `$make env` should be sufficient.
 
