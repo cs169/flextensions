@@ -8,7 +8,7 @@ class SessionController < ApplicationController
         
         token = get_access_token(canvas_code)
         # Fetch user profile from Canvas API using the token
-        response = Faraday.get("https://ucberkeleysandbox.instructure.com/api/v1/users/self?include[]=email") do |req|
+        response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/users/self?include[]=email") do |req|
             req.headers["Authorization"] = "Bearer #{token}"
           end
           
@@ -26,11 +26,10 @@ class SessionController < ApplicationController
         client = OAuth2::Client.new(
           ENV['CANVAS_CLIENT_ID'],
           ENV['APP_KEY'],
-          site: "https://ucberkeleysandbox.instructure.com",
+          site: ENV['CANVAS_URL'],
           token_url: "/login/oauth2/token"
         )
         token = client.auth_code.get_token(code, redirect_uri: :canvas_callback)
-        puts(token)
         return token.token
     end
     private def find_or_create_user(user_data, token)
