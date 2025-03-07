@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
     before_action :authenticated!, unless: -> { excluded_controller_action? }
 
     private def authenticated!
-       if session[:user_info].nil?
+       if session[:user_id].nil?
         redirect_to root_path, alert: "Please log in to access this page."
        end
     end

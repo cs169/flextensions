@@ -8,7 +8,7 @@ class SessionController < ApplicationController
         
         token = get_access_token(canvas_code)
         # Fetch user profile from Canvas API using the token
-        response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/users/self?include[]=email") do |req|
+        response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/users/self?") do |req|
             req.headers["Authorization"] = "Bearer #{token}"
           end
           
@@ -32,18 +32,25 @@ class SessionController < ApplicationController
         token = client.auth_code.get_token(code, redirect_uri: :canvas_callback)
         return token.token
     end
+    
     private def find_or_create_user(user_data, token)
         # Find or create user in database
-        user = User.find_or_initialize_by(canvas_uid: user_data["id"])
-        user.assign_attributes(
-          email: user_data["primary_email"] || "test@berkeley.edu",
-          name: user_data["name"],
-          canvas_token: token, # Store the token to use for API requests
-          #canvas_token_expires_at: Time.current + 1.hours 
-        )
-        session[:user_info] = user_data
-        user.save!
-  
+        user = nil
+        if User.exists?(email: "user_data['primary_email']") 
+            user = User.find_by(email: user_data["primary_email"])
+        elsif User.exists?(canvas_uid: user_data["id"])
+            user = User.find_by(canvas_uid: user_data["id"])
+        else 
+            user = User.find_or_initialize_by(canvas_uid: user_data["id"])
+            user.assign_attributes(
+                email: user_data["primary_email"],
+                name: user_data["name"],
+                canvas_token: token # Store the token to use for API requests
+                #canvas_token_expires_at: Time.current + 1.hours 
+            )
+            #session[:user_info] = user_data
+            user.save!
+        end
         # Store user ID in session for authentication
         session[:user_id] = user.id
     end
