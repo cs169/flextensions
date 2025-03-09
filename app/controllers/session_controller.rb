@@ -15,6 +15,7 @@ class SessionController < ApplicationController
     
         if response.success?
             user_data = JSON.parse(response.body)
+            puts(user_data)
             find_or_create_user(user_data, token)
             redirect_to offerings_path, notice: "Logged in!"
         else
@@ -36,14 +37,14 @@ class SessionController < ApplicationController
     private def find_or_create_user(user_data, token)
         # Find or create user in database
         user = nil
-        if User.exists?(email: "user_data['primary_email']") 
+        if User.exists?(email: user_data['primary_email']) 
             user = User.find_by(email: user_data["primary_email"])
         elsif User.exists?(canvas_uid: user_data["id"])
             user = User.find_by(canvas_uid: user_data["id"])
         else 
             user = User.find_or_initialize_by(canvas_uid: user_data["id"])
             user.assign_attributes(
-                email: user_data["primary_email"],
+                email: user_data["email"],
                 name: user_data["name"],
                 canvas_token: token # Store the token to use for API requests
                 #canvas_token_expires_at: Time.current + 1.hours 

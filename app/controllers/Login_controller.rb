@@ -10,10 +10,11 @@ class LoginController < ApplicationController
       client_id: ENV['CANVAS_CLIENT_ID'],
       response_type: 'code',
       redirect_uri: ENV["CANVAS_REDIRECT_URI"] + "/auth/canvas/callback",
+      scope: "url:GET|/api/v1/users/self profile email"
     }
     #canvas_callback
 
-    "https://ucberkeleysandbox.instructure.com/login/oauth2/auth?#{query_params.to_query}"
+    ENV["CANVAS_URL"] + "/login/oauth2/auth?#{query_params.to_query}"
 
     #The following line is for testing purposes and skips redirections.
     #:canvas_callback
