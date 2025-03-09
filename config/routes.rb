@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
   get '/offerings', to: 'offerings#index', as: 'offerings'
+  get '/offerings/new', to: 'offerings#new', as: :new_offerings
   
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 
