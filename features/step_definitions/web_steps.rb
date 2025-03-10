@@ -41,8 +41,12 @@ When /^(.*) within (.*[^:]):$/ do |step, parent, table_or_string|
   with_scope(parent) { When "#{step}:", table_or_string }
 end
 
-Given /^(?:|I )am on (.+)$/ do |page_name|
-  visit path_to(page_name)
+Given /^(?:|I )am on the\s*"?([^"]+)"?\s*$/ do |page_name|
+  visit path_to(page_name.strip)
+end
+
+When(/^I navigate to\s*"?([^"]+)"?\s*$/) do |page_name|
+  visit path_to(page_name.strip)
 end
 
 When /^(?:|I )go to (.+)$/ do |page_name|
@@ -52,6 +56,7 @@ end
 When /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
 end
+
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
   click_link(link)
@@ -227,12 +232,21 @@ Then /^the "([^"]*)" checkbox(?: within (.*))? should not be checked$/ do |label
   end
 end
  
-Then /^(?:|I )should be on (.+)$/ do |page_name|
+Then /^(?:|I )should be on the (.+)$/ do |page_name|
   current_path = URI.parse(current_url).path
   if current_path.respond_to? :should
     current_path.should == path_to(page_name)
   else
     assert_equal path_to(page_name), current_path
+  end
+end
+
+Then(/^I should be redirected to the\s*"?([^"]+)"?\s*$/) do |page_name|
+  current_path = URI.parse(current_url).path
+  if current_path.respond_to? :should
+    current_path.should == path_to(page_name.strip)
+  else
+    assert_equal path_to(page_name.strip), current_path
   end
 end
 
