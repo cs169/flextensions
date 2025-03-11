@@ -1,0 +1,46 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Thirteenth navbar example">
+	<div class="container-fluid">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-center"
+			aria-controls="navbar-center" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="color-mode-toggler">
+			<a class="navbar-brand col-lg-3 me-0" href="./">Flextensions</a>
+		</div>
+		<div class="color-mode-toggler">
+			<%= render "layouts/color_mode_btn" %>
+		</div>
+
+		<div class="collapse navbar-collapse d-lg-flex" id="navbar-center">
+			<a class="navbar-brand col-lg-3 me-0 color-mode-toggler-m" href="./">Flextensions</a>
+			<ul class="navbar-nav col-lg-6 justify-content-lg-center">
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="./">Home</a>
+				</li>
+
+				<li class="nav-item">
+					<a class="nav-link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Wiki</a>
+				</li>
+
+				<!-- TO-DO This should be displayed when there's NO logged user -->
+				<li class="nav-item">
+					<a class="nav-link" href="/login/" >Login</a>
+				</li>
+
+				<!--  TO-DO This should be displayed when there's a logged user -->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+						aria-expanded="false">Michael B</a>
+					<ul class="dropdown-menu">
+						<li><a class="dropdown-item" href="#">logout</a></li>
+					</ul>
+				</li>
+			</ul>
+			<div class="d-lg-flex col-lg-3 justify-content-lg-end">
+				<div class="color-mode-toggler-m">
+					<%= render "layouts/color_mode_btn" %>
+				</div>
+			</div>
+		</div>
+	</div>
+</nav>
