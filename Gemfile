@@ -53,9 +53,10 @@ gem "lms-api"
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
-gem 'bootstrap', '~> 5.3.2'
+gem 'bootstrap', '~> 5.3.3'
 gem 'jquery-rails'
-gem 'sassc-rails', '~> 2.1'   #dependency for bootstrap
+gem 'sassc-rails', '~> 2.1'   #dependency for bootstrap #03-10-2025 this is deprecated but still works
+# gem 'dartsass-sprockets' # alternative to sassc-rails, this is recommended but bootstrap 5.3.3 is still using "deprecated" @import statements which this gem doesn't like
 gem 'json'
 
 # Used to make http requests.
