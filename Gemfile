@@ -78,12 +78,15 @@ group :test do
     gem 'rspec-rails'
     gem 'guard-rspec'
     gem 'simplecov', '~> 0.17.1' , :require => false
-    gem 'codeclimate-test-reporter'
+    #gem 'codeclimate-test-reporter'
     gem 'cucumber-rails', :require => false
     gem 'cucumber-rails-training-wheels'
     gem 'database_cleaner'
     gem 'timecop'
     gem 'webmock'
+    #gem 'simplecov_json_formatter'
+    #gem 'simplecov'#, '~> 0.21.2'
+    #gem 'simplecov_json_formatter', '~> 0.1.4'
 end
 
 group :development do
