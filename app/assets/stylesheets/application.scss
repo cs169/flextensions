@@ -10,8 +10,10 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
- *= require_tree .
+ * // require_tree .
  *= require_self
  */
-
+ $primary: #002676;
+ $secondary: #fdb515;
  @import "bootstrap";
+ @import "custom_bootstrap";
