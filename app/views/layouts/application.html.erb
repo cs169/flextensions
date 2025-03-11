@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="h-100" data-bs-theme="auto">
   <head>
     <title>Flextensions</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,9 +8,9 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
   </head>
 
-  <body>
-    <%= yield %>
-  </body>
-</html>
+  <%= render "layouts/header" %>
+  <%= yield %>
+  <%= render "layouts/footer" %>
