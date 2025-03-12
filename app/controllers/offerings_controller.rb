@@ -3,5 +3,23 @@ class OfferingsController < ApplicationController
   end
 
   def new
+    user = nil
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: "Please log in to access this page."
+      return
+    end
+    token = user.canvas_token
+    response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/users/self/courses") do |req|
+      req.headers['Authorization'] = "Bearer #{token}"
+      req.headers['Content-Type'] = 'application/json'
+    end
+
+    if response.success?
+      @courses = JSON.parse(response.body)
+    else
+      @courses = []
+      flash[:alert] = "Failed to fetch courses from Canvas: #{response.status}"
+    end
   end
 end

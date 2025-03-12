@@ -60,13 +60,17 @@
     <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
   </div>
   
-<form method="POST">
-  <input id="csrf_token" name="csrf_token" type="hidden" value="IjU5Y2EyOTBjZGMzYjhjNzdjN2I5ZTg4YTE1ZGZjZTIxMjgxMTg2NDAi.Z84f0g.KDYf5HFUvaSsLve-7kDPv39DZwk">
-  
-    <div class="checkbox"><ul id="offerings"><li><input id="offerings-0" name="offerings" type="checkbox" value="1534405"> <label for="offerings-0">2024-02 | CS169L s | CS169L Flextensions</label></li></ul></div>
-    <div class="form-buttons"><input class="mdl-button mdl-js-button mdl-button--raised" id="submit" name="submit" type="submit" value="import"></div>
-  
-</form>
+  <h2>Your Canvas Courses</h2>
+
+  <% if @courses.any? %>
+    <ul>
+      <% @courses.each do |course| %>
+        <li><%= course["name"] %> (ID: <%= course["id"] %>)</li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No courses found or unable to fetch courses.</p>
+  <% end %>
 
 </div>
       </main>
