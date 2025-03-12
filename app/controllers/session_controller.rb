@@ -55,6 +55,7 @@ class SessionController < ApplicationController
         end
         # Store user ID in session for authentication
         session[:user_id] = user.id
+        Rails.logger.info "User ID: #{session[:user_id]}"
     end
   
     def destroy
