@@ -16,7 +16,7 @@ class SessionController < ApplicationController
         if response.success?
             user_data = JSON.parse(response.body)
             puts(user_data)
-            Rails.Logger.info "User Data: #{user_data}"
+            Rails.logger.info "User Data: #{user_data}"
             find_or_create_user(user_data, token)
             redirect_to offerings_path, notice: "Logged in!"
         else
