@@ -59,15 +59,20 @@
     <h5>Choose courses to set up extensions with:</h5>
     <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
   </div>
-  
-  <h2>Your Canvas Courses</h2>
-
   <% if @courses.any? %>
-    <ul>
-      <% @courses.each do |course| %>
-        <li><%= course["name"] %> (ID: <%= course["id"] %>)</li>
-      <% end %>
-    </ul>
+    <%= form_with url: offerings_path, method: :post do %>
+      <ul>
+        <% @courses.each do |course| %>
+          <li>
+            <label>
+              <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
+              <%= course["name"] %> (ID: <%= course["id"] %>)
+            </label>
+          </li>
+        <% end %>
+      </ul>
+      <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
+    <% end %>
   <% else %>
     <p>No courses found or unable to fetch courses.</p>
   <% end %>
