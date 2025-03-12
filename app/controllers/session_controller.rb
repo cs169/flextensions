@@ -37,6 +37,8 @@ class SessionController < ApplicationController
     
     private def find_or_create_user(user_data, token)
         # Find or create user in database
+        Rails.logger.info "User token: #{token}"
+
         user = nil
         if User.exists?(email: user_data['primary_email']) 
             user = User.find_by(email: user_data["primary_email"])

@@ -11,6 +11,7 @@ class OfferingsController < ApplicationController
       return
     end
     token = user.canvas_token
+    Rails.logger.info "User token: #{token}"
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/users/self/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = 'application/json'
