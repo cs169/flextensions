@@ -21,7 +21,7 @@ class OfferingsController < ApplicationController
       @courses = JSON.parse(response.body)
     else
       @courses = []
-      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status}"
+      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
       flash[:alert] = "Failed to fetch courses from Canvas: #{response.status}"
     end
   end
