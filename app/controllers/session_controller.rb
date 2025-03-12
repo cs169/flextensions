@@ -40,8 +40,14 @@ class SessionController < ApplicationController
         user = nil
         if User.exists?(email: user_data['primary_email']) 
             user = User.find_by(email: user_data["primary_email"])
+            user.assign_attributes(
+                canvas_token: token
+            )
         elsif User.exists?(canvas_uid: user_data["id"])
             user = User.find_by(canvas_uid: user_data["id"])
+            user.assign_attributes(
+                canvas_token: token
+            )
         else 
             user = User.find_or_initialize_by(canvas_uid: user_data["id"])
             user.assign_attributes(
