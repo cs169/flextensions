@@ -58,7 +58,7 @@
   <% if @courses.any? %>
     <%= form_with url: offerings_path, method: :post do %>
       <ul>
-        % @courses.sort_by { |c| c["enrollment_term_id"] } .each do |course| %>
+        <% @courses.sort_by { |c| c["enrollment_term_id"] } .each do |course| %>
           <li>
             <label>
               <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
