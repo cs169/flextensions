@@ -4,6 +4,11 @@ require 'rails_helper'
 RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
   before(:each) do
     WebMock.allow_net_connect!
+    Capybara.register_driver :selenium do |app|
+      Capybara::Selenium::Driver.new(app,
+        browser: :chrome,
+        options: Selenium::WebDriver::Chrome::Options.new(args: ["--user-data-dir=#{Dir.mktmpdir}"]))
+    end
   end
 
   after(:each) do
@@ -38,6 +43,4 @@ RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
       skip("error jump")
     end
   end
-  
 end
-  
