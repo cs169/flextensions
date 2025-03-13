@@ -14,7 +14,7 @@ class OfferingsController < ApplicationController
     Rails.logger.info "User token: #{token}"
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
+      req.headers['Content-Type'] = "application/json"
     end
 
     if response.success?
