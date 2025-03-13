@@ -15,6 +15,7 @@ class OfferingsController < ApplicationController
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = "application/json"
+      req.headers['enrollment_type'] = "teacher"
     end
 
     if response.success?
