@@ -32,4 +32,3 @@ end
 When(/^I navigate to any page other than "([^"]*)"$/) do |page_name|
   # Handle navigation scenario
 end
-
