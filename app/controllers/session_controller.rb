@@ -59,7 +59,7 @@ class SessionController < ApplicationController
                 #canvas_token_expires_at: Time.current + 1.hours 
             )
             #session[:user_info] = user_data
-            user.save!
+            user.save!  
         end
         # Store user ID in session for authentication
         session[:user_id] = user.id
