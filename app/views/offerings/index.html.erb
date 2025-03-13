@@ -31,12 +31,12 @@
           
             <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href="/">Home</a>
-                <a class="mdl-navigation__link" href="https://github.com/berkeley-cdss/seating/wiki/" target="_blank">Wiki</a>
+                <a class="mdl-navigation__link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
             </nav>
           
           
             <a id="auth-menu" class="mdl-navigation__link" href="#">
-                Eric Huang <i class="material-icons">expand_more</i>
+              <%= session[:username] || "Guest" %> <i class="material-icons">expand_more</i>
             </a>
             <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="auth-menu">
               <a class="mdl-navigation__link" href="/logout/">

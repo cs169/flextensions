@@ -58,6 +58,7 @@ class SessionController < ApplicationController
             user.save!  
         end
         # Store user ID in session for authentication
+        session[:username] = user.name
         session[:user_id] = user.id
     end
   
