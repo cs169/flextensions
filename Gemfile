@@ -64,6 +64,10 @@ gem 'faraday'
 # Used to allow dot notation of hashes.
 gem 'ostruct'
 
+#used to authenticate with the LMS
+gem 'omniauth'
+gem 'omniauth-oauth2'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
@@ -74,7 +78,7 @@ group :test do
     gem 'rspec-rails'
     gem 'guard-rspec'
     gem 'simplecov', '~> 0.17.1' , :require => false
-    gem 'codeclimate-test-reporter'
+    #gem 'codeclimate-test-reporter'
     gem 'cucumber-rails', :require => false
     gem 'cucumber-rails-training-wheels'
     gem 'database_cleaner'
@@ -85,6 +89,9 @@ group :test do
     gem 'axe-core-api'
     gem 'selenium-webdriver'
     gem 'capybara-screenshot'
+    #gem 'simplecov_json_formatter'
+    #gem 'simplecov'#, '~> 0.21.2'
+    #gem 'simplecov_json_formatter', '~> 0.1.4'
 end
 
 group :development do
@@ -100,4 +107,3 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
-
