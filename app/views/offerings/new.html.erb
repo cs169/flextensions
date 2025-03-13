@@ -56,26 +56,24 @@
     <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
   </div>
   <% if @courses.any? %>
-    <%= form_with url: offerings_path, method: :post do %>
-      <ul>
-        <% @courses.sort_by { |c| c["enrollment_term_id"] } .each do |course| %>
-          <li>
-            <label>
-              <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
-              <div>
-                <p><strong>Name:</strong> <%= course["name"] %></p>
-                <p><strong>Course Code:</strong> <%= course["course_code"] %></p>
-                <p><strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %></p>
-              </div>
-            </label>
-          </li>
-        <% end %>
-      </ul>
-      <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
+  <%= form_with url: offerings_path, method: :post do %>
+    <% @courses.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
+      <div style="margin-bottom: 10px;">
+        <label>
+          <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
+          <span style="margin-left: 8px;">
+            <strong>Name:</strong> <%= course["name"] %> |
+            <strong>Course Code:</strong> <%= course["course_code"] %> |
+            <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
+          </span>
+        </label>
+      </div>
     <% end %>
-  <% else %>
-    <p>No courses found or unable to fetch courses.</p>
+    <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
   <% end %>
+<% else %>
+  <p>No courses found or unable to fetch courses.</p>
+<% end %>
 
 </div>
       </main>
