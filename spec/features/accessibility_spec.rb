@@ -5,15 +5,12 @@ require 'tmpdir'
 RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
   before(:each) do
     WebMock.allow_net_connect!
-    
     chrome_data_dir = ENV['CHROME_DATA_DIR'] || Dir.mktmpdir
     
     Capybara.register_driver :selenium_chrome do |app|
       options = Selenium::WebDriver::Chrome::Options.new
-      
       # Chrome opt
       options.add_argument("--user-data-dir=#{chrome_data_dir}")
-      
       # CI opt
       if ENV['CI']
         options.add_argument('--headless')
@@ -37,28 +34,40 @@ RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
     end
     WebMock.disable_net_connect!(allow_localhost: true)
   end
-
+  
   it "Home page should be accessible" do
     visit '/'
     puts "Current URL: #{current_url}"
-    expect(page).to be_axe_clean
+    begin
+      expect(page).to be_axe_clean
+    rescue => e
+      puts "Accessibility error on Home page: #{e.message}"
+      raise
+    end
   end
-
+  
   it "Login page should be accessible" do
     visit '/login/canvas'
     puts "Current URL: #{current_url}"
-    expect(page).to be_axe_clean
+    begin
+      expect(page).to be_axe_clean
+    rescue => e
+      puts "Accessibility error on Login page: #{e.message}"
+      raise
+    end
   end
-
+  
   it "Offerings page should be accessible" do
     visit '/offerings'
     sleep 1
     begin
       expect(page).to be_axe_clean
     rescue Selenium::WebDriver::Error::JavascriptError, Selenium::WebDriver::Error::NoSuchWindowError => e
-      page.save_screenshot('offerings_error.png') if page.respond_to?(:save_screenshot)
-      puts "browser error: #{e.message}"
-      skip("error jump")
+      puts "Browser error on Offerings page: #{e.message}"
+      skip("Error in browser: #{e.message}")
+    rescue => e
+      puts "Accessibility error on Offerings page: #{e.message}"
+      raise
     end
   end
 end
