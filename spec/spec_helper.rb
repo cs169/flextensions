@@ -20,7 +20,6 @@ require 'simplecov'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
- # SimpleCov::Formatter::JSONFormatter,
   #CodeClimate::TestReporter::Formatter
 ]
 SimpleCov.start 'rails'
