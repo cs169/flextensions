@@ -11,9 +11,8 @@ module NavigationHelpers
     when /^Home\s?page$/
       '/'
 
-  # TODO: Update the bCourses login page path
     when /^bCourses login page$/
-      "/"
+      '/login/canvas'
 
     when /^Offerings page$/
       "/offerings"

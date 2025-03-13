@@ -6,6 +6,22 @@ require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'axe-rspec'
+require 'capybara/rspec'
+
+Capybara.register_driver :selenium_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--window-size=1400,1400')
+  options.add_argument('--headless') if ENV['HEADLESS'] == 'true'
+  options.add_argument('--disable-gpu')
+  options.add_argument('--memory-pressure-off')
+  options.add_argument('--js-flags=--max-old-space-size=4096')
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+Capybara.javascript_driver = :selenium_chrome
+Capybara.default_max_wait_time = 10
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -20,7 +36,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort.each { |f| require f }
+#Rails.root.glob('spec/support/**/*.rb').sort.each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.

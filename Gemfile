@@ -73,7 +73,7 @@ end
 group :test do
     gem 'rspec-rails'
     gem 'guard-rspec'
-    gem 'simplecov', '~> 0.17.1' , :require => false
+    gem 'simplecov', '~> 0.20.0' , :require => false
     gem 'codeclimate-test-reporter'
     gem 'cucumber-rails', :require => false
     gem 'cucumber-rails-training-wheels'
@@ -85,6 +85,8 @@ group :test do
     gem 'axe-core-api'
     gem 'selenium-webdriver'
     gem 'capybara-screenshot'
+    gem 'simplecov_json_formatter'
+
 end
 
 group :development do

@@ -17,11 +17,11 @@ require 'webmock/rspec'
 
 require 'codeclimate-test-reporter'
 require 'simplecov'
-
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+require 'simplecov_json_formatter'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::HTMLFormatter,
-  CodeClimate::TestReporter::Formatter
-]
+  SimpleCov::Formatter::JSONFormatter
+])
 SimpleCov.start 'rails'
 
 RSpec.configure do |config|
