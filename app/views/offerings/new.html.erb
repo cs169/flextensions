@@ -75,6 +75,21 @@
   <p>No courses found or unable to fetch courses.</p>
 <% end %>
 
+<% if @courses_student.any? %>
+  <div class="mdl-cell mdl-cell--12-col" style="margin-top: 20px;">
+    <h5>Classes you are enrolled in but cannot set up extensions for:</h5>
+    <% @courses_student.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
+      <div style="margin-bottom: 10px;">
+        <span>
+          <strong>Name:</strong> <%= course["name"] %> |
+          <strong>Course Code:</strong> <%= course["course_code"] %> |
+          <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
 </div>
       </main>
     </div>

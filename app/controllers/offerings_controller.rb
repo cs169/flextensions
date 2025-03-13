@@ -11,19 +11,41 @@ class OfferingsController < ApplicationController
       return
     end
     token = user.canvas_token
-    Rails.logger.info "User token: #{token}"
+    @courses = fetch_combined_courses(token, ["teacher", "ta"])
+    if @courses.empty?
+      Rails.logger.info "No courses found for teacher."
+      flash[:alert] = "No courses found for teacher."
+    end
+
+    @courses_student = fetch_courses(token, "student")
+    if @courses_student.empty?
+      Rails.logger.info "No courses found for student."
+      flash[:alert] = "No courses found for student."
+    end
+  end
+
+  private
+
+  def fetch_courses(token, enrollment_type)
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = "application/json"
-      req.headers['enrollment_type'] = "teacher"
+      req.headers['enrollment_type'] = enrollment_type
     end
 
     if response.success?
-      @courses = JSON.parse(response.body)
+      JSON.parse(response.body)
     else
-      @courses = []
-      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
-      flash[:alert] = "Failed to fetch courses from Canvas: #{response.status}"
+      Rails.logger.error "Failed to fetch #{enrollment_type} courses from Canvas: #{response.status} - #{response.body}"
+      []
     end
+  end
+
+  def fetch_combined_courses(token, enrollment_types)
+    combined_courses = []
+    enrollment_types.each do |enrollment_type|
+      combined_courses += fetch_courses(token, enrollment_type)
+    end
+    combined_courses
   end
 end
