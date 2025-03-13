@@ -6,6 +6,7 @@ Back end/API for UC Berkeley EECS "Flextensions" software
 [![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage) 
 [![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml) 
+[![Accessibility Tests](https://github.com/cs169/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/a11y.yml)
 
 ## Installation
 
@@ -44,6 +45,14 @@ In order to stand up the server you must first install [Overmind](https://github
   Development has been tested with overmind 2.4.0
 
 With Overmind, you can run `$make dev` or `$make`
+
+### Running Accessibility Tests
+
+Run RSpec accessibility tests:
+bashCopybundle exec rspec spec/ --tag a11y
+
+Run Cucumber accessibility tests:
+bashCopybundle exec cucumber features/ --tag @a11y
 
 ## Notes
 There are now two separate instances of Canvas, each with it's own triad of prod/test/beta environments:
