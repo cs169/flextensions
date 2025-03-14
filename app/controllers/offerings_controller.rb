@@ -11,13 +11,13 @@ class OfferingsController < ApplicationController
       return
     end
     token = user.canvas_token
-    @courses = fetch_combined_courses(token, ["teacher", "ta"])
+    @courses = fetch_combined_courses(token, ["TeacherEnrollment", "TaEnrollment"])
     if @courses.empty?
       Rails.logger.info "No courses found for teacher."
       flash[:alert] = "No courses found for teacher."
     end
 
-    @courses_student = fetch_courses(token, "student")
+    @courses_student = fetch_courses(token, "StudentEnrollment")
     if @courses_student.empty?
       Rails.logger.info "No courses found for student."
       flash[:alert] = "No courses found for student."
@@ -30,7 +30,7 @@ class OfferingsController < ApplicationController
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = "application/json"
-      req.headers['enrollment_type'] = enrollment_type
+      req.headers['enrollment_role'] = enrollment_type
     end
 
     if response.success?
