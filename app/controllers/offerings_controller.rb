@@ -16,6 +16,7 @@ class OfferingsController < ApplicationController
       Rails.logger.info "No courses found."
       flash[:alert] = "No courses found."
     end
+    Rails.logger.info "Courses: #{@courses}"
     @courses_teacher = @courses.select { |course| ["teacher", "ta"].include?(course["enrollment_type"]) }
     @courses_student = @courses.select { |course| course["enrollment_type"] == "student" }
 
