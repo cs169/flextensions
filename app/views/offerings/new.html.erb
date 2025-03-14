@@ -55,9 +55,9 @@
     <h5>Choose courses to set up extensions with:</h5>
     <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
   </div>
-  <% if @courses.any? %>
+  <% if @courses_teacher.any? %>
   <%= form_with url: offerings_path, method: :post do %>
-    <% @courses.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
+    <% @courses_teacher.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
       <div style="margin-bottom: 10px;">
         <label>
           <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>

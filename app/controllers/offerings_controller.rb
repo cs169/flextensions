@@ -11,41 +11,31 @@ class OfferingsController < ApplicationController
       return
     end
     token = user.canvas_token
-    @courses = fetch_combined_courses(token, ["TeacherEnrollment", "TaEnrollment"])
+    @courses = fetch_courses(token)
     if @courses.empty?
-      Rails.logger.info "No courses found for teacher."
-      flash[:alert] = "No courses found for teacher."
+      Rails.logger.info "No courses found."
+      flash[:alert] = "No courses found."
     end
+    @courses_teacher = @courses.select { |course| ["teacher", "ta"].include?(course["enrollment_type"]) }
+    @courses_student = @courses.select { |course| course["enrollment_type"] == "student" }
 
-    @courses_student = fetch_courses(token, "StudentEnrollment")
-    if @courses_student.empty?
-      Rails.logger.info "No courses found for student."
-      flash[:alert] = "No courses found for student."
-    end
   end
 
   private
 
-  def fetch_courses(token, enrollment_type)
+  def fetch_courses(tokene)
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = "application/json"
-      req.headers['enrollment_role'] = enrollment_type
+      req.params['include[]'] = "enrollment_type"
     end
 
     if response.success?
       JSON.parse(response.body)
     else
-      Rails.logger.error "Failed to fetch #{enrollment_type} courses from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
       []
     end
   end
 
-  def fetch_combined_courses(token, enrollment_types)
-    combined_courses = []
-    enrollment_types.each do |enrollment_type|
-      combined_courses += fetch_courses(token, enrollment_type)
-    end
-    combined_courses
-  end
 end
