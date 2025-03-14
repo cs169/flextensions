@@ -1,15 +1,11 @@
 module Api
   module V1
     class LmssController < BaseController
-    include CanvasValidationHelper
+      include CanvasValidationHelper
       before_action :validate_ids!, only: [:create]
 
       def index
-        render json: { message: 'not yet implemented'}, status: 501
-      end
-
-      def destroy
-        render json: { message: 'not yet implemented'}, status: 501
+        render json: { message: 'not yet implemented' }, status: :not_implemented
       end
 
       # POST /courses/:course_id/lmss
@@ -28,9 +24,11 @@ module Api
           return
         end
         # Ensure that the association does not already exist
-        existing_entry = CourseToLms.find_by(course_id: course_id, lms_id: lms_id, external_course_id: external_course_id)
+        existing_entry = CourseToLms.find_by(course_id: course_id, lms_id: lms_id,
+                                             external_course_id: external_course_id)
         if existing_entry
-          render json: { message: 'The association between the specified course and LMS already exists.' }, status: :ok
+          render json: { message: 'The association between the specified course and LMS already exists.' },
+                 status: :ok
           return
         end
         # Create the association
@@ -47,19 +45,21 @@ module Api
         end
       end
 
+      def destroy
+        render json: { message: 'not yet implemented' }, status: :not_implemented
+      end
+
       private
 
       def validate_ids!
-        begin
-          params.require([:course_id, :lms_id, :external_course_id])
-        rescue ActionController::ParameterMissing => e
-          render json: { error: e.message }, status: :bad_request
-          return
-        else
-          unless is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
-            render json: { error: 'Invalid course_id or lms_id' }, status: :bad_request
-            return
-          end
+        params.require(%i[course_id lms_id external_course_id])
+      rescue ActionController::ParameterMissing => e
+        render json: { error: e.message }, status: :bad_request
+        nil
+      else
+        unless is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
+          render json: { error: 'Invalid course_id or lms_id' }, status: :bad_request
+          nil
         end
       end
     end

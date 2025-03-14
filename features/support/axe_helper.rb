@@ -5,8 +5,6 @@ begin
   require 'axe-cucumber-steps'
   require 'capybara-screenshot/cucumber'
   require 'selenium-webdriver'
-
-
 rescue LoadError => e
   puts "Warning: Failed to load axe-core-cucumber: #{e.message}"
 end
@@ -28,19 +26,14 @@ end
 
 Capybara.default_max_wait_time = 10
 
-Around('@a11y') do |scenario, block|
-  begin
-    block.call
-  rescue Selenium::WebDriver::Error::JavascriptError => e
-    if e.message.include?('NS_ERROR_OUT_OF_MEMORY')
-      puts "Memory shortage error occurred: #{e.message}"
-      puts "Continuing the test."
-    else
-      raise e
-    end
-  rescue Selenium::WebDriver::Error::NoSuchWindowError => e
-    puts "Browser context error occurred: #{e.message}"
-    puts "Continuing the test."
-  end
-end
+Around('@a11y') do |_scenario, block|
+  block.call
+rescue Selenium::WebDriver::Error::JavascriptError => e
+  raise e unless e.message.include?('NS_ERROR_OUT_OF_MEMORY')
 
+  puts "Memory shortage error occurred: #{e.message}"
+  puts 'Continuing the test.'
+rescue Selenium::WebDriver::Error::NoSuchWindowError => e
+  puts "Browser context error occurred: #{e.message}"
+  puts 'Continuing the test.'
+end

@@ -82,6 +82,7 @@ describe 'CanvasValidationHelper', type: :helper do
       expect(helper.is_valid_student_ids(['abc', 16])).to be(false)
     end
   end
+
   describe 'is_valid_title' do
     it 'returns true on valid input' do
       expect(helper.is_valid_title('hello world')).to be(true)

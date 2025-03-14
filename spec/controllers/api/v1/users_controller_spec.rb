@@ -8,8 +8,8 @@ module Api
             post :create, params: { email: 'test@example.com' }
 
             expect(response).to have_http_status(:created)
-            expect(JSON.parse(response.body)['message']).to eq('User created successfully')
-            expect(User.exists?(email: 'test@example.com')).to be_truthy
+            expect(response.parsed_body['message']).to eq('User created successfully')
+            expect(User).to exist(email: 'test@example.com')
           end
         end
 
@@ -22,7 +22,7 @@ module Api
             post :create, params: { email: 'existing@example.com' }
 
             expect(response).to have_http_status(:conflict)
-            expect(JSON.parse(response.body)['message']).to eq('A user with this email already exists.')
+            expect(response.parsed_body['message']).to eq('A user with this email already exists.')
           end
         end
 
@@ -31,7 +31,7 @@ module Api
             post :create, params: { email: '' }
 
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(JSON.parse(response.body)['message']).to eq('Failed to create user')
+            expect(response.parsed_body['message']).to eq('Failed to create user')
           end
 
           it 'returns an error when email is invalid' do
@@ -39,7 +39,7 @@ module Api
             post :create, params: { email: 'invalid-email' }
 
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(JSON.parse(response.body)['message']).to eq('Failed to create user')
+            expect(response.parsed_body['message']).to eq('Failed to create user')
           end
         end
       end
