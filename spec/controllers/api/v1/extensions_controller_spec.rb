@@ -6,7 +6,7 @@ module Api
       #Log in user before accessing any controller resources.
       before do 
         session[:user_id] = 213 # Manually set session
-        #Added a line of meaningless cmt to make another commit.
+        #Added a line of meaningless cmt to make another commit.   
       end
       describe "POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
         before(:all) do
