@@ -43,6 +43,7 @@ jobs:
       run: bundle exec rspec
     - name: Run Cucumber tests
       run: bundle exec cucumber --tags 'not @skip'
+
     - name: Run after-build command
       run: |
         ./cc-test-reporter after-build --exit-code $?

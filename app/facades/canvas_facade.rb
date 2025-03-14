@@ -228,7 +228,7 @@ class CanvasFacade < ExtensionFacadeBase
   #
   # @return [String] the current time that Canvas likes.
   def get_current_formatted_time
-    currDateTimeUnformatted = DateTime.now().iso8601
+    currDateTimeUnformatted = DateTime.now().utc.iso8601
     # This is some weird format of iso8601 standard that Canvas likes... Don't ask me.
     /[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/.match(currDateTimeUnformatted)[0] + 'Z'
   end
