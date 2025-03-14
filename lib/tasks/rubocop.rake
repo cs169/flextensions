@@ -27,4 +27,4 @@ namespace :rubocop do
 end
 
 desc 'Run RuboCop (alias for rubocop:run)'
-task rubocop: 'rubocop:run' 
+task rubocop: 'rubocop:run'
