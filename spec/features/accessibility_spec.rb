@@ -35,7 +35,7 @@ RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
     WebMock.disable_net_connect!(allow_localhost: true)
   end
   
-  it "Home page should be accessible" do
+  it "Home page should be accessible", a11y: true do
     visit '/'
     puts "Current URL: #{current_url}"
     begin
@@ -46,7 +46,7 @@ RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
     end
   end
   
-  it "Login page should be accessible" do
+  it "Login page should be accessible", a11y: true do
     visit '/login/canvas'
     puts "Current URL: #{current_url}"
     begin
@@ -57,7 +57,7 @@ RSpec.describe "Accessibility", type: :feature, js: true, a11y: true do
     end
   end
   
-  it "Offerings page should be accessible" do
+  it "Offerings page should be accessible", a11y: true do
     visit '/offerings'
     sleep 1
     begin

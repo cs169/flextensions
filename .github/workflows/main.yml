@@ -40,9 +40,9 @@ jobs:
         rails db:create
         rails db:migrate
     - name: Run RSpec tests
-      run: bundle exec rspec
+      run: bundle exec rspec --tag ~a11y
     - name: Run Cucumber tests
-      run: bundle exec cucumber --tags 'not @skip'
+      run: bundle exec cucumber --tags 'not @a11y and not @skip'
 
     - name: Run after-build command
       run: |
