@@ -16,6 +16,7 @@ class SessionController < ApplicationController
         if response.success?
             user_data = JSON.parse(response.body)
             puts(user_data)
+            Rails.logger.info "User Data: #{user_data}"
             find_or_create_user(user_data, token)
             redirect_to offerings_path, notice: "Logged in!"
         else
@@ -36,11 +37,15 @@ class SessionController < ApplicationController
     
     private def find_or_create_user(user_data, token)
         # Find or create user in database
+        Rails.logger.info "User token: #{token}"
+
         user = nil
         if User.exists?(email: user_data['primary_email']) 
             user = User.find_by(email: user_data["primary_email"])
+            user.update(canvas_token: token)
         elsif User.exists?(canvas_uid: user_data["id"])
             user = User.find_by(canvas_uid: user_data["id"])
+            user.update(canvas_token: token)
         else 
             user = User.find_or_initialize_by(canvas_uid: user_data["id"])
             user.assign_attributes(
@@ -50,9 +55,10 @@ class SessionController < ApplicationController
                 #canvas_token_expires_at: Time.current + 1.hours 
             )
             #session[:user_info] = user_data
-            user.save!
+            user.save!  
         end
         # Store user ID in session for authentication
+        session[:username] = user.name
         session[:user_id] = user.id
     end
   
