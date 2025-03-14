@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
     "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
@@ -55,42 +54,42 @@
     <h5>Choose courses to set up extensions with:</h5>
     <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
   </div>
-  <% if @courses.any? %>
-  <%= form_with url: offerings_path, method: :post do %>
-    <% @courses.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
-      <div style="margin-bottom: 10px;">
-        <label>
-          <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
-          <span style="margin-left: 8px;">
-            <strong>Name:</strong> <%= course["name"] %> |
-            <strong>Course Code:</strong> <%= course["course_code"] %> |
-            <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
-          </span>
-        </label>
-      </div>
+  <% if @courses_teacher.any? %>
+    <%= form_with url: offerings_path, method: :post do %>
+      <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
+        <div style="margin-bottom: 10px;">
+          <label>
+            <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
+            <span style="margin-left: 8px;">
+              <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
+              <strong>Course Code:</strong> <%= course["course_code"] %> |
+              <strong>Name:</strong> <%= course["name"] %> |
+            </span>
+          </label>
+        </div>
+      <% end %>
+      <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
     <% end %>
-    <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
+  <% else %>
+    <p>No courses found or unable to fetch courses.</p>
   <% end %>
-<% else %>
-  <p>No courses found or unable to fetch courses.</p>
-<% end %>
 
-<% if @courses_student.any? %>
-  <div class="mdl-cell mdl-cell--12-col" style="margin-top: 20px;">
-    <h5>Classes you are enrolled in but cannot set up extensions for:</h5>
-    <% @courses_student.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
-      <div style="margin-bottom: 10px;">
-        <span>
-          <strong>Name:</strong> <%= course["name"] %> |
-          <strong>Course Code:</strong> <%= course["course_code"] %> |
-          <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
-        </span>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
+  <% if @courses_student.any? %>
+    <div class="mdl-cell mdl-cell--12-col" style="margin-top: 20px;">
+      <h5>Classes you are enrolled in but cannot set up extensions for:</h5>
+      <% @courses_student.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
+        <div style="margin-bottom: 10px;">
+          <span>
+            <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
+            <strong>Course Code:</strong> <%= course["course_code"] %> |
+            <strong>Name:</strong> <%= course["name"] %> |
+          </span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </div>
+
       </main>
     </div>
 

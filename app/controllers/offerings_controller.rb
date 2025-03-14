@@ -9,41 +9,36 @@ class OfferingsController < ApplicationController
       return
     end
     token = user.canvas_token
-    @courses = fetch_combined_courses(token, %w[TeacherEnrollment TaEnrollment])
+    @courses = fetch_courses(token)
     if @courses.empty?
-      Rails.logger.info 'No courses found for teacher.'
-      flash[:alert] = 'No courses found for teacher.'
+      Rails.logger.info 'No courses found.'
+      flash[:alert] = 'No courses found.'
+    end
+    # Rails.logger.info "Courses: #{@courses}"
+    teacher_roles = %w[teacher ta]
+    @courses_teacher = @courses.select do |course|
+      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
     end
 
-    @courses_student = fetch_courses(token, 'StudentEnrollment')
-    return unless @courses_student.empty?
-
-    Rails.logger.info 'No courses found for student.'
-    flash.now[:alert] = 'No courses found for student.'
+    @courses_student = @courses.select do |course|
+      course['enrollments'].any? { |enrollment| enrollment['type'] == 'student' }
+    end
   end
 
   private
 
-  def fetch_courses(token, enrollment_type)
+  def fetch_courses(token)
     response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = 'application/json'
-      req.headers['enrollment_role'] = enrollment_type
+      req.params['include[]'] = 'enrollment_type'
     end
 
     if response.success?
       JSON.parse(response.body)
     else
-      Rails.logger.error "Failed to fetch #{enrollment_type} courses from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
       []
     end
-  end
-
-  def fetch_combined_courses(token, enrollment_types)
-    combined_courses = []
-    enrollment_types.each do |enrollment_type|
-      combined_courses += fetch_courses(token, enrollment_type)
-    end
-    combined_courses
   end
 end
