@@ -6,9 +6,9 @@
 # external_extension_id:
 # last_processed_by_id: Requires login/sessions to be properly implemented
 class Extension < ApplicationRecord
-    #Relationship with Assignment
-    belongs_to :assignment
+  # Relationship with Assignment
+  belongs_to :assignment
 
-    #Relationship with User
-    has_one :user
+  # Relationship with User
+  has_one :user
 end

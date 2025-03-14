@@ -11,19 +11,36 @@ jobs:
   swagger:
     runs-on: ubuntu-latest
     name: Validate Spec
-    services:
-      swagger-editor:
-        image: swaggerapi/swagger-editor:next-v5
-        ports:
-          - 80:8080
     steps:
       - uses: actions/checkout@v2
-      - name: Validate Swagger Spec
-        uses: char0n/swagger-editor-validate@v1
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          definition-file: app/assets/swagger/swagger.json
-          ignore-error: app/assets/swagger/shouldIgnoreError.js
-        env:
-          SWAGGER_EDITOR_URL: https://editor.swagger.io/
+          node-version: '20'
+          
+      - name: Install validation tools
         run: |
-          node src/index.js --no-sandbox
+          npm install --no-save @redocly/cli
+          
+      - name: Validate Swagger schema
+        run: |
+          npx @redocly/cli lint app/assets/swagger/swagger.json --extends=minimal
+          
+      - name: Display OpenAPI information
+        run: |
+          node -e "
+          const fs = require('fs');
+          
+          try {
+            const apiSpec = JSON.parse(fs.readFileSync('app/assets/swagger/swagger.json', 'utf8'));
+            console.log('API name: %s, Version: %s, OpenAPI Version: %s', 
+              apiSpec.info.title, 
+              apiSpec.info.version,
+              apiSpec.openapi);
+            console.log('Validation successful');
+          } catch (err) {
+            console.error('Error reading API spec:', err.message);
+            process.exit(1);
+          }
+          "

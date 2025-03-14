@@ -1,0 +1,169 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.3
+  Exclude:
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+    - 'bin/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - '.git/**/*'
+    - 'coverage/**/*'
+  SuggestExtensions: false
+
+# Plugins
+require: []
+plugins:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-performance
+
+# Ruby style
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/EmptyElse:
+  Enabled: false
+
+Style/SafeNavigationChainLength:
+  Enabled: false
+
+# Metrics
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'lib/tasks/**/*'
+    - 'Guardfile'
+
+Metrics/MethodLength:
+  Max: 50
+
+Metrics/AbcSize:
+  Max: 40
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Metrics/ClassLength:
+  Max: 150
+
+Metrics/ModuleLength:
+  Max: 150
+
+Metrics/ParameterLists:
+  Max: 8
+
+# Layout
+Layout/LineLength:
+  Max: 250
+
+# Rails
+Rails:
+  Enabled: true
+
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+# RSpec
+RSpec:
+  Enabled: true
+
+RSpec/ExampleLength:
+  Max: 40
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 20
+
+RSpec/MultipleExpectations:
+  Max: 10
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/VoidExpect:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
+
+RSpec/BeforeAfterAll:
+  Enabled: false
+
+# Allow non-snake_case variable names for compatibility with existing code
+# This is a temporary allowance that should be addressed in future refactorings
+Naming/VariableName:
+  Enabled: false
+
+RSpec/VariableName:
+  Exclude:
+    - 'spec/Facades/canvas_facade_spec.rb'
+    - 'spec/Facades/extension_facade_base_spec.rb'
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Naming/PredicateName:
+  Enabled: false
+
+Naming/BlockParameterName:
+  Enabled: false
+
+Naming/FileName:
+  Enabled: false
+
+# Canvas-specific naming conventions may not follow Ruby conventions
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/MethodName:
+  Enabled: false
+
+# Sometimes OpenStruct is necessary for compatibility with APIs
+Style/OpenStructUse:
+  Enabled: false
+
+# Lints
+Lint/MissingSuper:
+  Enabled: false
+
+Lint/DuplicateMethods:
+  Enabled: false
+
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: false
+
+Lint/EmptyBlock:
+  Enabled: false
+
+Lint/EmptyFile:
+  Enabled: false 

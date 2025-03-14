@@ -46,4 +46,3 @@ When(/^I navigate to any page other than the "([^"]*)"$/) do |page_name|
   # Example:
   # visit courses_path unless page_name == "Courses page"
 end
-
