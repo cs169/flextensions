@@ -1,0 +1,99 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Exam Seat Assignments">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
+    <title>Add New Course Offerings</title>
+  </head>
+
+  <body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+        
+          
+            <a href="/">
+              <span class="hidden-small mdl-layout__title">
+                Add New Course Offerings
+              </span>
+            </a>
+          
+          
+          <div class="hidden-small mdl-layout-spacer"></div>
+
+          
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="/">Home</a>
+                <a class="mdl-navigation__link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
+            </nav>
+          
+          
+            <a id="auth-menu" class="mdl-navigation__link" href="#">
+              <%= session[:username] || "Guest" %> <i class="material-icons">expand_more</i>
+            </a>
+            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="auth-menu">
+              <a class="mdl-navigation__link" href="/logout/">
+              <li class="mdl-menu__item">Log Out</li>
+              </a>
+            </ul>
+          
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        
+
+<div class="mdl-grid main-container">
+  <div class="mdl-cell mdl-cell--12-col">
+    <h5>Choose courses to set up extensions with:</h5>
+    <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
+  </div>
+  <% if @courses.any? %>
+  <%= form_with url: offerings_path, method: :post do %>
+    <% @courses.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
+      <div style="margin-bottom: 10px;">
+        <label>
+          <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}" %>
+          <span style="margin-left: 8px;">
+            <strong>Name:</strong> <%= course["name"] %> |
+            <strong>Course Code:</strong> <%= course["course_code"] %> |
+            <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
+          </span>
+        </label>
+      </div>
+    <% end %>
+    <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
+  <% end %>
+<% else %>
+  <p>No courses found or unable to fetch courses.</p>
+<% end %>
+
+<% if @courses_student.any? %>
+  <div class="mdl-cell mdl-cell--12-col" style="margin-top: 20px;">
+    <h5>Classes you are enrolled in but cannot set up extensions for:</h5>
+    <% @courses_student.sort_by { |c| c["enrollment_term_id"] }.each do |course| %>
+      <div style="margin-bottom: 10px;">
+        <span>
+          <strong>Name:</strong> <%= course["name"] %> |
+          <strong>Course Code:</strong> <%= course["course_code"] %> |
+          <strong>Semester:</strong> <%= course["enrollment_term_id"] || "N/A" %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+</div>
+      </main>
+    </div>
+
+    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  </body>
+</html>
