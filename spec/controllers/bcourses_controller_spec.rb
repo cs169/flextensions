@@ -2,6 +2,9 @@ require 'rails_helper'
 require 'lms_api'
 
 RSpec.describe "Bcourses", type: :request do
+  before do 
+    session[:user_id] = 213 # Manually set session
+  end
   describe 'GET /index' do
     let(:canvas_api_key) { 'test_api_key' } 
     let(:api_mock) { instance_double('LMS::Canvas') }

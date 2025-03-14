@@ -3,6 +3,10 @@ require 'byebug'
 module Api
   module V1
     describe ExtensionsController do
+      #Log in user before accessing any controller resources.
+      before do 
+        session[:user_id] = 213 # Manually set session
+      end
       describe "POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions" do
         before(:all) do
           load "#{Rails.root}/db/seeds.rb"

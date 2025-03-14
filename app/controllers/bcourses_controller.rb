@@ -1,5 +1,5 @@
 class BcoursesController < ApplicationController
-  skip_before_action :authenticated!
+  #skip_before_action :authenticated!
   require 'lms_api'
   
   def index
