@@ -1,6 +1,7 @@
 class BcoursesController < ApplicationController
+  skip_before_action :authenticated!
   require 'lms_api'
-
+  
   def index
     # For dev,test,staging, they share the same canvas_test_url
     canvas_url = Rails.application.credentials.canvas.url
