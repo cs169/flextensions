@@ -2,13 +2,13 @@ module Api
   module V1
     class AssignmentsController < ApplicationController
       include CanvasValidationHelper
-      
+
       skip_before_action :authenticated!
       before_action :validate_ids!, only: [:create]
       skip_before_action :verify_authenticity_token
 
       def index
-        render json: { message: 'not yet implemented'} , status: 501
+        render json: { message: 'not yet implemented' }, status: :not_implemented
       end
 
       # POST /courses/:course_id/lms/:lms_id/assignments
@@ -21,12 +21,14 @@ module Api
         end
 
         # Check if the assignment already exists
-        if Assignment.exists?(course_to_lms_id: course_to_lms.id, name: params[:name], external_assignment_id: params[:external_assignment_id])
+        if Assignment.exists?(course_to_lms_id: course_to_lms.id, name: params[:name],
+                              external_assignment_id: params[:external_assignment_id])
           render json: { message: 'Record already exists' }, status: :ok
           return
         end
         # Create and render the assignment
-        assignment = Assignment.new(course_to_lms_id: course_to_lms.id, name: params[:name], external_assignment_id: params[:external_assignment_id])
+        assignment = Assignment.new(course_to_lms_id: course_to_lms.id, name: params[:name],
+                                    external_assignment_id: params[:external_assignment_id])
         if assignment.save
           render json: assignment, status: :created
         else
@@ -35,29 +37,25 @@ module Api
       end
 
       def destroy
-        render json: { message: 'not yet implemented'} , status: 501
+        render json: { message: 'not yet implemented' }, status: :not_implemented
       end
 
       private
 
-
-
       def validate_ids!
         begin
-          params.require([:course_id, :lms_id, :name, :external_assignment_id])
+          params.require(%i[course_id lms_id name external_assignment_id])
         rescue ActionController::ParameterMissing => e
           render json: { error: e.message }, status: :bad_request
           return
         end
-        
-      
+
         # Validate that course_id and lms_id are integers
-        unless is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
-          render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
-          return
-        end
+        return if is_valid_course_id(params[:course_id].to_i) && is_valid_lms_id(params[:lms_id].to_i)
+
+        render json: { error: 'course_id and lms_id must be integers' }, status: :bad_request
+        nil
       end
-      
     end
   end
 end

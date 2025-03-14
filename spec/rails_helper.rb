@@ -3,9 +3,25 @@ require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'axe-rspec'
+require 'capybara/rspec'
+
+Capybara.register_driver :selenium_chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--disable-dev-shm-usage')
+  options.add_argument('--no-sandbox')
+  options.add_argument('--window-size=1400,1400')
+  options.add_argument('--headless') if ENV['HEADLESS'] == 'true'
+  options.add_argument('--disable-gpu')
+  options.add_argument('--memory-pressure-off')
+  options.add_argument('--js-flags=--max-old-space-size=4096')
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+Capybara.javascript_driver = :selenium_chrome
+Capybara.default_max_wait_time = 10
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are

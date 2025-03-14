@@ -6,8 +6,7 @@ require 'ostruct'
 ##
 # This is the facade for Canvas.
 class CanvasFacade < ExtensionFacadeBase
-
-  CANVAS_URL = ENV['CANVAS_URL']
+  CANVAS_URL = ENV.fetch('CANVAS_URL', nil)
 
   ##
   # Configures the facade with the canvas api endpoint configured in the environment.
@@ -82,14 +81,14 @@ class CanvasFacade < ExtensionFacadeBase
   # @return  [Faraday::Response] information about the new override.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvasApi.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
-      assignment_override: {
-        student_ids: studentIds,
-        title:       title,
-        due_at:      dueDate,
-        unlock_at:   unlockDate,
-        lock_at:     lockDate,
-      }
-    })
+                      assignment_override: {
+                        student_ids: studentIds,
+                        title: title,
+                        due_at: dueDate,
+                        unlock_at: unlockDate,
+                        lock_at: lockDate
+                      }
+                    })
   end
 
   ##
@@ -105,12 +104,12 @@ class CanvasFacade < ExtensionFacadeBase
   # @return  [Faraday::Response] information about the updated override.
   def update_assignment_override(courseId, assignmentId, overrideId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvasApi.put("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}", {
-      student_ids: studentIds,
-      title:       title,
-      due_at:      dueDate,
-      unlock_at:   unlockDate,
-      lock_at:     lockDate,
-  })
+                     student_ids: studentIds,
+                     title: title,
+                     due_at: dueDate,
+                     unlock_at: unlockDate,
+                     lock_at: lockDate
+                   })
   end
 
   ##
@@ -142,13 +141,11 @@ class CanvasFacade < ExtensionFacadeBase
       [studentId],
       overrideTitle,
       newDueDate,
-      get_current_formatted_time(),
-      newDueDate,
+      get_current_formatted_time,
+      newDueDate
     )
     # Either successful or error that is not explicitly handled here.
-    if (createOverrideResponse.status != 400)
-      return createOverrideResponse
-    end
+    return createOverrideResponse if createOverrideResponse.status != 400
 
     decodedCreateOverrideResponseBody = nil
     begin
@@ -157,18 +154,16 @@ class CanvasFacade < ExtensionFacadeBase
       raise FailedPipelineError.new('Update Student Extension', 'Parse Creation Response')
     end
     # This only fails if the student already has an override provisioned to them.
-    if (
-      decodedCreateOverrideResponseBody&.errors
-      &.assignment_override_students.any? { |studentError| studentError&.type != "taken" }
-    )
+    if decodedCreateOverrideResponseBody&.errors
+                                        &.assignment_override_students&.any? { |studentError| studentError&.type != 'taken' }
+
       return createOverrideResponse
     end
 
     currOverride = get_existing_student_override(courseId, studentId, assignmentId)
-    if (currOverride == nil)
-      raise NotFoundError.new('could not find student\'s override')
-    end
-    if (currOverride.student_ids.length == 1)
+    raise NotFoundError, 'could not find student\'s override' if currOverride.nil?
+
+    if currOverride.student_ids.length == 1
       return update_assignment_override(
         courseId,
         assignmentId,
@@ -176,18 +171,18 @@ class CanvasFacade < ExtensionFacadeBase
         currOverride.student_ids,
         overrideTitle,
         newDueDate,
-        get_current_formatted_time(),
-        newDueDate,
+        get_current_formatted_time,
+        newDueDate
       )
     end
     remove_student_from_override(courseId, currOverride, studentId)
     create_assignment_override(
       courseId,
       assignmentId,
-      [studentId],overrideTitle,
+      [studentId], overrideTitle,
       newDueDate,
-      get_current_formatted_time(),
-      newDueDate,
+      get_current_formatted_time,
+      newDueDate
     )
   end
 
@@ -211,16 +206,14 @@ class CanvasFacade < ExtensionFacadeBase
       raise FailedPipelineError.new(
         'Update Student Extension',
         'Get Existing Student Override',
-        'Parse Canvas Response',
+        'Parse Canvas Response'
       )
     end
 
     allAssignmentOverrides.each do |override|
-      if (override&.student_ids.include?(studentId))
-        return override
-      end
+      return override if override&.student_ids&.include?(studentId)
     end
-    return nil
+    nil
   end
 
   ##
@@ -228,9 +221,9 @@ class CanvasFacade < ExtensionFacadeBase
   #
   # @return [String] the current time that Canvas likes.
   def get_current_formatted_time
-    currDateTimeUnformatted = DateTime.now().utc.iso8601
+    currDateTimeUnformatted = DateTime.now.utc.iso8601
     # This is some weird format of iso8601 standard that Canvas likes... Don't ask me.
-    /[0-9]{4}\-[0-9]{2}\-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/.match(currDateTimeUnformatted)[0] + 'Z'
+    "#{/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/.match(currDateTimeUnformatted)[0]}Z"
   end
 
   ##
@@ -251,16 +244,16 @@ class CanvasFacade < ExtensionFacadeBase
       override.title,
       override.due_at,
       override.unlock_at,
-      override.lock_at,
+      override.lock_at
     )
     decodedBody = JSON.parse(res.body, object_class: OpenStruct)
-    if (decodedBody&.student_ids.include?(studentId))
+    if decodedBody&.student_ids&.include?(studentId)
       raise FailedPipelineError.new(
         'Update Student Extension',
         'Remove Student from Existing Override',
-        'Could not remove student',
+        'Could not remove student'
       )
     end
-    return res
+    res
   end
 end
