@@ -23,7 +23,7 @@ class OfferingsController < ApplicationController
 
   private
 
-  def fetch_courses(tokene)
+  def fetch_courses(token)
     response = Faraday.get(ENV['CANVAS_URL'] + "/api/v1/courses") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = "application/json"
