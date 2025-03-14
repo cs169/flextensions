@@ -16,6 +16,8 @@ module Api
         mock_course
         mock_lms
         mock_course_to_lms
+        #Log in user before accessing any controller resources.
+        session[:user_id] = 213 # Manually set session
       end
 
       after do

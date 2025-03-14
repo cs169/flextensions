@@ -11,6 +11,10 @@ module Api
         @course = Course.create!(course_name: "Mock CS169 Course")
         @lms = Lms.create!(lms_name: "Mock Canvas", use_auth_token: true)
         @external_course_id = "mock_external_course_id"
+        
+        #Log in user before accessing any controller resources. 
+        session[:user_id] = 213 # Manually set session
+      
       end
 
       after do

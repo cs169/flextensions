@@ -2,6 +2,11 @@ require 'rails_helper'
 module Api
   module V1
     describe CoursesController do
+      #Log in user before accessing any controller resources.
+      before do 
+        session[:user_id] = 213 # Manually set session
+      end
+
       describe 'POST #create' do
         context "when the new course is successfully created" do
           let(:course_name) { "New Course" }

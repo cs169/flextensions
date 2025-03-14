@@ -2,13 +2,13 @@ require 'rails_helper'
 require 'lms_api'
 
 RSpec.describe "Bcourses", type: :request do
+
   describe 'GET /index' do
     let(:canvas_api_key) { 'test_api_key' } 
     let(:api_mock) { instance_double('LMS::Canvas') }
     let(:courses) { [{'name' => 'Course 1'}, {'name' => 'Course 2'}] }
     
     before do
-
       # Stub to return the URL
       allow(Rails.application.credentials.canvas).to receive(:url).and_return("https://ucberkeley.test.instructure.com")
       # Stub to return the API key
