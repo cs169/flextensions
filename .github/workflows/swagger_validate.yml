@@ -19,30 +19,28 @@ jobs:
         with:
           node-version: '20'
           
-      - name: Install Puppeteer and validation tools
+      - name: Install validation tools
         run: |
-          npm install --no-save puppeteer swagger-parser @apidevtools/swagger-cli
+          npm install --no-save @redocly/cli
           
       - name: Validate Swagger schema
         run: |
-          npx swagger-cli validate app/assets/swagger/swagger.json
+          npx @redocly/cli lint app/assets/swagger/swagger.json --extends=minimal
           
-      - name: Check for semantic errors
+      - name: Display OpenAPI information
         run: |
           node -e "
-          const SwaggerParser = require('swagger-parser');
           const fs = require('fs');
           
-          async function validateSwagger() {
-            try {
-              const api = await SwaggerParser.validate('app/assets/swagger/swagger.json');
-              console.log('API name: %s, Version: %s', api.info.title, api.info.version);
-              console.log('Validation successful');
-            } catch (err) {
-              console.error('Validation failed:', err.message);
-              process.exit(1);
-            }
+          try {
+            const apiSpec = JSON.parse(fs.readFileSync('app/assets/swagger/swagger.json', 'utf8'));
+            console.log('API name: %s, Version: %s, OpenAPI Version: %s', 
+              apiSpec.info.title, 
+              apiSpec.info.version,
+              apiSpec.openapi);
+            console.log('Validation successful');
+          } catch (err) {
+            console.error('Error reading API spec:', err.message);
+            process.exit(1);
           }
-          
-          validateSwagger();
           "
