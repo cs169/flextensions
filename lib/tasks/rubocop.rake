@@ -14,7 +14,7 @@ namespace :rubocop do
     puts "RuboCop auto-fix completed with issues: #{e.message}"
     exit(0) # Don't fail the rake task
   end
-  
+
   desc 'Run RuboCop with HTML report output'
   task report: :environment do
     sh 'bundle exec rubocop --format html --out rubocop_report.html'

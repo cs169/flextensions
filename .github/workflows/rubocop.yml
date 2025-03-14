@@ -12,29 +12,12 @@ jobs:
     name: Ruby Linting
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: ${{ github.head_ref }}
-        
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.3.0
         bundler-cache: true
-        
     - name: Install dependencies
       run: bundle install
-      
-    - name: Run RuboCop auto-correct
-      run: bundle exec rubocop -A
-      
-    - name: Commit auto-corrected changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: "Auto-fix RuboCop issues"
-        file_pattern: "**/*.rb **/*.rake"
-        commit_user_name: "GitHub Actions"
-        commit_user_email: "actions@github.com"
-        commit_author: "GitHub Actions <actions@github.com>"
-        
-    - name: Run RuboCop check
+    - name: Run RuboCop
       run: bundle exec rubocop 
