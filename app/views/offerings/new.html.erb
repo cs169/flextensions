@@ -1,10 +1,10 @@
-<div class="container mt-4">
+<div class="container">
   <div class="row">
     <div class="col-12">
       <h5>Choose courses to set up extensions with:</h5>
       <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
     </div>
-  </div>
+  
 
   <% if @courses_teacher.any? %>
     <%= form_with url: offerings_path, method: :post, class: "mt-3" do %>
@@ -40,4 +40,5 @@
       </div>
     </div>
   <% end %>
+  </div>
 </div>
