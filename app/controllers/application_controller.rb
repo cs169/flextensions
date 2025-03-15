@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-    before_action :authenticated!, unless: -> { excluded_controller_action? }
+  before_action :authenticated!, unless: -> { excluded_controller_action? }
 
     private def authenticated!
        if session[:user_id].nil?
@@ -18,6 +18,14 @@ class ApplicationController < ActionController::Base
         controller = params[:controller]
         action = params[:action]
 
-        excluded_actions[controller]&.include?(action)
-    end
+    excluded_actions[controller]&.include?(action)
+  end
+
+  private
+
+  def authenticated!
+    return unless session[:user_id].nil?
+
+    redirect_to root_path, alert: 'Please log in to access this page.'
+  end
 end

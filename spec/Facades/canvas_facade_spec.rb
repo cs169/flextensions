@@ -12,42 +12,44 @@ describe CanvasFacade do
   let(:mockTitle) { 'mockOverrideTitle' }
   let(:mockDate) { '2002-03-16:16:00:00Z' }
   let(:mockOverrideId) { 8 }
-  let(:mockOverride) { {
-    id:            mockOverrideId,
-    assignment_id: mockAssignmentId,
-    title:         'mockOverrideTitle',
-    due_at:        mockDate,
-    unlock_at:     mockDate,
-    lock_at:       mockDate,
-    student_ids:   [mockStudentId],
-  } }
+  let(:mockOverride) do
+    {
+      id: mockOverrideId,
+      assignment_id: mockAssignmentId,
+      title: 'mockOverrideTitle',
+      due_at: mockDate,
+      unlock_at: mockDate,
+      lock_at: mockDate,
+      student_ids: [mockStudentId]
+    }
+  end
+
+  let(:facade) { described_class.new(mockAuthToken, conn) }
+  let(:conn) { Faraday.new { |builder| builder.adapter(:test, stubs) } }
+  # Used https://danielabaron.me/blog/testing-faraday-with-rspec/ as reference.
+  let(:stubs) { Faraday::Adapter::Test::Stubs.new }
+
+  # Allows each  test to have its own set of stubs.
+  after do
+    Faraday.default_connection = nil
+  end
 
   describe('initialization') do
     it 'sets the proper URL' do
       expect(Faraday).to receive(:new).with(hash_including(
-        url: "#{ENV['CANVAS_URL']}/api/v1",
-      ))
+                                              url: "#{ENV.fetch('CANVAS_URL', nil)}/api/v1"
+                                            ))
       described_class.new(mockAuthToken)
     end
 
     it 'sets the proper token' do
       expect(Faraday).to receive(:new).with(hash_including(
-        headers: {
-          Authorization: "Bearer #{mockAuthToken}"
-        }
-      ))
+                                              headers: {
+                                                Authorization: "Bearer #{mockAuthToken}"
+                                              }
+                                            ))
       described_class.new(mockAuthToken)
     end
-  end
-
-  # Used https://danielabaron.me/blog/testing-faraday-with-rspec/ as reference.
-  let(:stubs) { Faraday::Adapter::Test::Stubs.new }
-  let(:conn) { Faraday.new { |builder| builder.adapter(:test, stubs) } }
-  let(:facade) { described_class.new(mockAuthToken, conn) }
-
-  # Allows each  test to have its own set of stubs.
-  after do
-    Faraday.default_connection = nil
   end
 
   describe 'get_all_courses' do
@@ -112,7 +114,7 @@ describe CanvasFacade do
 
     before do
       stubs.post(
-        createAssignmentOverrideUrl,
+        createAssignmentOverrideUrl
       ) { [200, {}, '{}'] }
     end
 
@@ -121,11 +123,11 @@ describe CanvasFacade do
         createAssignmentOverrideUrl,
         { assignment_override: {
           student_ids: [mockStudentId],
-          title:       mockTitle,
-          due_at:      mockDate,
-          unlock_at:   mockDate,
-          lock_at:     mockDate,
-        }}
+          title: mockTitle,
+          due_at: mockDate,
+          unlock_at: mockDate,
+          lock_at: mockDate
+        } }
       )
 
       facade.create_assignment_override(
@@ -135,7 +137,7 @@ describe CanvasFacade do
         mockTitle,
         mockDate,
         mockDate,
-        mockDate,
+        mockDate
       )
     end
 
@@ -147,19 +149,20 @@ describe CanvasFacade do
         mockTitle,
         mockDate,
         mockDate,
-        mockDate,
+        mockDate
       ).body).to eq('{}')
       stubs.verify_stubbed_calls
     end
   end
 
   describe('update_assignment_override') do
-    let(:updateAssignmentOverrideUrl) {
+    let(:updateAssignmentOverrideUrl) do
       "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides/#{mockOverrideId}"
-    }
+    end
+
     before do
       stubs.put(
-        updateAssignmentOverrideUrl,
+        updateAssignmentOverrideUrl
       ) { [200, {}, '{}'] }
     end
 
@@ -168,10 +171,10 @@ describe CanvasFacade do
         updateAssignmentOverrideUrl,
         {
           student_ids: [mockStudentId],
-          title:       mockTitle,
-          due_at:      mockDate,
-          unlock_at:   mockDate,
-          lock_at:     mockDate,
+          title: mockTitle,
+          due_at: mockDate,
+          unlock_at: mockDate,
+          lock_at: mockDate
         }
       )
 
@@ -183,7 +186,7 @@ describe CanvasFacade do
         mockTitle,
         mockDate,
         mockDate,
-        mockDate,
+        mockDate
       )
     end
 
@@ -196,7 +199,7 @@ describe CanvasFacade do
         mockTitle,
         mockDate,
         mockDate,
-        mockDate,
+        mockDate
       ).body).to eq('{}')
       stubs.verify_stubbed_calls
     end
@@ -213,7 +216,7 @@ describe CanvasFacade do
       expect(facade.delete_assignment_override(
         mockCourseId,
         mockAssignmentId,
-        mockOverrideId,
+        mockOverrideId
       ).body).to eq('{}')
       stubs.verify_stubbed_calls
     end
@@ -221,49 +224,55 @@ describe CanvasFacade do
 
   describe('provision_extension') do
     let(:mockOverrideCreationUrl) { "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides" }
-    let(:mockCreationErrorResponseAlreadyExists) { [
-      400,
-      {},
-      { errors: { assignment_override_students: [{
-        attribute: 'assignment_override_students',
-        type:      'taken',
-        message:   'already belongs to an assignment override'
-      }] } }.to_json
-    ] }
+    let(:mockCreationErrorResponseAlreadyExists) do
+      [
+        400,
+        {},
+        { errors: { assignment_override_students: [{
+          attribute: 'assignment_override_students',
+          type: 'taken',
+          message: 'already belongs to an assignment override'
+        }] } }.to_json
+      ]
+    end
 
     before do
       allow(facade).to receive(:get_current_formatted_time).and_return(mockDate)
     end
 
     it 'returns correct response body on successful creation' do
-      stubs.post(mockOverrideCreationUrl) { [200, {}, '{}' ] }
+      stubs.post(mockOverrideCreationUrl) { [200, {}, '{}'] }
       expect(facade.provision_extension(
         mockCourseId,
         mockStudentId,
         mockAssignmentId,
-        mockDate,
+        mockDate
       ).body).to eq('{}')
     end
 
     it 'throws a pipeline error if the creation response body is improperly formatted' do
       stubs.post(mockOverrideCreationUrl) { [400, {}, '{invalid json}'] }
-      expect { facade.provision_extension(
-        mockCourseId,
-        mockStudentId,
-        mockAssignmentId,
-        mockDate,
-      ) }.to raise_error(FailedPipelineError)
+      expect do
+        facade.provision_extension(
+          mockCourseId,
+          mockStudentId,
+          mockAssignmentId,
+          mockDate
+        )
+      end.to raise_error(FailedPipelineError)
     end
 
     it 'throws an error if the existing override cannot be found' do
       stubs.post(mockOverrideCreationUrl) { mockCreationErrorResponseAlreadyExists }
       expect(facade).to receive(:get_existing_student_override).and_return(nil)
-      expect { facade.provision_extension(
-        mockCourseId,
-        mockStudentId,
-        mockAssignmentId,
-        mockDate,
-      ) }.to raise_error(NotFoundError)
+      expect do
+        facade.provision_extension(
+          mockCourseId,
+          mockStudentId,
+          mockAssignmentId,
+          mockDate
+        )
+      end.to raise_error(NotFoundError)
     end
 
     it 'updates the existing assignment override if the student is the only student the override is provisioned to' do
@@ -277,13 +286,13 @@ describe CanvasFacade do
         "#{mockStudentId} extended to #{mockDate}",
         mockDate,
         mockDate,
-        mockDate,
+        mockDate
       )
       facade.provision_extension(
         mockCourseId,
         mockStudentId,
         mockAssignmentId,
-        mockDate,
+        mockDate
       )
     end
 
@@ -295,64 +304,71 @@ describe CanvasFacade do
       expect(facade).to receive(:remove_student_from_override).with(
         mockCourseId,
         mockOverrideStruct,
-        mockStudentId,
+        mockStudentId
       )
       facade.provision_extension(
         mockCourseId,
         mockStudentId,
         mockAssignmentId,
-        mockDate,
+        mockDate
       )
     end
   end
 
   describe 'get_existing_student_override' do
     let(:getAssignmentOverridesUrl) { "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides" }
+
     it 'throws an error if the overrides response body cannot be parsed' do
       stubs.get(getAssignmentOverridesUrl) { [200, {}, '{invalid json}'] }
-      expect { facade.send(
-        :get_existing_student_override,
-        mockCourseId,
-        mockStudentId,
-        mockAssignmentId,
-      ) }.to raise_error(FailedPipelineError)
+      expect do
+        facade.send(
+          :get_existing_student_override,
+          mockCourseId,
+          mockStudentId,
+          mockAssignmentId
+        )
+      end.to raise_error(FailedPipelineError)
     end
 
     it 'returns the override that the student is listed in' do
       mockOverrideWithoutStudent = mockOverride.clone
       mockOverrideWithoutStudent[:student_ids] = [mockStudentId + 1]
-      stubs.get(getAssignmentOverridesUrl) { [
-        200,
-        {},
-        [mockOverrideWithoutStudent, mockOverride].to_json,
-      ] }
+      stubs.get(getAssignmentOverridesUrl) do
+        [
+          200,
+          {},
+          [mockOverrideWithoutStudent, mockOverride].to_json
+        ]
+      end
       expect(facade.send(
         :get_existing_student_override,
         mockCourseId,
         mockStudentId,
-        mockAssignmentId,
+        mockAssignmentId
       ).student_ids[0]).to eq(mockStudentId)
     end
 
     it 'returns nil if no override for that student is found' do
       mockOverride[:student_ids] = [mockStudentId + 1]
-      stubs.get(getAssignmentOverridesUrl) { [
-        200,
-        {},
-        mockOverride.to_json
-      ] }
+      stubs.get(getAssignmentOverridesUrl) do
+        [
+          200,
+          {},
+          mockOverride.to_json
+        ]
+      end
       expect(facade.send(
-        :get_existing_student_override,
-        mockCourseId,
-        mockStudentId,
-        mockAssignmentId,
-      )).to eq(nil)
+               :get_existing_student_override,
+               mockCourseId,
+               mockStudentId,
+               mockAssignmentId
+             )).to be_nil
     end
   end
 
   describe 'get_current_formatted_time' do
     before do
-      Timecop.freeze(DateTime.new(2002, 03, 16, 16))
+      Timecop.freeze(DateTime.new(2002, 0o3, 16, 16))
     end
 
     it 'outputs the current time in Canvas iso8601 formatting' do
@@ -378,14 +394,14 @@ describe CanvasFacade do
         mockOverrideStruct.title,
         mockOverrideStruct.due_at,
         mockOverrideStruct.unlock_at,
-        mockOverrideStruct.lock_at,
+        mockOverrideStruct.lock_at
       ).and_return(OpenStruct.new({ body: mockOverrideWithoutStudent.to_h.to_json }))
       expect(facade.send(
-        :remove_student_from_override,
-        mockCourseId,
-        mockOverrideStruct,
-        mockStudentId,
-      ))
+               :remove_student_from_override,
+               mockCourseId,
+               mockOverrideStruct,
+               mockStudentId
+             ))
     end
 
     it 'throws a pipeline error if the student cannot be removed from the override' do
@@ -397,14 +413,16 @@ describe CanvasFacade do
         mockOverrideStruct.title,
         mockOverrideStruct.due_at,
         mockOverrideStruct.unlock_at,
-        mockOverrideStruct.lock_at,
+        mockOverrideStruct.lock_at
       ).and_return(OpenStruct.new({ body: mockOverrideStruct.to_h.to_json }))
-      expect { facade.send(
-        :remove_student_from_override,
-        mockCourseId,
-        mockOverrideStruct,
-        mockStudentId,
-      ) }.to raise_error(FailedPipelineError)
+      expect do
+        facade.send(
+          :remove_student_from_override,
+          mockCourseId,
+          mockOverrideStruct,
+          mockStudentId
+        )
+      end.to raise_error(FailedPipelineError)
     end
   end
 end
