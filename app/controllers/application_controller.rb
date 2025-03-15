@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
       'login' => ['canvas'],
       'session' => ['create'],
       'rails/health' => ['show']
+      # "offerings" => ["index"] # only here for dev purposes
     }
     controller = params[:controller]
     action = params[:action]
@@ -16,6 +17,12 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def authenticated!
+    return unless session[:user_id].nil?
+
+    redirect_to root_path, alert: 'Please log in to access this page.'
+  end
 
   def authenticated!
     return unless session[:user_id].nil?

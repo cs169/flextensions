@@ -1,104 +1,43 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-    "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en">
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="col-12 mb-4">
+			<h4>Staff Course Offerings</h4>
+			<p>
+				The following course offerings that you are a staff member of, and already have exams set up. You can now manage their exams. You can add more courses you are a staff member of by clicking the button below.
+			</p>
 
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Exam Seat Assignments">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
-    <title>Select a Course Offering</title>
-  </head>
+			<div class="col-10">
+				<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
+			</div>
 
-  <body>
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-      <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-        
-          
-            <a href="/">
-              <span class="hidden-small mdl-layout__title">
-                Select a Course Offering
-              </span>
-            </a>
-          
-          
-          <div class="hidden-small mdl-layout-spacer"></div>
+			<div class="text-center">
+				<a href="/offerings/new" class="btn btn-secondary">Import courses from canvas</a>
+			</div>
+		</div>
 
-          
-            <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="/">Home</a>
-                <a class="mdl-navigation__link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
-            </nav>
-          
-          
-            <a id="auth-menu" class="mdl-navigation__link" href="#">
-              <%= session[:username] || "Guest" %> <i class="material-icons">expand_more</i>
-            </a>
-            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="auth-menu">
-              <a class="mdl-navigation__link" href="/logout/">
-              <li class="mdl-menu__item">Log Out</li>
-              </a>
-            </ul>
-          
-        </div>
-      </header>
-      <main class="mdl-layout__content">
-        
-<section class="rooms mdl-grid">
-  <div class="mdl-cell mdl-cell--12-col">
-    <h4>Staff Course Offerings</h4>
-    <div>
-      <p>The following course offerings that you are a staff member of, and already have extensions set up. You can now manage their extensions. You can add more courses you are a staff member of by clicking the button below.
-      </p>
-    </div>
-    <ul class="mdl-list">
-        
-        <li class="mdl-list__item">
-        You are not a student in any course offerings with extensions set up.
-        </li>
-    
-    </ul>
-    <div style="display: flex; justify-content: center;">
-      <a href="/offerings/new" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-        Import Courses from Canvas
-      </a>
-    </div>
-    <h4>Student Course Offerings</h4>
-    <div>
-      <p>The following course offerings that you are a student of already have extensions set up. If you expect to see a course here but it is not here, your course staff have not yet set up extensions for the course yet in this system. Contact your course staff.
-      </p>
-    </div>
-    <ul class="mdl-list">
-    
-      <li class="mdl-list__item">
-        You are not a student in any course offerings with extensions set up.
-      </li>
-    
-    
-    </ul>
-    <h4>Other Course Offerings</h4>
-    <div>
-    <p>In the following course offerings you are neither a staff member nor a student, but extensions have been set up. You cannot do anything with these offerings.
-    </p>
-    </div>
-    <ul class="mdl-list">
-    
-      <li class="mdl-list__item">
-        There are no other course offerings with extensions set up.
-      </li>
-    
-    
-    </ul>
-  </div>
-</section>
 
-      </main>
-    </div>
+		<div class="col-12 mb-4">
+			<h4>Student Course Offerings</h4>
+			<p>
+				The following course offerings that you are a student of already have flextensions set up. You can now view your own seat assignments and exam schedule. If you expect to see a course here but it is not here, your course staff have not yet set up exams for the course yet in this system. Contact your course staff.
+			</p>
+			<div class="col-10">
+				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
+			</div>
 
-    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
-  </body>
-</html>
+		</div>
+
+
+		<div class="col-12 p-0">
+			<h4>Other Course Offerings</h4>
+			<p>
+			In the following course offerings you are neither a staff member nor a student, but exams have been set up. You cannot do anything with these offerings.
+			</p>
+
+			<div class="col-10">
+				<div class="alert alert-warning">There are no other course offerings that support flextensions</div>
+			</div>
+
+		</div>
+	</div>
+</div>

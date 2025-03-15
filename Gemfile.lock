@@ -541,7 +541,7 @@ DEPENDENCIES
   axe-core-cucumber
   axe-core-rspec
   bootsnap
-  bootstrap (~> 5.3.2)
+  bootstrap (~> 5.3.3)
   byebug
   capybara-screenshot
   codeclimate-test-reporter
