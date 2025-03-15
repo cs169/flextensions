@@ -53,7 +53,7 @@ gem 'lms-api'
 
 gem 'bootstrap', '~> 5.3.3'
 gem 'jquery-rails'
-gem 'sassc-rails', '~> 2.1'   #dependency for bootstrap #03-10-2025 this is deprecated but still works
+gem 'sassc-rails', '~> 2.1' # dependency for bootstrap #03-10-2025 this is deprecated but still works
 # gem 'dartsass-sprockets' # alternative to sassc-rails, this is recommended but bootstrap 5.3.3 is still using "deprecated" @import statements which this gem doesn't like
 gem 'json'
 
