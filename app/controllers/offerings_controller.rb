@@ -2,7 +2,7 @@ class OfferingsController < ApplicationController
   def index; end
 
   def new
-    user = User.find_by(id: session[:user_id])
+    user = User.find_by(canvas_uid: session[:user_id])
     if user.nil?
       Rails.logger.info 'User not found in session'
       redirect_to root_path, alert: 'Please log in to access this page.'
