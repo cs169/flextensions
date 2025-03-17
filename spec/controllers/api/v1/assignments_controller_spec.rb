@@ -2,9 +2,14 @@ require 'rails_helper'
 module Api
   module V1
     describe AssignmentsController do
-      before do 
-        session[:user_id] = 213 # Manually set session
+      before do
+        session[:user_id] = 213
+        mock_course
+        mock_lms
+        mock_course_to_lms
+        # Manually set session
       end
+
       def json_response
         response.parsed_body
       end
@@ -15,12 +20,6 @@ module Api
 
       let(:valid_params) do
         { name: 'Test Assignment', external_assignment_id: '123ABC', course_id: mock_course.id, lms_id: mock_lms.id }
-      end
-
-      before do
-        mock_course
-        mock_lms
-        mock_course_to_lms
       end
 
       after do
