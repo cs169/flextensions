@@ -2,6 +2,10 @@ require 'rails_helper'
 module Api
   module V1
     describe UsersController do
+      before do
+        session[:user_id] = 213 # Manually set session
+      end
+
       describe 'POST #create' do
         context 'when creating a new user' do
           it 'creates the user successfully' do

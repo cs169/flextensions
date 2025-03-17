@@ -2,15 +2,17 @@ require 'rails_helper'
 module Api
   module V1
     describe LmssController do
-      def json_response
-        response.parsed_body
-      end
-
       before do
-        # Manually create a course and LMS in the database
+        session[:user_id] = 213
         @course = Course.create!(course_name: 'Mock CS169 Course')
         @lms = Lms.create!(lms_name: 'Mock Canvas', use_auth_token: true)
         @external_course_id = 'mock_external_course_id'
+        session[:user_id] = 213 # Manually set session
+        # Manually set session
+      end
+
+      def json_response
+        response.parsed_body
       end
 
       after do

@@ -10,7 +10,12 @@ class LoginController < ApplicationController
   end
 
   def logout
+    Faraday.delete("#{ENV.fetch('CANVAS_URL', nil)}/login/oauth2/token") do |req|
+      req.headers['Authorization'] = "Bearer #{current_user.lms_credential.access_token}"
+    end
+    users.find_by(user_id: session[:user_id]).lms_credentials.destroy_all
     session[:user_id] = nil
+    session[:username] = nil
     redirect_to root_path
   end
 
