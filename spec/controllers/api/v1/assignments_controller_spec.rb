@@ -2,6 +2,9 @@ require 'rails_helper'
 module Api
   module V1
     describe AssignmentsController do
+      before do 
+        session[:user_id] = 213 # Manually set session
+      end
       def json_response
         response.parsed_body
       end

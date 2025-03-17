@@ -57,10 +57,8 @@ class SessionController < ApplicationController
       user.assign_attributes(
         email: user_data['email'],
         name: user_data['name'],
-        canvas_token: token # Store the token to use for API requests
-        # canvas_token_expires_at: Time.current + 1.hours
+        canvas_token: token
       )
-      # session[:user_info] = user_data
       user.save!
     end
     # Store user ID in session for authentication

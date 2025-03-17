@@ -2,6 +2,9 @@ require 'rails_helper'
 module Api
   module V1
     describe LmssController do
+      before do 
+        session[:user_id] = 213 # Manually set session
+      end
       def json_response
         response.parsed_body
       end
@@ -11,6 +14,7 @@ module Api
         @course = Course.create!(course_name: 'Mock CS169 Course')
         @lms = Lms.create!(lms_name: 'Mock Canvas', use_auth_token: true)
         @external_course_id = 'mock_external_course_id'
+          session[:user_id] = 213 # Manually set session
       end
 
       after do
