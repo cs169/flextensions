@@ -5,6 +5,9 @@
 # files.
 
 require 'cucumber/rails'
+require 'rspec/mocks'
+
+World(RSpec::Mocks::ExampleMethods)
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -71,4 +74,31 @@ Capybara.default_max_wait_time = 10
 
 Before do
   page.driver.browser.manage.window.resize_to(1400, 900) if page.driver.browser.respond_to?(:manage)
+  RSpec::Mocks.setup
+end
+
+Capybara.default_driver = :selenium_chrome
+Capybara.javascript_driver = :selenium_chrome
+
+# Increase wait time for slower operations
+Capybara.default_max_wait_time = 15 
+
+# Ensure we get a clean slate in the browser for each test
+Before do
+  # Reset sessions between scenarios
+  Capybara.reset_sessions!
+  # Clear browser cookies
+  page.driver.browser.manage.delete_all_cookies if page.driver.browser.respond_to?(:manage)
+  # Resize the browser window
+  page.driver.browser.manage.window.resize_to(1400, 900) if page.driver.browser.respond_to?(:manage)
+  # Print current URL for debugging
+  puts "Starting scenario on URL: #{current_url}" if current_url != "about:blank"
+end
+
+After do
+  begin
+    RSpec::Mocks.verify
+  ensure
+    RSpec::Mocks.teardown
+  end
 end

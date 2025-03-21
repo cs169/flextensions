@@ -17,6 +17,9 @@ module NavigationHelpers
     when /^Offerings page$/
       '/offerings'
 
+    when /^Courses page$/
+      '/courses'
+
     else
       begin
         page_name =~ /^the (.*) page$/

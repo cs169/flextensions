@@ -41,7 +41,11 @@ When(/^(.*) within (.*[^:]):$/) do |step, parent, table_or_string|
 end
 
 Given(/^(?:|I )am on the\s*"?([^"]+)"?\s*$/) do |page_name|
-  visit path_to(page_name.strip)
+  page_path = path_to(page_name.strip)
+  puts "Navigating to: #{page_path}"
+  visit page_path
+  # Wait for navigation to complete
+  expect(page).to have_current_path(page_path)
 end
 
 When(/^I navigate to\s*"?([^"]+)"?\s*$/) do |page_name|
