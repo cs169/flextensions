@@ -58,10 +58,10 @@ With Overmind, you can run `$make dev` or `$make`
 ### Running Accessibility Tests
 
 Run RSpec accessibility tests:
-bashCopybundle exec rspec spec/ --tag a11y
+bundle exec rspec spec/ --tag a11y
 
 Run Cucumber accessibility tests:
-bashCopybundle exec cucumber features/ --tag @a11y
+bundle exec cucumber features/ --tag @a11y
 
 ## Notes
 There are now two separate instances of Canvas, each with it's own triad of prod/test/beta environments:
