@@ -10,9 +10,9 @@ Feature: Accessibility Testing
     Then the page should be axe clean
 
   @a11y
-  Scenario: Offerings page should be accessible
+  Scenario: Courses page should be accessible
     Given I am logged in as a user
-    And I am on the "Offerings page"
+    And I am on the "Courses page"
     Then the page should be axe clean
 
   # Theme-specific accessibility tests

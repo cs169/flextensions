@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'offering/index'
+  get 'courses/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'
   get "home/index"
@@ -11,8 +11,8 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
-  get '/offerings', to: 'offerings#index', as: 'offerings'
-  get '/offerings/new', to: 'offerings#new', as: :new_offerings
+  get '/courses', to: 'courses#index', as: 'courses'
+  get '/courses/new', to: 'courses#new', as: :new_course
   
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 

@@ -1,4 +1,4 @@
-class OfferingsController < ApplicationController
+class CoursesController < ApplicationController
   def index; end
 
   def new

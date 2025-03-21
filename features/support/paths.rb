@@ -14,8 +14,8 @@ module NavigationHelpers
     when /^bCourses login page$/
       '/login/canvas'
 
-    when /^Offerings page$/
-      '/offerings'
+    when /^Courses page$/
+      '/courses'
 
     when /^Courses page$/
       '/courses'
