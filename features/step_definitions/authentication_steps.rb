@@ -1,6 +1,89 @@
 When(/^I authorize bCourses with (in)?valid credentials$/) do |invalid|
-  # TODO: Implement this
-  raise 'Not implemented'
+  if invalid
+    # Invalid credentials
+    if page.has_selector?('#pseudonym_session_unique_id')
+      # Canvas direct login
+      fill_in 'pseudonym_session[unique_id]', with: 'invalid_user'
+      fill_in 'pseudonym_session[password]', with: 'invalid_password'
+      begin
+        click_button 'Log In'
+      rescue StandardError
+        find('button[type="submit"]').click
+      end
+    elsif page.has_selector?('#username')
+      # Berkeley CAS login
+      fill_in 'username', with: 'invalid_user'
+      fill_in 'password', with: 'invalid_password'
+      begin
+        begin
+          click_button 'Sign In'
+        rescue StandardError
+          click_button 'Login'
+        end
+      rescue StandardError
+        find('button[type="submit"]').click
+      end
+    else
+      # Generic form
+      within('form') do
+        inputs = all('input[type="text"], input[type="email"], input:not([type="hidden"])')
+        password_inputs = all('input[type="password"]')
+
+        inputs.first.fill_in with: 'invalid_user' if inputs.any?
+        password_inputs.first.fill_in with: 'invalid_password' if password_inputs.any?
+
+        find('button[type="submit"], input[type="submit"]').click
+      end
+    end
+  else
+    # Valid credentials from environment variables
+    if page.has_selector?('#pseudonym_session_unique_id')
+      # Canvas direct login
+      fill_in 'pseudonym_session[unique_id]', with: ENV.fetch('CANVAS_TEST_USERNAME', nil)
+      fill_in 'pseudonym_session[password]', with: ENV.fetch('CANVAS_TEST_PASSWORD', nil)
+      begin
+        click_button 'Log In'
+      rescue StandardError
+        find('button[type="submit"]').click
+      end
+    elsif page.has_selector?('#username')
+      # Berkeley CAS login
+      fill_in 'username', with: ENV.fetch('CANVAS_TEST_USERNAME', nil)
+      fill_in 'password', with: ENV.fetch('CANVAS_TEST_PASSWORD', nil)
+      begin
+        begin
+          click_button 'Sign In'
+        rescue StandardError
+          click_button 'Login'
+        end
+      rescue StandardError
+        find('button[type="submit"]').click
+      end
+    else
+      # Generic form
+      within('form') do
+        inputs = all('input[type="text"], input[type="email"], input:not([type="hidden"])')
+        password_inputs = all('input[type="password"]')
+
+        inputs.first.fill_in with: ENV.fetch('CANVAS_TEST_USERNAME', nil) if inputs.any?
+        password_inputs.first.fill_in with: ENV.fetch('CANVAS_TEST_PASSWORD', nil) if password_inputs.any?
+
+        find('button[type="submit"], input[type="submit"]').click
+      end
+    end
+
+    # Check for authorization screen after login
+    sleep 2
+    if page.has_css?('input[value="Authorize"]') || page.has_button?('Authorize')
+      puts 'Found authorization screen after login, clicking Authorize button'
+      begin
+        click_button('Authorize')
+      rescue StandardError
+        find('input[value="Authorize"]').click
+      end
+      puts 'Clicked Authorize button after login'
+    end
+  end
 end
 
 def click_login_button
@@ -121,19 +204,17 @@ Given(/^I am logged in as a user$/) do
 
   visit root_path
   click_login_button
+  log_in_canvas
 
   # Go to courses and verify
-  visit "#{courses_path}?skip_auth_check=true"
+  visit courses_path
   sleep 1
   puts "After login, current path: #{current_path}"
 
   # Store session state
   @logged_in = true
-  @user_id = begin
-    page.get_rack_session_key('213')
-  rescue StandardError
-    '213'
-  end
+  @user_id = '123456' # Use a consistent user ID for tests
+  @current_path = '/courses'
   @user_name = 'Test User'
 end
 

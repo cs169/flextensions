@@ -6,8 +6,6 @@ class CoursesController < ApplicationController
     Rails.logger.info "TEST ENV: In courses#index - user_id=#{session[:user_id]}"
     # Just render the index view in test env
     nil
-
-    # Regular production/development logic can go here if needed
   end
 
   def new
