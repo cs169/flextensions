@@ -17,7 +17,7 @@ class SessionController < ApplicationController
       #   Rails.logger.debug(user_data)
       #   Rails.logger.info "User Data: #{user_data}"
       find_or_create_user(user_data, token)
-      redirect_to offerings_path, notice: 'Logged in!'
+      redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
     end
