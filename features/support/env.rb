@@ -6,6 +6,7 @@
 
 require 'cucumber/rails'
 require 'rspec/mocks'
+require 'rack_session_access/capybara'
 
 World(RSpec::Mocks::ExampleMethods)
 
@@ -81,7 +82,7 @@ Capybara.default_driver = :selenium_chrome
 Capybara.javascript_driver = :selenium_chrome
 
 # Increase wait time for slower operations
-Capybara.default_max_wait_time = 15 
+Capybara.default_max_wait_time = 15
 
 # Ensure we get a clean slate in the browser for each test
 Before do
@@ -92,13 +93,20 @@ Before do
   # Resize the browser window
   page.driver.browser.manage.window.resize_to(1400, 900) if page.driver.browser.respond_to?(:manage)
   # Print current URL for debugging
-  puts "Starting scenario on URL: #{current_url}" if current_url != "about:blank"
+  puts "Starting scenario on URL: #{current_url}" if current_url != 'about:blank'
+end
+
+# Capture scenario tags
+Before do |scenario|
+  @scenario_tags = scenario.source_tag_names
 end
 
 After do
-  begin
-    RSpec::Mocks.verify
-  ensure
-    RSpec::Mocks.teardown
-  end
+  RSpec::Mocks.verify
+ensure
+  RSpec::Mocks.teardown
 end
+
+# Configure Capybara to use port 3000 for tests
+# This is important for OAuth redirect_uri to work correctly
+Capybara.server_port = 3000

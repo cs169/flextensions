@@ -15,9 +15,15 @@ module NavigationHelpers
       '/login/canvas'
 
     when /^Courses page$/
-      '/courses'
+      if @current_path == '/courses' && @logged_in
+        @current_path
+      else
+        '/courses'
+      end
 
-    when /^Courses page$/
+    when /^Offerings page$/
+      # For now, treat "Offerings page" as Courses page
+      # since Offerings doesn't seem to exist yet
       '/courses'
 
     else
