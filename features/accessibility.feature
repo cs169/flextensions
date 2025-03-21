@@ -14,6 +14,6 @@ Feature: Accessibility Testing
     Given I am on the "bCourses login page"
     Then the page should be axe clean
   @a11y @skip
-  Scenario: Offerings page should be accessible
-    And I am on the "Offerings page"
+  Scenario: Courses page should be accessible
+    And I am on the "Courses page"
     Then the page should be axe clean

@@ -58,16 +58,16 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     end
   end
 
-  it 'Offerings page should be accessible', :a11y do
-    visit '/offerings'
+  it 'Courses page should be accessible', :a11y do
+    visit '/courses'
     sleep 1
     begin
       expect(page).to be_axe_clean
     rescue Selenium::WebDriver::Error::JavascriptError, Selenium::WebDriver::Error::NoSuchWindowError => e
-      puts "Browser error on Offerings page: #{e.message}"
+      puts "Browser error on Courses page: #{e.message}"
       skip("Error in browser: #{e.message}")
     rescue StandardError => e
-      puts "Accessibility error on Offerings page: #{e.message}"
+      puts "Accessibility error on Courses page: #{e.message}"
       raise
     end
   end

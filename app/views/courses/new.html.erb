@@ -5,10 +5,10 @@
       <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
     </div>
     <% if @courses_teacher.any? %>
-      <%= form_with url: offerings_path, method: :post, class: "mt-3" do %>
+      <%= form_with url: courses_path, method: :post, class: "mt-3" do %>
         <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
           <div class="form-check mb-3">
-            <%= check_box_tag "offerings[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
+            <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
             <label for="course_#{course["id"]}" class="form-check-label">
               <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
               <strong>Course Code:</strong> <%= course["course_code"] %> |
