@@ -25,6 +25,27 @@ class CoursesController < ApplicationController
     end
   end
 
+  def create
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    selected_course_ids = params[:courses] || []
+    selected_course_ids.each do |course_id|
+      # Check if the course already exists in the database
+      course = Course.find_or_create_by(canvas_id: course_id)
+
+      # Associate the course with the user if not already associated
+      unless user.courses.include?(course)
+        user.courses << course
+      end
+    end
+
+    redirect_to courses_path, notice: 'Selected courses have been imported successfully.'
+  end
+
   private
 
   def fetch_courses(token)

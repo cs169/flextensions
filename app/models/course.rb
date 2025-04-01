@@ -7,4 +7,5 @@ class Course < ApplicationRecord
 
   # Validations
   validates :course_name, presence: true
+  #validates :canvas_id, presence: true, uniqueness: true
 end
