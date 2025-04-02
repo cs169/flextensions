@@ -11,7 +11,7 @@ Given(/^I am using the "(light|dark|auto)" theme$/) do |theme|
 
   sleep 0.5
 
-  # Verify that the theme was applied correctly
+  # Verify
   current_theme = page.evaluate_script("document.documentElement.getAttribute('data-bs-theme')")
 
   expect(current_theme).to eq(theme) if theme != 'auto'

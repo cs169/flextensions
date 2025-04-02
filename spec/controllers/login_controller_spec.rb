@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe LoginController, type: :controller do
   describe 'GET #canvas' do
     it 'redirects to canvas authorization URL' do
-      # Set up proper env variables for test
       allow(ENV).to receive(:fetch).with('CANVAS_CLIENT_ID', nil).and_return('test_client_id')
       allow(ENV).to receive(:fetch).with('CANVAS_REDIRECT_URI', nil).and_return('http://localhost:3000')
       allow(ENV).to receive(:fetch).with('CANVAS_URL', nil).and_return('https://ucberkeleysandbox.instructure.com')
@@ -27,7 +26,6 @@ RSpec.describe LoginController, type: :controller do
 
     it 'clears the session and redirects to root path' do
       get :logout
-
       expect(session[:user_id]).to be_nil
       expect(session[:username]).to be_nil
       expect(response).to redirect_to(root_path)
@@ -40,8 +38,7 @@ RSpec.describe LoginController, type: :controller do
       allow(ENV).to receive(:fetch).with('CANVAS_REDIRECT_URI', nil).and_return('http://localhost:3000')
       allow(ENV).to receive(:fetch).with('CANVAS_URL', nil).and_return('https://ucberkeleysandbox.instructure.com')
 
-      # Use send to test private method
-      url = controller.send(:canvas_authorize_url)
+      url = controller.send(:canvas_authorize_url) # send to test private method
 
       expect(url).to start_with('https://ucberkeleysandbox.instructure.com/login/oauth2/auth?')
       expect(url).to include('client_id=test_client_id')

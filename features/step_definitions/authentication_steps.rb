@@ -1,3 +1,24 @@
+Given(/^I am not logged in as a user$/) do
+  # Ensure the user is not logged in
+  page.driver.submit :delete, logout_path, {}
+  @user_name = nil
+end
+
+When(/^I log out$/) do
+  click_link 'Logout'
+end
+
+Then(/^I should see my username on the navbar$/) do
+  within('[data-testid="user-name"]') do
+    expect(page).to have_content(@user_name || 'Test User')
+  end
+end
+
+When(/^I navigate to any page other than the "([^"]*)"$/) do |page_name|
+  visit offerings_path unless page_name == 'Offerings page'
+  visit root_path unless page_name == 'Home page'
+end
+
 When(/^I authorize bCourses with (in)?valid credentials$/) do |invalid|
   if invalid
     # Invalid credentials
@@ -187,7 +208,7 @@ def log_in_canvas
       raise 'CANVAS_TEST_USERNAME and CANVAS_TEST_PASSWORD must be set in .env file'
     end
   end
-  sleep 3
+  sleep 1
   # Screenshot and logging
   page.save_screenshot('after_login.png')
   puts "After login, current URL: #{current_url}"
@@ -213,28 +234,7 @@ Given(/^I am logged in as a user$/) do
 
   # Store session state
   @logged_in = true
-  @user_id = '123456' # Use a consistent user ID for tests
+  @user_id = '213'
   @current_path = '/courses'
   @user_name = 'Test User'
-end
-
-Given(/^I am not logged in as a user$/) do
-  # Ensure the user is not logged in
-  page.driver.submit :delete, logout_path, {}
-  @user_name = nil
-end
-
-When(/^I log out$/) do
-  click_link 'Logout'
-end
-
-Then(/^I should see my username on the navbar$/) do
-  within('nav') do
-    expect(page).to have_content(@user_name || 'Test User')
-  end
-end
-
-When(/^I navigate to any page other than the "([^"]*)"$/) do |page_name|
-  visit offerings_path unless page_name == 'Offerings page'
-  visit root_path unless page_name == 'Home page'
 end
