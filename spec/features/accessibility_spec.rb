@@ -57,7 +57,7 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
 
   it 'Courses page should be accessible', :a11y do
     visit '/courses'
-    sleep 1
+    sleep 2
     begin
       expect(page).to be_axe_clean
     rescue Selenium::WebDriver::Error::JavascriptError, Selenium::WebDriver::Error::NoSuchWindowError => e

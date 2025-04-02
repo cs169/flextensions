@@ -1,6 +1,6 @@
 Given(/^I am logged in as a user$/) do
   visit login_path
-  sleep 1
+  sleep 2
   # Check if already logged in by checking for the username on page
   if page.has_css?('.testid-username')
     puts 'Already logged in, continuing'
@@ -17,7 +17,7 @@ end
 
 Given(/^I am not logged in as a user$/) do
   visit courses_path
-  sleep 1
+  sleep 2
   expect(page).not_to have_css('.testid-username')
 end
 
@@ -46,7 +46,7 @@ When(/^I authorize bCourses with (in)?valid credentials$/) do |invalid|
 end
 
 def click_authorize_button
-  sleep 1
+  sleep 2
   return unless page.has_css?('input[value="Authorize"]') || page.has_button?('Authorize')
 
   puts 'Found authorization screen after login, clicking Authorize button'
@@ -68,7 +68,7 @@ def login_with_credentials(username, password)
     end
     # page.save_screenshot('login_page.png')
     # puts "Current path after login attempt: #{current_path}"
-    sleep 1
+    sleep 2
   else
     puts 'Error: No login form found'
   end

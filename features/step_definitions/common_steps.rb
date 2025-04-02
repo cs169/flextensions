@@ -5,7 +5,7 @@ end
 
 # Redirect check with explicit path verification
 Then(/^I should be (on|redirected to) the "(.*?)"$/) do |_redirect_or_on, page_name|
-  sleep 1
+  sleep 2
   expected_path =
     case page_name
     when 'Home page'
