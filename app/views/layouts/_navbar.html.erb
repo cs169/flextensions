@@ -25,10 +25,10 @@
 				<% if session[:user_id].present? %>
                     <!-- Display this when there's a logged-in user -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle testid-user-name" href="#" data-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle testid-username" href="#" data-bs-toggle="dropdown"
                             aria-expanded="false"><%= session[:username].present? ? session[:username] : "Test User" %></a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/logout/">Logout</a></li>
+                            <li><a class="dropdown-item testid-logout-button" href="/logout/">Logout</a></li>
                         </ul>
                     </li>
                 <% else %>

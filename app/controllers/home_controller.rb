@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    return unless session[:user_id].present?
+    return if session[:user_id].blank?
 
     redirect_to courses_path
   end

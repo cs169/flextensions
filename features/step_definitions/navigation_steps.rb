@@ -15,10 +15,11 @@ Then(/^I should not see "(.*?)" in the navbar$/) do |text|
 end
 
 When(/^I navigate to any page other than the "(.*?)"$/) do |excluded_page|
-  # Choose a page that's not the excluded page
-  if excluded_page == 'Home page'
-    visit offerings_path
-  else
+  # Currently included home and courses page
+  case excluded_page
+  when 'Home page'
+    visit courses_path
+  when 'Courses page'
     visit root_path
   end
 end
