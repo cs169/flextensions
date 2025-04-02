@@ -41,8 +41,19 @@ class CoursesController < ApplicationController
       return
     end
 
+    # Fetch courses from Canvas
+    token = user.canvas_token
+    courses = fetch_courses(token)
+
+    # Filter teacher courses
+    teacher_roles = %w[teacher ta]
+    courses_teacher = courses.select do |course|
+      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
+    end
+
+    # Process selected courses
     selected_course_ids = params[:courses] || []
-    selected_courses = @courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
+    selected_courses = courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
 
     selected_courses.each do |course_data|
       # Create or find the course in the database
@@ -52,7 +63,7 @@ class CoursesController < ApplicationController
       end
 
       # Create a new UserToCourse record if it doesn't already exist
-      UserToCourse.find_or_create_by(user: user, course: course) do |user_to_course|
+      UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
         user_to_course.role = 'teacher'
       end
     end
