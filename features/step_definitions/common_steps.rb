@@ -18,8 +18,8 @@ Then(/^I should be (on|redirected to) the "(.*?)"$/) do |_redirect_or_on, page_n
       raise "Unknown page: #{page_name}"
     end
   # screenshot
-  page.save_screenshot("screenshot_#{page_name}.png")
-  puts "Screenshot saved at path tmp/capybara/screenshot_#{page_name}.png"
+  # page.save_screenshot("screenshot_#{page_name}.png")
+  # puts "Screenshot saved at path tmp/capybara/screenshot_#{page_name}.png"
   expect(page).to have_current_path(expected_path)
 end
 

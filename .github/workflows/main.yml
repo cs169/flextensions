@@ -19,6 +19,13 @@ jobs:
       RUBY_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       CANVAS_URL: http://bcourses.test.instructure.com/
+      # Canvas authentication variables
+      CANVAS_TEST_USERNAME: ${{ secrets.CANVAS_TEST_USERNAME }}
+      CANVAS_TEST_PASSWORD: ${{ secrets.CANVAS_TEST_PASSWORD }}
+      CANVAS_TEST_NAME: ${{ secrets.CANVAS_TEST_NAME }}
+      # Add debugging for Capybara
+      CAPYBARA_DEBUG: true
+      HEADLESS: true
     steps:
     - uses: actions/checkout@v1
     - name: Install Ruby
@@ -39,10 +46,21 @@ jobs:
         bundle install --jobs 4 --retry 3
         rails db:create
         rails db:migrate
+    - name: Setup Chrome for testing
+      uses: browser-actions/setup-chrome@latest
     - name: Run RSpec tests
       run: bundle exec rspec --tag ~a11y
     - name: Run Cucumber tests
       run: bundle exec cucumber --tags 'not @a11y and not @skip'
+      
+    - name: Upload test screenshots and logs if failure
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-artifacts
+        path: |
+          tmp/capybara/
+          log/test.log
 
     - name: Run after-build command
       run: |

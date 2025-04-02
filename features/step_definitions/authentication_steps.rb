@@ -67,7 +67,7 @@ def login_with_credentials(username, password)
       find('button[type="submit"]').click
     end
     # page.save_screenshot('login_page.png')
-    puts "Current path after login attempt: #{current_path}"
+    # puts "Current path after login attempt: #{current_path}"
     sleep 1
   else
     puts 'Error: No login form found'
