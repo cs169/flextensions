@@ -1,5 +1,14 @@
 class CoursesController < ApplicationController
-  def index; end
+  def index
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    # Fetch UserToCourse records where the user is a teacher or TA
+    @teacher_courses = UserToCourse.includes(:course).where(user: user, role: ['teacher', 'ta'])
+  end
 
   def new
     user = User.find_by(canvas_uid: session[:user_id])
@@ -33,17 +42,38 @@ class CoursesController < ApplicationController
     end
 
     selected_course_ids = params[:courses] || []
-    selected_course_ids.each do |course_id|
-      # Check if the course already exists in the database
-      course = Course.find_or_create_by(canvas_id: course_id)
+    selected_courses = @courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
 
-      # Associate the course with the user if not already associated
-      unless user.courses.include?(course)
-        user.courses << course
+    selected_courses.each do |course_data|
+      # Create or find the course in the database
+      course = Course.find_or_create_by(canvas_id: course_data['id']) do |c|
+        c.course_name = course_data['name']
+        c.course_code = course_data['course_code']
+      end
+
+      # Create a new UserToCourse record if it doesn't already exist
+      UserToCourse.find_or_create_by(user: user, course: course) do |user_to_course|
+        user_to_course.role = 'teacher'
       end
     end
 
     redirect_to courses_path, notice: 'Selected courses have been imported successfully.'
+  end
+
+  def delete_all
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    # Delete all UserToCourse records for the user
+    UserToCourse.where(user_id: user.id).destroy_all
+
+    # Delete orphaned courses (courses with no associated UserToCourse records)
+    Course.left_outer_joins(:user_to_courses).where(user_to_courses: { id: nil }).destroy_all
+
+    redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
 
   private
