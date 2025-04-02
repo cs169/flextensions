@@ -7,7 +7,7 @@ class CoursesController < ApplicationController
     end
 
     # Fetch UserToCourse records where the user is a teacher or TA
-    @teacher_courses = UserToCourse.includes(:course).where(user: user, role: ['teacher', 'ta'])
+    @teacher_courses = UserToCourse.includes(:course).where(user: user, role: %w[teacher ta])
   end
 
   def new
@@ -82,7 +82,7 @@ class CoursesController < ApplicationController
     UserToCourse.where(user_id: user.id).destroy_all
 
     # Delete orphaned courses (courses with no associated UserToCourse records)
-    Course.left_outer_joins(:user_to_courses).where(user_to_courses: { id: nil }).destroy_all
+    Course.where.missing(:user_to_courses).destroy_all
 
     redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
