@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   root "home#index"
   get '/courses', to: 'courses#index', as: 'courses'
   get '/courses/new', to: 'courses#new', as: :new_course
+  get '/courses/:id', to: 'courses#show', as: :course
   
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 

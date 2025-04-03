@@ -25,6 +25,22 @@ class CoursesController < ApplicationController
     end
   end
 
+  def show
+    # user = User.find_by(canvas_uid: session[:user_id])
+    # if user.nil?
+    #   Rails.logger.info 'User not found in session'
+    #   redirect_to root_path, alert: 'Please log in to access this page.'
+    #   return
+    # end
+
+    # token = user.canvas_token
+    # @course = fetch_course_details(token, params[:id])
+    # unless @course
+    #   flash[:alert] = "Course not found."
+    #   redirect_to courses_path
+    # end
+  end
+
   private
 
   def fetch_courses(token)
