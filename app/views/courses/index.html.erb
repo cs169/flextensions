@@ -11,7 +11,7 @@
           <% @teacher_courses.each do |user_to_course| %>
             <li class="list-group-item">
               <strong>Name:</strong> <%= user_to_course.course.course_name %> |
-              <strong>Course Code:</strong> <%= user_to_course.course.course_code %> |
+              <strong>Course:</strong> <%= user_to_course.course.course_code %> |
               <strong>Role:</strong> <%= user_to_course.role.capitalize %>
             </li>
           <% end %>
@@ -33,17 +33,6 @@
       </p>
       <div class="col-10">
         <div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
-      </div>
-    </div>
-
-    <div class="col-12 p-0">
-      <h4>Other Course Offerings</h4>
-      <p>
-        In the following course offerings you are neither a staff member nor a student, but exams have been set up. You cannot do anything with these offerings.
-      </p>
-
-      <div class="col-10">
-        <div class="alert alert-warning">There are no other course offerings that support flextensions</div>
       </div>
     </div>
   </div>

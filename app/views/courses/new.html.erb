@@ -11,8 +11,10 @@
             <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
             <label for="course_#{course["id"]}" class="form-check-label">
               <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
-              <strong>Course Code:</strong> <%= course["course_code"] %> |
-              <strong>Name:</strong> <%= course["name"] %>
+              <strong>Course:</strong> <%= course["course_code"] %> |
+              <strong>Name:</strong> <%= course["name"] %> |
+              <strong>Role:</strong>
+              <%= course['enrollments'].find { |enrollment| %w[teacher ta].include?(enrollment['type']) }['type'].capitalize %>
             </label>
           </div>
         <% end %>
