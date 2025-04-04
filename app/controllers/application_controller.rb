@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
         return false
       end
     end
-    flash[:alert] = 'Please log in to access this page.'
+    flash[:alert] = 'Please log in first to access any other pages.'
     redirect_to root_path
   end
 end
