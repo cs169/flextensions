@@ -59,9 +59,9 @@ class SessionController < ApplicationController
         name: user_data['name']
       )
     end
-    update_user_credential(user, full_token)
     user.canvas_token = token
     user.save!
+    update_user_credential(user, full_token)
 
     # Store user ID in session for authentication
     session[:username] = user.name
@@ -82,8 +82,8 @@ class SessionController < ApplicationController
       user.lms_credentials.create!(
         lms_name: 'canvas',
         token: token,
-        refresh_token: full_token.refresh_token,
-        expire_time: Time.zone.at(full_token.expires_at)
+        refresh_token: token.refresh_token,
+        expire_time: Time.zone.at(token.expires_at)
       )
     end
   end
