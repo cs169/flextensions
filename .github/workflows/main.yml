@@ -17,7 +17,10 @@ jobs:
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
+      # Rails secret management
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+      # Canvas configuration
       CANVAS_URL: http://bcourses.test.instructure.com/
       # Canvas authentication variables
       CANVAS_TEST_USERNAME: ${{ secrets.CANVAS_TEST_USERNAME }}
@@ -32,6 +35,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: 3.3.0
+        bundler-cache: true
     - name: Download and install Code Climate test reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -43,9 +47,10 @@ jobs:
     - name: Setup Rails environment
       run: |
         gem install bundler
+        bundle config set --local deployment 'true'
         bundle install --jobs 4 --retry 3
-        rails db:create
-        rails db:migrate
+        bundle exec rails db:create db:schema:load
+        bundle exec rails db:migrate
     - name: Setup Chrome for testing
       uses: browser-actions/setup-chrome@latest
     - name: Run RSpec tests

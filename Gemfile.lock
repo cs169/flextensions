@@ -325,9 +325,6 @@ GEM
       hashie (>= 3.4.6)
       rack (>= 2.2.3)
       rack-protection
-    omniauth-oauth2 (1.8.0)
-      oauth2 (>= 1.4, < 3)
-      omniauth (~> 2.0)
     ostruct (0.6.1)
     parallel (1.26.3)
     parser (3.3.7.1)
@@ -560,8 +557,8 @@ DEPENDENCIES
   jquery-rails
   json
   lms-api
+  oauth2 (~> 2.0.9)
   omniauth
-  omniauth-oauth2
   ostruct
   pg
   puma (>= 5.0)
