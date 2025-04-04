@@ -18,27 +18,33 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def log_session_info
-    Rails.logger.info "Session info: user_id=#{session[:user_id]}, controller=#{params[:controller]}, action=#{params[:action]}, path=#{request.path}"
-  end
 
-  # def authenticated!
-  #   return unless session[:user_id].nil?
-
-  #   redirect_to root_path, alert: 'Please log in to access this page.'
-  # end
-
+  # This method checks if the user has loggedin and has valid credentials.
   def authenticated!
-    return unless session[:user_id].nil?
+    unless session[:user_id].nil?
+      # User has logged in
+      return true if Rails.env.test?
 
-    Rails.logger.warn "AUTH CHECK FAILED: Session user_id is nil in #{controller_name}##{action_name} (path: #{request.path})"
-
-    # In test environment, don't redirect to help debugging
-    if Rails.env.test?
-      Rails.logger.warn 'TEST ENV: Would redirect to root, but allowing request to continue for testing'
-      if request.path == '/courses' && params[:skip_auth_check] == 'true'
-        Rails.logger.warn 'TEST ENV: Skipping auth check for courses path as requested'
-        return
+      @current_user = User.find_by(canvas_uid: session[:user_id])
+      if @current_user.nil?
+        # User is not found in the database
+        redirect_to root_path, flash: 'User not found.'
+        return false
+      elsif @current_user.lms_credentials.empty?
+        redirect_to root_path, flash: 'Invalid user credentials.'
+        # User has no credentials
+        return false
+      elsif @current_user.lms_credentials.first.expire_time < Time.zone.now
+        # User's token has expired
+        redirect_to root_path, flash: 'Your session has expired. Please log in again.'
+        return false
+      elsif @current_user.lms_credentials.first.expire_time > Time.zone.now
+        # User's token is still valid
+        return true
+      else
+        # Unhandled cases
+        redirect_to root_path, flash: 'An unexpected error occurred.'
+        return false
       end
     end
     redirect_to root_path, alert: 'Please log in to access this page.'
