@@ -65,7 +65,7 @@ gem 'ostruct'
 
 # used to authenticate with the LMS
 gem 'omniauth'
-gem 'oauth2', '~> 2.0.9'  # Specify exact version to avoid warnings
+gem 'omniauth-oauth2'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
