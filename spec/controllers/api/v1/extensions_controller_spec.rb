@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'byebug'
 module Api
   module V1
-    describe ExtensionsController do
+    describe ExtensionsController, :allow_net_connect do
       before do
         session[:user_id] = 213 # Manually set session
       end
