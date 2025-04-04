@@ -66,6 +66,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "external_user_id"
+    t.datetime "expire_time"
     t.index ["user_id"], name: "index_lms_credentials_on_user_id"
   end
 
