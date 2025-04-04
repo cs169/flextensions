@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  # Add rack_session_access routes for testing
+  # if Rails.env.test?
+  #   mount RackSessionAccess::Engine => '/rack_session'
+  # end
+  
   get 'courses/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'

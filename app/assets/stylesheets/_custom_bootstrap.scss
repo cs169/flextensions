@@ -101,3 +101,17 @@
 		display: none;
 	}
 }
+
+// Color contrast fixes for dark mode
+[data-bs-theme="dark"] {
+  
+  // Specific fix for the Wiki link on home page
+  .col-12 p a[target="_blank"] {
+    color: #03e2fa; // Extra bright color for the Wiki link specifically
+    font-weight: 500; // Slightly bolder to improve readability
+    
+    &:hover {
+      color: #cffafe; // Even brighter on hover
+    }
+  }
+}

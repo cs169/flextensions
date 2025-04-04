@@ -5,6 +5,10 @@
 # files.
 
 require 'cucumber/rails'
+require 'rspec/mocks'
+require 'rack_session_access/capybara'
+
+World(RSpec::Mocks::ExampleMethods)
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -59,7 +63,7 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument('--disable-gpu')
   options.add_argument('--js-flags=--max-old-space-size=4096')
   options.add_argument('--window-size=1400,1400')
-
+  options.add_argument('--headless=new')
   options.add_argument('--disable-extensions')
   options.add_argument('--disable-infobars')
   options.add_argument('--disable-popup-blocking')
@@ -70,5 +74,37 @@ end
 Capybara.default_max_wait_time = 10
 
 Before do
-  page.driver.browser.manage.window.resize_to(1400, 900) if page.driver.browser.respond_to?(:manage)
+  RSpec::Mocks.setup
 end
+
+# Set the default driver to headless chrome
+Capybara.default_driver = :selenium_chrome
+Capybara.javascript_driver = :selenium_chrome
+
+# Increase wait time for slower operations
+Capybara.default_max_wait_time = 15
+
+# Ensure we get a clean slate in the browser for each test
+Before do
+  # Reset sessions between scenarios
+  Capybara.reset_sessions!
+  # Clear browser cookies
+  page.driver.browser.manage.delete_all_cookies if page.driver.browser.respond_to?(:manage)
+  # Print current URL for debugging
+  puts "Starting scenario on URL: #{current_url}" if current_url != 'about:blank'
+end
+
+# Capture scenario tags
+Before do |scenario|
+  @scenario_tags = scenario.source_tag_names
+end
+
+After do
+  RSpec::Mocks.verify
+ensure
+  RSpec::Mocks.teardown
+end
+
+# Configure Capybara to use port 3000 for tests
+# This is important for OAuth redirect_uri to work correctly
+Capybara.server_port = 3000

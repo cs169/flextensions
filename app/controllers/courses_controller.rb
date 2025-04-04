@@ -1,5 +1,12 @@
 class CoursesController < ApplicationController
-  def index; end
+  def index
+    # Special handling for test environment
+    return unless Rails.env.test?
+
+    Rails.logger.info "TEST ENV: In courses#index - user_id=#{session[:user_id]}"
+    # Just render the index view in test env
+    nil
+  end
 
   def new
     user = User.find_by(canvas_uid: session[:user_id])

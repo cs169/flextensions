@@ -14,12 +14,17 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--window-size=1400,1400')
-  options.add_argument('--headless') if ENV['HEADLESS'] == 'true'
+  options.add_argument('--headless=new')
   options.add_argument('--disable-gpu')
+  options.add_argument('--disable-extensions')
+  options.add_argument('--disable-infobars')
   options.add_argument('--memory-pressure-off')
   options.add_argument('--js-flags=--max-old-space-size=4096')
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
+
+# Ensure both drivers are set to selenium_chrome
+Capybara.default_driver = :selenium_chrome
 Capybara.javascript_driver = :selenium_chrome
 Capybara.default_max_wait_time = 10
 
