@@ -1,4 +1,10 @@
 <div class="container">
+	<% if flash[:alert] %>
+  		<div class="alert alert-danger text-center" role="alert">
+    		<%= flash[:alert] %>
+  		</div>
+	<% end %>
+
 	<div class="row">
 		<div class="col-12">
 			<h2 class="text-center">Welcome to Flextensions!</h2>
