@@ -1,5 +1,14 @@
 class CoursesController < ApplicationController
-  def index; end
+  def index
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    # Fetch UserToCourse records where the user is a teacher or TA
+    @teacher_courses = UserToCourse.includes(:course).where(user: user, role: %w[teacher ta])
+  end
 
   def new
     user = User.find_by(canvas_uid: session[:user_id])
@@ -23,6 +32,59 @@ class CoursesController < ApplicationController
     @courses_student = @courses.select do |course|
       course['enrollments'].any? { |enrollment| enrollment['type'] == 'student' }
     end
+  end
+
+  def create
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    # Fetch courses from Canvas
+    token = user.canvas_token
+    courses = fetch_courses(token)
+
+    # Filter teacher courses
+    teacher_roles = %w[teacher ta]
+    courses_teacher = courses.select do |course|
+      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
+    end
+
+    # Process selected courses
+    selected_course_ids = params[:courses] || []
+    selected_courses = courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
+
+    selected_courses.each do |course_data|
+      # Create or find the course in the database
+      course = Course.find_or_create_by(canvas_id: course_data['id']) do |c|
+        c.course_name = course_data['name']
+        c.course_code = course_data['course_code']
+      end
+
+      # Create a new UserToCourse record if it doesn't already exist
+      UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
+        user_to_course.role = 'teacher'
+      end
+    end
+
+    redirect_to courses_path, notice: 'Selected courses have been imported successfully.'
+  end
+
+  def delete_all
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    # Delete all UserToCourse records for the user
+    UserToCourse.where(user_id: user.id).destroy_all
+
+    # Delete orphaned courses (courses with no associated UserToCourse records)
+    Course.where.missing(:user_to_courses).destroy_all
+
+    redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
 
   private
