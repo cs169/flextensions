@@ -14,10 +14,37 @@ class User < ApplicationRecord
   has_many :courses, through: :user_to_courses
 
   def token_expired?
-    return false unless users.lms_credentials.any?
+    return false unless lms_credentials.any?
 
-    users.lms_credentials.each do |credential|
-      return true if Time.zone.now > credential.expires_time
+    lms_credentials.each do |credential|
+      return true if Time.zone.now > credential.expire_time
     end
+    
+    false
+  end
+  
+  # Check if token will expire within the specified buffer time
+  def token_expires_soon?(buffer_minutes = 15)
+    return false unless lms_credentials.any?
+    
+    lms_credentials.each do |credential|
+      return true if credential.expire_time && Time.zone.now + buffer_minutes.minutes > credential.expire_time
+    end
+    
+    false
+  end
+  
+  # Get active token or refresh if needed
+  def ensure_fresh_token
+    return nil unless lms_credentials.any?
+    
+    credential = lms_credentials.first
+    
+    if token_expires_soon?
+      # Call the refresh token method from SessionController
+      SessionController.new.send(:refresh_user_token, self)
+    end
+    
+    credential.token
   end
 end
