@@ -4,157 +4,54 @@
             <h4 class="mb-4">Flextensions Test Student Course / March 2025</h4>
             <ul class="nav nav-pills mb-3 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="course-assignments-tab" data-bs-toggle="pill" data-bs-target="#course-assignments" type="button" role="tab" aria-controls="course-assignments" aria-selected="false">Assignments</button>
+                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-settings-tab" data-bs-toggle="pill" data-bs-target="#course-settings" type="button" role="tab" aria-controls="course-settings" aria-selected="true">Settings</button>
+                    <button class="nav-link" id="course-form-tab" data-bs-toggle="pill" data-bs-target="#course-form" type="button" role="tab" aria-controls="course-form" aria-selected="true">Form</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email</button>
                 </li>
             </ul>
             <form action="./">
                 <div class="tab-content" id="courses-tabContent">
-                    <div class="tab-pane fade show active" id="course-assignments" role="tabpanel" aria-labelledby="course-assignments-tab" tabindex="0">
-                        <table class="table table-bordered table-striped" id="assignments-table">
-                            <thead>
-                                <tr class="table-info">
-                                    
-                                    <th>Assignment</th>
-                                    <th>View</th>
-                                    <th>Due Date</th>
-                                    <th>Late Due Date</th>
-                                    <th style="width: 50px;">Enable</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 1</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-03-27</td>
-                                <td class="row-check">2025-03-27</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-1-has-partner">
-                                        <label class="form-check-label" for="assignment-1-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 2</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-04</td>
-                                <td class="row-check">2025-04-04</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-2-has-partner">
-                                        <label class="form-check-label" for="assignment-2-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 3</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-11</td>
-                                <td class="row-check">2025-04-11</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-3-has-partner">
-                                        <label class="form-check-label" for="assignment-3-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Project 1</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-11</td>
-                                <td class="row-check">2025-04-11</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-4-has-partner">
-                                        <label class="form-check-label" for="assignment-4-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 4</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-16</td>
-                                <td class="row-check">2025-04-16</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-5-has-partner">
-                                        <label class="form-check-label" for="assignment-5-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 5</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-21</td>
-                                <td class="row-check">2025-04-21</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-6-has-partner">
-                                        <label class="form-check-label" for="assignment-6-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Project 2A</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-21</td>
-                                <td class="row-check">2025-04-21</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-7-has-partner">
-                                        <label class="form-check-label" for="assignment-7-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Project 2B</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-04-28</td>
-                                <td class="row-check">2025-04-28</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-8-has-partner">
-                                        <label class="form-check-label" for="assignment-8-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            <tr>
-                                <input type="hidden" class="assignment-id" name="assignment_id_or_something">
-                                <td class="row-check">Homework 6</td>
-                                <td> <a href="#">bCourses</a></td>
-                                <td class="row-check">2025-05-03</td>
-                                <td class="row-check">2025-05-03</td>
-                                <td class="self-check text-center">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="assignment-9-has-partner">
-                                        <label class="form-check-label" for="assignment-9-has-partner"></label>
-                                    </div>
-                                </td>
-                                
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
+                        <div class="mb-3 row justify-content-center">
+                            <div class="col-11 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
+                                <label class="form-check-label h4" for="course-enable">Enable Students to request extensions</label>
+                            </div>
+                            <!--<div class="col-11 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ta-approve">
+                                <label class="form-check-label" for="ta-approve">Extensions can be approved by TAs</label>
+                            </div> -->
+                        </div>
+                        <div class="mb-3 row justify-content-center">
+                            <label for="auto-approve" class="col-sm-3 col-form-label">Auto approve within days </label>
+                            <div class="col-sm-8">
+                            <input type="number" min="1" step="1" class="form-control" id="auto-approve" placeholder="number of days">
+                            </div>
+                        </div>
+                        <div class="mb-3 row justify-content-center">
+                            <label for="auto-approve-dsp" class="col-sm-3 col-form-label">Auto approve within days (DSP) </label>
+                            <div class="col-sm-8">
+                            <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="number of days">
+                            </div>
+                        </div>
+                        <div class="mb-3 row justify-content-center">
+                            <label for="auto-approve-dsp" class="col-sm-3 col-form-label">Maximum requests to auto approve</label>
+                            <div class="col-sm-8">
+                            <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="number">
+                            </div>
+                        </div>
+                        <div class="mb-3 row justify-content-center">
+                            <label for="auto-reject" class="col-sm-3 col-form-label">Course Reply Email Address</label>
+                            <div class="col-sm-8">
+                            <input type="email" min="1" step="1" class="form-control" id="auto-reject" placeholder="example@email.com">
+                            </div>
+                        </div>
                     </div>
-                    <div class="tab-pane fade" id="course-settings" role="tabpanel" aria-labelledby="course-settings-tab" tabindex="0">
+                    <div class="tab-pane fade" id="course-form" role="tabpanel" aria-labelledby="course-form-tab" tabindex="0">
                         <div class="mb-3 row justify-content-center">
                             <div class="col-11 form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
@@ -187,17 +84,6 @@
                             <label for="auto-reject" class="col-sm-3 col-form-label">Course Reply Email Address >= <span title="Auto reject the extension if days greater than or equal to">?</span></label>
                             <div class="col-sm-8">
                             <input type="email" min="1" step="1" class="form-control" id="auto-reject" placeholder="example@email.com">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <p class="col-11 text-left"> Extend using: (bCourses only)</p>
-                            <div class="col-10 form-check form-switch">
-                                <input class="form-check-input" type="radio" name="extend-using-date" role="switch" id="use-date-due" checked>
-                                <label class="form-check-label" for="use-date-due">Due Date</label>
-                            </div>
-                            <div class="col-10 form-check form-switch">
-                                <input class="form-check-input" type="radio" name="extend-using-date" role="switch" id="use-date-available">
-                                <label class="form-check-label" for="use-date-available">Available Date</label>
                             </div>
                         </div>
                     </div>

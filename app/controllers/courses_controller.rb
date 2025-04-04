@@ -47,6 +47,7 @@ class CoursesController < ApplicationController
     unless @course
       flash[:alert] = "Course not found."
       redirect_to courses_path
+    end
   end
 
   def create
