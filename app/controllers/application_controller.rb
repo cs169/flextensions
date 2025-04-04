@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
       'home' => ['index'],
       'login' => ['canvas'],
       'session' => ['create'],
-      'rails/health' => ['show'],
+      'rails/health' => ['show']
       # 'courses' => ['index', 'show', 'new']
     }
     controller = params[:controller]
