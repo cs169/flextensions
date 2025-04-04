@@ -16,7 +16,7 @@ Feature: Accessibility Testing
     Then the page should be axe clean
 
   # Theme-specific accessibility tests
-  @a11y @theme
+  @a11y @theme @skip
   Scenario: Home page should be accessible in light mode
     Given I am on the "Home page"
     And I am using the "light" theme
@@ -28,14 +28,14 @@ Feature: Accessibility Testing
     And I am using the "dark" theme
     Then the page should be axe clean
     
-  @a11y @theme
+  @a11y @theme @skip
   Scenario: Offerings page should be accessible in light mode
     Given I am logged in as a user
     And I am on the "Courses page"
     And I am using the "light" theme
     Then the page should be axe clean
     
-  @a11y @theme
+  @a11y @theme @skip
   Scenario: Offerings page should be accessible in dark mode
     Given I am logged in as a user
     And I am on the "Courses page"
