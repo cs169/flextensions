@@ -4,30 +4,30 @@ RSpec.describe SessionController, type: :controller do
   describe 'GET #create' do
     let(:user_info) do
       {
-        "id" => "12345",
-        "name" => "Test User",
-        "primary_email" => "test@example.com",
-        "email" => "test@example.com"
+        'id' => '12345',
+        'name' => 'Test User',
+        'primary_email' => 'test@example.com',
+        'email' => 'test@example.com'
       }
     end
 
     let(:mock_token) do
       instance_double(OAuth2::AccessToken,
-        token: "fake-token",
-        refresh_token: "fake-refresh-token",
-        expires_at: Time.now.to_i + 3600
-      )
+                      token: 'fake-token',
+                      refresh_token: 'fake-refresh-token',
+                      expires_at: Time.now.to_i + 3600)
     end
 
-    before do
-      # Mock the OAuth token exchange
-      allow_any_instance_of(OAuth2::Client)
-        .to receive_message_chain(:auth_code, :get_token)
-        .and_return(mock_token)
+    let(:mock_auth_code) { instance_double(OAuth2::Strategy::AuthCode) }
 
-      # Mock Canvas API response for user data
-      stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/users/self?")
-        .with(headers: { 'Authorization' => "Bearer fake-token" })
+    let(:mock_client) { instance_double(OAuth2::Client, auth_code: mock_auth_code) }
+
+    before do
+      allow(OAuth2::Client).to receive(:new).and_return(mock_client)
+      allow(mock_auth_code).to receive(:get_token).and_return(mock_token)
+
+      stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?")
+        .with(headers: { 'Authorization' => 'Bearer fake-token' })
         .to_return(status: 200, body: user_info.to_json, headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -51,7 +51,7 @@ RSpec.describe SessionController, type: :controller do
     end
 
     it 'redirects to root_path if Canvas API call fails' do
-      stub_request(:get, "#{ENV['CANVAS_URL']}/api/v1/users/self?")
+      stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?")
         .to_return(status: 401)
 
       get :create, params: { code: 'bad-code' }

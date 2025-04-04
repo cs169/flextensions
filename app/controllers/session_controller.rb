@@ -20,7 +20,7 @@ class SessionController < ApplicationController
       redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-      #Looking into the status code in response.status
+      # Looking into the status code in response.status
     end
   end
 
@@ -68,22 +68,23 @@ class SessionController < ApplicationController
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
   end
+
   def update_user_credential(user, token)
-        # update user's lms credentials.
-        if user.lms_credentials.any?
-          user.lms_credentials.first.update(
-              token: token.token,
-              refresh_token: token.refresh_token,
-              expire_time: Time.at(token.expires_at)
-              )
-      else
-          user.lms_credentials.create!(
-              lms_name: 'canvas',
-              token: token,
-              refresh_token: full_token.refresh_token,
-              expire_time: Time.at(full_token.expires_at)
-          )
-      end
+    # update user's lms credentials.
+    if user.lms_credentials.any?
+      user.lms_credentials.first.update(
+        token: token.token,
+        refresh_token: token.refresh_token,
+        expire_time: Time.zone.at(token.expires_at)
+      )
+    else
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: token,
+        refresh_token: full_token.refresh_token,
+        expire_time: Time.zone.at(full_token.expires_at)
+      )
     end
-  #serialize user data in activeRecord/activeModels (rails serialize)
+  end
+  # serialize user data in activeRecord/activeModels (rails serialize)
 end
