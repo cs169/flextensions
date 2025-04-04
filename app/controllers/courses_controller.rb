@@ -35,6 +35,7 @@ class CoursesController < ApplicationController
   end
 
   def show
+    @side_nav = 'show'
     user = User.find_by(canvas_uid: session[:user_id])
     if user.nil?
       Rails.logger.info 'User not found in session'
@@ -43,11 +44,45 @@ class CoursesController < ApplicationController
     end
 
     token = user.canvas_token
-    @course = fetch_course_details(token, params[:id])
+    @course = Course.find(params[:id])
     unless @course
       flash[:alert] = "Course not found."
       redirect_to courses_path
     end
+  end
+
+  def edit
+    @side_nav = 'edit'
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      Rails.logger.info 'User not found in session'
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    @course = Course.find_by(id: params[:id])
+    unless @course
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path and return
+    end
+
+  end
+
+  def requests
+    @side_nav = 'requests'
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      Rails.logger.info 'User not found in session'
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    @course = Course.find_by(id: params[:id])
+    unless @course
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path and return
+    end
+
   end
 
   def create
