@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_03_06_231038) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_02_020448) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -36,6 +36,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_06_231038) do
     t.string "course_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "canvas_id"
+    t.string "course_code"
+    t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
   end
 
   create_table "extensions", force: :cascade do |t|

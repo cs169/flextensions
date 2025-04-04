@@ -15,6 +15,13 @@ Rails.application.routes.draw do
   get '/courses/new', to: 'courses#new', as: :new_course
   get '/courses/:id', to: 'courses#show', as: :course
   
+  # Add the delete_all route for courses
+  resources :courses do
+    collection do
+      delete :delete_all
+    end
+  end
+
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 
   get '/login/canvas', to: 'login#canvas', as: :bcourses_login
