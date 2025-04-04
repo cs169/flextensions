@@ -10,6 +10,23 @@ class CoursesController < ApplicationController
     @teacher_courses = UserToCourse.includes(:course).where(user: user, role: %w[teacher ta])
   end
 
+  def show
+    @side_nav = 'show'
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      Rails.logger.info 'User not found in session'
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    user.canvas_token
+    @course = Course.find(params[:id])
+    return if @course
+
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path
+  end
+
   def new
     user = User.find_by(canvas_uid: session[:user_id])
     if user.nil?
@@ -32,6 +49,38 @@ class CoursesController < ApplicationController
     @courses_student = @courses.select do |course|
       course['enrollments'].any? { |enrollment| enrollment['type'] == 'student' }
     end
+  end
+
+  def edit
+    @side_nav = 'edit'
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      Rails.logger.info 'User not found in session'
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    @course = Course.find_by(id: params[:id])
+    return if @course
+
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path and return
+  end
+
+  def requests
+    @side_nav = 'requests'
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      Rails.logger.info 'User not found in session'
+      redirect_to root_path, alert: 'Please log in to access this page.'
+      return
+    end
+
+    @course = Course.find_by(id: params[:id])
+    return if @course
+
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path and return
   end
 
   def create
