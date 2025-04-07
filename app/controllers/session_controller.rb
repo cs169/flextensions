@@ -69,7 +69,6 @@ class SessionController < ApplicationController
   end
 
   def update_user_credential(user, token)
-
     # update user's lms credentials.
     # Refresh token before it expires.
     if user.lms_credentials.any?
@@ -114,12 +113,11 @@ class SessionController < ApplicationController
         refresh_token: token.refresh_token || credential.refresh_token, # Keep old refresh token if new one not provided
         expire_time: Time.zone.at(token.expires_at)
       )
-      
-      return token.token
+
+      token.token
     rescue OAuth2::Error => e
       Rails.logger.error "Failed to refresh token: #{e.message}"
-      return nil
+      nil
     end
   end
-
 end
