@@ -19,12 +19,15 @@ class CoursesController < ApplicationController
       return
     end
 
-    user.canvas_token
-    @course = Course.find(params[:id])
-    return if @course
+    @course = Course.find_by(id: params[:id])
+    if @course.nil?
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path
+      return
+    end
 
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path
+    # Fetch assignments associated with the course
+    @assignments = Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: @course.id })
   end
 
   def new
@@ -111,6 +114,13 @@ class CoursesController < ApplicationController
         c.course_code = course_data['course_code']
       end
 
+      assignments = fetch_assignments(course_data['id'], token)
+      assignments.each do |assignment_data|
+        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
+          assignment.name = assignment_data['name']
+        end
+      end
+
       # Create a new UserToCourse record if it doesn't already exist
       UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
         user_to_course.role = 'teacher'
@@ -149,6 +159,21 @@ class CoursesController < ApplicationController
       JSON.parse(response.body)
     else
       Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
+      []
+    end
+  end
+
+  def fetch_assignments(course_id, token)
+    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{course_id}/assignments"
+    response = Faraday.get(url) do |req|
+      req.headers['Authorization'] = "Bearer #{token}"
+      req.headers['Content-Type'] = 'application/json'
+    end
+
+    if response.success?
+      JSON.parse(response.body)
+    else
+      Rails.logger.error "Failed to fetch assignments: #{response.status} - #{response.body}"
       []
     end
   end
