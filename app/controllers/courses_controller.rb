@@ -114,6 +114,10 @@ class CoursesController < ApplicationController
         c.course_code = course_data['course_code']
       end
 
+      course_to_lms = CourseToLms.find_or_create_by(course_id: course.id, lms_id: 1) do |ctl|
+        ctl.external_course_id = course_data['id']
+      end
+
       assignments = fetch_assignments(course_data['id'], token)
       assignments.each do |assignment_data|
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
