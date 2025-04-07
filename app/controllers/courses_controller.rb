@@ -30,6 +30,7 @@ class CoursesController < ApplicationController
     course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
     if course_to_lms.nil?
       flash[:alert] = 'No LMS data found for this course.'
+      Rails.logger.info "No LMS data found for course ID: #{@course.id}"
       redirect_to courses_path
       return
     end
@@ -122,6 +123,7 @@ class CoursesController < ApplicationController
         c.course_code = course_data['course_code']
       end
 
+      Rails.logger.info "Course ID: #{course.id}"
       course_to_lms = CourseToLms.find_or_create_by(course_id: course.id, lms_id: 1) do |ctl|
         ctl.external_course_id = course_data['id']
       end
