@@ -26,10 +26,16 @@ class CoursesController < ApplicationController
       return
     end
 
-    # Fetch assignments associated with the course
-    Rails.logger.info "Fetching assignments for course: #{@course.id}"
-    @assignments = Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: @course.id })
-    Rails.logger.info "Assignments: #{@assignments.inspect}"
+    # Find the CourseToLms record for the course with lms_id of 1
+    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
+    if course_to_lms.nil?
+      flash[:alert] = 'No LMS data found for this course.'
+      redirect_to courses_path
+      return
+    end
+
+    # Fetch assignments associated with the CourseToLms
+    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
   end
 
   def new
@@ -122,7 +128,7 @@ class CoursesController < ApplicationController
 
       assignments = fetch_assignments(course_data['id'], token)
       assignments.each do |assignment_data|
-        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
+        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id) do |assignment|
           assignment.name = assignment_data['name']
           Rails.logger.info "Assignment Name: #{assignment.name}"
         end
