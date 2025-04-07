@@ -27,7 +27,9 @@ class CoursesController < ApplicationController
     end
 
     # Fetch assignments associated with the course
+    Rails.logger.info "Fetching assignments for course: #{@course.id}"
     @assignments = Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: @course.id })
+    Rails.logger.info "Assignments: #{@assignments.inspect}"
   end
 
   def new
