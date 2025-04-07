@@ -124,8 +124,10 @@ class CoursesController < ApplicationController
       assignments.each do |assignment_data|
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
+          Rails.logger.info "Assignment Name: #{assignments.name}"
         end
       end
+      
 
       # Create a new UserToCourse record if it doesn't already exist
       UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
