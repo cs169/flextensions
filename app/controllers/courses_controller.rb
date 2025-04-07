@@ -124,7 +124,7 @@ class CoursesController < ApplicationController
       assignments.each do |assignment_data|
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
-          Rails.logger.info "Assignment Name: #{assignments.name}"
+          Rails.logger.info "Assignment Name: #{assignment.name}"
         end
       end
       
