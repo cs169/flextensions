@@ -1,21 +1,17 @@
 class CoursesController < ApplicationController
+  before_action :authenticate_user
+
   def index
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
-      redirect_to root_path, alert: 'Please log in to access this page.'
-      return
-    end
+    return if @user.nil?
 
     # Fetch UserToCourse records where the user is a teacher or TA
-    @teacher_courses = UserToCourse.includes(:course).where(user: user, role: %w[teacher ta])
+    @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
   end
 
   def show
     @side_nav = 'show'
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
+    if @user.nil?
       Rails.logger.info 'User not found in session'
-      redirect_to root_path, alert: 'Please log in to access this page.'
       return
     end
 
@@ -41,19 +37,18 @@ class CoursesController < ApplicationController
   end
 
   def new
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
+    if @user.nil?
       Rails.logger.info 'User not found in session'
-      redirect_to root_path, alert: 'Please log in to access this page.'
       return
     end
-    token = user.canvas_token
-    @courses = fetch_courses(token)
+
+    token = @user.canvas_token
+    @courses = Course.fetch_courses(token)
     if @courses.empty?
       Rails.logger.info 'No courses found.'
       flash[:alert] = 'No courses found.'
     end
-    # Rails.logger.info "Courses: #{@courses}"
+
     teacher_roles = %w[teacher ta]
     @courses_teacher = @courses.select do |course|
       course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
@@ -66,10 +61,8 @@ class CoursesController < ApplicationController
 
   def edit
     @side_nav = 'edit'
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
+    if @user.nil?
       Rails.logger.info 'User not found in session'
-      redirect_to root_path, alert: 'Please log in to access this page.'
       return
     end
 
@@ -82,10 +75,8 @@ class CoursesController < ApplicationController
 
   def requests
     @side_nav = 'requests'
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
+    if @user.nil?
       Rails.logger.info 'User not found in session'
-      redirect_to root_path, alert: 'Please log in to access this page.'
       return
     end
 
@@ -97,69 +88,28 @@ class CoursesController < ApplicationController
   end
 
   def create
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
-      redirect_to root_path, alert: 'Please log in to access this page.'
-      return
-    end
+    return if @user.nil?
 
-    # Ensure the Lms record exists
-    lms = Lms.find_or_create_by(id: 1) do |l|
-      l.lms_name = 'Canvas' # Set a default name for the LMS
-      l.use_auth_token = true
-    end
+    token = @user.canvas_token
+    courses = Course.fetch_courses(token)
 
-    # Fetch courses from Canvas
-    token = user.canvas_token
-    courses = fetch_courses(token)
-
-    # Filter teacher courses
     teacher_roles = %w[teacher ta]
     courses_teacher = courses.select do |course|
       course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
     end
 
-    # Process selected courses
     selected_course_ids = params[:courses] || []
     selected_courses = courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
 
     selected_courses.each do |course_data|
-      # Create or find the course in the database
-      course = Course.find_or_create_by(canvas_id: course_data['id']) do |c|
-        c.course_name = course_data['name']
-        c.course_code = course_data['course_code']
-      end
-
-      # Create or find the CourseToLms record
-      Rails.logger.info "Creating CourseToLms with course_id: #{course.id}, lms_id: 1"
-      course_to_lms = CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: 1)
-      course_to_lms.external_course_id = course_data['id']
-      course_to_lms.save!
-      Rails.logger.info "Created CourseToLms: #{course_to_lms.inspect}"
-
-      # Fetch assignments for the course and add them to CourseToLms
-      assignments = fetch_assignments(course_data['id'], token)
-      assignments.each do |assignment_data|
-        Rails.logger.info "assignment_data: #{assignment_data.inspect}"
-        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
-          assignment.name = assignment_data['name']
-          assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-          assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-        end
-      end
-
-      # Create a new UserToCourse record if it doesn't already exist
-      UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
-        user_to_course.role = 'teacher'
-      end
+      Course.create_or_update_from_canvas(course_data, token, @user)
     end
 
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
   def sync_assignments
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
+    if @user.nil?
       render json: { error: 'Please log in to access this page.' }, status: :unauthorized
       return
     end
@@ -170,16 +120,15 @@ class CoursesController < ApplicationController
       return
     end
 
-    # Find the CourseToLms record for the course with lms_id of 1
     course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
     if course_to_lms.nil?
       render json: { error: 'No LMS data found for this course.' }, status: :not_found
       return
     end
 
-    # Fetch assignments from Canvas API
-    token = user.canvas_token
-    assignments = fetch_assignments(course_to_lms.external_course_id, token)
+    # Fetch assignments using the CourseToLms model
+    token = @user.canvas_token
+    assignments = course_to_lms.fetch_assignments(token)
 
     # Create or update assignments
     assignments.each do |assignment_data|
@@ -194,21 +143,17 @@ class CoursesController < ApplicationController
 
   # ONLY USE THIS FOR TESTING PURPOSES
   def delete_all
-    user = User.find_by(canvas_uid: session[:user_id])
-    if user.nil?
-      redirect_to root_path, alert: 'Please log in to access this page.'
-      return
-    end
+    return if @user.nil?
 
-    #Delete all assignments associated with the user's courses
-    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: user.id }).pluck(:id)).pluck(:id)).destroy_all
+    # Delete all assignments associated with the user's courses
+    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).select(:id)).destroy_all
 
     # Delete all CourseToLms records associated with the user's courses
-    CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: user.id }).pluck(:id)).destroy_all
+    CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).destroy_all
 
     # Delete all UserToCourse records for the user
-    UserToCourse.where(user_id: user.id).destroy_all
-    
+    UserToCourse.where(user_id: @user.id).destroy_all
+
     # Delete orphaned courses (courses with no associated UserToCourse records)
     Course.where.missing(:user_to_courses).destroy_all
 
@@ -216,6 +161,13 @@ class CoursesController < ApplicationController
   end
 
   private
+
+  def authenticate_user
+    @user = User.find_by(canvas_uid: session[:user_id])
+    return unless @user.nil?
+
+    redirect_to root_path, alert: 'Please log in to access this page.'
+  end
 
   def fetch_courses(token)
     response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses") do |req|
