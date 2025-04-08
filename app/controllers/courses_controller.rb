@@ -126,9 +126,8 @@ class CoursesController < ApplicationController
 
       # Create or find the CourseToLms record
       Rails.logger.info "Creating CourseToLms with course_id: #{course.id}, lms_id: 1"
-      course_to_lms = CourseToLms.find_or_create_by(course_id: course.id, lms_id: 1) do |ctl|
-        ctl.external_course_id = course_data['id']
-      end
+      course_to_lms = CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: 1)
+      course_to_lms.external_course_id = course_data['id']
       course_to_lms.save!
       Rails.logger.info "Created CourseToLms: #{course_to_lms.inspect}"
 
