@@ -18,6 +18,7 @@ class SessionController < ApplicationController
       redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
+      # Looking into the status code in response.status
     end
   end
 
@@ -62,7 +63,6 @@ class SessionController < ApplicationController
     user.save!
     update_user_credential(user, full_token)
 
-    # end
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid

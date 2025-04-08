@@ -18,6 +18,7 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # This method checks if the user has loggedin and has valid credentials.
   def authenticated!
     return true if session[:user_id].present? && Rails.env.test?
 
