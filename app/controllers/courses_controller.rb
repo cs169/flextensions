@@ -2,18 +2,12 @@ class CoursesController < ApplicationController
   before_action :authenticate_user
 
   def index
-    return if @user.nil?
-
     # Fetch UserToCourse records where the user is a teacher or TA
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
   end
 
   def show
     @side_nav = 'show'
-    if @user.nil?
-      Rails.logger.info 'User not found in session'
-      return
-    end
 
     @course = Course.find_by(id: params[:id])
     if @course.nil?
@@ -37,11 +31,6 @@ class CoursesController < ApplicationController
   end
 
   def new
-    if @user.nil?
-      Rails.logger.info 'User not found in session'
-      return
-    end
-
     token = @user.canvas_token
     @courses = Course.fetch_courses(token)
     if @courses.empty?
@@ -61,10 +50,6 @@ class CoursesController < ApplicationController
 
   def edit
     @side_nav = 'edit'
-    if @user.nil?
-      Rails.logger.info 'User not found in session'
-      return
-    end
 
     @course = Course.find_by(id: params[:id])
     return if @course
@@ -75,10 +60,6 @@ class CoursesController < ApplicationController
 
   def requests
     @side_nav = 'requests'
-    if @user.nil?
-      Rails.logger.info 'User not found in session'
-      return
-    end
 
     @course = Course.find_by(id: params[:id])
     return if @course
@@ -88,8 +69,6 @@ class CoursesController < ApplicationController
   end
 
   def create
-    return if @user.nil?
-
     token = @user.canvas_token
     courses = Course.fetch_courses(token)
 
@@ -109,11 +88,6 @@ class CoursesController < ApplicationController
   end
 
   def sync_assignments
-    if @user.nil?
-      render json: { error: 'Please log in to access this page.' }, status: :unauthorized
-      return
-    end
-
     @course = Course.find_by(id: params[:id])
     if @course.nil?
       render json: { error: 'Course not found.' }, status: :not_found
@@ -138,8 +112,6 @@ class CoursesController < ApplicationController
 
   # ONLY USE THIS FOR TESTING PURPOSES
   def delete_all
-    return if @user.nil?
-
     # Delete all assignments associated with the user's courses
     Assignment.where(course_to_lms_id: CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).select(:id)).destroy_all
 
@@ -162,35 +134,5 @@ class CoursesController < ApplicationController
     return unless @user.nil?
 
     redirect_to root_path, alert: 'Please log in to access this page.'
-  end
-
-  def fetch_courses(token)
-    response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses") do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-      req.params['include[]'] = 'enrollment_type'
-    end
-
-    if response.success?
-      JSON.parse(response.body)
-    else
-      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
-      []
-    end
-  end
-
-  def fetch_assignments(course_id, token)
-    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{course_id}/assignments"
-    response = Faraday.get(url) do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-    end
-
-    if response.success?
-      JSON.parse(response.body)
-    else
-      Rails.logger.error "Failed to fetch assignments: #{response.status} - #{response.body}"
-      []
-    end
   end
 end
