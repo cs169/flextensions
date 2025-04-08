@@ -26,6 +26,7 @@ class CoursesController < ApplicationController
       return
     end
 
+    @course.reload
     # Find the CourseToLms record for the course with lms_id of 1
     course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
     if course_to_lms.nil?
@@ -123,19 +124,20 @@ class CoursesController < ApplicationController
         c.course_code = course_data['course_code']
       end
 
-      Rails.logger.info "Course ID: #{course.id}"
+      # Create or find the CourseToLms record
+      Rails.logger.info "Creating CourseToLms with course_id: #{course.id}, lms_id: 1"
       course_to_lms = CourseToLms.find_or_create_by(course_id: course.id, lms_id: 1) do |ctl|
         ctl.external_course_id = course_data['id']
       end
+      Rails.logger.info "Created CourseToLms: #{course_to_lms.inspect}"
 
+      # Fetch assignments for the course and add them to CourseToLms
       assignments = fetch_assignments(course_data['id'], token)
       assignments.each do |assignment_data|
-        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id) do |assignment|
+        Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
-          Rails.logger.info "Assignment Name: #{assignment.name}"
         end
       end
-      
 
       # Create a new UserToCourse record if it doesn't already exist
       UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
@@ -143,7 +145,7 @@ class CoursesController < ApplicationController
       end
     end
 
-    redirect_to courses_path, notice: 'Selected courses have been imported successfully.'
+    redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
   def delete_all
