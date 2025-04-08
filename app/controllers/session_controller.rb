@@ -20,7 +20,6 @@ class SessionController < ApplicationController
       redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-      # Looking into the status code in response.status
     end
   end
 
@@ -63,28 +62,25 @@ class SessionController < ApplicationController
     end
     user.canvas_token = token
     user.save!
+    # update user's lms credentials.
+    # if user.lms_credentials.any?
+    #     user.lms_credentials.first.update(
+    #         token: token.token,
+    #         refresh_token: token.refresh_token,
+    #         expire_time: Time.at(token.expires_at)
+    #         )
+    # else
+    #     user.lms_credentials.create!(
+    #         user_id: user.canvas_uid,
+    #         lms_name: 'canvas',
+    #         token: token,
+    #         refresh_token: full_token.refresh_token,
+    #         expire_time: Time.at(full_token.expires_at)
+    #     )
 
+    # end
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
   end
-
-  def update_user_credential(user, token)
-    # update user's lms credentials.
-    if user.lms_credentials.any?
-      user.lms_credentials.first.update(
-        token: token.token,
-        refresh_token: token.refresh_token,
-        expire_time: Time.zone.at(token.expires_at)
-      )
-    else
-      user.lms_credentials.create!(
-        lms_name: 'canvas',
-        token: token,
-        refresh_token: full_token.refresh_token,
-        expire_time: Time.zone.at(full_token.expires_at)
-      )
-    end
-  end
-  # serialize user data in activeRecord/activeModels (rails serialize)
 end
