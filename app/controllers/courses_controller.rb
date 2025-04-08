@@ -143,8 +143,8 @@ class CoursesController < ApplicationController
         Rails.logger.info "assignment_data: #{assignment_data.inspect}"
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
-          assignment.due_date = DateTime.parse(assignment_data['due_at'])
-          assignment.late_due_date = DateTime.parse(assignment_data['due_at'])
+          assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+          assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
         end
       end
 
@@ -157,6 +157,40 @@ class CoursesController < ApplicationController
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
+  def sync_assignments
+    user = User.find_by(canvas_uid: session[:user_id])
+    if user.nil?
+      render json: { error: 'Please log in to access this page.' }, status: :unauthorized
+      return
+    end
+
+    @course = Course.find_by(id: params[:id])
+    if @course.nil?
+      render json: { error: 'Course not found.' }, status: :not_found
+      return
+    end
+
+    # Find the CourseToLms record for the course with lms_id of 1
+    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
+    if course_to_lms.nil?
+      render json: { error: 'No LMS data found for this course.' }, status: :not_found
+      return
+    end
+
+    # Fetch assignments from Canvas API
+    token = user.canvas_token
+    assignments = fetch_assignments(course_to_lms.external_course_id, token)
+
+    # Create or update assignments
+    assignments.each do |assignment_data|
+      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
+      assignment.name = assignment_data['name']
+      assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+      assignment.save!
+    end
+
+    render json: { message: 'Assignments synced successfully.' }, status: :ok
+  end
 
   # ONLY USE THIS FOR TESTING PURPOSES
   def delete_all
