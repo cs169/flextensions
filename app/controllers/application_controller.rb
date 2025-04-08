@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
       'login' => ['canvas'],
       'session' => ['create'],
       'rails/health' => ['show']
+      # 'courses' => ['index', 'show', 'new']
     }
     controller = params[:controller]
     action = params[:action]
@@ -17,7 +18,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # This method checks if the user has loggedin and has valid credentials.
   def authenticated!
     return true if session[:user_id].present? && Rails.env.test?
 
