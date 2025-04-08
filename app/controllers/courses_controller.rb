@@ -143,8 +143,8 @@ class CoursesController < ApplicationController
         Rails.logger.info "assignment_data: #{assignment_data.inspect}"
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
-          assignment.due_date = assignment_data['due_at']
-          assignment.late_due_date = assignment_data['due_at']
+          assignment.due_date = DateTime.parse(assignment_data['due_at'])
+          assignment.late_due_date = DateTime.parse(assignment_data['due_at'])
         end
       end
 
@@ -157,12 +157,17 @@ class CoursesController < ApplicationController
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
+
+  # ONLY USE THIS FOR TESTING PURPOSES
   def delete_all
     user = User.find_by(canvas_uid: session[:user_id])
     if user.nil?
       redirect_to root_path, alert: 'Please log in to access this page.'
       return
     end
+
+    #Delete all assignments associated with the user's courses
+    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: user.id }).pluck(:id)).pluck(:id)).destroy_all
 
     # Delete all CourseToLms records associated with the user's courses
     CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: user.id }).pluck(:id)).destroy_all
