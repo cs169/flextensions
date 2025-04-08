@@ -2,6 +2,12 @@ class CoursesController < ApplicationController
   before_action :authenticate_user
 
   def index
+    # Temp Code for making an LMS
+    Lms.find_or_create_by(id: 1) do |lms|
+      lms.lms_name = 'Canvas'
+      lms.use_auth_token = true
+    end
+
     # Fetch UserToCourse records where the user is a teacher or TA
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
   end
