@@ -19,6 +19,9 @@ Rails.application.routes.draw do
   
   # Add the delete_all route for courses
   resources :courses do
+    member do
+      post :sync_assignments
+    end
     collection do
       delete :delete_all
     end
