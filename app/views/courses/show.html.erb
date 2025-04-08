@@ -18,7 +18,11 @@
             <tr>
               <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
               <td class="row-check"><%= assignment.name %></td>
-              <td><a href="#">bCourses</a></td>
+              <td>
+                <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
+                  bCourses
+                </a>
+              </td>
               <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
               <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
               <td class="d-flex justify-content-center align-content-center">
