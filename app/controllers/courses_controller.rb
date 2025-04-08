@@ -140,6 +140,7 @@ class CoursesController < ApplicationController
       # Fetch assignments for the course and add them to CourseToLms
       assignments = fetch_assignments(course_data['id'], token)
       assignments.each do |assignment_data|
+        Rails.logger.info "assignment_data: #{assignment_data.inspect}"
         Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
           assignment.name = assignment_data['name']
           assignment.due_date = assignment_data['due_at']
@@ -163,10 +164,12 @@ class CoursesController < ApplicationController
       return
     end
 
-    # Delete all UserToCourse records for the user
-    UserToCourse.where(user_id: user.id).destroy_all
     # Delete all CourseToLms records associated with the user's courses
     CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: user.id }).pluck(:id)).destroy_all
+
+    # Delete all UserToCourse records for the user
+    UserToCourse.where(user_id: user.id).destroy_all
+    
     # Delete orphaned courses (courses with no associated UserToCourse records)
     Course.where.missing(:user_to_courses).destroy_all
 
