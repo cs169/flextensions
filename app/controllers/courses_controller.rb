@@ -103,6 +103,12 @@ class CoursesController < ApplicationController
       return
     end
 
+    # Ensure the Lms record exists
+    lms = Lms.find_or_create_by(id: 1) do |l|
+      l.lms_name = 'Canvas' # Set a default name for the LMS
+      l.use_auth_token = true
+    end
+
     # Fetch courses from Canvas
     token = user.canvas_token
     courses = fetch_courses(token)
