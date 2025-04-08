@@ -40,6 +40,9 @@ class Course < ApplicationRecord
       Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
         assignment.name = assignment_data['name']
         assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+        if assignment.late_due_date.nil? || assignment.late_due_date < DateTime.parse(assignment_data['due_at'])
+          assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+        end
       end
     end
 

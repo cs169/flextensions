@@ -120,23 +120,18 @@ class CoursesController < ApplicationController
       return
     end
 
-    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
-    if course_to_lms.nil?
-      render json: { error: 'No LMS data found for this course.' }, status: :not_found
-      return
-    end
-
-    # Fetch assignments using the CourseToLms model
+    # Fetch the Canvas token
     token = @user.canvas_token
-    assignments = course_to_lms.fetch_assignments(token)
 
-    # Create or update assignments
-    assignments.each do |assignment_data|
-      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-      assignment.name = assignment_data['name']
-      assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-      assignment.save!
-    end
+    # Use the Course model's create_or_update_from_canvas method
+    course_data = {
+      'id' => @course.canvas_id,
+      'name' => @course.course_name,
+      'course_code' => @course.course_code
+    }
+
+    # Call the model method to sync assignments
+    Course.create_or_update_from_canvas(course_data, token, @user)
 
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
