@@ -25,7 +25,7 @@ class Course < ApplicationRecord
   end
 
   # Create or find a course and its associated CourseToLms and assignments
-  def self.create_or_update_from_canvas(course_data, token, user)
+  def self.create_or_update_from_canvas(course_data, token, _user)
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
@@ -83,7 +83,6 @@ class Course < ApplicationRecord
     end
   end
 
-
   # Fetch users for a course and create/find their User and UserToCourse records
   def sync_users_from_canvas(token, role)
     # Fetch all users for the course from Canvas
@@ -97,9 +96,7 @@ class Course < ApplicationRecord
       end
 
       # Use the associate_user_with_course method to create the UserToCourse record
-      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
-      # Log the creation of UserToCourse
-      # Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}, role: #{role}: #{user_to_course.inspect}"
+      UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
     end
   end
 
@@ -108,5 +105,4 @@ class Course < ApplicationRecord
     sync_users_from_canvas(token, 'teacher')
     sync_users_from_canvas(token, 'ta')
   end
-
 end

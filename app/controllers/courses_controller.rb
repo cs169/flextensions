@@ -118,7 +118,7 @@ class CoursesController < ApplicationController
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 
-  def sync_students
+  def sync_enrollments
     @course = Course.find_by(id: params[:id])
     if @course.nil?
       render json: { error: 'Course not found.' }, status: :not_found
@@ -129,7 +129,7 @@ class CoursesController < ApplicationController
     token = @user.canvas_token
 
     # Call the sync_users_from_canvas method
-    @course.sync_students_from_canvas(token)
+    @course.sync_enrollments_from_canvas(token)
 
     Rails.logger.info "Users synced for course ID: #{@course.id}"
     render json: { message: 'Users synced successfully.' }, status: :ok
@@ -148,6 +148,9 @@ class CoursesController < ApplicationController
 
     # Delete orphaned courses (courses with no associated UserToCourse records)
     Course.where.missing(:user_to_courses).destroy_all
+
+    # Delete orphaned CourseToLms records (CourseToLms with no associated Course)
+    CourseToLms.where.missing(:course).destroy_all
 
     redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
