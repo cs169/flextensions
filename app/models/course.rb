@@ -69,9 +69,7 @@ class Course < ApplicationRecord
 
   # Associate the user with the course
   def self.associate_user_with_course(user, course)
-    UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
-      user_to_course.role = 'teacher'
-    end
+    UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: 'teacher')
   end
 
   # Fetch users for a course from Canvas API
@@ -104,9 +102,7 @@ class Course < ApplicationRecord
         u.email = user_data['email'] # Assuming login_id is the email
       end
 
-      UserToCourse.find_or_create_by(user_id: user.id, course_id: id) do |user_to_course|
-        user_to_course.role = 'student'
-      end
+      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: 'student')
 
       # Log the creation of UserToCourse
       Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}: #{user_to_course.inspect}"
