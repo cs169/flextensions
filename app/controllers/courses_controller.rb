@@ -178,6 +178,7 @@ class CoursesController < ApplicationController
     roles = UserToCourse.where(user_id: @user.id, course_id: course.id).pluck(:role)
     return 'instructor' if roles.include?('teacher') || roles.include?('ta')
     return 'student' if roles.include?('student')
+
     nil
   end
 end
