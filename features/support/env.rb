@@ -7,10 +7,6 @@
 # Configure SimpleCov before requiring other files
 require 'simplecov'
 require 'simplecov_json_formatter'
-require 'dotenv'
-
-# Load environment variables from .env file
-Dotenv.load
 
 # Only start SimpleCov if it hasn't been started
 unless SimpleCov.running
@@ -74,33 +70,6 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
-# Get Chrome and Chromedriver paths from environment variables
-path_to_chromedriver = ENV.fetch('CHROMEDRIVER_PATH', nil)
-path_to_chrome_for_testing = ENV.fetch('CHROME_FOR_TESTING_PATH', nil)
-
-if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
-  if ENV['CI']
-    abort "Chrome/Chromedriver paths not set in CI environment. Check workflow configuration.\nCHROMEDRIVER_PATH=#{ENV.fetch('CHROMEDRIVER_PATH', nil)}\nCHROME_FOR_TESTING_PATH=#{ENV.fetch('CHROME_FOR_TESTING_PATH', nil)}"
-  else
-    # Local development fallbacks
-    path_to_chromedriver ||= `which chromedriver`.chomp
-    path_to_chrome_for_testing ||= '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-  end
-end
-
-# Verify the binaries exist
-abort "Chromedriver not found at: #{path_to_chromedriver}" unless File.exist?(path_to_chromedriver)
-
-abort "Chrome not found at: #{path_to_chrome_for_testing}" unless File.exist?(path_to_chrome_for_testing)
-
-# Verify the binaries are executable
-abort "Chromedriver at #{path_to_chromedriver} is not executable" unless File.executable?(path_to_chromedriver)
-
-abort "Chrome at #{path_to_chrome_for_testing} is not executable" unless File.executable?(path_to_chrome_for_testing)
-
-puts "Using Chromedriver at: #{path_to_chromedriver}"
-puts "Using Chrome at: #{path_to_chrome_for_testing}"
-
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
 
@@ -120,22 +89,15 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument('--dns-prefetch-disable')
   options.add_argument('--disable-browser-side-navigation')
 
-  # Set Chrome binary path if provided
-  options.binary = path_to_chrome_for_testing if path_to_chrome_for_testing.present?
-
   # Add headless mode if in CI
   if ENV['CI']
     options.add_argument('--headless=new')
     options.add_argument('--disable-extensions')
   end
 
-  # Create driver with custom service if chromedriver path is provided
-  service = path_to_chromedriver.blank? ? nil : Selenium::WebDriver::Service.chrome(path: path_to_chromedriver)
-
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
-    service: service,
     options: options,
     clear_local_storage: true,
     clear_session_storage: true
@@ -163,16 +125,9 @@ Capybara.register_driver :selenium_chrome_headless do |app|
   options.add_argument('--dns-prefetch-disable')
   options.add_argument('--disable-browser-side-navigation')
 
-  # Set Chrome binary path if provided
-  options.binary = path_to_chrome_for_testing if path_to_chrome_for_testing.present?
-
-  # Create driver with custom service if chromedriver path is provided
-  service = path_to_chromedriver.blank? ? nil : Selenium::WebDriver::Service.chrome(path: path_to_chromedriver)
-
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
-    service: service,
     options: options,
     clear_local_storage: true,
     clear_session_storage: true
