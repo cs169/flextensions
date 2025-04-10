@@ -4,7 +4,7 @@ Feature: Accessibility Testing
   I want the application to be accessible
   So that I can use it effectively
 
-  @a11y @skip @javascript
+  @a11y@javascript
   Scenario: Home page should be accessible
     Given I am on the "Home page"
     Then the page should be axe clean
