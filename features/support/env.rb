@@ -22,8 +22,42 @@ end
 require 'cucumber/rails'
 require 'rspec/mocks'
 require 'rack_session_access/capybara'
+require 'omniauth'
 
 World(RSpec::Mocks::ExampleMethods)
+
+# OmniAuth test mode configuration
+OmniAuth.config.test_mode = true
+
+# Mock authentication data for Canvas
+OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new(
+  {
+    provider: 'canvas',
+    uid: '12345', # A mock Canvas User ID
+    info: {
+      name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'), # Use env var or default
+      email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com') # Use env var or default
+      # Add any other required info fields based on your User model/session logic
+      # e.g., image: 'http://example.com/avatar.png'
+    },
+    credentials: {
+      token: 'mock_token',
+      refresh_token: 'mock_refresh_token', # If you use refresh tokens
+      expires_at: Time.now.to_i + 3600 # Optional: mock token expiry
+    },
+    extra: {
+      # Any extra data your application might expect
+    }
+  }
+)
+
+# Handle invalid credentials mock if needed for specific tests
+OmniAuth.config.add_mock(:canvas, { uid: nil, info: {} }) # Default invalid mock
+
+# Optional: A helper to simulate authentication failure
+def mock_invalid_canvas_auth
+  OmniAuth.config.mock_auth[:canvas] = :invalid_credentials
+end
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -156,6 +190,18 @@ end
 Before('@javascript') do
   # Switch to selenium_chrome_headless for JavaScript tests
   Capybara.current_driver = :selenium_chrome_headless
+
+  # Reset to default valid mock before each scenario
+  OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new({
+                                                                provider: 'canvas',
+                                                                uid: '12345',
+                                                                info: {
+                                                                  name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'),
+                                                                  email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com')
+                                                                },
+                                                                credentials: { token: 'mock_token' }
+                                                                # Add other fields as needed
+                                                              })
 end
 
 After do
