@@ -49,11 +49,11 @@ jobs:
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-rspec
     - name: Run RSpec Tests
-      run: bundle exec rspec spec/ --tag ~skip --tag ~wip
+      run: bundle exec rspec spec/ --tag "~skip" --tag "~wip"
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
     - name: Run after-build command
       run: |
-        ./cc-test-reporter after-build --exit-code $?
+        ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }} 

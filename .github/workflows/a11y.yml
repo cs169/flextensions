@@ -42,7 +42,7 @@ jobs:
          mkdir -p /tmp/chrome-data-cucumber
          mkdir -p /tmp/chrome-data-rspec
      - name: Run Cucumber Accessibility Tests
-       run: bundle exec cucumber features/ --tag @a11y
+       run: bundle exec cucumber features/ --tag @a11y 
        env:
          CHROME_DATA_DIR: /tmp/chrome-data-cucumber
      - name: Run RSpec Accessibility Tests
