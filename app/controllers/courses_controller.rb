@@ -144,16 +144,11 @@ class CoursesController < ApplicationController
     CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).destroy_all
 
     # Delete all UserToCourse records for the user
-    UserToCourse.where(user_id: @user.id).destroy_all
+    #UserToCourse.where(user_id: @user.id).destroy_all
+    UserToCourse.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).destroy_all
 
     # Delete orphaned courses (courses with no associated UserToCourse records)
     Course.where.missing(:user_to_courses).destroy_all
-
-    # Delete orphaned CourseToLms records (CourseToLms with no associated Course)
-    CourseToLms.where.missing(:course).destroy_all
-
-    # Delete orphaned UserToCourse records (UserToCourse with no associated Course)
-    UserToCourse.where.missing(:course).destroy_all
 
     redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
