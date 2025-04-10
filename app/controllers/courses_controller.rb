@@ -94,6 +94,16 @@ class CoursesController < ApplicationController
 
     @course = Course.find_by(id: params[:id])
     @role = determine_user_role(@course)
+    # Find the CourseToLms record for the course with lms_id of 1
+    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
+    if course_to_lms.nil?
+      flash[:alert] = 'No LMS data found for this course.'
+      Rails.logger.info "No LMS data found for course ID: #{@course.id}"
+      redirect_to courses_path
+      return
+    end
+    # Fetch assignments associated with the CourseToLms
+    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
     return if @course
 
     flash[:alert] = 'Course not found.'
