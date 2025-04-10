@@ -18,12 +18,32 @@ require 'webmock/rspec'
 # require 'codeclimate-test-reporter'
 require 'simplecov'
 require 'simplecov_json_formatter'
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
-                                                                 SimpleCov::Formatter::HTMLFormatter,
-                                                                 SimpleCov::Formatter::JSONFormatter
-                                                               ])
 
-SimpleCov.start 'rails'
+# Ensure SimpleCov starts at the very beginning
+SimpleCov.start 'rails' do
+  enable_coverage :branch
+  primary_coverage :branch
+
+  # Add filters to ignore external code
+  add_filter '/spec/'
+  add_filter '/config/'
+  add_filter '/vendor/'
+
+  # Group files by type
+  add_group 'Controllers', 'app/controllers'
+  add_group 'Models', 'app/models'
+  add_group 'Helpers', 'app/helpers'
+  add_group 'Libraries', 'lib'
+
+  # Track all Ruby files in the app directory
+  track_files 'app/**/*.rb'
+
+  # Use both formatters
+  formatter SimpleCov::Formatter::MultiFormatter.new([
+                                                       SimpleCov::Formatter::HTMLFormatter,
+                                                       SimpleCov::Formatter::JSONFormatter
+                                                     ])
+end
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
