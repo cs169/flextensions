@@ -130,6 +130,7 @@ class CoursesController < ApplicationController
     # Call the sync_users_from_canvas method
     @course.sync_users_from_canvas(token)
 
+    Rails.logger.info "Users synced for course ID: #{@course.id}"
     render json: { message: 'Users synced successfully.' }, status: :ok
   end
 

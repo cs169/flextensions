@@ -94,6 +94,7 @@ class Course < ApplicationRecord
   def sync_users_from_canvas(token)
     # Fetch all users for the course from Canvas
     users_data = fetch_users_from_canvas(token)
+    Rails.logger.info "users_data: #{users_data.inspect}"
 
     users_data.each do |user_data|
       # Create or find the User model
@@ -101,6 +102,7 @@ class Course < ApplicationRecord
         u.name = user_data['name']
         u.email = user_data['login_id'] # Assuming login_id is the email
       end
+      
 
       # Create or find the UserToCourse record
       user_data['enrollments'].each do |enrollment|
@@ -108,6 +110,8 @@ class Course < ApplicationRecord
           user_to_course.role = enrollment['type'].downcase # Set role to enrollment type
         end
       end
+
+      Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}"
     end
   end
 end
