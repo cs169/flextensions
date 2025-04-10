@@ -26,6 +26,14 @@
 				</a>
 			</li>
 		<% end %>
+		<% if @role == 'student' %>
+			<li>
+				<a href="/courses/<%= @course.id %>/form" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
+					Request Extension
+				</a>
+			</li>
+		<% end %>
 	</ul>
 	<!--<hr>
 	<div class="dropdown">

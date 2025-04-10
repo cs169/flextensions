@@ -89,6 +89,17 @@ class CoursesController < ApplicationController
     redirect_to courses_path and return
   end
 
+  def form
+    @side_nav = 'form'
+
+    @course = Course.find_by(id: params[:id])
+    @role = determine_user_role(@course)
+    return if @course
+
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path and return
+  end
+
   def create
     token = @user.canvas_token
     courses = Course.fetch_courses(token)
