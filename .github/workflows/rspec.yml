@@ -36,8 +36,8 @@ jobs:
         bundle install --jobs 4 --retry 3
     - name: Setup Database
       run: |
-        bundle exec rails db:create
-        bundle exec rails db:migrate
+        rails db:create
+        rails db:migrate
     - name: Download and install Code Climate test reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -46,14 +46,12 @@ jobs:
       run: ./cc-test-reporter before-build
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-    - name: Create Chrome data directory
-      run: mkdir -p /tmp/chrome-data-rspec
+    - name: Setup Chrome for testing
+      uses: browser-actions/setup-chrome@latest
     - name: Run RSpec Tests
       run: bundle exec rspec --tag "~skip" --tag "~wip" --tag "~a11y"
-      env:
-        CHROME_DATA_DIR: /tmp/chrome-data-rspec
     - name: Run after-build command
       run: |
-        ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
+        ./cc-test-reporter after-build --exit-code $?
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }} 
