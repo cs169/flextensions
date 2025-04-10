@@ -30,7 +30,7 @@ class Course < ApplicationRecord
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
     course.sync_students_from_canvas(token)
-    associate_user_with_course(user, course)
+    associate_user_with_course(user, course, 'teacher')
     course
   end
 
@@ -68,8 +68,10 @@ class Course < ApplicationRecord
   end
 
   # Associate the user with the course
-  def self.associate_user_with_course(user, course)
-    UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: 'teacher')
+  def self.associate_user_with_course(user, course, role)
+    user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: 'teacher')
+    # Log the creation of UserToCourse
+    # Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}: #{user_to_course.inspect}"
   end
 
   # Fetch users for a course from Canvas API
@@ -93,7 +95,7 @@ class Course < ApplicationRecord
   def sync_students_from_canvas(token)
     # Fetch all users for the course from Canvas
     users_data = fetch_users_from_canvas(token, 'student')
-    Rails.logger.info "users_data: #{users_data.inspect}"
+    # Rails.logger.info "users_data: #{users_data.inspect}"
 
     users_data.each do |user_data|
       # Create or find the User model
@@ -102,10 +104,7 @@ class Course < ApplicationRecord
         u.email = user_data['email'] # Assuming login_id is the email
       end
 
-      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: 'student')
-
-      # Log the creation of UserToCourse
-      Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}: #{user_to_course.inspect}"
+      associate_user_with_course(user, self, 'student')
     end
   end
 end
