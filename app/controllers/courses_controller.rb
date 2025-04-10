@@ -1,5 +1,7 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
+  before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments]
+  before_action :determine_user_role
 
   def index
     # Temp Code for making an LMS
@@ -17,16 +19,11 @@ class CoursesController < ApplicationController
   def show
     @side_nav = 'show'
 
-    @course = Course.find_by(id: params[:id])
-    if @course.nil?
-      flash[:alert] = 'Course not found.'
-      redirect_to courses_path
-      return
-    end
+    return if @course.nil?
 
     @course.reload
     # Find the CourseToLms record for the course with lms_id of 1
-    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
+    course_to_lms = @course.course_to_lms(1)
     if course_to_lms.nil?
       flash[:alert] = 'No LMS data found for this course.'
       Rails.logger.info "No LMS data found for course ID: #{@course.id}"
@@ -37,7 +34,6 @@ class CoursesController < ApplicationController
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
 
-    @role = determine_user_role(@course)
     case @role
     when 'instructor'
       render 'courses/instructor_view'
@@ -69,33 +65,18 @@ class CoursesController < ApplicationController
 
   def edit
     @side_nav = 'edit'
-
-    @course = Course.find_by(id: params[:id])
-    @role = determine_user_role(@course)
-    return if @course
-
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path and return
+    nil if @course.nil?
   end
 
   def requests
     @side_nav = 'requests'
-
-    @course = Course.find_by(id: params[:id])
-    @role = determine_user_role(@course)
-    return if @course
-
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path and return
+    nil if @course.nil?
   end
 
   def form
     @side_nav = 'form'
-
-    @course = Course.find_by(id: params[:id])
-    @role = determine_user_role(@course)
     # Find the CourseToLms record for the course with lms_id of 1
-    course_to_lms = CourseToLms.find_by(course_id: @course.id, lms_id: 1)
+    course_to_lms = @course.course_to_lms(1)
     if course_to_lms.nil?
       flash[:alert] = 'No LMS data found for this course.'
       Rails.logger.info "No LMS data found for course ID: #{@course.id}"
@@ -104,10 +85,6 @@ class CoursesController < ApplicationController
     end
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
-    return if @course
-
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path and return
   end
 
   def create
@@ -130,7 +107,6 @@ class CoursesController < ApplicationController
   end
 
   def sync_assignments
-    @course = Course.find_by(id: params[:id])
     if @course.nil?
       render json: { error: 'Course not found.' }, status: :not_found
       return
@@ -153,7 +129,6 @@ class CoursesController < ApplicationController
   end
 
   def sync_enrollments
-    @course = Course.find_by(id: params[:id])
     if @course.nil?
       render json: { error: 'Course not found.' }, status: :not_found
       return
@@ -195,11 +170,17 @@ class CoursesController < ApplicationController
     redirect_to root_path, alert: 'Please log in to access this page.'
   end
 
-  def determine_user_role(course)
-    roles = UserToCourse.where(user_id: @user.id, course_id: course.id).pluck(:role)
-    return 'instructor' if roles.include?('teacher') || roles.include?('ta')
-    return 'student' if roles.include?('student')
+  def set_course
+    @course = Course.find_by(id: params[:id])
+    return if @course
 
-    nil
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path
+  end
+
+  def determine_user_role
+    return unless @course && @user
+
+    @role = @course.user_role(@user)
   end
 end
