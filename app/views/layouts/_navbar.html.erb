@@ -24,11 +24,6 @@
 
 			</ul>
 			<div class="d-lg-flex col-lg-3 justify-content-lg-end align-items-lg-center gap-2"> 
-				<div class="color-mode-toggler-m">
-					<%= render "layouts/color_mode_btn" %>
-				</div>
-
-				
 				<% if session[:user_id].present? %>
 					<!-- Display this when there's a logged-in user -->
 					<div class="nav-item dropdown">
@@ -44,6 +39,10 @@
 						<a class="nav-link text-white" href="/login/">Login</a>
 					</div>
 				<% end %>
+				
+				<div class="color-mode-toggler-m">
+					<%= render "layouts/color_mode_btn" %>
+				</div>
 			</div>
 		</div>
 	</div>
