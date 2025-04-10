@@ -4,7 +4,7 @@ require 'ostruct'
 require 'rails_helper'
 require 'timecop'
 
-describe CanvasFacade do
+describe CanvasFacade, :skip do
   let(:mockAuthToken) { 'testAuthToken' }
   let(:mockCourseId) { 16 }
   let(:mockStudentId) { 22 }

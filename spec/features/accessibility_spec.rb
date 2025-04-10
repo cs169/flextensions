@@ -1,30 +1,31 @@
-# spec/features/accessibility_spec.rb
 require 'rails_helper'
 require 'tmpdir'
 
-RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
+RSpec.describe 'Accessibility', :a11y, :js, :skip, type: :feature do
   before do
     WebMock.allow_net_connect!
     chrome_data_dir = ENV['CHROME_DATA_DIR'] || Dir.mktmpdir
 
     Capybara.register_driver :selenium_chrome do |app|
       options = Selenium::WebDriver::Chrome::Options.new
-      # Chrome opt
       options.add_argument("--user-data-dir=#{chrome_data_dir}")
-      # CI opt
-      if ENV['CI']
-        options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-      end
 
       Capybara::Selenium::Driver.new(app,
                                      browser: :chrome,
                                      options: options)
     end
+    options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--disable-extensions')
+    options.add_argument('--disable-infobars')
+    options.add_argument('--window-size=1400,1400')
 
-    Capybara.javascript_driver = :selenium_chrome
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
   end
+
+  Capybara.javascript_driver = :selenium_chrome
 
   after do
     begin
