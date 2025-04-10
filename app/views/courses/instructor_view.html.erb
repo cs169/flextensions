@@ -67,11 +67,4 @@ document.getElementById("sync-assignments-button").addEventListener("click", fun
       alert(error.message || "An error occurred while syncing assignments.");
     });
 });
-
-document.querySelectorAll("table tr").forEach(row => {
-  row.addEventListener("click", () => {
-    const checkbox = row.querySelector('input[type="checkbox"]');
-    if (checkbox) checkbox.checked = !checkbox.checked;
-  });
-});
 </script>

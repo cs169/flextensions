@@ -1,7 +1,7 @@
 <div class="container mt-4">
 	<div class="row justify-content-center">
 		<div class="col-12 mb-4">
-			<h4>Staff Course Offerings</h4>
+			<h1 class="h4">Staff Course Offerings</h1>
 			<p>
 				The following course offerings are those where you are a staff member. You can now manage their exams. You can add more courses by clicking the button below.
 			</p>
@@ -23,11 +23,10 @@
 							<td><%= user_to_course.role.capitalize %></td>
 						</tr>
 					<% end %>
-
 				</tbody>
 			</table>
 			<% else %>
-					<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
+				<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
 			<% end %>
 
 			<div class="text-center my-3">
@@ -39,13 +38,33 @@
 		</div>
 
 		<div class="col-12 mb-4">
-			<h4>Student Course Offerings</h4>
+			<h1 class="h4">Student Course Offerings</h1>
 			<p>
 				The following course offerings that you are a student of already have flextensions set up. You can now view your own seat assignments and exam schedule. If you expect to see a course here but it is not here, your course staff have not yet set up exams for the course yet in this system. Contact your course staff.
 			</p>
-			<div class="col-10">
+
+			<% if @student_courses.any? %>
+			<table class="table table-bordered table-striped" id="student-assignments-table">
+				<thead class="table-info">
+					<tr>
+						<th>Name</th>
+						<th>Course</th>
+						<th>Role</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @student_courses.each do |user_to_course| %>
+						<tr>
+							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
+							<td><%= user_to_course.course.course_code %></td>
+							<td><%= user_to_course.role.capitalize %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+			<% else %>
 				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
-			</div>
+			<% end %>
 		</div>
 	</div>
 </div>

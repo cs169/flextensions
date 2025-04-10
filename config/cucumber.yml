@@ -4,5 +4,12 @@ rerun = rerun.strip.gsub /\s/, ' '
 rerun_opts = rerun.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} features" : "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} #{rerun}"
 std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip'"
 %>
-default: <%= std_opts %> features
+default: --publish-quiet --format pretty --tags 'not @a11y'
+wip: --tags @wip:3 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags 'not @wip'
+
+# Use rack_test for faster non-JavaScript tests
+rack_test: --publish-quiet --format pretty --tags 'not @javascript and not @a11y'
+
+# Use headless Chrome for JavaScript tests
+selenium_chrome_headless: --publish-quiet --format pretty --tags '@javascript and not @a11y'
