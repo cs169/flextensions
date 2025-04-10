@@ -11,18 +11,21 @@
 				Assignments
 			</a>
 		</li>
+		
 		<li>
 			<a href="/courses/<%= @course.id %>/requests" class="nav-link <%= @side_nav == 'requests' ? 'active' : 'link-body-emphasis' %>">
 				<i class="fas fa-tachometer-alt me-2"></i>
 				Requests
 			</a>
 		</li>
-		<li>
-			<a href="/courses/<%= @course.id %>/edit" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
-				<i class="fas fa-cog me-2"></i>
-				Settings
-			</a>
-		</li>
+		<% if @role == 'instructor' %>
+			<li>
+				<a href="/courses/<%= @course.id %>/edit" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
+					Settings
+				</a>
+			</li>
+		<% end %>
 	</ul>
 	<!--<hr>
 	<div class="dropdown">
