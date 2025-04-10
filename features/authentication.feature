@@ -3,30 +3,30 @@ Feature: User Authentication and Access Control
   I want to be able to log in and out
   So that I can access my courses
 
-  @skip
+  @javascript
   Scenario: Failed login with invalid credentials
     Given I am on the "bCourses login page"
     When I authorize bCourses with invalid credentials
     And I should be on the "bCourses login page"
 
-  @skip
+  @javascript
   Scenario: Successful login with valid credentials
     Given I am on the "bCourses login page"
     When I authorize bCourses with valid credentials
     And I should be on the "Courses page"
 
-  @skip
+  @javascript
   Scenario: Successfully access the Courses page with valid credentials
     Given I am logged in as a user
     Then I should see my name on the navbar
 
-  @skip
+  @javascript
   Scenario: Attempt to access the Courses page with invalid credentials
     Given I am not logged in as a user
     When I navigate to any page other than the "Home page"
     Then I should be redirected to the "Home page"
 
-  @skip
+  @javascript
   Scenario: Unable to access the Courses page after logging out
     Given I am logged in as a user
     When I navigate to the "Courses page"

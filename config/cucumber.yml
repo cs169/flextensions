@@ -5,4 +5,11 @@ rerun_opts = rerun.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} fe
 std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip'"
 %>
 default: <%= std_opts %> features
+wip: --tags @wip:3 --wip features
 rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags 'not @wip'
+
+# Use rack_test for faster non-JavaScript tests
+rack_test: DRIVER=rack_test --format pretty
+
+# Use headless Chrome for JavaScript tests
+selenium_chrome_headless: DRIVER=selenium_chrome_headless --format pretty

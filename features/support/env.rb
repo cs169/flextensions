@@ -4,6 +4,21 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
+# Configure SimpleCov before requiring other files
+require 'simplecov'
+require 'simplecov_json_formatter'
+
+# Only start SimpleCov if it hasn't been started
+unless SimpleCov.running
+  SimpleCov.start 'rails' do
+    track_files 'app/**/*.rb'
+    formatter SimpleCov::Formatter::MultiFormatter.new([
+                                                         SimpleCov::Formatter::HTMLFormatter,
+                                                         SimpleCov::Formatter::JSONFormatter
+                                                       ])
+  end
+end
+
 require 'cucumber/rails'
 require 'rspec/mocks'
 require 'rack_session_access/capybara'
@@ -71,56 +86,44 @@ Capybara.register_driver :selenium_chrome do |app|
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
 
+# Register Chrome headless driver
 Capybara.register_driver :selenium_chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument('--headless')
+  options.add_argument('--headless=new')
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
-  options.add_argument('--js-flags=--max-old-space-size=4096')
   options.add_argument('--window-size=1400,1400')
-  options.add_argument('--disable-extensions')
-  options.add_argument('--disable-infobars')
-  options.add_argument('--disable-popup-blocking')
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    options: options
+  )
 end
 
-Capybara.default_driver = :selenium_chrome_headless
+# Use rack_test by default (faster)
+Capybara.default_driver = :rack_test
+# Use selenium_chrome_headless for JavaScript tests
 Capybara.javascript_driver = :selenium_chrome_headless
 
+# Set default max wait time
 Capybara.default_max_wait_time = 10
 
+# Set up hooks
 Before do
-  RSpec::Mocks.setup
+  # Use rack_test by default
+  Capybara.current_driver = :rack_test
 end
 
-# Set the default driver to headless chrome
-Capybara.default_driver = :selenium_chrome
-Capybara.javascript_driver = :selenium_chrome
-
-# Increase wait time for slower operations
-Capybara.default_max_wait_time = 15
-
-# Ensure we get a clean slate in the browser for each test
-Before do
-  # Reset sessions between scenarios
-  Capybara.reset_sessions!
-  # Clear browser cookies
-  page.driver.browser.manage.delete_all_cookies if page.driver.browser.respond_to?(:manage)
-  # Print current URL for debugging
-  puts "Starting scenario on URL: #{current_url}" if current_url != 'about:blank'
-end
-
-# Capture scenario tags
-Before do |scenario|
-  @scenario_tags = scenario.source_tag_names
+Before('@javascript') do
+  # Switch to selenium_chrome_headless for JavaScript tests
+  Capybara.current_driver = :selenium_chrome_headless
 end
 
 After do
-  RSpec::Mocks.verify
-ensure
-  RSpec::Mocks.teardown
+  # Always reset to default driver
+  Capybara.use_default_driver
 end
 
 # Configure Capybara to use port 3000 for tests
