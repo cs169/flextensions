@@ -39,18 +39,17 @@ jobs:
       with:
         chrome-version: stable
     
-    - name: Install Chromedriver
+    - name: Set Chrome paths
       run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-chromedriver
-        echo "CHROMEDRIVER_PATH=/usr/bin/chromedriver" >> $GITHUB_ENV
-        echo "CHROME_FOR_TESTING_PATH=/usr/bin/google-chrome" >> $GITHUB_ENV
-        echo "Found Chromedriver at: $(which chromedriver)"
+        echo "CHROMEDRIVER_PATH=${{ steps.setup-chrome.outputs.chromedriver-path }}" >> $GITHUB_ENV
+        echo "CHROME_FOR_TESTING_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
+        echo "Found Chrome at: ${{ steps.setup-chrome.outputs.chrome-path }}"
+        echo "Found Chromedriver at: ${{ steps.setup-chrome.outputs.chromedriver-path }}"
     
     - name: Verify Chrome and Chromedriver
       run: |
-        google-chrome --version
-        chromedriver --version
+        "${{ steps.setup-chrome.outputs.chrome-path }}" --version
+        "${{ steps.setup-chrome.outputs.chromedriver-path }}" --version
         echo "Chrome path: $CHROME_FOR_TESTING_PATH"
         echo "Chromedriver path: $CHROMEDRIVER_PATH"
     
@@ -84,5 +83,5 @@ jobs:
         COVERAGE: "true"
         CI: "true"
         SELENIUM_HEADLESS: "true"
-        CHROMEDRIVER_PATH: /usr/bin/chromedriver
-        CHROME_FOR_TESTING_PATH: /usr/bin/google-chrome 
+        CHROMEDRIVER_PATH: ${{ steps.setup-chrome.outputs.chromedriver-path }}
+        CHROME_FOR_TESTING_PATH: ${{ steps.setup-chrome.outputs.chrome-path }} 

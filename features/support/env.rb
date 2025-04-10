@@ -80,9 +80,7 @@ path_to_chrome_for_testing = ENV.fetch('CHROME_FOR_TESTING_PATH', nil)
 
 if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
   if ENV['CI']
-    # In CI, use the standard Ubuntu paths
-    path_to_chromedriver = '/usr/bin/chromedriver'
-    path_to_chrome_for_testing = '/usr/bin/google-chrome'
+    abort "Chrome/Chromedriver paths not set in CI environment. Check workflow configuration.\nCHROMEDRIVER_PATH=#{ENV.fetch('CHROMEDRIVER_PATH', nil)}\nCHROME_FOR_TESTING_PATH=#{ENV.fetch('CHROME_FOR_TESTING_PATH', nil)}"
   else
     # Local development fallbacks
     path_to_chromedriver ||= `which chromedriver`.chomp
@@ -90,10 +88,15 @@ if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
   end
 end
 
-# Verify the binaries exist and are executable
-abort "Chromedriver not found or not executable at: #{path_to_chromedriver}" unless File.executable?(path_to_chromedriver)
+# Verify the binaries exist
+abort "Chromedriver not found at: #{path_to_chromedriver}" unless File.exist?(path_to_chromedriver)
 
-abort "Chrome not found or not executable at: #{path_to_chrome_for_testing}" unless File.executable?(path_to_chrome_for_testing)
+abort "Chrome not found at: #{path_to_chrome_for_testing}" unless File.exist?(path_to_chrome_for_testing)
+
+# Verify the binaries are executable
+abort "Chromedriver at #{path_to_chromedriver} is not executable" unless File.executable?(path_to_chromedriver)
+
+abort "Chrome at #{path_to_chrome_for_testing} is not executable" unless File.executable?(path_to_chrome_for_testing)
 
 puts "Using Chromedriver at: #{path_to_chromedriver}"
 puts "Using Chrome at: #{path_to_chrome_for_testing}"
