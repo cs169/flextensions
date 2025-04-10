@@ -80,14 +80,9 @@ path_to_chrome_for_testing = ENV.fetch('CHROME_FOR_TESTING_PATH', nil)
 
 if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
   if ENV['CI']
-    # In CI, try to find the binaries in the system path
-    path_to_chromedriver ||= `which chromedriver`.chomp
-    path_to_chrome_for_testing ||= `which google-chrome`.chomp
-
-    # Verify the binaries exist and are executable
-    unless File.executable?(path_to_chromedriver) && File.executable?(path_to_chrome_for_testing)
-      abort "Chrome/Chromedriver binaries not found or not executable in CI environment.\nChromedriver: #{path_to_chromedriver}\nChrome: #{path_to_chrome_for_testing}"
-    end
+    # In CI, use the standard Ubuntu paths
+    path_to_chromedriver = '/usr/bin/chromedriver'
+    path_to_chrome_for_testing = '/usr/bin/google-chrome'
   else
     # Local development fallbacks
     path_to_chromedriver ||= `which chromedriver`.chomp
@@ -95,8 +90,13 @@ if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
   end
 end
 
-abort "Cannot find Chromedriver binary at: #{path_to_chromedriver}" if path_to_chromedriver.blank?
-abort "Cannot find Chrome binary at: #{path_to_chrome_for_testing}" if path_to_chrome_for_testing.blank?
+# Verify the binaries exist and are executable
+abort "Chromedriver not found or not executable at: #{path_to_chromedriver}" unless File.executable?(path_to_chromedriver)
+
+abort "Chrome not found or not executable at: #{path_to_chrome_for_testing}" unless File.executable?(path_to_chrome_for_testing)
+
+puts "Using Chromedriver at: #{path_to_chromedriver}"
+puts "Using Chrome at: #{path_to_chrome_for_testing}"
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new

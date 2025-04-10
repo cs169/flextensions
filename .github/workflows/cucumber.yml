@@ -43,15 +43,16 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y chromium-chromedriver
-        echo "CHROMEDRIVER_PATH=$(which chromedriver)" >> $GITHUB_ENV
+        echo "CHROMEDRIVER_PATH=/usr/bin/chromedriver" >> $GITHUB_ENV
+        echo "CHROME_FOR_TESTING_PATH=/usr/bin/google-chrome" >> $GITHUB_ENV
         echo "Found Chromedriver at: $(which chromedriver)"
     
     - name: Verify Chrome and Chromedriver
       run: |
         google-chrome --version
         chromedriver --version
-        echo "Chrome path: $(which google-chrome)"
-        echo "Chromedriver path: $(which chromedriver)"
+        echo "Chrome path: $CHROME_FOR_TESTING_PATH"
+        echo "Chromedriver path: $CHROMEDRIVER_PATH"
     
     - name: Install Dependencies
       run: |
@@ -83,5 +84,5 @@ jobs:
         COVERAGE: "true"
         CI: "true"
         SELENIUM_HEADLESS: "true"
-        CHROMEDRIVER_PATH: $(which chromedriver)
-        CHROME_FOR_TESTING_PATH: $(which google-chrome) 
+        CHROMEDRIVER_PATH: /usr/bin/chromedriver
+        CHROME_FOR_TESTING_PATH: /usr/bin/google-chrome 
