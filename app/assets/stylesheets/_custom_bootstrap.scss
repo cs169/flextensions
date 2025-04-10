@@ -106,3 +106,20 @@
 	background-color: #fdb515;
 	color: #000;
 }
+
+// custom link styles for accessibility
+.accessible-link {
+	color: #8BA3D4; // Lighter blue for dark mode
+	
+	[data-bs-theme="light"] & {
+		color: #4A5D8B; // Darker blue for light mode that meets contrast requirements
+	}
+	
+	&:hover {
+		color: #A3B5DE; // Lighter hover color for dark mode
+		
+		[data-bs-theme="light"] & {
+			color: #374772; // Darker hover color for light mode
+		}
+	}
+}
