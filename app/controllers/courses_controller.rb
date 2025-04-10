@@ -71,8 +71,13 @@ class CoursesController < ApplicationController
     @side_nav = 'edit'
 
     @course = Course.find_by(id: params[:id])
-    @role = determine_user_role(@course)
     return if @course
+    @role = determine_user_role(@course)
+
+    unless @role == 'instructor'
+      flash[:alert] = 'You do not have access to this page.'
+      redirect_to courses_path and return
+    end
 
     flash[:alert] = 'Course not found.'
     redirect_to courses_path and return
@@ -82,8 +87,17 @@ class CoursesController < ApplicationController
     @side_nav = 'requests'
 
     @course = Course.find_by(id: params[:id])
-    @role = determine_user_role(@course)
     return if @course
+    @role = determine_user_role(@course)
+    case @role
+    when 'instructor'
+      render 'courses/instructor_request_view'
+    when 'student'
+      render 'courses/student_request_view'
+    else
+      flash[:alert] = 'You do not have access to this course.'
+      redirect_to courses_path
+    end
 
     flash[:alert] = 'Course not found.'
     redirect_to courses_path and return
