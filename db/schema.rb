@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_03_06_231038) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -20,6 +20,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_06_231038) do
     t.datetime "updated_at", null: false
     t.string "external_assignment_id"
     t.bigint "course_to_lms_id", null: false
+    t.datetime "due_date"
+    t.datetime "late_due_date"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -36,6 +38,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_06_231038) do
     t.string "course_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "canvas_id"
+    t.string "course_code"
+    t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
   end
 
   create_table "extensions", force: :cascade do |t|
