@@ -34,6 +34,7 @@ class CoursesController < ApplicationController
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
 
+    # might want to create a convention and factor out this case statement
     case @role
     when 'instructor'
       render 'courses/instructor_view'
@@ -65,16 +66,35 @@ class CoursesController < ApplicationController
 
   def edit
     @side_nav = 'edit'
+    unless @role == 'instructor'
+      flash[:alert] = 'You do not have access to this page.'
+      redirect_to course_path(@course.id) and return
+    end
     nil if @course.nil?
   end
 
   def requests
     @side_nav = 'requests'
+    # might want to create a convention and factor out this case statement
+    case @role
+    when 'instructor'
+      render 'courses/instructor_request_view'
+    when 'student'
+      render 'courses/student_request_view'
+    else
+      flash[:alert] = 'You do not have access to this course.'
+      redirect_to courses_path
+    end
     nil if @course.nil?
   end
 
+  # this is for requests/new (might change the name later)
   def form
     @side_nav = 'form'
+    unless @role == 'student'
+      flash[:alert] = 'You do not have access to this page.'
+      redirect_to course_path(@course.id) and return
+    end
     # Find the CourseToLms record for the course with lms_id of 1
     course_to_lms = @course.course_to_lms(1)
     if course_to_lms.nil?
