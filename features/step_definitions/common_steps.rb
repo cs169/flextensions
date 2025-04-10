@@ -1,14 +1,38 @@
-# TODO: Display error message, complete function
+# Common step definitions
 Then(/^I should see an error message "(.*)"$/) do |error_message|
-  # TODO: Display error message
+  expect(page).to have_css('.alert', text: /#{error_message}/i)
 end
 
-# Redirect check
-Then(/^I should be (on|redirected to) the "(.*?)"$/) do |redirect_or_on, page_name|
-  # TODO: Check that current page matches the expected page
+# Redirect check with explicit path verification
+Then(/^I should be (on|redirected to) the "(.*?)"$/) do |_redirect_or_on, page_name|
+  sleep 2
+  expected_path =
+    case page_name
+    when 'Home page'
+      root_path
+    when 'Courses page'
+      courses_path
+    when 'bCourses login page'
+      bcourses_login_path
+    else
+      raise "Unknown page: #{page_name}"
+    end
+  # screenshot
+  # page.save_screenshot("screenshot_#{page_name}.png")
+  # puts "Screenshot saved at path tmp/capybara/screenshot_#{page_name}.png"
+  expect(page).to have_current_path(expected_path)
 end
 
 # Navigate to a page
 When(/^I navigate to the "(.*?)"$/) do |page_name|
-  # TODO: Navigate to the specified page
+  case page_name
+  when 'Home page'
+    visit root_path
+  when 'Courses page'
+    visit courses_path
+  when 'bCourses login page'
+    visit bcourses_login_path
+  else
+    raise "Unknown page: #{page_name}"
+  end
 end

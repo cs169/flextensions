@@ -60,13 +60,3 @@
     <% end %>
   </div>
 </div>
-
-<script>
-// this js code is temporary 
-document.querySelectorAll("table tr").forEach(row => {
-  row.addEventListener("click", () => {
-    const checkbox = row.querySelector('input[type="checkbox"]');
-    if (checkbox) checkbox.checked = !checkbox.checked;
-  });
-});
-</script>
