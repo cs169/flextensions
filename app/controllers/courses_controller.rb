@@ -48,7 +48,6 @@ class CoursesController < ApplicationController
       flash[:alert] = 'You do not have access to this course.'
       redirect_to courses_path
     end
-
   end
 
   def new
