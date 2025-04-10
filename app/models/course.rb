@@ -29,6 +29,7 @@ class Course < ApplicationRecord
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
+    course.sync_users_from_canvas(token)
     associate_user_with_course(user, course)
     course
   end
