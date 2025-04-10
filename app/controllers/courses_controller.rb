@@ -152,6 +152,9 @@ class CoursesController < ApplicationController
     # Delete orphaned CourseToLms records (CourseToLms with no associated Course)
     CourseToLms.where.missing(:course).destroy_all
 
+    # Delete orphaned UserToCourse records (UserToCourse with no associated Course)
+    UserToCourse.where.missing(:course).destroy_all
+
     redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
 
