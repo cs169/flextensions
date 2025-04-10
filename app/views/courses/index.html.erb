@@ -1,51 +1,107 @@
 <div class="container mt-4">
 	<div class="row justify-content-center">
-		<div class="col-12 mb-4">
-			<h4>Staff Course Offerings</h4>
-			<p>
-				The following course offerings are those where you are a staff member. You can now manage their exams. You can add more courses by clicking the button below.
-			</p>
+		<div class="col-md-10">
+			<!-- Staff Courses Card -->
+			<div class="flx-card card">
+				<div class="card-header bg-light">
+					<h5 class="mb-0">Staff Course Offerings</h5>
+				</div>
+				<div class="card-body">
+					<p class="text-muted mb-4">
+						The following course offerings are those where you are a staff member. You can now manage their extensions. You can add more courses by clicking the button below.
+					</p>
 
-			<% if @teacher_courses.any? %>
-			<table class="table table-bordered table-striped" id="assignments-table">
-				<thead class="table-info">
-					<tr>
-						<th>Name</th>
-						<th>Course</th>
-						<th>Role</th>
-					</tr>
-				</thead>
-				<tbody>
-					<% @teacher_courses.each do |user_to_course| %>
-						<tr>
-							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
-							<td><%= user_to_course.course.course_code %></td>
-							<td><%= user_to_course.role.capitalize %></td>
-						</tr>
+					<% if @teacher_courses.any? %>
+						<div class="flx-table__responsive">
+							<table class="table table-hover">
+								<thead class="table-light">
+									<tr>
+										<th>Name</th>
+										<th>Course</th>
+										<th>Term</th>
+										<th>Role</th>
+									</tr>
+								</thead>
+								<tbody>
+									<% @teacher_courses.each do |user_to_course| %>
+										<tr class="flx-table__row flx-table__row--clickable" data-href="/courses/<%= user_to_course.course.id %>">
+											<td class="text-decoration-underline"><%= user_to_course.course.course_name %></td>
+											<td class="flx-table__cell"><%= user_to_course.course.course_code %></td>
+											<%# TODO New row to show which term, it is not in the moddel yet, so use default N/A %>
+											<td class="flx-table__cell">N/A</td>
+											<td class="flx-table__cell"><span class="badge bg-primary"><%= user_to_course.role.capitalize %></span></td>
+										</tr>
+									<% end %>
+								</tbody>
+							</table>
+						</div>
+					<% else %>
+						<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
 					<% end %>
 
-				</tbody>
-			</table>
-			<% else %>
-					<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
-			<% end %>
-
-			<div class="text-center my-3">
-				<a href="/courses/new" class="btn btn-secondary">Import courses from Canvas</a>
+					<div class="mt-4 d-flex flex-wrap gap-2">
+						<a href="/courses/new" class="btn btn-primary">
+							<i class="fas fa-file-import me-2"></i>Import courses from Canvas
+						</a>
+						<%= button_to delete_all_courses_path, method: :delete, class: 'btn btn-outline-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } do %>
+							<i class="fas fa-trash-alt me-2"></i>Delete All Courses
+						<% end %>
+					</div>
+				</div>
 			</div>
-			<div class="text-center">
-				<%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
-			</div>
-		</div>
 
-		<div class="col-12 mb-4">
-			<h4>Student Course Offerings</h4>
-			<p>
-				The following course offerings that you are a student of already have flextensions set up. You can now view your own seat assignments and exam schedule. If you expect to see a course here but it is not here, your course staff have not yet set up exams for the course yet in this system. Contact your course staff.
-			</p>
-			<div class="col-10">
-				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
+			<!-- Student Courses Card -->
+			<div class="flx-card card">
+				<div class="card-header bg-light">
+					<h5 class="mb-0">Student Course Offerings</h5>
+				</div>
+				<div class="card-body">
+					<p class="text-muted mb-4">
+						The following course offerings that you are a student of already have flextensions set up. You can now view your own extension requests. If you expect to see a course here but it is not here, your course staff have not yet set up extensions for the course yet in this system. Contact your course staff.
+					</p>
+					
+					<% if @student_courses && @student_courses.any? %>
+						<div class="flx-table__responsive">
+							<table class="table table-hover">
+								<thead class="table-light">
+									<tr>
+										<th>Name</th>
+										<th>Course</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									<% @student_courses.each do |user_to_course| %>
+										<tr class="flx-table__row flx-table__row--clickable" data-href="/courses/<%= user_to_course.course.id %>/requests">
+											<td><%= user_to_course.course.course_name %></td>
+											<td><%= user_to_course.course.course_code %></td>
+											<td>
+												<a href="/courses/<%= user_to_course.course.id %>/requests" class="btn btn-sm btn-primary" onclick="event.stopPropagation();">
+													<i class="fas fa-external-link-alt me-1"></i> View Requests
+												</a>
+											</td>
+										</tr>
+									<% end %>
+								</tbody>
+							</table>
+						</div>
+					<% else %>
+						<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
+					<% end %>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Make table rows clickable
+		document.querySelectorAll('.flx-table__row--clickable').forEach(row => {
+			row.style.cursor = 'pointer';
+			row.addEventListener('click', function() {
+				window.location.href = this.dataset.href;
+			});
+		});
+	});
+</script>

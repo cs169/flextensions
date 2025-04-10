@@ -12,7 +12,7 @@
 	</head>
 	<body class="d-flex flex-column h-100">
 		<%= render "layouts/header" %>
-		<main class="d-flex flex-nowrap h-100"> <!-- flex-shrink-0 -->
+		<main class="flex-grow-1 overflow-auto">
 			<%= yield %>
 		</main>
 		<%= render "layouts/footer" %>

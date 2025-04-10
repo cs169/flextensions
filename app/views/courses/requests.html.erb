@@ -1,7 +1,339 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
-	<div class="row">
-		<div class="alert alert-warning">There are no current requests.</div>
+<div class="flx-layout__wrapper">
+	<%= render "layouts/sidebar" %>
+	<div class="flx-layout__content flx-container">
+		<div class="flx-layout__header">
+			<h4><%= @course.course_name %> / <%= @course.course_code %></h4>
+		</div>
+		
+		<!-- Student Extension Requests -->
+		<div class="flx-card card">
+			<div class="card-header bg-light d-flex justify-content-between align-items-center">
+				<h5 class="mb-0">My Extension Requests</h5>
+				<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newRequestModal">
+					<i class="fas fa-plus me-1"></i> New Request
+				</button>
+			</div>
+			<div class="card-body">
+				<div class="flx-table__responsive">
+					<table class="table table-hover">
+						<thead class="table-light">
+							<tr>
+								<th>Assignment</th>
+								<th>Original Due Date</th>
+								<th>Extended Due Date</th>
+								<th>Extension</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @extension_requests && @extension_requests.any? %>
+								<% @extension_requests.each do |request| %>
+									<tr>
+										<td><%= request.assignment.name %></td>
+										<td><%= request.assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+										<td>
+											<% if request.status == 'Approved' %>
+												<strong class="text-success"><%= request.extended_date&.strftime("%B %d, %Y") || 'N/A' %></strong>
+											<% elsif request.status == 'Pending' %>
+												<span class="text-muted"><%= (request.assignment.due_date + request.days_requested.days)&.strftime("%B %d, %Y") %> (pending)</span>
+											<% else %>
+												<span>-</span>
+											<% end %>
+										</td>
+										<td><%= request.days_requested %> days</td>
+										<td>
+											<span class="flx-table__status flx-table__status--<%= request.status.downcase %>">
+												<%= request.status %>
+											</span>
+										</td>
+										<td>
+											<% if request.status == 'Pending' %>
+												<button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updateRequestModal" data-request-id="<%= request.id %>">
+													Update
+												</button>
+											<% elsif request.status == 'Approved' %>
+												<button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewRequestModal" data-request-id="<%= request.id %>">
+													View
+												</button>
+											<% else %>
+												<button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewRequestModal" data-request-id="<%= request.id %>">
+													View
+												</button>
+											<% end %>
+										</td>
+									</tr>
+								<% end %>
+							<% else %>
+								<tr>
+									<td colspan="6" class="text-center text-muted py-4">
+										<em>You haven't made any extension requests yet</em><br>
+										<button class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#newRequestModal">
+											<i class="fas fa-plus me-1"></i> Request an Extension
+										</button>
+									</td>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Available Assignments Card -->
+		<div class="flx-card card">
+			<div class="card-header bg-light">
+				<h5 class="mb-0">Available Assignments</h5>
+			</div>
+			<div class="card-body">
+				<div class="flx-table__responsive">
+					<table class="table table-hover">
+						<thead class="table-light">
+							<tr>
+								<th>Assignment</th>
+								<th>Due Date</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<% if @available_assignments && @available_assignments.any? %>
+								<% @available_assignments.each do |assignment| %>
+									<tr>
+										<td><%= assignment.name %></td>
+										<td><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+										<td>
+											<span class="badge bg-success">Extensions Available</span>
+										</td>
+										<td>
+											<button class="btn btn-sm btn-primary flx-btn--request" data-bs-toggle="modal" data-bs-target="#newRequestModal" data-assignment-id="<%= assignment.id %>">
+												Request Extension
+											</button>
+										</td>
+									</tr>
+								<% end %>
+							<% else %>
+								<tr>
+									<td colspan="4" class="text-center text-muted py-4">
+										<em>No assignments available for extension requests</em>
+									</td>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
+
+<!-- New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1" aria-labelledby="newRequestModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="newRequestModalLabel">Request Extension</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="/courses/<%= @course.id %>/extension_requests" method="post">
+				<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+				<div class="modal-body">
+					<div class="flx-form__group">
+						<label for="assignment_id" class="flx-form__label">Assignment</label>
+						<select class="form-select" id="assignment_id" name="extension_request[assignment_id]" required>
+							<option value="" selected disabled>Select an assignment</option>
+							<% @available_assignments&.each do |assignment| %>
+								<option value="<%= assignment.id %>"><%= assignment.name %> (Due: <%= assignment.due_date&.strftime("%b %d, %Y") %>)</option>
+							<% end %>
+						</select>
+					</div>
+					
+					<div class="flx-form__group">
+						<label for="days_requested" class="flx-form__label">How many days extension do you need?</label>
+						<input type="number" class="form-control" id="days_requested" name="extension_request[days_requested]" min="1" max="14" value="3" required>
+						
+						<div class="flx-form__preview mt-2" id="new-due-date-preview">
+							<p class="mb-0">New due date will be: <strong id="preview-new-date">calculating...</strong></p>
+						</div>
+					</div>
+					
+					<% if false && @course.custom_question_1.present? %>
+						<div class="flx-form__group">
+							<label for="answer_1" class="flx-form__label">Custom Question 1</label>
+							<textarea class="form-control" id="answer_1" name="extension_request[answer_1]" rows="2" required></textarea>
+						</div>
+					<% end %>
+					
+					<% if false && @course.custom_question_2.present? %>
+						<div class="flx-form__group">
+							<label for="answer_2" class="flx-form__label">Custom Question 2</label>
+							<textarea class="form-control" id="answer_2" name="extension_request[answer_2]" rows="2" required></textarea>
+						</div>
+					<% end %>
+					
+					<% if false && @course.custom_question_3.present? %>
+						<div class="flx-form__group">
+							<label for="answer_3" class="flx-form__label">Custom Question 3</label>
+							<textarea class="form-control" id="answer_3" name="extension_request[answer_3]" rows="2" required></textarea>
+						</div>
+					<% end %>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-primary">Submit Request</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Update Request Modal -->
+<div class="modal fade" id="updateRequestModal" tabindex="-1" aria-labelledby="updateRequestModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="updateRequestModalLabel">Update Extension Request</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form action="/courses/<%= @course.id %>/extension_requests/update" method="post">
+				<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+				<input type="hidden" name="extension_request[id]" id="update_request_id" value="">
+				<div class="modal-body">
+					<div class="flx-form__group">
+						<label for="update_assignment_id" class="flx-form__label">Assignment</label>
+						<select class="form-select" id="update_assignment_id" name="extension_request[assignment_id]" disabled>
+							<% @available_assignments&.each do |assignment| %>
+								<option value="<%= assignment.id %>"><%= assignment.name %> (Due: <%= assignment.due_date&.strftime("%b %d, %Y") %>)</option>
+							<% end %>
+						</select>
+						<div class="flx-form__help-text">Assignment cannot be changed after submission</div>
+					</div>
+					
+					<div class="flx-form__group">
+						<label for="update_days_requested" class="flx-form__label">How many days extension do you need?</label>
+						<input type="number" class="form-control" id="update_days_requested" name="extension_request[days_requested]" min="1" max="14" required>
+						
+						<div class="flx-form__preview mt-2" id="update-due-date-preview">
+							<p class="mb-0">New due date will be: <strong id="update-preview-new-date">calculating...</strong></p>
+						</div>
+					</div>
+					
+					<% if false && @course.custom_question_1.present? %>
+						<div class="flx-form__group">
+							<label for="update_answer_1" class="flx-form__label">Custom Question 1</label>
+							<textarea class="form-control" id="update_answer_1" name="extension_request[answer_1]" rows="2" required></textarea>
+						</div>
+					<% end %>
+					
+					<% if false && @course.custom_question_2.present? %>
+						<div class="flx-form__group">
+							<label for="update_answer_2" class="flx-form__label">Custom Question 2</label>
+							<textarea class="form-control" id="update_answer_2" name="extension_request[answer_2]" rows="2" required></textarea>
+						</div>
+					<% end %>
+					
+					<% if false && @course.custom_question_3.present? %>
+						<div class="flx-form__group">
+							<label for="update_answer_3" class="flx-form__label">Custom Question 3</label>
+							<textarea class="form-control" id="update_answer_3" name="extension_request[answer_3]" rows="2" required></textarea>
+						</div>
+					<% end %>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-primary">Update Request</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Get assignment dates to calculate previews
+		const assignmentDates = {};
+		<% @available_assignments&.each do |assignment| %>
+			assignmentDates[<%= assignment.id %>] = "<%= assignment.due_date&.to_s %>";
+		<% end %>
+		
+		// New request date preview
+		const daysInput = document.getElementById('days_requested');
+		const assignmentSelect = document.getElementById('assignment_id');
+		const previewNewDate = document.getElementById('preview-new-date');
+		
+		function updateNewDatePreview() {
+			const assignmentId = assignmentSelect.value;
+			const days = parseInt(daysInput.value);
+			
+			if (assignmentId && !isNaN(days) && days > 0) {
+				const dueDate = new Date(assignmentDates[assignmentId]);
+				if (!isNaN(dueDate.getTime())) {
+					const newDate = new Date(dueDate);
+					newDate.setDate(newDate.getDate() + days);
+					previewNewDate.textContent = newDate.toLocaleDateString('en-US', {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric'
+					});
+				} else {
+					previewNewDate.textContent = "Invalid date";
+				}
+			} else {
+				previewNewDate.textContent = "Select an assignment and days";
+			}
+		}
+		
+		daysInput.addEventListener('input', updateNewDatePreview);
+		assignmentSelect.addEventListener('change', updateNewDatePreview);
+		
+		// Pre-select assignment if coming from assignment list
+		document.querySelectorAll('[data-assignment-id]').forEach(button => {
+			button.addEventListener('click', function() {
+				const assignmentId = this.getAttribute('data-assignment-id');
+				if (assignmentSelect) {
+					assignmentSelect.value = assignmentId;
+					updateNewDatePreview();
+				}
+			});
+		});
+		
+		// Update request modal
+		const updateRequestModal = document.getElementById('updateRequestModal');
+		if (updateRequestModal) {
+			updateRequestModal.addEventListener('show.bs.modal', function(event) {
+				const button = event.relatedTarget;
+				const requestId = button.getAttribute('data-request-id');
+				document.getElementById('update_request_id').value = requestId;
+				
+				// Here you would normally fetch the request data via AJAX and populate the form
+				// For this template, we'll just show how it would look
+				document.getElementById('update_days_requested').value = 3;
+				
+				// Update the preview date
+				const updateDaysInput = document.getElementById('update_days_requested');
+				const updatePreviewDate = document.getElementById('update-preview-new-date');
+				
+				updateDaysInput.addEventListener('input', function() {
+					const days = parseInt(this.value);
+					if (!isNaN(days) && days > 0) {
+						// In a real implementation, you'd get the correct assignment date
+						const dueDate = new Date();
+						dueDate.setDate(dueDate.getDate() + 7); // Example due date
+						
+						const newDate = new Date(dueDate);
+						newDate.setDate(newDate.getDate() + days);
+						updatePreviewDate.textContent = newDate.toLocaleDateString('en-US', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+						});
+					}
+				});
+				
+				// Trigger an initial update
+				updateDaysInput.dispatchEvent(new Event('input'));
+			});
+		}
+	});
+</script>
 

@@ -1,90 +1,371 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h4 class="mb-4">Flextensions Test Student Course / March 2025</h4>
-            <ul class="nav nav-pills mb-3 justify-content-center" id="courses-tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-form-tab" data-bs-toggle="pill" data-bs-target="#course-form" type="button" role="tab" aria-controls="course-form" aria-selected="true">Form</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email</button>
-                </li>
-            </ul>
-            <form action="/courses/<% @course.id %>edit">
-                <div class="tab-content" id="courses-tabContent">
-                    <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
-                        <div class="mb-3 row justify-content-center">
-                            <div class="col-11 form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
-                                <label class="form-check-label h4" for="course-enable">Enable Students to request extensions</label>
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve" class="col-sm-3 col-form-label">Auto approve within days </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve" placeholder="number of days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve-dsp" class="col-sm-3 col-form-label">Auto approve within days (DSP) </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="number of days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="max-auto-approve" class="col-sm-3 col-form-label">Maximum requests to auto approve</label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="max-auto-approve" placeholder="number">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-reject" class="col-sm-3 col-form-label">Course Reply Email Address</label>
-                            <div class="col-sm-8">
-                            <input type="email" min="1" step="1" class="form-control" id="auto-reject" placeholder="example@email.com">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="course-form" role="tabpanel" aria-labelledby="course-form-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="custom-question-1" class="form-label">Custom Question 1</label>
-                                <textarea class="form-control" id="custom-question-1" rows="3"></textarea>
-                            </div>
-                            <div class="col-11 mb-3">
-                                <label for="custom-question-2" class="form-label">Custom Question 2</label>
-                                <textarea class="form-control" id="custom-question-2" rows="3"></textarea>
-                            </div>
-                            <div class="col-11 mb-3">
-                                <label for="custom-question-3" class="form-label">Custom Question 3</label>
-                                <textarea class="form-control" id="custom-question-3" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="email-template" class="form-label">Auto Reply Email Template</label>
-                                <textarea class="form-control" id="email-template" rows="10">maybe this can be a wysiwyg editor like TinyMCE</textarea>
-                            </div>
-                            <div class="col-11 mb-3">
-                                <label for="email-template-html" class="form-label">Auto Reply Email Template (html)</label>
-                                <textarea class="form-control" id="email-template-html" rows="10">if you go with TinyMCE (which is a good option) the free version doesn't allow you to use raw html so we would need another textarea that would be for raw html and code to ignore the above textarea if this has content</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <a href="/courses" class="btn btn-dark">Back</a>
-                    <input type="submit" class="btn btn-success" value="Save Settings" />
-                </div>
-            </form>
-        </div>
+<div class="flx-layout__wrapper">
+  <%= render "layouts/sidebar" %>
+  <div class="flx-layout__content flx-container">
+    <div class="flx-layout__header">
+      <h4><%= @course.course_name %> / <%= @course.course_code %></h4>
     </div>
+    
+    <!-- Flash message container -->
+    <div id="settings-flash-container" class="mb-3" style="display: none;">
+      <div class="alert alert-success alert-dismissible fade show" role="alert" id="settings-flash-message">
+        <i class="fas fa-check-circle me-2"></i>
+        <span id="settings-flash-text"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    </div>
+    
+    <div class="flx-card card">
+      <div class="card-header bg-light">
+        <ul class="flx-card__pills nav nav-pills card-header-pills" id="courses-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="true">General</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="course-form-tab" data-bs-toggle="pill" data-bs-target="#course-form" type="button" role="tab" aria-controls="course-form" aria-selected="false">Form</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="false">Email</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <form action="/courses/<%= @course.id %>/update_settings" method="post" id="course-settings-form">
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+          
+          <div class="tab-content" id="courses-tabContent">
+            <!-- General Settings Tab -->
+            <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
+              <div class="card px-4 mb-4 flex flex-row justify-content-between" id="extensions-toggle-card">
+              <div>
+                    <div class="btn-group w-100 mt-3" role="group" aria-label="Extension status toggle">
+                      <input type="radio" class="btn-check" name="course[extensions_enabled]" id="extensions-enabled" value="true" autocomplete="off">
+                      <label class="btn btn-success fs-6 py-3" for="extensions-enabled" id="settings-enable-button">
+                        <i class="fas fa-check-circle me-2"></i>ENABLE
+                      </label>
+                      
+                      <input type="radio" class="btn-check" name="course[extensions_enabled]" id="extensions-disabled" value="false" autocomplete="off" checked>
+                      <label class="btn btn-danger fs-6 py-3" for="extensions-disabled" id="settings-disable-button">
+                        <i class="fas fa-times-circle me-2"></i>DISABLE
+                      </label>
+                    </div>
+                    
+                    <div class="form-text text-center mt-2 fs-6">
+                      Current status: <span class="fw-bold" id="extensions-status">OFF</span>
+                    </div>
+                  </div>
+                <div class="card-body">
+                  <h5 class="mb-3">Extension Requests</h5>
+                  <p class="text-muted mb-3">Allow students to request deadline extensions for assignments</p>
+                  
+  
+                </div>
+                
+              </div>
+              
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="flx-form__group">
+                    <label for="auto-approve" class="flx-form__label">Auto approve within days</label>
+                    <div class="input-group">
+                      <input type="number" min="1" max="14" step="1" class="form-control" id="auto-approve" name="course[auto_approve_days]" value="3" placeholder="Days">
+                      <span class="input-group-text">days</span>
+                    </div>
+                    <div class="flx-form__help-text">Automatically approve extension requests that are within this many days</div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="flx-form__group">
+                    <label for="auto-approve-dsp" class="flx-form__label">Auto approve within days (DSP)</label>
+                    <div class="input-group">
+                      <input type="number" min="1" max="30" step="1" class="form-control" id="auto-approve-dsp" name="course[auto_approve_days_dsp]" value="7" placeholder="Days">
+                      <span class="input-group-text">days</span>
+                    </div>
+                    <div class="flx-form__help-text">Automatically approve DSP extension requests that are within this many days</div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="flx-form__group">
+                    <label for="max-auto-approve" class="flx-form__label">Maximum requests to auto approve</label>
+                    <div class="input-group">
+                      <input type="number" min="1" max="10" step="1" class="form-control" id="max-auto-approve" name="course[max_auto_approve]" value="2" placeholder="Count">
+                      <span class="input-group-text">requests</span>
+                    </div>
+                    <div class="flx-form__help-text">After this many requests for a single assignment, manual review is required</div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="flx-form__group">
+                    <label for="course-reply-email" class="flx-form__label">Course Reply Email Address</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                      <input type="email" class="form-control" id="course-reply-email" name="course[reply_to_email]" value="" placeholder="example@email.com">
+                    </div>
+                    <div class="flx-form__help-text">Email address that students can reply to about their extension requests</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Settings Tab -->
+            <div class="tab-pane fade" id="course-form" role="tabpanel" aria-labelledby="course-form-tab" tabindex="0">
+              <p class="text-muted mb-4">Configure additional questions for students to answer when requesting extensions.</p>
+              
+              <div class="card bg-light mb-4">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Required Questions</h6>
+                </div>
+                <div class="card-body">
+                  <div class="flx-form__group">
+                    <label class="flx-form__label">Required Question 1</label>
+                    <div class="form-control bg-white p-3 mb-2" disabled>How many days extension do you need?</div>
+                    <div class="flx-form__help-text"><i class="fas fa-info-circle me-1"></i> This question is required and cannot be modified</div>
+                  </div>
+                  
+                  <div class="flx-form__group mb-0">
+                    <label class="flx-form__label">Required Question 2</label>
+                    <div class="form-control bg-white p-3 mb-2" disabled>Which assignment are you requesting an extension for?</div>
+                    <div class="flx-form__help-text"><i class="fas fa-info-circle me-1"></i> This question is required and cannot be modified</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">Custom Questions</h6>
+                </div>
+                <div class="card-body">
+                  <div class="flx-form__group">
+                    <label for="custom-question-1" class="flx-form__label">Custom Question 1</label>
+                    <textarea class="form-control" id="custom-question-1" name="course[custom_question_1]" rows="2" placeholder="e.g., Why do you need an extension?"></textarea>
+                    <div class="flx-form__help-text">Leave blank to not include this question</div>
+                  </div>
+                  
+                  <div class="flx-form__group">
+                    <label for="custom-question-2" class="flx-form__label">Custom Question 2</label>
+                    <textarea class="form-control" id="custom-question-2" name="course[custom_question_2]" rows="2" placeholder="e.g., Have you contacted your TA about this?"></textarea>
+                    <div class="flx-form__help-text">Leave blank to not include this question</div>
+                  </div>
+                  
+                  <div class="flx-form__group mb-0">
+                    <label for="custom-question-3" class="flx-form__label">Custom Question 3</label>
+                    <textarea class="form-control" id="custom-question-3" name="course[custom_question_3]" rows="2" placeholder="e.g., What steps will you take to avoid needing extensions in the future?"></textarea>
+                    <div class="flx-form__help-text">Leave blank to not include this question</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email Settings Tab -->
+            <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
+              <p class="text-muted mb-4">Customize the email templates sent to students when their extension requests are processed.</p>
+              
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="card mb-4">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">Email Template</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="flx-form__group">
+                        <label for="email-subject" class="flx-form__label">Email Subject Line</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                          <input type="text" class="form-control" id="email-subject" name="course[email_subject]" value="Extension Request Status Update" placeholder="Extension Request Status Update">
+                        </div>
+                      </div>
+                      
+                      <div class="flx-form__group mb-0">
+                        <label for="email-template" class="flx-form__label">Email Body Template</label>
+                        <textarea class="form-control" id="email-template" name="course[email_template]" rows="12">Dear {student_name},
+
+Your extension request for {assignment_name} has been {status}.
+
+Original due date: {original_date}
+New due date: {new_date}
+
+If you have any questions, please contact the course staff.
+
+Regards,
+{course_name} Staff</textarea>
+                        <div class="flx-form__help-text mt-2">
+                          <strong>Available placeholders:</strong><br>
+                          <code>{student_name}</code> - Student's name<br>
+                          <code>{assignment_name}</code> - Assignment name<br>
+                          <code>{status}</code> - Request status (approved/denied)<br>
+                          <code>{original_date}</code> - Original due date<br>
+                          <code>{new_date}</code> - Extended due date<br>
+                          <code>{days_requested}</code> - Days requested<br>
+                          <code>{course_name}</code> - Course name
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-lg-6">
+                  <div class="card mb-4">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">Email Preview</h6>
+                    </div>
+                    <div class="card-body email-preview-wrapper">
+                      <div class="card">
+                        <div class="card-header bg-white">
+                          <p class="mb-0"><strong>Subject:</strong> <span id="preview-subject">Extension Request Status Update</span></p>
+                          <p class="mb-0"><strong>To:</strong> Student Name</p>
+                        </div>
+                        <div class="card-body email-preview-content">
+                          <p>Dear Student Name,</p>
+                          <p>Your extension request for Assignment Name has been approved.</p>
+                          <p>Original due date: May 15, 2025<br>
+                          New due date: May 18, 2025</p>
+                          <p>If you have any questions, please contact the course staff.</p>
+                          <p>Regards,<br>
+                          Course Name Staff</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flx-form__actions">
+            <div class="d-flex">
+              <a href="/courses/<%= @course.id %>" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Course
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-1"></i> Save Settings
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+  // Initialize tabs based on URL hash
+  document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    if (hash) {
+      const tab = document.querySelector(`button[data-bs-target="${hash}"]`);
+      if (tab) {
+        const tabInstance = new bootstrap.Tab(tab);
+        tabInstance.show();
+      }
+    }
+    
+    // Update hash when tabs change
+    const tabs = document.querySelectorAll('button[data-bs-toggle="pill"]');
+    tabs.forEach(tab => {
+      tab.addEventListener('shown.bs.tab', function (e) {
+        const target = e.target.getAttribute('data-bs-target');
+        window.location.hash = target;
+      });
+    });
+    
+    // Extension toggle functionality
+    const enabledRadio = document.getElementById('extensions-enabled');
+    const disabledRadio = document.getElementById('extensions-disabled');
+    const statusText = document.getElementById('extensions-status');
+    const enableButton = document.getElementById('settings-enable-button');
+    const disableButton = document.getElementById('settings-disable-button');
+    const flashContainer = document.getElementById('settings-flash-container');
+    const flashText = document.getElementById('settings-flash-text');
+    
+    // Function to show flash message
+    function showFlashMessage(message) {
+      flashText.textContent = message;
+      flashContainer.style.display = 'block';
+      
+      // Scroll to top to make sure user sees the message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(document.querySelector('.alert'));
+        bsAlert.close();
+        setTimeout(() => {
+          flashContainer.style.display = 'none';
+        }, 500);
+      }, 5000);
+    }
+    
+    function updateToggleState() {
+      const wasEnabled = enabledRadio.checked;
+      
+      if (enabledRadio.checked) {
+        statusText.textContent = 'ON';
+        statusText.className = 'fw-bold text-success';
+        
+        // Update button styles and text
+        enableButton.classList.remove('btn-outline-success');
+        enableButton.classList.add('btn-success');
+        enableButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>ENABLED';
+        
+        disableButton.classList.remove('btn-danger');
+        disableButton.classList.add('btn-outline-danger');
+        disableButton.innerHTML = '<i class="fas fa-times-circle me-2"></i>DISABLE';
+        
+        // Show flash message
+        showFlashMessage('Extensions have been turned ON. Remember to save settings.');
+      } else {
+        statusText.textContent = 'OFF';
+        statusText.className = 'fw-bold text-danger';
+        
+        // Update button styles and text
+        enableButton.classList.remove('btn-success');
+        enableButton.classList.add('btn-outline-success');
+        enableButton.innerHTML = '<i class="fas fa-check-circle me-2"></i>ENABLE';
+        
+        disableButton.classList.remove('btn-outline-danger');
+        disableButton.classList.add('btn-danger');
+        disableButton.innerHTML = '<i class="fas fa-times-circle me-2"></i>DISABLED';
+        
+        // Show flash message
+        showFlashMessage('Extensions have been turned OFF. Remember to save settings.');
+      }
+    }
+    
+    enabledRadio.addEventListener('change', updateToggleState);
+    disabledRadio.addEventListener('change', updateToggleState);
+    
+    // Email template preview functionality
+    const emailTemplate = document.getElementById('email-template');
+    const emailSubject = document.getElementById('email-subject');
+    
+    function updatePreview() {
+      let templateContent = emailTemplate.value;
+      let subjectContent = emailSubject.value || 'Extension Request Status Update';
+      
+      // Replace placeholders with sample values
+      templateContent = templateContent
+        .replace(/{student_name}/g, 'Student Name')
+        .replace(/{assignment_name}/g, 'Assignment Name')
+        .replace(/{status}/g, 'approved')
+        .replace(/{original_date}/g, 'May 15, 2025')
+        .replace(/{new_date}/g, 'May 18, 2025')
+        .replace(/{days_requested}/g, '3')
+        .replace(/{course_name}/g, 'Course Name');
+      
+      // Convert line breaks to HTML
+      templateContent = templateContent.replace(/\n/g, '<br>');
+      
+      // Update the preview
+      document.getElementById('preview-subject').textContent = subjectContent;
+      document.querySelector('.email-preview-content').innerHTML = templateContent;
+    }
+    
+    emailTemplate.addEventListener('input', updatePreview);
+    emailSubject.addEventListener('input', updatePreview);
+    
+    // Initialize toggle state
+    updateToggleState();
+  });
+</script>

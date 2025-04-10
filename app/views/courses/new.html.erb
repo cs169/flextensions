@@ -1,72 +1,194 @@
 <div class="container mt-4">
-  <div class="row">
-    <div class="col-12">
-      <h5>Choose courses to set up extensions with:</h5>
-      <p>If you expect to see an offering but it is not listed, please make sure its corresponding Canvas course exists and is active.</p>
-    </div>
-    <% if @courses_teacher.any? %>
-      <%= form_with url: courses_path, method: :post, class: "mt-3" do %>
-
-			<table class="table table-bordered table-striped" id="import-course-table">
-        <thead class="table-info">
-            <tr>
-              <th></th>
-              <th>Semester</th>
-              <th>Course</th>
-              <th>Name</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
-              <tr>
-
-					<td class="d-flex justify-content-center align-content-center">
-						<div class="d-flex justify-content-center form-check form-switch">
-              <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
-							<label class="form-check-label" for="assignment-1-has-partner"></label>
-						</div>
-					</td>
-                <td><%= DateTime.parse(course["created_at"]).strftime("%B %Y") %></td>
-                <td><%= course["course_code"] %></td>
-                <td><%= course["name"] %></td>
-                <td><%= course['enrollments'].find { |enrollment| %w[teacher ta].include?(enrollment['type']) }['type'].capitalize %></td>
-              </tr>
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="flx-card card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Import Courses</h5>
+          <a href="/courses" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Courses
+          </a>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-4">
+            Select the courses you want to set up with Flextensions. If you don't see a course, please make sure its corresponding Canvas course exists and is active.
+          </p>
+          
+          <% if @courses_teacher.any? %>
+            <%= form_with url: courses_path, method: :post, class: "mt-3", id: "import-courses-form" do %>
+              <div class="flx-table__responsive">
+                <table class="table table-hover" id="import-course-table">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 60px;">
+                        <div class="form-check d-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" id="select-all-courses">
+                        </div>
+                      </th>
+                      <th>Course</th>
+                      <th>Name</th>
+                      <th>Semester</th>
+                      <th>Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
+                      <tr class="flx-table__row flx-table__row--clickable">
+                        <td>
+                          <div class="form-check d-flex justify-content-center">
+                            <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input course-checkbox" %>
+                          </div>
+                        </td>
+                        <td><strong><%= course["course_code"] %></strong></td>
+                        <td><%= course["name"] %></td>
+                        <td><%= DateTime.parse(course["created_at"]).strftime("%B %Y") %></td>
+                        <td><span class="badge bg-primary"><%= course['enrollments'].find { |enrollment| %w[teacher ta].include?(enrollment['type']) }['type'].capitalize %></span></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-primary" id="import-button" data-bs-toggle="modal" data-bs-target="#importConfirmModal">
+                  <i class="fas fa-download me-2"></i> Import Selected Courses
+                </button>
+              </div>
             <% end %>
-          </tbody>
-      </table>
-      <%= submit_tag "Import Selected Courses", class: "btn btn-secondary" %>
-      <% end %>
-    <% else %>
-      <p class="alert alert-danger">No courses found or unable to fetch courses.</p>
-    <% end %>
-
-    <% if @courses_student.any? %>
-      <div class="row mt-4">
-        <div class="col-12">
-          <h5>Classes you are enrolled in but cannot set up extensions for:</h5>
-          <% @courses_student.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
-            <div class="mb-3">
-              <span>
-                <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
-                <strong>Course:</strong> <%= course["course_code"] %> |
-                <strong>Name:</strong> <%= course["name"] %> |
-                <strong>Role:</strong> <%= course['enrollments'].find { |enrollment| %w[student observer designer].include?(enrollment['type']) }['type'].capitalize %>
-              </span>
+          <% else %>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              No courses found or unable to fetch courses from Canvas.
             </div>
           <% end %>
         </div>
       </div>
-    <% end %>
+      
+      <% if @courses_student.any? %>
+        <div class="flx-card card mt-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Your Enrolled Courses</h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted mb-3">
+              These are courses where you are enrolled as a student and cannot set up extensions.
+            </p>
+            
+            <div class="flx-table__responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Course</th>
+                    <th>Name</th>
+                    <th>Semester</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @courses_student.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
+                    <tr>
+                      <td><strong><%= course["course_code"] %></strong></td>
+                      <td><%= course["name"] %></td>
+                      <td><%= DateTime.parse(course["created_at"]).strftime("%B %Y") %></td>
+                      <td><span class="badge bg-secondary"><%= course['enrollments'].find { |enrollment| %w[student observer designer].include?(enrollment['type']) }['type'].capitalize %></span></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Import Confirmation Modal -->
+<div class="modal fade" id="importConfirmModal" tabindex="-1" aria-labelledby="importConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="importConfirmModalLabel">Confirm Import</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to import the selected courses?</p>
+        <p>This will create course entries in Flextensions and allow you to set up extension requests for assignments in these courses.</p>
+        <div id="selected-courses-preview" class="mt-3">
+          <p class="fw-bold mb-1">Selected courses:</p>
+          <ul id="selected-courses-list" class="mb-0"></ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirm-import-btn">Import Courses</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-// this js code is temporary 
-document.querySelectorAll("table tr").forEach(row => {
-  row.addEventListener("click", () => {
-    const checkbox = row.querySelector('input[type="checkbox"]');
-    if (checkbox) checkbox.checked = !checkbox.checked;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Make rows clickable to toggle checkboxes
+    document.querySelectorAll("#import-course-table .flx-table__row--clickable").forEach(row => {
+      row.addEventListener("click", (event) => {
+        if (event.target.type !== 'checkbox') {
+          const checkbox = row.querySelector('input[type="checkbox"]');
+          if (checkbox) checkbox.checked = !checkbox.checked;
+        }
+      });
+    });
+    
+    // Select all functionality
+    const selectAllCheckbox = document.getElementById('select-all-courses');
+    const courseCheckboxes = document.querySelectorAll('.course-checkbox');
+    
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', function() {
+        courseCheckboxes.forEach(checkbox => {
+          checkbox.checked = this.checked;
+        });
+      });
+    }
+    
+    // Handle confirmation modal
+    const importButton = document.getElementById('import-button');
+    const confirmImportBtn = document.getElementById('confirm-import-btn');
+    const selectedCoursesList = document.getElementById('selected-courses-list');
+    const importForm = document.getElementById('import-courses-form');
+    
+    if (importButton && confirmImportBtn && selectedCoursesList && importForm) {
+      // Update selected courses in modal
+      importButton.addEventListener('click', function() {
+        selectedCoursesList.innerHTML = '';
+        let hasSelectedCourses = false;
+        
+        courseCheckboxes.forEach(checkbox => {
+          if (checkbox.checked) {
+            hasSelectedCourses = true;
+            const row = checkbox.closest('tr');
+            const courseName = row.cells[2].textContent;
+            const courseCode = row.cells[1].textContent;
+            
+            const listItem = document.createElement('li');
+            listItem.textContent = `${courseCode} - ${courseName}`;
+            selectedCoursesList.appendChild(listItem);
+          }
+        });
+        
+        document.getElementById('selected-courses-preview').style.display = hasSelectedCourses ? 'block' : 'none';
+        
+        if (!hasSelectedCourses) {
+          selectedCoursesList.innerHTML = '<li class="text-danger">No courses selected</li>';
+          confirmImportBtn.disabled = true;
+        } else {
+          confirmImportBtn.disabled = false;
+        }
+      });
+      
+      // Submit form when confirmed
+      confirmImportBtn.addEventListener('click', function() {
+        importForm.submit();
+      });
+    }
   });
-});
 </script>

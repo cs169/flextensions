@@ -106,3 +106,391 @@
 	background-color: #fdb515;
 	color: #000;
 }
+
+// Sidebar responsive styles
+.flx-sidebar {
+	width: 100%;
+	flex-shrink: 0;
+	
+	&__container {
+		width: 100%;
+	}
+	
+	&__content {
+		background-color: #f8f9fa;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		margin-top: 0.5rem;
+		margin-bottom: 1rem;
+		transition: all 0.3s ease;
+		
+		&:hover {
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
+	}
+	
+	&__nav-item {
+		margin-bottom: 0.5rem;
+	}
+	
+	&__nav-link {
+		padding: 0.75rem 1rem;
+		border-radius: 6px;
+		transition: all 0.2s ease;
+		
+		&:hover {
+			background-color: rgba(0,0,0,0.03);
+			transform: translateX(4px);
+		}
+	}
+	
+	// Desktop styles
+	@media (min-width: 768px) {
+		width: 220px;
+		min-width: 220px;
+		padding: 0 10px 0 0;
+		height: 100%;
+		
+		&__content {
+			position: sticky;
+			top: 70px; // Adjust based on navbar height
+			height: calc(100vh - 70px);
+			margin-top: 0;
+			overflow-y: auto;
+		}
+	}
+}
+
+// Specific layout styles for the course pages
+.flx-layout {
+	&__wrapper {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		min-height: 100vh;
+		
+		@media (min-width: 768px) {
+			flex-direction: row;
+		}
+	}
+	
+	&__content {
+		flex-grow: 1;
+		padding: 1rem 0.5rem;
+		
+		@media (min-width: 768px) {
+			padding: 1rem 1.5rem;
+		}
+	}
+	
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		margin-bottom: 1.5rem;
+		margin-top: 1.5rem;
+		
+		h4 {
+			margin-bottom: 0;
+		}
+		
+		@media (max-width: 768px) {
+			flex-direction: column;
+			align-items: flex-start;
+			
+			h4 {
+				margin-bottom: 1rem;
+			}
+		}
+	}
+}
+
+// Form specific styles
+.flx-form {
+	&__group {
+		margin-bottom: 1.5rem;
+	}
+	
+	&__label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+	}
+	
+	&__switch {
+		margin-bottom: 2rem;
+		padding: 1rem;
+		background-color: rgba(253, 181, 21, 0.1);
+		border-radius: 8px;
+		border-left: 4px solid #fdb515;
+	}
+	
+	&__actions {
+		margin-top: 1.5rem;
+		text-align: center;
+	}
+	
+	&__help-text {
+		color: #6c757d;
+		font-size: 0.875rem;
+		margin-top: 0.25rem;
+	}
+	
+	&__preview {
+		background-color: #f8f9fa;
+		padding: 0.75rem;
+		border-radius: 4px;
+		margin-top: 0.5rem;
+		border: 1px solid #dee2e6;
+		
+		strong {
+			color: #002676; // primary color
+		}
+	}
+}
+
+// Table specific styles
+.flx-table {
+	&__responsive {
+		overflow-x: auto;
+		margin-bottom: 1rem;
+		-webkit-overflow-scrolling: touch;
+		
+		.table {
+			margin-bottom: 0;
+			
+			th, td {
+				vertical-align: middle;
+			}
+		}
+	}
+	
+	&__row {
+		&--clickable {
+			transition: background-color 0.15s ease-in-out;
+			
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+				box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+			}
+		}
+	}
+	
+	&__status {
+		display: inline-block;
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-size: 0.875rem;
+		font-weight: 500;
+		
+		&--approved {
+			background-color: rgba(25, 135, 84, 0.1);
+			color: #198754;
+		}
+		
+		&--pending {
+			background-color: rgba(255, 193, 7, 0.1);
+			color: #fd7e14;
+		}
+		
+		&--denied {
+			background-color: rgba(220, 53, 69, 0.1);
+			color: #dc3545;
+		}
+	}
+	
+	&__feature-toggle {
+		display: flex;
+		align-items: center;
+		
+		.spinner-border {
+			display: none;
+			margin-left: 0.5rem;
+			width: 1rem;
+			height: 1rem;
+		}
+		
+		&.loading {
+			.spinner-border {
+				display: inline-block;
+			}
+			
+			.flx-feature-btn {
+				pointer-events: none;
+				opacity: 0.65;
+			}
+		}
+		
+		.flx-feature-label {
+			margin-left: 0.5rem;
+			font-weight: 500;
+			font-size: 0.875rem;
+		}
+	}
+	
+	&__actions {
+		margin-top: 1.5rem;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		
+		.btn {
+			margin-right: 0.5rem;
+		}
+	}
+}
+
+// Feature toggle button instead of switch
+.flx-feature-btn {
+	display: inline-block;
+	padding: 0.375rem 0.75rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.5;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	cursor: pointer;
+	user-select: none;
+	border: 1px solid transparent;
+	border-radius: 0.25rem;
+	transition: all 0.15s ease-in-out;
+	
+	&--on {
+		background-color: #198754;
+		color: #fff;
+		
+		&:hover {
+			background-color: darken(#198754, 5%);
+		}
+		
+		.flx-feature-icon--on {
+			display: inline-block;
+		}
+		
+		.flx-feature-icon--off {
+			display: none;
+		}
+	}
+	
+	&--off {
+		background-color: #6c757d;
+		color: #fff;
+		
+		&:hover {
+			background-color: darken(#6c757d, 5%);
+		}
+		
+		.flx-feature-icon--on {
+			display: none;
+		}
+		
+		.flx-feature-icon--off {
+			display: inline-block;
+		}
+	}
+	
+	.flx-feature-icon {
+		margin-right: 0.375rem;
+	}
+}
+
+// General layout improvements - kept general but with flx prefix
+.flx-container {
+	padding: 0 1rem;
+	
+	@media (min-width: 768px) {
+		padding: 0 1.5rem;
+	}
+}
+
+.flx-card {
+	margin-bottom: 1.5rem;
+	border: none;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	}
+	
+	.card-header {
+		background-color: #f8f9fa;
+		border-bottom: none;
+		padding: 1rem 1.25rem;
+		border-radius: 8px 8px 0 0 !important;
+		
+		h5 {
+			font-weight: 500;
+		}
+	}
+	
+	&__pills {
+		margin: -0.5rem;
+		
+		.nav-link {
+			margin: 0.25rem;
+			border-radius: 6px;
+			padding: 0.5rem 1rem;
+			
+			&.active {
+				background-color: #fdb515;
+				color: #000;
+			}
+		}
+	}
+	
+	&__sync-btn {
+		display: flex;
+		align-items: center;
+		
+		.spinner-border {
+			display: none;
+			margin-right: 0.75rem;
+		}
+		
+		&.loading {
+			.spinner-border {
+				display: inline-block;
+			}
+			
+			.btn {
+				pointer-events: none;
+				opacity: 0.65;
+			}
+		}
+	}
+}
+
+// Button and interactive elements
+.flx-btn {
+	&--request {
+		border-radius: 20px;
+		transition: all 0.2s ease;
+		
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+		}
+	}
+}
+
+@media (max-width: 767.98px) {
+	.row.justify-content-center {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	
+	.col-form-label {
+		text-align: left;
+		padding-bottom: 0.25rem;
+	}
+	
+	// Make nav pills wrap on mobile
+	.nav-pills {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+}

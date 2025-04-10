@@ -1,77 +1,343 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-12">
-      <h4 class="mb-4"><%= @course.course_name %> / <%= @course.course_code %></h4>
-      <table class="table table-bordered table-striped" id="assignments-table">
-        <thead>
-          <tr class="table-info">
-            <th>Assignment</th>
-            <th>View</th>
-            <th>Due Date</th>
-            <th>Late Due Date</th>
-            <th style="width: 50px;">Enable</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @assignments.each do |assignment| %>
-            <tr>
-              <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-              <td class="row-check"><%= assignment.name %></td>
-              <td>
-                <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                  bCourses
-                </a>
-              </td>
-              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="d-flex justify-content-center align-content-center">
-                <div class="d-flex justify-content-center form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
-                  <label class="form-check-label" for="assignment-<%= assignment.id %>-has-partner"></label>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-      <div class="text-center">
-        <a href="/courses" class="btn btn-dark">Back</a>
-        <button class="btn btn-info" id="sync-assignments-button" data-course-id="<%= @course.id %>">Sync Assignments</button>
+<div class="flx-layout__wrapper">
+  <%= render "layouts/sidebar" %>
+  <div class="flx-layout__content flx-container">
+    <div class="flx-layout__header">
+      <h4><%= @course.course_name %> / <%= @course.course_code %></h4>
+      <div class="flx-card__sync-btn">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <button class="btn btn-primary" id="sync-assignments-button" data-course-id="<%= @course.id %>" data-bs-toggle="modal" data-bs-target="#syncConfirmModal">
+          <i class="fas fa-sync-alt me-2"></i> Sync Assignments
+        </button>
+      </div>
+    </div>
+    
+    <div class="flx-card card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Assignments</h5>
+      </div>
+      <div class="card-body">
+        <div class="flx-table__responsive">
+          <table class="table table-hover" id="assignments-table">
+            <thead class="table-light">
+              <tr>
+                <th>Assignment</th>
+                <th>Source</th>
+                <th>Due Date</th>
+                <th>Late Due Date</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @assignments.each do |assignment| %>
+                <tr class="flx-table__row">
+                  <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
+                  <td><%= assignment.name %></td>
+                  <td>
+                    <a href="<%= "#{ENV.fetch('CANVAS_URL', 'https://bcourses.berkeley.edu')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="badge bg-primary">
+                      <i class="fas fa-external-link-alt me-1"></i> bCourses
+                    </a>
+                  </td>
+                  <td><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+                  <td><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center">
+                      <button 
+                        class="btn btn-sm btn-secondary" 
+                        data-assignment-id="<%= assignment.id %>"
+                        id="assignment-<%= assignment.id %>-toggle-extension"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#toggleExtensionModal"
+                        data-assignment-name="<%= assignment.name %>"
+                      >
+                        <i class="fas fa-cog me-1"></i>
+                        <span class="d-none d-md-inline">Configure</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="flx-table__actions">
+          <a href="/courses" class="btn btn-dark me-2">
+            <i class="fas fa-arrow-left me-1"></i> Back to Courses
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flx-card card">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">Student Extension Requests</h5>
+      </div>
+      <div class="card-body">
+        <div class="flx-table__responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Student</th>
+                <th>Assignment</th>
+                <th>Original Due Date</th>
+                <th>Requested Extension</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @extension_requests && @extension_requests.any? %>
+                <% @extension_requests.each do |request| %>
+                  <tr>
+                    <td><%= request.student.name %></td>
+                    <td><%= request.assignment.name %></td>
+                    <td><%= request.assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+                    <td><%= request.days_requested %> days (<%= (request.assignment.due_date + request.days_requested.days)&.strftime("%B %d, %Y") %>)</td>
+                    <td>
+                      <span class="flx-table__status flx-table__status--<%= request.status.downcase %>">
+                        <%= request.status %>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-success btn-sm">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm">Deny</button>
+                        <button type="button" class="btn btn-secondary btn-sm">View</button>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <em>No extension requests yet</em>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sync Confirmation Modal -->
+<div class="modal fade" id="syncConfirmModal" tabindex="-1" aria-labelledby="syncConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="syncConfirmModalLabel">Sync Assignments</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This will synchronize assignments from Canvas. Any manually added assignments not in Canvas will remain unchanged.</p>
+        <p>Do you want to continue?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmSyncBtn">Sync Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Extension Toggle Modal -->
+<div class="modal fade" id="toggleExtensionModal" tabindex="-1" aria-labelledby="toggleExtensionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="toggleExtensionModalLabel">Configure Extensions</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="mb-4" id="assignmentNameDisplay"></h6>
+        
+        <div class="mb-4">
+          <p class="fw-bold mb-2">Extension Status:</p>
+          <div class="btn-group w-100" role="group" aria-label="Extension status options">
+            <input type="radio" class="btn-check" name="extensionStatus" id="extensionEnabled" autocomplete="off" value="true">
+            <label class="btn btn-success" for="extensionEnabled" id="enableButton">
+              <i class="fas fa-check-circle me-2"></i>ENABLE
+            </label>
+            
+            <input type="radio" class="btn-check" name="extensionStatus" id="extensionDisabled" autocomplete="off" value="false" checked>
+            <label class="btn btn-secondary" for="extensionDisabled" id="disableButton">
+              <i class="fas fa-times-circle me-2"></i>DISABLED
+            </label>
+          </div>
+          <div class="form-text text-muted mt-2">
+            Enable extensions to allow students to request deadline extensions for this assignment.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveExtensionConfigBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="successMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="errorModalLabel">Error</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="errorMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-document.getElementById("sync-assignments-button").addEventListener("click", function () {
-  const courseId = this.getAttribute("data-course-id");
-  fetch(`/courses/${courseId}/sync_assignments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to sync assignments.");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      alert(data.message || "Assignments synced successfully.");
-      location.reload(); // Reload the page to reflect updated assignments
-    })
-    .catch((error) => {
-      alert(error.message || "An error occurred while syncing assignments.");
+  document.addEventListener('DOMContentLoaded', function() {
+    // Show success modal
+    function showSuccessModal(message) {
+      document.getElementById('successMessage').textContent = message;
+      const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+      successModal.show();
+    }
+    
+    // Show error modal
+    function showErrorModal(message) {
+      document.getElementById('errorMessage').textContent = message;
+      const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+      errorModal.show();
+    }
+    
+    // Sync assignments - modal confirmation
+    document.getElementById('confirmSyncBtn').addEventListener('click', function() {
+      const courseId = document.getElementById('sync-assignments-button').getAttribute('data-course-id');
+      const syncBtn = document.querySelector('.flx-card__sync-btn');
+      const syncModal = bootstrap.Modal.getInstance(document.getElementById('syncConfirmModal'));
+      
+      syncModal.hide();
+      syncBtn.classList.add('loading');
+      
+      fetch(`/courses/${courseId}/sync_assignments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        },
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to sync assignments.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        syncBtn.classList.remove('loading');
+        showSuccessModal(data.message || "Assignments synced successfully.");
+        setTimeout(() => {
+          location.reload();
+        }, 1500);
+      })
+      .catch((error) => {
+        syncBtn.classList.remove('loading');
+        showErrorModal(error.message || "An error occurred while syncing assignments.");
+      });
     });
-});
 
-document.querySelectorAll("table tr").forEach(row => {
-  row.addEventListener("click", () => {
-    const checkbox = row.querySelector('input[type="checkbox"]');
-    if (checkbox) checkbox.checked = !checkbox.checked;
+    // Extension toggle configuration modal
+    document.getElementById('toggleExtensionModal').addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const assignmentId = button.getAttribute('data-assignment-id');
+      const assignmentName = button.getAttribute('data-assignment-name');
+      
+      // Set assignment name in modal
+      document.getElementById('assignmentNameDisplay').textContent = assignmentName;
+      
+      // Store assignment ID in save button
+      document.getElementById('saveExtensionConfigBtn').setAttribute('data-assignment-id', assignmentId);
+      
+      // Set initial state (this would be based on actual assignment status in a real implementation)
+      document.getElementById('extensionDisabled').checked = true;
+      updateToggleButtonStyles();
+    });
+    
+    // Function to update toggle button styles
+    function updateToggleButtonStyles() {
+      const enableButton = document.getElementById('enableButton');
+      const disableButton = document.getElementById('disableButton');
+      const isEnabled = document.getElementById('extensionEnabled').checked;
+      
+      if (isEnabled) {
+        enableButton.classList.remove('btn-outline-success');
+        enableButton.classList.add('btn-success');
+        disableButton.classList.remove('btn-danger', 'btn-secondary');
+        disableButton.classList.add('btn-outline-danger');
+      } else {
+        enableButton.classList.remove('btn-success');
+        enableButton.classList.add('btn-outline-success');
+        disableButton.classList.remove('btn-warning', 'btn-secondary', 'btn-outline-danger');
+        disableButton.classList.add('btn-danger');
+      }
+    }
+    
+    // Add listeners for radio buttons
+    document.getElementById('extensionEnabled').addEventListener('change', updateToggleButtonStyles);
+    document.getElementById('extensionDisabled').addEventListener('change', updateToggleButtonStyles);
+    
+    // Save extension configuration
+    document.getElementById('saveExtensionConfigBtn').addEventListener('click', function() {
+      const assignmentId = this.getAttribute('data-assignment-id');
+      const enableExtension = document.getElementById('extensionEnabled').checked;
+      const modal = bootstrap.Modal.getInstance(document.getElementById('toggleExtensionModal'));
+      
+      modal.hide();
+      
+      fetch(`/courses/<%= @course.id %>/assignments/${assignmentId}/toggle_extension`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        },
+        body: JSON.stringify({
+          enabled: enableExtension
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Failed to update assignment");
+        }
+        return response.json();
+      })
+      .then(data => {
+        const status = enableExtension ? 'enabled' : 'disabled';
+        showSuccessModal(`Extensions ${status} for this assignment`);
+      })
+      .catch(error => {
+        showErrorModal(error.message || "An error occurred while updating the assignment");
+      });
+    });
   });
-});
 </script>
