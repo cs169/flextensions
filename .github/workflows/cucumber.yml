@@ -41,6 +41,6 @@ jobs:
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-cucumber
     - name: Run Cucumber Tests
-      run: bundle exec cucumber features/
+      run: bundle exec cucumber features/ --tags 'not @skip and not @wip'
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-cucumber 

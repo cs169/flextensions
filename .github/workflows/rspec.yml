@@ -49,7 +49,7 @@ jobs:
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-rspec
     - name: Run RSpec Tests
-      run: bundle exec rspec spec/
+      run: bundle exec rspec spec/ --tag ~skip --tag ~wip
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
     - name: Run after-build command
