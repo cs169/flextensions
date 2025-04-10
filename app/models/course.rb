@@ -97,7 +97,7 @@ class Course < ApplicationRecord
       end
 
       # Use the associate_user_with_course method to create the UserToCourse record
-      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: role)
+      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
       # Log the creation of UserToCourse
       # Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}, role: #{role}: #{user_to_course.inspect}"
     end
