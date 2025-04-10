@@ -73,32 +73,64 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
 
+  # Basic Chrome options
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
-  options.add_argument('--js-flags=--max-old-space-size=4096')
-  options.add_argument('--window-size=1400,1400')
-  options.add_argument('--headless=new')
-  options.add_argument('--disable-extensions')
-  options.add_argument('--disable-infobars')
-  options.add_argument('--disable-popup-blocking')
+  options.add_argument('--window-size=1920,1080')
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  # Additional stability options
+  options.add_argument('--disable-site-isolation-trials')
+  options.add_argument('--disable-web-security')
+  options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+
+  # Performance options
+  options.add_argument('--disable-dev-tools')
+  options.add_argument('--dns-prefetch-disable')
+  options.add_argument('--disable-browser-side-navigation')
+
+  # Add headless mode if in CI
+  if ENV['CI']
+    options.add_argument('--headless=new')
+    options.add_argument('--disable-extensions')
+  end
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    options: options,
+    clear_local_storage: true,
+    clear_session_storage: true
+  )
 end
 
 # Register Chrome headless driver
 Capybara.register_driver :selenium_chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
+
+  # Basic Chrome options
   options.add_argument('--headless=new')
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
-  options.add_argument('--window-size=1400,1400')
+  options.add_argument('--window-size=1920,1080')
+
+  # Additional stability options
+  options.add_argument('--disable-site-isolation-trials')
+  options.add_argument('--disable-web-security')
+  options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+
+  # Performance options
+  options.add_argument('--disable-dev-tools')
+  options.add_argument('--dns-prefetch-disable')
+  options.add_argument('--disable-browser-side-navigation')
 
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
-    options: options
+    options: options,
+    clear_local_storage: true,
+    clear_session_storage: true
   )
 end
 
@@ -107,8 +139,13 @@ Capybara.default_driver = :rack_test
 # Use selenium_chrome_headless for JavaScript tests
 Capybara.javascript_driver = :selenium_chrome_headless
 
-# Set default max wait time
-Capybara.default_max_wait_time = 10
+# Increase timeouts for CI environment
+if ENV['CI']
+  Capybara.default_max_wait_time = 20
+  Capybara.default_normalize_ws = true
+else
+  Capybara.default_max_wait_time = 10
+end
 
 # Set up hooks
 Before do
