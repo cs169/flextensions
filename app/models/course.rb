@@ -25,11 +25,11 @@ class Course < ApplicationRecord
   end
 
   # Create or find a course and its associated CourseToLms and assignments
-  def self.create_or_update_from_canvas(course_data, token, user)
+  def self.create_or_update_from_canvas(course_data, token, _user)
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
-    associate_user_with_course(user, course)
+    course.sync_enrollments_from_canvas(token)
     course
   end
 
@@ -66,10 +66,43 @@ class Course < ApplicationRecord
     end
   end
 
-  # Associate the user with the course
-  def self.associate_user_with_course(user, course)
-    UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id) do |user_to_course|
-      user_to_course.role = 'teacher'
+  # Fetch users for a course from Canvas API
+  def fetch_users_from_canvas(token, enrollment_type = nil)
+    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
+    response = Faraday.get(url) do |req|
+      req.headers['Authorization'] = "Bearer #{token}"
+      req.headers['Content-Type'] = 'application/json'
+      req.params['enrollment_type'] = enrollment_type if enrollment_type.present?
     end
+
+    if response.success?
+      JSON.parse(response.body)
+    else
+      Rails.logger.error "Failed to fetch users from Canvas: #{response.status} - #{response.body}"
+      []
+    end
+  end
+
+  # Fetch users for a course and create/find their User and UserToCourse records
+  def sync_users_from_canvas(token, role)
+    # Fetch all users for the course from Canvas
+    users_data = fetch_users_from_canvas(token, role)
+
+    users_data.each do |user_data|
+      # Create or find the User model
+      user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
+        u.name = user_data['name']
+        u.email = user_data['email'] # Assuming login_id is the email
+      end
+
+      # Use the associate_user_with_course method to create the UserToCourse record
+      UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
+    end
+  end
+
+  def sync_enrollments_from_canvas(token)
+    sync_users_from_canvas(token, 'student')
+    sync_users_from_canvas(token, 'teacher')
+    sync_users_from_canvas(token, 'ta')
   end
 end
