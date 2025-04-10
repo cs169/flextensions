@@ -494,3 +494,354 @@
 		gap: 0.5rem;
 	}
 }
+
+// Dark mode specific styles
+[data-bs-theme="dark"] {
+	// Fix background and text colors
+	.flx-sidebar__content {
+		background-color: #2b3035;
+		color: #e9ecef;
+	}
+
+	.flx-sidebar__nav-link:hover {
+		background-color: rgba(255, 255, 255, 0.1);
+	}
+
+	// Card styles in dark mode
+	.flx-card {
+		background-color: #212529;
+		
+		.card-header {
+			background-color: #2b3035;
+			color: #e9ecef;
+		}
+		
+		.card-body {
+			color: #e9ecef;
+		}
+	}
+
+	// Table header styling for dark mode
+	.table {
+		--bs-table-color: #e9ecef;
+		--bs-table-bg: #212529;
+		--bs-table-border-color: #495057;
+		--bs-table-striped-bg: #2c3034;
+		--bs-table-striped-color: #e9ecef;
+		--bs-table-hover-bg: #323539;
+		--bs-table-hover-color: #e9ecef;
+		--bs-table-active-bg: #373b3e;
+		--bs-table-active-color: #e9ecef;
+		color: #e9ecef;
+		border-color: #495057;
+		
+		thead {
+			background-color: #343a40;
+			
+			th {
+				color: #ffffff !important;
+				font-weight: 600;
+				border-bottom-color: #495057;
+				background-color: #343a40;
+				border-top: none;
+				border-bottom: 2px solid #495057;
+				padding-top: 12px;
+				padding-bottom: 12px;
+			}
+		}
+		
+		tbody {
+			tr:hover {
+				color: #f8f9fa;
+			}
+		}
+	}
+
+	// Fix table in specific components
+	.flx-table__responsive {
+		.table {
+			thead th {
+				color: #ffffff !important;
+				background-color: #343a40;
+			}
+		}
+	}
+
+	// Required form fields in dark mode
+	.form-control, .form-select, textarea, input {
+		&:required {
+			background-color: rgba(25, 135, 84, 0.05);
+			border-left: 3px solid #20c997;
+		}
+	}
+
+	// Card styles
+	.card {
+		background-color: #212529;
+		border-color: #495057;
+		
+		.card-header {
+			background-color: #343a40;
+			color: #f8f9fa;
+			border-bottom-color: #495057;
+		}
+		
+		.card-body {
+			color: #e9ecef;
+		}
+	}
+
+	// Fix section headers
+	h4, h5, .h4, .h5 {
+		color: #f8f9fa;
+	}
+
+	// Fix standard content background
+	.bg-light, .bg-body-tertiary {
+		background-color: #2b3035 !important;
+	}
+
+	// Improve message display
+	.text-center, .text-muted {
+		color: #adb5bd !important;
+	}
+
+	// Form elements in dark mode
+	.flx-form__preview {
+		background-color: #2b3035;
+		border-color: #495057;
+		color: #e9ecef;
+		
+		strong {
+			color: #6ea8fe; // Bootstrap blue for dark mode
+		}
+	}
+
+	.flx-form__switch {
+		background-color: rgba(253, 181, 21, 0.2);
+	}
+
+	.flx-form__help-text {
+		color: #adb5bd;
+	}
+
+	// Button close (X) in modals
+	.btn-close {
+		filter: invert(1) grayscale(100%) brightness(200%);
+	}
+	
+	// Table styles in dark mode
+	.flx-table__row--clickable:hover {
+		background-color: rgba(255, 255, 255, 0.05);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+	}
+
+	.flx-table__status {
+		&--approved {
+			background-color: rgba(25, 135, 84, 0.2);
+		}
+		
+		&--pending {
+			background-color: rgba(255, 193, 7, 0.2);
+		}
+		
+		&--denied {
+			background-color: rgba(220, 53, 69, 0.2);
+		}
+	}
+
+	// Fix tab navigation
+	.nav-pills .nav-link {
+		color: #e9ecef;
+		
+		&:hover {
+			background-color: rgba(255, 255, 255, 0.1);
+		}
+		
+		&.active {
+			background-color: #fdb515;
+			color: #000;
+		}
+	}
+
+	// Modal styles
+	.modal-content {
+		background-color: #2b3035;
+		color: #e9ecef;
+	}
+
+	.modal-header, .modal-footer {
+		border-color: #495057;
+	}
+
+	// Bootstrap overrides for dark mode
+	.form-control, .form-select {
+		background-color: #212529;
+		border-color: #495057;
+		color: #e9ecef;
+		
+		&:focus {
+			background-color: #2b3035;
+			color: #e9ecef;
+		}
+	}
+
+	.input-group-text {
+		background-color: #2b3035;
+		border-color: #495057;
+		color: #e9ecef;
+	}
+
+	// Fix badges 
+	.badge {
+		&.bg-success {
+			background-color: rgba(25, 135, 84, 0.8) !important;
+		}
+		
+		&.bg-warning {
+			background-color: rgba(255, 193, 7, 0.8) !important;
+		}
+		
+		&.bg-danger {
+			background-color: rgba(220, 53, 69, 0.8) !important;
+		}
+		
+		&.bg-info {
+			background-color: rgba(13, 202, 240, 0.8) !important;
+		}
+		
+		&.bg-primary {
+			background-color: rgba(13, 110, 253, 0.8) !important;
+		}
+		
+		&.bg-secondary {
+			background-color: rgba(108, 117, 125, 0.8) !important;
+		}
+	}
+
+	// Improve empty states
+	.text-muted {
+		color: #adb5bd !important;
+	}
+	
+	em {
+		color: #adb5bd;
+	}
+	
+	// Fix outline buttons in dark mode
+	.btn-outline-primary {
+		color: #6ea8fe;
+		border-color: #6ea8fe;
+		
+		&:hover {
+			background-color: rgba(13, 110, 253, 0.2);
+			color: #fff;
+		}
+	}
+	
+	.btn-outline-secondary {
+		color: #adb5bd;
+		border-color: #adb5bd;
+		
+		&:hover {
+			background-color: rgba(108, 117, 125, 0.2);
+			color: #fff;
+		}
+	}
+	
+	// Ensure buttons in tables have proper contrast
+	.table .btn {
+		border-width: 2px;
+	}
+	
+	// Fix text colors in status elements
+	.text-success {
+		color: #75b798 !important;
+	}
+	
+	.text-danger {
+		color: #ea868f !important;
+	}
+	
+	.text-warning {
+		color: #ffda6a !important;
+	}
+
+	// Fix theme button
+	#bd-theme, #bd-theme-text {
+		color: #fff;
+	}
+	
+	// Ensure white text in dropdowns
+	.dropdown-item {
+		color: #e9ecef;
+		
+		&:hover, &:focus {
+			background-color: rgba(255, 255, 255, 0.1);
+			color: #fff;
+		}
+		
+		&.active {
+			background-color: #0d6efd;
+			color: #fff;
+		}
+	}
+	
+	// Fix required form styling and focus states
+	input, select, textarea {
+		&:required {
+			background-color: rgba(25, 135, 84, 0.05);
+			border-left-color: #20c997;
+		}
+		
+		&:focus {
+			background-color: #2b3035;
+			color: #e9ecef;
+			border-color: #6ea8fe;
+			box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+		}
+	}
+	
+	// Code blocks in dark mode
+	pre, code {
+		background-color: #212529;
+		color: #e9ecef;
+		border-color: #495057;
+	}
+
+	// Email preview specific fixes
+	.email-preview, #email-preview {
+		background-color: #2b3035;
+		color: #e9ecef;
+		border-color: #495057;
+		
+		.email-subject, .email-to, .email-from {
+			color: #e9ecef !important;
+			background-color: #212529 !important;
+			border-color: #495057 !important;
+		}
+		
+		input, textarea {
+			color: #e9ecef !important;
+			background-color: #212529 !important;
+			border-color: #495057 !important;
+		}
+	}
+	
+	// Target specific email form elements by ID
+	#email-subject, #email-template {
+		color: #e9ecef !important;
+		background-color: #212529 !important;
+		border-color: #495057 !important;
+		
+		&:focus {
+			background-color: #2b3035 !important;
+			color: #fff !important;
+		}
+	}
+	
+	// Make sure labels are visible
+	label {
+		color: #e9ecef;
+	}
+}

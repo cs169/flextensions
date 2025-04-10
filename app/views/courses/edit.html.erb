@@ -261,12 +261,26 @@ Regards,
       }
     }
     
-    // Update hash when tabs change
+    // Update hash when tabs change WITHOUT scrolling
     const tabs = document.querySelectorAll('button[data-bs-toggle="pill"]');
     tabs.forEach(tab => {
       tab.addEventListener('shown.bs.tab', function (e) {
+        // Get current scroll position before changing hash
+        const scrollPosition = window.scrollY;
+        
+        // Update hash without triggering scroll (using history.replaceState)
         const target = e.target.getAttribute('data-bs-target');
-        window.location.hash = target;
+        history.replaceState(null, null, target);
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollPosition);
+      });
+    });
+    
+    // Prevent default hash navigation behavior
+    document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(tabButton => {
+      tabButton.addEventListener('click', function(e) {
+        e.preventDefault();
       });
     });
     
@@ -313,8 +327,7 @@ Regards,
         disableButton.classList.add('btn-outline-danger');
         disableButton.innerHTML = '<i class="fas fa-times-circle me-2"></i>DISABLE';
         
-        // Show flash message
-        showFlashMessage('Extensions have been turned ON. Remember to save settings.');
+       
       } else {
         statusText.textContent = 'OFF';
         statusText.className = 'fw-bold text-danger';
@@ -328,8 +341,7 @@ Regards,
         disableButton.classList.add('btn-danger');
         disableButton.innerHTML = '<i class="fas fa-times-circle me-2"></i>DISABLED';
         
-        // Show flash message
-        showFlashMessage('Extensions have been turned OFF. Remember to save settings.');
+        
       }
     }
     
