@@ -33,10 +33,13 @@ jobs:
         ruby-version: 3.3.0
         bundler-cache: true
     
-    - name: Install Chrome and ChromeDriver
+    - name: Install Chrome For Testing and Chromedriver
       uses: browser-actions/setup-chrome@v1
+      id: install-chrome
       with:
         chrome-version: stable
+        install-chromedriver: true
+        install-dependencies: true
     
     - name: Install Dependencies
       run: |
@@ -68,4 +71,5 @@ jobs:
         COVERAGE: "true"
         CI: "true"
         SELENIUM_HEADLESS: "true"
-        SELENIUM_DRIVER_VERSION: stable 
+        CHROMEDRIVER_PATH: ${{ steps.install-chrome.outputs.chromedriver-path }}
+        CHROME_FOR_TESTING_PATH: ${{ steps.install-chrome.outputs.chrome-path }} 

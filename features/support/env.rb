@@ -70,6 +70,12 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
+# Get Chrome and Chromedriver paths from environment variables
+path_to_chromedriver = ENV['CHROMEDRIVER_PATH'] || `find ~+/tmp -type f -name 'chromedriver'`.chomp
+path_to_chrome_for_testing = ENV['CHROME_FOR_TESTING_PATH'] || `find ~+/tmp -type f -name 'Google Chrome for Testing'`.chomp
+
+abort 'Cannot find Chromedriver and/or ChromeForTesting binaries. Check CI configuration.' if ENV['CI'] && (path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?)
+
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
 
@@ -89,15 +95,22 @@ Capybara.register_driver :selenium_chrome do |app|
   options.add_argument('--dns-prefetch-disable')
   options.add_argument('--disable-browser-side-navigation')
 
+  # Set Chrome binary path if provided
+  options.binary = path_to_chrome_for_testing if path_to_chrome_for_testing.present?
+
   # Add headless mode if in CI
   if ENV['CI']
     options.add_argument('--headless=new')
     options.add_argument('--disable-extensions')
   end
 
+  # Create driver with custom service if chromedriver path is provided
+  service = path_to_chromedriver.blank? ? nil : Selenium::WebDriver::Service.chrome(path: path_to_chromedriver)
+
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
+    service: service,
     options: options,
     clear_local_storage: true,
     clear_session_storage: true
@@ -125,9 +138,16 @@ Capybara.register_driver :selenium_chrome_headless do |app|
   options.add_argument('--dns-prefetch-disable')
   options.add_argument('--disable-browser-side-navigation')
 
+  # Set Chrome binary path if provided
+  options.binary = path_to_chrome_for_testing if path_to_chrome_for_testing.present?
+
+  # Create driver with custom service if chromedriver path is provided
+  service = path_to_chromedriver.blank? ? nil : Selenium::WebDriver::Service.chrome(path: path_to_chromedriver)
+
   Capybara::Selenium::Driver.new(
     app,
     browser: :chrome,
+    service: service,
     options: options,
     clear_local_storage: true,
     clear_session_storage: true
