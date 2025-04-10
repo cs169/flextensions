@@ -95,7 +95,6 @@ class Course < ApplicationRecord
   def sync_students_from_canvas(token)
     # Fetch all users for the course from Canvas
     users_data = fetch_users_from_canvas(token, 'student')
-    # Rails.logger.info "users_data: #{users_data.inspect}"
 
     users_data.each do |user_data|
       # Create or find the User model
@@ -104,7 +103,8 @@ class Course < ApplicationRecord
         u.email = user_data['email'] # Assuming login_id is the email
       end
 
-      associate_user_with_course(user, self, 'student')
+      # Use the associate_user_with_course method to create the UserToCourse record
+      self.class.associate_user_with_course(user, self, 'student')
     end
   end
 end
