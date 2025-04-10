@@ -71,7 +71,7 @@ class CoursesController < ApplicationController
     @side_nav = 'edit'
 
     @course = Course.find_by(id: params[:id])
-    
+
     @role = determine_user_role(@course)
 
     unless @role == 'instructor'
@@ -79,6 +79,7 @@ class CoursesController < ApplicationController
       redirect_to courses_path and return
     end
     return if @course
+
     flash[:alert] = 'Course not found.'
     redirect_to courses_path and return
   end
@@ -87,7 +88,7 @@ class CoursesController < ApplicationController
     @side_nav = 'requests'
 
     @course = Course.find_by(id: params[:id])
-    
+
     @role = determine_user_role(@course)
     case @role
     when 'instructor'
@@ -99,6 +100,7 @@ class CoursesController < ApplicationController
       redirect_to courses_path
     end
     return if @course
+
     flash[:alert] = 'Course not found.'
     redirect_to courses_path and return
   end
