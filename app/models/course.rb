@@ -8,6 +8,19 @@ class Course < ApplicationRecord
   # Validations
   validates :course_name, presence: true
 
+  # Helper function for the controller
+  def course_to_lms(lms_id = 1)
+    CourseToLms.find_by(course_id: id, lms_id: lms_id)
+  end
+
+  def user_role(user)
+    roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
+    return 'instructor' if roles.include?('teacher') || roles.include?('ta')
+    return 'student' if roles.include?('student')
+
+    nil
+  end
+
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
     response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses") do |req|
