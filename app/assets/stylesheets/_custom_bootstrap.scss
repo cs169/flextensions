@@ -79,6 +79,10 @@
 	display: block !important;
 }
 
+// Prevent theme menu from being too close to the toggle
+.dropdown-menu[aria-labelledby="bd-theme-text"] {
+	margin-top: 0.125rem !important;
+}
 
 // navbars
 .navbar {

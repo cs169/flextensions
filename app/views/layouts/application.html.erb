@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100" data-bs-theme="light">
+<html lang="en" class="h-100" data-bs-theme="auto">
 	<head>
 		<title>Flextensions</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,11 +8,6 @@
 
 		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 		<%= javascript_importmap_tags %>
-		<script>
-			// Force light mode on initial page load
-			document.documentElement.setAttribute('data-bs-theme', 'light');
-			localStorage.setItem('theme', 'light');
-		</script>
 		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
 	</head>
 	<body class="d-flex flex-column h-100">

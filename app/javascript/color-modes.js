@@ -7,37 +7,39 @@
 (() => {
   'use strict'
 
-  const getStoredTheme = () => localStorage.getItem('theme') || 'light'
+  const getStoredTheme = () => localStorage.getItem('theme')
   
   const setStoredTheme = (theme) => localStorage.setItem('theme', theme)
 
   const getPreferredTheme = () => {
-    // Always default to light mode
     const storedTheme = getStoredTheme()
     if (storedTheme) {
       return storedTheme
     }
 
-    // Default to light
-    return 'light'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
   const setTheme = (theme) => {
     if (theme === 'auto') {
-      document.documentElement.setAttribute('data-bs-theme', 'light')
+      document.documentElement.setAttribute('data-bs-theme', 
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     } else {
       document.documentElement.setAttribute('data-bs-theme', theme)
     }
   }
 
+  // Set theme on page load
+  setTheme(getPreferredTheme())
+
   const showActiveTheme = (theme, focus = false) => {
     const themeSwitcher = document.querySelector('#bd-theme')
+    const themeSwitcherText = document.querySelector('#bd-theme-text')
     
     if (!themeSwitcher) {
       return
     }
     
-    const themeSwitcherText = document.querySelector('#bd-theme-text')
     const activeThemeIcon = document.querySelector('.theme-icon-active use')
     const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
     
@@ -72,27 +74,42 @@
     }
   }
 
-  // Initialize theme
+  // Update the active theme indicator based on the current theme
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const storedTheme = getStoredTheme()
+    if (storedTheme !== 'light' && storedTheme !== 'dark') {
+      setTheme(getPreferredTheme())
+    }
+  })
+
+  // Initialize theme and handle theme toggle button click
   const initializeTheme = () => {
-    const theme = getPreferredTheme()
-    const themeSwitcherText = document.querySelector('#bd-theme-text')
+    // Show the active theme in UI
+    showActiveTheme(getPreferredTheme())
     
-    // Set theme on page load
-    setTheme(theme)
-    
-    // Show active theme in UI
-    showActiveTheme(theme)
-    
-    // Add event listeners to theme toggle buttons
-    document.querySelectorAll('[data-bs-theme-value]')
-      .forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          const theme = toggle.getAttribute('data-bs-theme-value')
-          setStoredTheme(theme)
-          setTheme(theme)
-          showActiveTheme(theme, true)
-        })
+    // Add event handlers for theme toggle buttons
+    document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+      toggle.addEventListener('click', (event) => {
+        event.preventDefault()
+        const theme = toggle.getAttribute('data-bs-theme-value')
+        setStoredTheme(theme)
+        setTheme(theme)
+        showActiveTheme(theme, true)
       })
+    })
+    
+    // Handle dropdown open without changing the theme
+    const dropdown = document.querySelector('#bd-theme')
+    if (dropdown) {
+      dropdown.addEventListener('click', (event) => {
+        if (!event.target.closest('[data-bs-theme-value]')) {
+          // Only show current theme, don't change it
+          event.preventDefault()
+          event.stopPropagation()
+          showActiveTheme(getPreferredTheme(), false)
+        }
+      })
+    }
   }
 
   // Initialize theme on DOMContentLoaded
