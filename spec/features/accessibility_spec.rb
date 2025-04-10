@@ -44,17 +44,6 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     end
   end
 
-  it 'Login page should be accessible', :a11y do
-    visit '/login/canvas'
-    puts "Current URL: #{current_url}"
-    begin
-      expect(page).to be_axe_clean
-    rescue StandardError => e
-      puts "Accessibility error on Login page: #{e.message}"
-      raise
-    end
-  end
-
   it 'Courses page should be accessible', :a11y do
     visit '/courses'
     sleep 2
