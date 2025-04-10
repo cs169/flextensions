@@ -7,6 +7,10 @@
 # Configure SimpleCov before requiring other files
 require 'simplecov'
 require 'simplecov_json_formatter'
+require 'dotenv'
+
+# Load environment variables from .env file
+Dotenv.load
 
 # Only start SimpleCov if it hasn't been started
 unless SimpleCov.running
@@ -71,10 +75,28 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
 # Get Chrome and Chromedriver paths from environment variables
-path_to_chromedriver = ENV['CHROMEDRIVER_PATH'] || `find ~+/tmp -type f -name 'chromedriver'`.chomp
-path_to_chrome_for_testing = ENV['CHROME_FOR_TESTING_PATH'] || `find ~+/tmp -type f -name 'Google Chrome for Testing'`.chomp
+path_to_chromedriver = ENV.fetch('CHROMEDRIVER_PATH', nil)
+path_to_chrome_for_testing = ENV.fetch('CHROME_FOR_TESTING_PATH', nil)
 
-abort 'Cannot find Chromedriver and/or ChromeForTesting binaries. Check CI configuration.' if ENV['CI'] && (path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?)
+if path_to_chromedriver.blank? || path_to_chrome_for_testing.blank?
+  if ENV['CI']
+    # In CI, try to find the binaries in the system path
+    path_to_chromedriver ||= `which chromedriver`.chomp
+    path_to_chrome_for_testing ||= `which google-chrome`.chomp
+
+    # Verify the binaries exist and are executable
+    unless File.executable?(path_to_chromedriver) && File.executable?(path_to_chrome_for_testing)
+      abort "Chrome/Chromedriver binaries not found or not executable in CI environment.\nChromedriver: #{path_to_chromedriver}\nChrome: #{path_to_chrome_for_testing}"
+    end
+  else
+    # Local development fallbacks
+    path_to_chromedriver ||= `which chromedriver`.chomp
+    path_to_chrome_for_testing ||= '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  end
+end
+
+abort "Cannot find Chromedriver binary at: #{path_to_chromedriver}" if path_to_chromedriver.blank?
+abort "Cannot find Chrome binary at: #{path_to_chrome_for_testing}" if path_to_chrome_for_testing.blank?
 
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new

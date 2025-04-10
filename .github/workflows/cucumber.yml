@@ -33,13 +33,25 @@ jobs:
         ruby-version: 3.3.0
         bundler-cache: true
     
-    - name: Install Chrome For Testing and Chromedriver
+    - name: Install Chrome and ChromeDriver
       uses: browser-actions/setup-chrome@v1
-      id: install-chrome
+      id: setup-chrome
       with:
         chrome-version: stable
-        install-chromedriver: true
-        install-dependencies: true
+    
+    - name: Install Chromedriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-chromedriver
+        echo "CHROMEDRIVER_PATH=$(which chromedriver)" >> $GITHUB_ENV
+        echo "Found Chromedriver at: $(which chromedriver)"
+    
+    - name: Verify Chrome and Chromedriver
+      run: |
+        google-chrome --version
+        chromedriver --version
+        echo "Chrome path: $(which google-chrome)"
+        echo "Chromedriver path: $(which chromedriver)"
     
     - name: Install Dependencies
       run: |
@@ -61,15 +73,15 @@ jobs:
         COVERAGE: "true"
         CI: "true"
     
-    - name: Run JavaScript Cucumber Tests
+    - name: Run JavaScript and A11y Cucumber Tests
       run: |
         DISPLAY=:99
         Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-        bundle exec cucumber features/ --tags '@javascript and not @skip and not @wip and not @a11y' --profile selenium_chrome_headless
+        bundle exec cucumber features/ --tags '@javascript or @a11y' --profile selenium_chrome_headless
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-cucumber
         COVERAGE: "true"
         CI: "true"
         SELENIUM_HEADLESS: "true"
-        CHROMEDRIVER_PATH: ${{ steps.install-chrome.outputs.chromedriver-path }}
-        CHROME_FOR_TESTING_PATH: ${{ steps.install-chrome.outputs.chrome-path }} 
+        CHROMEDRIVER_PATH: $(which chromedriver)
+        CHROME_FOR_TESTING_PATH: $(which google-chrome) 
