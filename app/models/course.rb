@@ -29,8 +29,7 @@ class Course < ApplicationRecord
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
-    course.sync_students_from_canvas(token)
-    associate_user_with_course(user, course, 'teacher')
+    course.sync_enrollments_from_canvas(token)
     course
   end
 
@@ -67,13 +66,6 @@ class Course < ApplicationRecord
     end
   end
 
-  # Associate the user with the course
-  def self.associate_user_with_course(user, course, role)
-    user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: 'teacher')
-    # Log the creation of UserToCourse
-    # Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}: #{user_to_course.inspect}"
-  end
-
   # Fetch users for a course from Canvas API
   def fetch_users_from_canvas(token, enrollment_type = nil)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
@@ -91,10 +83,11 @@ class Course < ApplicationRecord
     end
   end
 
+
   # Fetch users for a course and create/find their User and UserToCourse records
-  def sync_students_from_canvas(token)
+  def sync_users_from_canvas(token, role)
     # Fetch all users for the course from Canvas
-    users_data = fetch_users_from_canvas(token, 'student')
+    users_data = fetch_users_from_canvas(token, role)
 
     users_data.each do |user_data|
       # Create or find the User model
@@ -104,7 +97,16 @@ class Course < ApplicationRecord
       end
 
       # Use the associate_user_with_course method to create the UserToCourse record
-      self.class.associate_user_with_course(user, self, 'student')
+      user_to_course = UserToCourse.find_or_create_by(user_id: user.id, course_id: course.id, role: role)
+      # Log the creation of UserToCourse
+      # Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}, role: #{role}: #{user_to_course.inspect}"
     end
   end
+
+  def sync_enrollments_from_canvas(token)
+    sync_users_from_canvas(token, 'student')
+    sync_users_from_canvas(token, 'teacher')
+    sync_users_from_canvas(token, 'ta')
+  end
+
 end
