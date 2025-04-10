@@ -1,20 +1,42 @@
-<div class="container">
+<div class="container mt-4">
 	<div class="row justify-content-center">
 		<div class="col-12 mb-4">
 			<h4>Staff Course Offerings</h4>
 			<p>
-				The following course offerings that you are a staff member of, and already have exams set up. You can now manage their exams. You can add more courses you are a staff member of by clicking the button below.
+				The following course offerings are those where you are a staff member. You can now manage their exams. You can add more courses by clicking the button below.
 			</p>
 
-			<div class="col-10">
-				<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
-			</div>
+			<% if @teacher_courses.any? %>
+			<table class="table table-bordered table-striped" id="assignments-table">
+				<thead class="table-info">
+					<tr>
+						<th>Name</th>
+						<th>Course</th>
+						<th>Role</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @teacher_courses.each do |user_to_course| %>
+						<tr>
+							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
+							<td><%= user_to_course.course.course_code %></td>
+							<td><%= user_to_course.role.capitalize %></td>
+						</tr>
+					<% end %>
 
+				</tbody>
+			</table>
+			<% else %>
+					<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
+			<% end %>
+
+			<div class="text-center my-3">
+				<a href="/courses/new" class="btn btn-secondary">Import courses from Canvas</a>
+			</div>
 			<div class="text-center">
-				<a href="/courses/new" class="btn btn-secondary">Import courses from canvas</a>
+				<%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
 			</div>
 		</div>
-
 
 		<div class="col-12 mb-4">
 			<h4>Student Course Offerings</h4>
@@ -24,20 +46,6 @@
 			<div class="col-10">
 				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
 			</div>
-
-		</div>
-
-
-		<div class="col-12 p-0">
-			<h4>Other Course Offerings</h4>
-			<p>
-			In the following course offerings you are neither a staff member nor a student, but exams have been set up. You cannot do anything with these offerings.
-			</p>
-
-			<div class="col-10">
-				<div class="alert alert-warning">There are no other course offerings that support flextensions</div>
-			</div>
-
 		</div>
 	</div>
 </div>
