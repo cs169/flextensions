@@ -29,7 +29,7 @@ class Course < ApplicationRecord
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
     sync_assignments(course_to_lms, token)
-    course.sync_users_from_canvas(token)
+    course.sync_students_from_canvas(token)
     associate_user_with_course(user, course)
     course
   end
@@ -92,24 +92,20 @@ class Course < ApplicationRecord
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records
-  def sync_users_from_canvas(token)
+  def sync_students_from_canvas(token)
     # Fetch all users for the course from Canvas
-    users_data = fetch_users_from_canvas(token)
+    users_data = fetch_users_from_canvas(token, 'student')
     Rails.logger.info "users_data: #{users_data.inspect}"
 
     users_data.each do |user_data|
       # Create or find the User model
       user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
         u.name = user_data['name']
-        u.email = user_data['login_id'] # Assuming login_id is the email
+        u.email = user_data['email'] # Assuming login_id is the email
       end
-      
 
-      # Create or find the UserToCourse record
-      user_data['enrollments'].each do |enrollment|
-        UserToCourse.find_or_create_by(user_id: user.id, course_id: id) do |user_to_course|
-          user_to_course.role = enrollment['type'].downcase # Set role to enrollment type
-        end
+      UserToCourse.find_or_create_by(user_id: user.id, course_id: id) do |user_to_course|
+        user_to_course.role = 'student'
       end
 
       Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}"

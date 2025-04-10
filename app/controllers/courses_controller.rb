@@ -117,7 +117,7 @@ class CoursesController < ApplicationController
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 
-  def sync_users
+  def sync_students
     @course = Course.find_by(id: params[:id])
     if @course.nil?
       render json: { error: 'Course not found.' }, status: :not_found
@@ -128,7 +128,7 @@ class CoursesController < ApplicationController
     token = @user.canvas_token
 
     # Call the sync_users_from_canvas method
-    @course.sync_users_from_canvas(token)
+    @course.sync_students_from_canvas(token)
 
     Rails.logger.info "Users synced for course ID: #{@course.id}"
     render json: { message: 'Users synced successfully.' }, status: :ok
