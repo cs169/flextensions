@@ -49,21 +49,11 @@ jobs:
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-rspec
     - name: Run RSpec Tests
-      run: |
-        COVERAGE=true bundle exec rspec spec/ --tag "~skip" --tag "~wip"
-        ls -la coverage/
+      run: bundle exec rspec --tag "~skip" --tag "~wip" --tag "~a11y"
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
-        COVERAGE: "true"
-        CI: "true"
     - name: Run after-build command
       run: |
-        if [ -f coverage/.resultset.json ]; then
-          ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
-        else
-          echo "No coverage report found"
-          ls -la coverage/
-          exit 1
-        fi
+        ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }} 
