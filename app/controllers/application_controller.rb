@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  before_action :log_session_info
+  # before_action :log_session_info
   before_action :authenticated!, unless: -> { excluded_controller_action? }
 
   def excluded_controller_action?
