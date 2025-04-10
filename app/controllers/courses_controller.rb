@@ -36,6 +36,19 @@ class CoursesController < ApplicationController
 
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
+
+    user_roles = UserToCourse.where(user_id: @user.id, course_id: @course.id).pluck(:role)
+    if user_roles.include?('teacher') || user_roles.include?('ta')
+      @role = 'instructor'
+      render 'courses/instructor_view'
+    elsif user_roles.include?('student')
+      @role = 'student'
+      render 'courses/student_view'
+    else
+      flash[:alert] = 'You do not have access to this course.'
+      redirect_to courses_path
+    end
+
   end
 
   def new

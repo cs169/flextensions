@@ -55,7 +55,7 @@
 				<tbody>
 					<% @student_courses.each do |user_to_course| %>
 						<tr>
-							<td><%= user_to_course.course.course_name %></td>
+							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
 							<td><%= user_to_course.course.course_code %></td>
 							<td><%= user_to_course.role.capitalize %></td>
 						</tr>
