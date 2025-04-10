@@ -108,7 +108,8 @@ class Course < ApplicationRecord
         user_to_course.role = 'student'
       end
 
-      Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}"
+      # Log the creation of UserToCourse
+      Rails.logger.info "UserToCourse created for user ID: #{user.id}, course ID: #{id}: #{user_to_course.inspect}"
     end
   end
 end

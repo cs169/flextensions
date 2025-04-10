@@ -10,6 +10,7 @@ class CoursesController < ApplicationController
 
     # Fetch UserToCourse records where the user is a teacher or TA
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
+    # Fetch UserToCourse records where the user is a student
     @student_courses = UserToCourse.includes(:course).where(user: @user, role: 'student')
   end
 
