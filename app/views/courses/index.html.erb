@@ -23,11 +23,10 @@
 							<td><%= user_to_course.role.capitalize %></td>
 						</tr>
 					<% end %>
-
 				</tbody>
 			</table>
 			<% else %>
-					<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
+				<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
 			<% end %>
 
 			<div class="text-center my-3">
@@ -43,9 +42,29 @@
 			<p>
 				The following course offerings that you are a student of already have flextensions set up. You can now view your own seat assignments and exam schedule. If you expect to see a course here but it is not here, your course staff have not yet set up exams for the course yet in this system. Contact your course staff.
 			</p>
-			<div class="col-10">
+
+			<% if @student_courses.any? %>
+			<table class="table table-bordered table-striped" id="student-assignments-table">
+				<thead class="table-info">
+					<tr>
+						<th>Name</th>
+						<th>Course</th>
+						<th>Role</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @student_courses.each do |user_to_course| %>
+						<tr>
+							<td><%= user_to_course.course.course_name %></td>
+							<td><%= user_to_course.course.course_code %></td>
+							<td><%= user_to_course.role.capitalize %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+			<% else %>
 				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
-			</div>
+			<% end %>
 		</div>
 	</div>
 </div>

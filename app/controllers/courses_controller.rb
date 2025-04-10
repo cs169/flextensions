@@ -10,6 +10,7 @@ class CoursesController < ApplicationController
 
     # Fetch UserToCourse records where the user is a teacher or TA
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
+    @student_courses = UserToCourse.includes(:course).where(user: @user, role: 'student')
   end
 
   def show
@@ -114,6 +115,22 @@ class CoursesController < ApplicationController
     Course.create_or_update_from_canvas(course_data, token, @user)
 
     render json: { message: 'Assignments synced successfully.' }, status: :ok
+  end
+
+  def sync_users
+    @course = Course.find_by(id: params[:id])
+    if @course.nil?
+      render json: { error: 'Course not found.' }, status: :not_found
+      return
+    end
+
+    # Fetch the Canvas token
+    token = @user.canvas_token
+
+    # Call the sync_users_from_canvas method
+    @course.sync_users_from_canvas(token)
+
+    render json: { message: 'Users synced successfully.' }, status: :ok
   end
 
   # ONLY USE THIS FOR TESTING PURPOSES

@@ -72,4 +72,42 @@ class Course < ApplicationRecord
       user_to_course.role = 'teacher'
     end
   end
+
+  # Fetch users for a course from Canvas API
+  def fetch_users_from_canvas(token, enrollment_type = nil)
+    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
+    response = Faraday.get(url) do |req|
+      req.headers['Authorization'] = "Bearer #{token}"
+      req.headers['Content-Type'] = 'application/json'
+      req.params['enrollment_type'] = enrollment_type if enrollment_type.present?
+    end
+
+    if response.success?
+      JSON.parse(response.body)
+    else
+      Rails.logger.error "Failed to fetch users from Canvas: #{response.status} - #{response.body}"
+      []
+    end
+  end
+
+  # Fetch users for a course and create/find their User and UserToCourse records
+  def sync_users_from_canvas(token)
+    # Fetch all users for the course from Canvas
+    users_data = fetch_users_from_canvas(token)
+
+    users_data.each do |user_data|
+      # Create or find the User model
+      user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
+        u.name = user_data['name']
+        u.email = user_data['login_id'] # Assuming login_id is the email
+      end
+
+      # Create or find the UserToCourse record
+      user_data['enrollments'].each do |enrollment|
+        UserToCourse.find_or_create_by(user_id: user.id, course_id: id) do |user_to_course|
+          user_to_course.role = enrollment['type'].downcase # Set role to enrollment type
+        end
+      end
+    end
+  end
 end
