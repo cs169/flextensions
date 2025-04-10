@@ -22,26 +22,28 @@
 					<a class="nav-link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
 				</li>
 
-				<% if session[:user_id].present? %>
-					<!-- Display this when there's a logged-in user -->
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-							aria-expanded="false"><%= session[:username] %></a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="/logout/">Logout</a></li>
-						</ul>
-					</li>
-				<% else %>
-					<!-- Display this when there's NO logged-in user -->
-					<li class="nav-item">
-						<a class="nav-link" href="/login/">Login</a>
-					</li>
-				<% end %>
 			</ul>
-			<div class="d-lg-flex col-lg-3 justify-content-lg-end">
+			<div class="d-lg-flex col-lg-3 justify-content-lg-end align-items-lg-center gap-2"> 
 				<div class="color-mode-toggler-m">
 					<%= render "layouts/color_mode_btn" %>
 				</div>
+
+				
+				<% if session[:user_id].present? %>
+					<!-- Display this when there's a logged-in user -->
+					<div class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown"
+							aria-expanded="false"><%= session[:username] %></a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li><a class="dropdown-item" href="/logout/">Logout</a></li>
+						</ul>
+					</div>
+				<% else %>
+					<!-- Display this when there's NO logged-in user -->
+					<div class="nav-item">
+						<a class="nav-link text-white" href="/login/">Login</a>
+					</div>
+				<% end %>
 			</div>
 		</div>
 	</div>
