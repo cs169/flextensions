@@ -37,12 +37,11 @@ class CoursesController < ApplicationController
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
 
-    user_roles = UserToCourse.where(user_id: @user.id, course_id: @course.id).pluck(:role)
-    if user_roles.include?('teacher') || user_roles.include?('ta')
-      @role = 'instructor'
+    @role = determine_user_role(@course)
+    case @role
+    when 'instructor'
       render 'courses/instructor_view'
-    elsif user_roles.include?('student')
-      @role = 'student'
+    when 'student'
       render 'courses/student_view'
     else
       flash[:alert] = 'You do not have access to this course.'
@@ -72,6 +71,7 @@ class CoursesController < ApplicationController
     @side_nav = 'edit'
 
     @course = Course.find_by(id: params[:id])
+    @role = determine_user_role(@course)
     return if @course
 
     flash[:alert] = 'Course not found.'
@@ -82,6 +82,7 @@ class CoursesController < ApplicationController
     @side_nav = 'requests'
 
     @course = Course.find_by(id: params[:id])
+    @role = determine_user_role(@course)
     return if @course
 
     flash[:alert] = 'Course not found.'
@@ -171,5 +172,12 @@ class CoursesController < ApplicationController
     return unless @user.nil?
 
     redirect_to root_path, alert: 'Please log in to access this page.'
+  end
+
+  def determine_user_role(course)
+    roles = UserToCourse.where(user_id: @user.id, course_id: course.id).pluck(:role)
+    return 'instructor' if roles.include?('teacher') || roles.include?('ta')
+    return 'student' if roles.include?('student')
+    nil
   end
 end
