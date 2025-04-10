@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container mt-4">
   <div class="row">
     <div class="col-12">
       <h5>Choose courses to set up extensions with:</h5>
@@ -6,20 +6,39 @@
     </div>
     <% if @courses_teacher.any? %>
       <%= form_with url: courses_path, method: :post, class: "mt-3" do %>
-        <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
-          <div class="form-check mb-3">
-            <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
-            <label for="course_#{course["id"]}" class="form-check-label">
-              <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
-              <strong>Course Code:</strong> <%= course["course_code"] %> |
-              <strong>Name:</strong> <%= course["name"] %>
-            </label>
-          </div>
-        <% end %>
-        <%= submit_tag "Import Selected Courses", class: "btn btn-primary" %>
+
+			<table class="table table-bordered table-striped" id="import-course-table">
+        <thead class="table-info">
+            <tr>
+              <th></th>
+              <th>Semester</th>
+              <th>Course</th>
+              <th>Name</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
+              <tr>
+
+					<td class="d-flex justify-content-center align-content-center">
+						<div class="d-flex justify-content-center form-check form-switch">
+              <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
+							<label class="form-check-label" for="assignment-1-has-partner"></label>
+						</div>
+					</td>
+                <td><%= DateTime.parse(course["created_at"]).strftime("%B %Y") %></td>
+                <td><%= course["course_code"] %></td>
+                <td><%= course["name"] %></td>
+                <td><%= course['enrollments'].find { |enrollment| %w[teacher ta].include?(enrollment['type']) }['type'].capitalize %></td>
+              </tr>
+            <% end %>
+          </tbody>
+      </table>
+      <%= submit_tag "Import Selected Courses", class: "btn btn-secondary" %>
       <% end %>
     <% else %>
-      <p class="text-danger">No courses found or unable to fetch courses.</p>
+      <p class="alert alert-danger">No courses found or unable to fetch courses.</p>
     <% end %>
 
     <% if @courses_student.any? %>
@@ -30,8 +49,9 @@
             <div class="mb-3">
               <span>
                 <strong>Semester:</strong> <%= DateTime.parse(course["created_at"]).strftime("%B %Y") %> |
-                <strong>Course Code:</strong> <%= course["course_code"] %> |
-                <strong>Name:</strong> <%= course["name"] %>
+                <strong>Course:</strong> <%= course["course_code"] %> |
+                <strong>Name:</strong> <%= course["name"] %> |
+                <strong>Role:</strong> <%= course['enrollments'].find { |enrollment| %w[student observer designer].include?(enrollment['type']) }['type'].capitalize %>
               </span>
             </div>
           <% end %>
@@ -40,3 +60,13 @@
     <% end %>
   </div>
 </div>
+
+<script>
+// this js code is temporary 
+document.querySelectorAll("table tr").forEach(row => {
+  row.addEventListener("click", () => {
+    const checkbox = row.querySelector('input[type="checkbox"]');
+    if (checkbox) checkbox.checked = !checkbox.checked;
+  });
+});
+</script>

@@ -73,6 +73,7 @@ Capybara.default_driver = :rack_test
 # Use selenium_chrome for JavaScript tests
 Capybara.javascript_driver = :selenium_chrome
 
+
 Capybara.default_max_wait_time = 10
 
 Before do
