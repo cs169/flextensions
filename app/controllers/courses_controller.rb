@@ -109,9 +109,7 @@ class CoursesController < ApplicationController
   end
 
   def new_request
-    assignment_id = params[:assignment_id]
-    course_id = params[:course_id]
-    redirect_to course_extension_form_path(course_id, assignment_id: assignment_id)
+    redirect_to course_extension_form_path(params[:course_id], assignment_id: params[:assignment_id])
   end
 
   def create
