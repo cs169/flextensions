@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_authentication_failure(message)
-    #session[:user_id] = nil
+    # session[:user_id] = nil
     reset_session
     flash[:alert] = message
     redirect_to root_path
