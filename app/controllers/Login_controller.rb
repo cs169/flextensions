@@ -17,6 +17,7 @@ class LoginController < ApplicationController
     # users.find_by(user_id: session[:user_id]).lms_credentials.destroy_all
     session[:user_id] = nil
     session[:username] = nil
+    reset_session
     redirect_to root_path
   end
 
