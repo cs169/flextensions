@@ -3,6 +3,7 @@ class CoursesController < ApplicationController
   before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments]
   before_action :determine_user_role
 
+  # Define coursese variables for teacher role and student role separately.
   def index
     # Temp Code for making an LMS
     Lms.find_or_create_by(id: 1) do |lms|
