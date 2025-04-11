@@ -6,23 +6,34 @@
 	<hr> -->
 	<ul class="nav nav-pills flex-column mb-auto">
 		<li class="nav-item">
-			<a href="/courses/<%= @course.id %>/" class="nav-link <%= @side_nav == 'show' ? 'active' : 'link-body-emphasis' %>">
+			<a href="<%= course_path(@course.id) %>" class="nav-link <%= @side_nav == 'show' ? 'active' : 'link-body-emphasis' %>">
 				<i class="fas fa-home me-2"></i>
 				Assignments
 			</a>
 		</li>
+		
 		<li>
-			<a href="/courses/<%= @course.id %>/requests" class="nav-link <%= @side_nav == 'requests' ? 'active' : 'link-body-emphasis' %>">
+			<a href="<%= course_requests_path(@course.id) %>" class="nav-link <%= @side_nav == 'requests' ? 'active' : 'link-body-emphasis' %>">
 				<i class="fas fa-tachometer-alt me-2"></i>
 				Requests
 			</a>
 		</li>
-		<li>
-			<a href="/courses/<%= @course.id %>/edit" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
-				<i class="fas fa-cog me-2"></i>
-				Settings
-			</a>
-		</li>
+		<% if @role == 'instructor' %>
+			<li>
+				<a href="<%= course_settings_path(@course.id) %>" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
+					Settings
+				</a>
+			</li>
+		<% end %>
+		<% if @role == 'student' %>
+			<li>
+				<a href="<%= course_extension_form_path(@course.id) %>" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
+					Request Extension
+				</a>
+			</li>
+		<% end %>
 	</ul>
 	<!--<hr>
 	<div class="dropdown">

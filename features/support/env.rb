@@ -4,7 +4,60 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
+# Configure SimpleCov before requiring other files
+require 'simplecov'
+require 'simplecov_json_formatter'
+
+# Only start SimpleCov if it hasn't been started
+unless SimpleCov.running
+  SimpleCov.start 'rails' do
+    track_files 'app/**/*.rb'
+    formatter SimpleCov::Formatter::MultiFormatter.new([
+                                                         SimpleCov::Formatter::HTMLFormatter,
+                                                         SimpleCov::Formatter::JSONFormatter
+                                                       ])
+  end
+end
+
 require 'cucumber/rails'
+require 'rspec/mocks'
+require 'rack_session_access/capybara'
+require 'omniauth'
+
+World(RSpec::Mocks::ExampleMethods)
+
+# OmniAuth test mode configuration
+OmniAuth.config.test_mode = true
+
+# Mock authentication data for Canvas
+OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new(
+  {
+    provider: 'canvas',
+    uid: '12345', # A mock Canvas User ID
+    info: {
+      name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'), # Use env var or default
+      email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com') # Use env var or default
+      # Add any other required info fields based on your User model/session logic
+      # e.g., image: 'http://example.com/avatar.png'
+    },
+    credentials: {
+      token: 'mock_token',
+      refresh_token: 'mock_refresh_token', # If you use refresh tokens
+      expires_at: Time.now.to_i + 3600 # Optional: mock token expiry
+    },
+    extra: {
+      # Any extra data your application might expect
+    }
+  }
+)
+
+# Handle invalid credentials mock if needed for specific tests
+OmniAuth.config.add_mock(:canvas, { uid: nil, info: {} }) # Default invalid mock
+
+# Optional: A helper to simulate authentication failure
+def mock_invalid_canvas_auth
+  OmniAuth.config.mock_auth[:canvas] = :invalid_credentials
+end
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -54,39 +107,108 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
 
+  # Basic Chrome options
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
-  options.add_argument('--js-flags=--max-old-space-size=4096')
-  options.add_argument('--window-size=1400,1400')
+  options.add_argument('--window-size=1920,1080')
 
-  options.add_argument('--disable-extensions')
-  options.add_argument('--disable-infobars')
-  options.add_argument('--disable-popup-blocking')
+  # Additional stability options
+  options.add_argument('--disable-site-isolation-trials')
+  options.add_argument('--disable-web-security')
+  options.add_argument('--disable-features=IsolateOrigins,site-per-process')
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  # Performance options
+  options.add_argument('--disable-dev-tools')
+  options.add_argument('--dns-prefetch-disable')
+  options.add_argument('--disable-browser-side-navigation')
+
+  # Add headless mode if in CI
+  if ENV['CI']
+    options.add_argument('--headless=new')
+    options.add_argument('--disable-extensions')
+  end
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    options: options,
+    clear_local_storage: true,
+    clear_session_storage: true
+  )
 end
 
+# Register Chrome headless driver
 Capybara.register_driver :selenium_chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument('--headless')
+
+  # Basic Chrome options
+  options.add_argument('--headless=new')
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
-  options.add_argument('--js-flags=--max-old-space-size=4096')
-  options.add_argument('--window-size=1400,1400')
-  options.add_argument('--disable-extensions')
-  options.add_argument('--disable-infobars')
-  options.add_argument('--disable-popup-blocking')
+  options.add_argument('--window-size=1920,1080')
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  # Additional stability options
+  options.add_argument('--disable-site-isolation-trials')
+  options.add_argument('--disable-web-security')
+  options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+
+  # Performance options
+  options.add_argument('--disable-dev-tools')
+  options.add_argument('--dns-prefetch-disable')
+  options.add_argument('--disable-browser-side-navigation')
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    options: options,
+    clear_local_storage: true,
+    clear_session_storage: true
+  )
 end
 
-Capybara.default_driver = :selenium_chrome_headless
+# Use rack_test by default (faster)
+Capybara.default_driver = :rack_test
+# Use selenium_chrome_headless for JavaScript tests
 Capybara.javascript_driver = :selenium_chrome_headless
 
-Capybara.default_max_wait_time = 10
-
-Before do
-  page.driver.browser.manage.window.resize_to(1400, 900) if page.driver.browser.respond_to?(:manage)
+# Increase timeouts for CI environment
+if ENV['CI']
+  Capybara.default_max_wait_time = 20
+  Capybara.default_normalize_ws = true
+else
+  Capybara.default_max_wait_time = 10
 end
+
+# Set up hooks
+Before do
+  # Use rack_test by default
+  Capybara.current_driver = :rack_test
+end
+
+Before('@javascript') do
+  # Switch to selenium_chrome_headless for JavaScript tests
+  Capybara.current_driver = :selenium_chrome_headless
+
+  # Reset to default valid mock before each scenario
+  OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new({
+                                                                provider: 'canvas',
+                                                                uid: '12345',
+                                                                info: {
+                                                                  name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'),
+                                                                  email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com')
+                                                                },
+                                                                credentials: { token: 'mock_token' }
+                                                                # Add other fields as needed
+                                                              })
+end
+
+After do
+  # Always reset to default driver
+  Capybara.use_default_driver
+end
+
+# Configure Capybara to use port 3000 for tests
+# This is important for OAuth redirect_uri to work correctly
+Capybara.server_port = 3000

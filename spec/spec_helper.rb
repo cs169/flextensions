@@ -26,6 +26,9 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
 SimpleCov.start 'rails'
 
 RSpec.configure do |config|
+  # Exclude accessibility tests by default
+  config.filter_run_excluding :a11y
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.

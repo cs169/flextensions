@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  # Add rack_session_access routes for testing
+  # if Rails.env.test?
+  #   mount RackSessionAccess::Engine => '/rack_session'
+  # end
+  
   get 'courses/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'
@@ -16,6 +21,7 @@ Rails.application.routes.draw do
   get '/courses/:id', to: 'courses#show', as: :course
   get '/courses/:id/edit', to: 'courses#edit', as: :course_settings
   get '/courses/:id/requests', to: 'courses#requests', as: :course_requests
+  get '/courses/:id/requests/new', to: 'courses#form', as: :course_extension_form
   
   # Add the delete_all route for courses
   resources :courses do
@@ -25,6 +31,7 @@ Rails.application.routes.draw do
     collection do
       delete :delete_all
     end
+    resources :extensions, only: [:create]
   end
 
   #Authentication routes
