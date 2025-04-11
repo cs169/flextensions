@@ -1,8 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :authenticated!, unless: -> { excluded_controller_action? }
 
-  helper_method :authenticated! # Expose the method to other controllers
-
   def excluded_controller_action?
     # Actions and controllers that do NOT require authentication
     excluded_actions = {
@@ -36,6 +34,7 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_authentication_failure(message)
+    session[:user_id] = nil
     flash[:alert] = message
     redirect_to root_path
     false
