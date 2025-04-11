@@ -105,6 +105,11 @@ class CoursesController < ApplicationController
     end
     # Fetch assignments associated with the CourseToLms
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
+    @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
+  end
+
+  def new_request
+    redirect_to course_extension_form_path(params[:course_id], assignment_id: params[:assignment_id])
   end
 
   def create
