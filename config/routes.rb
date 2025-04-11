@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   get '/courses/:id/requests', to: 'courses#requests', as: :course_requests
   get '/courses/:id/requests/new', to: 'courses#form', as: :course_extension_form
 
-  post '/courses', to: 'courses#new_request', as: :new_extension_request
+  post '/courses/:id', to: 'courses#new_request', as: :new_extension_request
   
   # Add the delete_all route for courses
   resources :courses do
