@@ -15,8 +15,8 @@ class LoginController < ApplicationController
     #   req.headers['Authorization'] = "Bearer #{cur_user.lms_credentials.first.token}"
     # end
     # users.find_by(user_id: session[:user_id]).lms_credentials.destroy_all
-    session[:user_id] = nil
-    session[:username] = nil
+    #session[:user_id] = nil
+    #session[:username] = nil
     reset_session
     redirect_to root_path
   end
