@@ -1,33 +1,128 @@
 <%= render "layouts/sidebar" %>
 <div class="container mt-4">
-	<div class="row">
+	<div class="row justify-content-center">
 		<div class="col-12">
-			<h4 class="mb-4"><%= @course.course_name %> / <%= @course.course_code %></h4>
+			<%= render "courses/course_title" %>
+
 			<%= form_with url: course_extensions_path(@course), method: :post, local: true do %>
-			  <div class="mb-3">
-			    <label for="assignment_id" class="form-label">Assignment</label>
-			    <select class="form-select" name="assignment_id" id="assignment_id" required>
-			      <% @assignments.each do |assignment| %>
-			        <option value="<%= assignment.id %>"><%= assignment.name %></option>
-			      <% end %>
-			    </select>
-			  </div>
+			<div class="mb-3">
+				<label for="assignment_id" class="form-label">Assignment</label>
+				<select class="form-select" name="assignment_id" id="assignment_id" required>
+					<option value="" disabled selected>---</option>
+				<% @assignments.each do |assignment| %>
+					<option value="<%= assignment.id %>" data-original-due-date="<%= assignment.due_date.strftime('%Y-%m-%d') %>" <%= assignment.id == params[:assignment_id].to_i ? 'selected': '' %>><%= assignment.name + ' Due on ' + assignment.due_date.strftime('%B %d, %Y at %I:%M %p') %></option>
+				<% end %>
+				</select>
+			</div>
 
-			  <div class="mb-3">
-			    <label for="number_of_days" class="form-label">Number of Days</label>
-			    <input type="number" class="form-control" name="number_of_days" id="number_of_days" required>
-			  </div>
+			<div class="row justify-content-between p-0">
+				<div class="col-5 mb-3">
+					<label for="days" class="form-label">Number of Days</label>
+					<input type="number" class="form-control" id="days" value="1" min="1" required />
+				</div>
+				<div class="col-5 mb-3">
+					<label for="form-new-due-date" class="form-label">Requested Due Date</label>
+					<input type="date" class="form-control" id="form-new-due-date" data-original-due-date="<%= @selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment %>" value="<%= @selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment %>" required />
+				</div>
+			</div>
 
-			  <div class="mb-3">
-			    <label for="reason" class="form-label">Why do you need this extension?</label>
-			    <textarea class="form-control" name="reason" id="reason" rows="4" required></textarea>
-			  </div>
+			<div class="mb-3">
+				<label for="reason" class="form-label">Why do you need this extension?</label>
+				<textarea class="form-control" name="reason" id="reason" rows="2" required></textarea>
+			</div>
 
-			  <div class="text-center">
-				<a href="/courses" class="btn btn-dark">Back</a>
-			    <button type="submit" class="btn btn-secondary">Submit</button>
-			  </div>
+			<div class="mb-3">
+				<label for="additional-doc" class="form-label">Additional Documentation<p class="mt-1">Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form.</p></label>
+				<textarea class="form-control" name="additional_doc" id="additional-doc" rows="2" required></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="custom-question-1" class="form-label">Custom Question 1<p class="mt-1">Custom Question 1 Description</p></label>
+				<textarea class="form-control" name="custom_question_1" id="custom-question-1" rows="2" required></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="custom-question-2" class="form-label">Custom Question 2<p class="mt-1">Custom Question 2 Description</p></label>
+				<textarea class="form-control" name="custom_question_1" id="custom-question-2" rows="2" required></textarea>
+			</div>
+
+
+			<div class="text-center">
+				<button type="submit" class="btn btn-secondary">Submit</button>
+			</div>
 			<% end %>
 		</div>
 	</div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+	const daysInput = document.getElementById("days");
+	const dueDateInput = document.getElementById("form-new-due-date");
+	const assignmentSelect = document.getElementById("assignment_id");
+
+	let originalDueDateStr = dueDateInput.dataset.originalDueDate;
+	let originalDueDate = new Date(originalDueDateStr);
+
+	if (originalDueDateStr) {
+		let minDate = new Date(originalDueDateStr);
+		minDate.setDate(minDate.getDate() + 1);
+		dueDateInput.min = minDate.toISOString().split("T")[0];
+		dueDateInput.value = minDate.toISOString().split("T")[0];
+
+		const currentDueDate = new Date(dueDateInput.value);
+		if (currentDueDate < minDate) {
+			dueDateInput.value = minDate.toISOString().split("T")[0];
+		}
+
+		const diffTime = currentDueDate - originalDueDate;
+		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+		daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
+	}
+
+	// Update due date when days input changes
+	daysInput.addEventListener("input", () => {
+		const days = parseInt(daysInput.value, 10);
+		if (!isNaN(days)) {
+			const newDate = new Date(originalDueDate);
+			newDate.setDate(originalDueDate.getDate() + days);
+			dueDateInput.value = newDate.toISOString().split("T")[0];
+		}
+	});
+
+	// Update days when due date changes
+	dueDateInput.addEventListener("input", () => {
+		const newDueDate = new Date(dueDateInput.value);
+		const diffTime = newDueDate - originalDueDate;
+		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+		daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
+	});
+
+	// When assignment changes, update the data-original-due-date
+	assignmentSelect.addEventListener("change", () => {
+		const selectedOption = assignmentSelect.options[assignmentSelect.selectedIndex];
+		const newOriginalDueDate = selectedOption.dataset.originalDueDate;
+		console.log("Original due date from option:", newOriginalDueDate);
+
+		if (newOriginalDueDate) {
+			let minDate = new Date(newOriginalDueDate);
+			minDate.setDate(minDate.getDate() + 1);
+			dueDateInput.min = minDate.toISOString().split("T")[0];
+
+			dueDateInput.dataset.originalDueDate = newOriginalDueDate;
+			originalDueDate = new Date(newOriginalDueDate);
+
+			const currentDueDate = new Date(dueDateInput.value);
+			if (currentDueDate < minDate) {
+				dueDateInput.value = minDate.toISOString().split("T")[0];
+			}
+
+			// trigger update in days field in case due date changed
+			const newDueDate = new Date(dueDateInput.value);
+			const diffTime = newDueDate - originalDueDate;
+			const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+			daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
+		}
+	});
+});
+</script>

@@ -2,7 +2,7 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-12">
-      <h4 class="mb-4"><%= @course.course_name %> / <%= @course.course_code %></h4>
+        <%= render "courses/course_title" %>
       <table class="table table-bordered table-striped" id="assignments-table">
         <thead>
           <tr class="table-info">
@@ -10,7 +10,7 @@
             <th>View</th>
             <th>Due Date</th>
             <th>Late Due Date</th>
-            <th style="width: 50px;">Enable</th>
+            <th style="width: 50px;">Request</th>
           </tr>
         </thead>
         <tbody>
@@ -25,11 +25,12 @@
               </td>
               <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
               <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="d-flex justify-content-center align-content-center">
-                <div class="d-flex justify-content-center form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
-                  <label class="form-check-label" for="assignment-<%= assignment.id %>-has-partner"></label>
-                </div>
+              <td class="text-center">
+                <%= form_with url: new_extension_request_path, method: :post, local: true do |f| %>
+                  <%= hidden_field_tag :assignment_id, assignment.id %>
+                  <%= hidden_field_tag :course_id, @course.id %>
+                  <%= f.submit "New", class: "btn btn-sm btn-secondary" %>
+                <% end %>
               </td>
             </tr>
           <% end %>
