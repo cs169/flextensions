@@ -9,11 +9,9 @@
 		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 		<%= javascript_importmap_tags %>
 		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
-		<%= javascript_include_tag "application", defer: true %>
 	</head>
 	<body class="d-flex flex-column h-100">
 		<%= render "layouts/header" %>
-			<%= render "layouts/navbar" %>
 		<main class="d-flex flex-nowrap h-100 overflow-auto"> <!-- flex-shrink-0 -->
 			<%= yield %>
 		</main>
