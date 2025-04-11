@@ -27,19 +27,21 @@
 				<% if session[:user_id].present? %>
 					<!-- Display this when there's a logged-in user -->
 					<div class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown"
-							aria-expanded="false"><%= session[:username] %></a>
-						<ul class="dropdown-menu dropdown-menu-end">
-							<li><a class="dropdown-item" href="/logout/">Logout</a></li>
-						</ul>
+  					<a class="nav-link dropdown-toggle text-white testid-username" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+    					<%= session[:username] %>
+  					</a>
+  					<ul class="dropdown-menu dropdown-menu-end">
+    					<li><a class="dropdown-item testid-logout-button" href="/logout/">Logout</a></li>
+  					</ul>
 					</div>
+
 				<% else %>
 					<!-- Display this when there's NO logged-in user -->
 					<div class="nav-item">
 						<a class="nav-link text-white" href="/login/">Login</a>
 					</div>
 				<% end %>
-				
+
 				<div class="color-mode-toggler-m">
 					<%= render "layouts/color_mode_btn" %>
 				</div>
