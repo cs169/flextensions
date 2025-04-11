@@ -14,12 +14,11 @@ class SessionController < ApplicationController
 
     if response.success?
       user_data = JSON.parse(response.body)
-      #   Rails.logger.debug(user_data)
-      #   Rails.logger.info "User Data: #{user_data}"
       find_or_create_user(user_data, token)
       redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
+      # Looking into the status code in response.status
     end
   end
 
@@ -62,25 +61,63 @@ class SessionController < ApplicationController
     end
     user.canvas_token = token
     user.save!
-    # update user's lms credentials.
-    # if user.lms_credentials.any?
-    #     user.lms_credentials.first.update(
-    #         token: token.token,
-    #         refresh_token: token.refresh_token,
-    #         expire_time: Time.at(token.expires_at)
-    #         )
-    # else
-    #     user.lms_credentials.create!(
-    #         user_id: user.canvas_uid,
-    #         lms_name: 'canvas',
-    #         token: token,
-    #         refresh_token: full_token.refresh_token,
-    #         expire_time: Time.at(full_token.expires_at)
-    #     )
+    update_user_credential(user, full_token)
 
-    # end
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
+  end
+
+  def update_user_credential(user, token)
+    # update user's lms credentials.
+    # Refresh token before it expires.
+    if user.lms_credentials.any?
+      user.lms_credentials.first.update(
+        token: token.token,
+        refresh_token: token.refresh_token,
+        expire_time: Time.zone.at(token.expires_at)
+      )
+    else
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: token,
+        refresh_token: token.refresh_token,
+        expire_time: Time.zone.at(token.expires_at)
+      )
+    end
+  end
+
+  def refresh_user_token(user)
+    # Get the user's credentials
+    credential = user.lms_credentials.first
+    return unless credential&.refresh_token
+
+    # Create OAuth2 client
+    client = OAuth2::Client.new(
+      ENV.fetch('CANVAS_CLIENT_ID', nil),
+      ENV.fetch('APP_KEY', nil),
+      site: ENV.fetch('CANVAS_URL', nil),
+      token_url: '/login/oauth2/token'
+    )
+
+    # Use refresh token to get a new access token
+    begin
+      token = OAuth2::AccessToken.from_hash(
+        client,
+        refresh_token: credential.refresh_token
+      ).refresh!
+
+      # Update the user's credentials with the new token
+      credential.update(
+        token: token.token,
+        refresh_token: token.refresh_token || credential.refresh_token, # Keep old refresh token if new one not provided
+        expire_time: Time.zone.at(token.expires_at)
+      )
+
+      token.token
+    rescue OAuth2::Error => e
+      Rails.logger.error "Failed to refresh token: #{e.message}"
+      nil
+    end
   end
 end

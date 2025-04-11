@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
     t.bigint "course_to_lms_id", null: false
     t.datetime "due_date"
     t.datetime "late_due_date"
+    t.boolean "extensions_enabled"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -40,6 +41,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
     t.datetime "updated_at", null: false
     t.string "canvas_id"
     t.string "course_code"
+    t.boolean "enable_student_requests"
+    t.integer "auto_approve_days"
+    t.integer "auto_approve_dsp_days"
+    t.integer "max_auto_approve"
+    t.string "reply_email"
+    t.text "custom_question_1"
+    t.text "custom_question_2"
+    t.text "custom_question_3"
+    t.string "email_subject"
+    t.text "email_template"
     t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
   end
 
@@ -66,6 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_08_015944) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "external_user_id"
+    t.datetime "expire_time"
     t.index ["user_id"], name: "index_lms_credentials_on_user_id"
   end
 

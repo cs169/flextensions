@@ -84,8 +84,20 @@
 .navbar {
 	margin-bottom: 20px;
 }
-  
-  
+
+// navbar accessibility - ensure high contrast for links
+.navbar-dark .nav-link {
+	color: #FFFFFF !important; // High contrast white against dark background
+	
+	&:hover, &:focus {
+		color: #FFFFFF !important;
+		text-decoration: underline;
+	}
+}
+
+.navbar-dark .nav-link.active {
+	font-weight: bold;
+}
 
 
 // custom
@@ -109,14 +121,14 @@
 
 // custom link styles for accessibility
 .accessible-link {
-	color: #8BA3D4; // Lighter blue for dark mode
+	color: #AABFEE; // Lighter blue for dark mode with better contrast
 	
 	[data-bs-theme="light"] & {
 		color: #4A5D8B; // Darker blue for light mode that meets contrast requirements
 	}
 	
 	&:hover {
-		color: #A3B5DE; // Lighter hover color for dark mode
+		color: #C2D0F5; // Lighter hover color for dark mode
 		
 		[data-bs-theme="light"] & {
 			color: #374772; // Darker hover color for light mode
