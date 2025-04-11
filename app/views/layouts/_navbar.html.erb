@@ -1,52 +1,48 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-0" aria-label="Thirteenth navbar example">
-  <div class="container-fluid">
-    <!-- Navbar Toggler for Mobile View -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-center"
-      aria-controls="navbar-center" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+	<div class="container-fluid">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-center"
+			aria-controls="navbar-center" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="color-mode-toggler">
+			<a class="navbar-brand col-lg-3 me-0" href="./">Flextensions</a>
+		</div>
+		<div class="color-mode-toggler">
+			<%= render "layouts/color_mode_btn" %>
+		</div>
 
-    <!-- Brand Name -->
-    <a class="navbar-brand col-lg-3 me-0" href="./">Flextensions</a>
+		<div class="collapse navbar-collapse d-lg-flex" id="navbar-center">
+			<a class="navbar-brand col-lg-3 me-0 color-mode-toggler-m" href="./">Flextensions</a>
+			<ul class="navbar-nav col-lg-9 justify-content-lg-end">
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="page" href="/courses">Home</a>
+				</li>
 
-    <!-- Mode Selector -->
-    <div class="color-mode-toggler">
-      <%= render "layouts/color_mode_btn" %>
-    </div>
+				<li class="nav-item">
+					<a class="nav-link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
+				</li>
 
-    <!-- Navbar Content -->
-    <div class="collapse navbar-collapse d-lg-flex" id="navbar-center">
-      <!-- Centered Links -->
-      <ul class="navbar-nav col-lg-6 justify-content-lg-center">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/courses">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/cs169/flextensions/wiki/" target="_blank">Help</a>
-        </li>
-      </ul>
-
-      <!-- Right-Aligned Content -->
-      <div class="d-lg-flex col-lg-3 justify-content-lg-end align-items-center gap-2">
-        <% if session[:user_id].present? %>
-          <!-- If user is logged in -->
-          <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-white" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="fas fa-user me-2"></i><%= session[:username] %>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li>
-                <a class="dropdown-item" href="/logout/">Logout</a>
-              </li>
-            </ul>
-          </div>
-        <% else %>
-          <!-- If user is not logged in -->
-          <div class="nav-item">
-            <a class="nav-link text-white" href="/login/">Login</a>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  </div>
+				<% if session[:user_id].present? %>
+					<!-- Display this when there's a logged-in user -->
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle testid-username" href="#" data-bs-toggle="dropdown"
+							aria-expanded="false"><%= session[:username] %></a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item testid-logout-button" href="/logout/">Logout</a></li>
+						</ul>
+					</li>
+				<% else %>
+					<!-- Display this when there's NO logged-in user -->
+					<li class="nav-item">
+						<a class="nav-link" href="/login/">Login</a>
+					</li>
+				<% end %>
+				<div class="nav-item">
+					<div class="color-mode-toggler-m">
+						<%= render "layouts/color_mode_btn" %>
+					</div>
+				</div>
+			</ul>
+		</div>
+	</div>
 </nav>
