@@ -16,7 +16,11 @@ class CoursesController < ApplicationController
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: @role == 'student' ? true : nil)
+    if @role == 'student'
+      @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true)
+    else
+      @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
+    end
     render_role_based_view
   end
 
@@ -48,7 +52,11 @@ class CoursesController < ApplicationController
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: @role == 'student' ? true : nil)
+    if @role == 'student'
+      @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true)
+    else
+      @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
+    end
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
   end
 
