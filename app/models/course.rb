@@ -103,10 +103,11 @@ class Course < ApplicationRecord
 
     users_data.each do |user_data|
       # Create or find the User model
-      Rails.logger.info "Syncing user: user_data: #{user_data}"
+      # Rails.logger.info "Syncing user: user_data: #{user_data}"
       user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
         u.name = user_data['name']
         u.email = user_data['email'] # Assuming login_id is the email
+        u.student_id = user_data['sis_user_id']
       end
 
       # Use the associate_user_with_course method to create the UserToCourse record

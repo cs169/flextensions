@@ -16,7 +16,7 @@
           <% @enrollments.each do |enrollment| %>
             <tr>
               <td><%= enrollment.user.name %></td>
-              <td><%= enrollment.user.canvas_uid %></td>
+              <td><%= enrollment.user.student_id %></td>
               <td><%= enrollment.user.email %></td>
               <td><%= enrollment.role %></td>
             </tr>
