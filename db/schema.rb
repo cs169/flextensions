@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_12_013657) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_12_215352) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_12_013657) do
     t.bigint "course_to_lms_id", null: false
     t.datetime "due_date"
     t.datetime "late_due_date"
+    t.boolean "enabled", default: false
   end
 
   create_table "course_to_lmss", force: :cascade do |t|

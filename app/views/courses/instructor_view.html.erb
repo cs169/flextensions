@@ -27,8 +27,8 @@
               <td class="row-check"><%= assignment.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="d-flex justify-content-center align-content-center">
                 <div class="d-flex justify-content-center form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
-                  <label class="form-check-label" for="assignment-<%= assignment.id %>-has-partner"></label>
+                  <input class="form-check-input toggle-enabled-switch" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-enabled" <%= 'checked' if assignment.enabled %> data-assignment-id="<%= assignment.id %>">
+                  <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
                 </div>
               </td>
             </tr>

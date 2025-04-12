@@ -38,6 +38,12 @@ Rails.application.routes.draw do
     resources :extensions, only: [:create]
   end
 
+  resources :assignments, only: [] do
+    member do
+      patch :toggle_enabled
+    end
+  end
+
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 
   get '/login/canvas', to: 'login#canvas', as: :bcourses_login
