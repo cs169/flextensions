@@ -2,6 +2,6 @@
 //= require jquery3
 //= require popper
 //= require bootstrap
-//= require assignments
 // import "@hotwired/turbo-rails"
+import './assignments';
 import "controllers"
