@@ -2,13 +2,14 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-12">
-      <h1>Enrollments</h1>
-      <table class="table table-bordered table-striped">
+      <%= render "courses/course_title" %>
+      <table class="table table-bordered table-striped" id="enrollments-table">
         <thead>
           <tr class="table-info">
             <th>Name</th>
             <th>Student ID</th>
             <th>Email</th>
+            <th>Role</th>
           </tr>
         </thead>
         <tbody>
@@ -17,6 +18,7 @@
               <td><%= enrollment.user.name %></td>
               <td><%= enrollment.user.canvas_uid %></td>
               <td><%= enrollment.user.email %></td>
+              <td><%= enrollment.role %></td>
             </tr>
           <% end %>
         </tbody>
