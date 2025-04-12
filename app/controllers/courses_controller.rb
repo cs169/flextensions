@@ -56,8 +56,11 @@ class CoursesController < ApplicationController
     end
 
     teacher_roles = %w[teacher ta]
+    existing_canvas_ids = Course.pluck(:canvas_id) # Fetch all existing canvas_ids from the database
+
     @courses_teacher = @courses.select do |course|
-      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
+      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) } &&
+        !existing_canvas_ids.include?(course['id'].to_s) # Exclude courses that already exist
     end
 
     @courses_student = @courses.select do |course|
