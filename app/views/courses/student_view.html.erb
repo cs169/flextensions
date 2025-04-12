@@ -23,8 +23,8 @@
                   bCourses
                 </a>
               </td>
-              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y %I:%M %p") || 'N/A' %></td>
+              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="text-center">
                 <%= form_with url: new_extension_request_path, method: :post, local: true do |f| %>
                   <%= hidden_field_tag :assignment_id, assignment.id %>
