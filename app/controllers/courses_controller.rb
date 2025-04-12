@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments]
+  before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments enrollments]
   before_action :determine_user_role
 
   def index
@@ -76,6 +76,13 @@ class CoursesController < ApplicationController
 
     @course.sync_enrollments_from_canvas(@user.canvas_token)
     render json: { message: 'Users synced successfully.' }, status: :ok
+  end
+
+  def enrollments
+    @side_nav = 'enrollments'
+    return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
+
+    @enrollments = @course.user_to_courses.includes(:user)
   end
 
   def delete_all

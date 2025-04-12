@@ -1,0 +1,29 @@
+<%= render "layouts/sidebar" %>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h1>Enrollments</h1>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr class="table-info">
+            <th>Name</th>
+            <th>Student ID</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @enrollments.each do |enrollment| %>
+            <tr>
+              <td><%= enrollment.user.name %></td>
+              <td><%= enrollment.user.canvas_uid %></td>
+              <td><%= enrollment.user.email %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="text-center">
+        <a href="<%= course_path(@course.id) %>" class="btn btn-dark">Back</a>
+      </div>
+    </div>
+  </div>
+</div>
