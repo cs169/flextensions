@@ -111,7 +111,7 @@ class Course < ApplicationRecord
       user.student_id = user_data['sis_user_id']
       user.save!
 
-      Rails.logger.info "USER student_id: #{user.student_id} && #{user_data['sis_user_id']}"
+      # Rails.logger.info "USER student_id: #{user.student_id} && #{user_data['sis_user_id']}"
       # Use the associate_user_with_course method to create the UserToCourse record
       UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
     end

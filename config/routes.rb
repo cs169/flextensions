@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   resources :courses do
     member do
       post :sync_assignments
+      post :sync_enrollments
       get :enrollments
     end
     collection do
