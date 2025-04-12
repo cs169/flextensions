@@ -38,7 +38,7 @@ Rails.application.routes.draw do
     resources :extensions, only: [:create]
   end
 
-  resources :assignments, only: [] do
+  resources :assignments do
     member do
       patch :toggle_enabled
     end
