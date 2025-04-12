@@ -23,8 +23,8 @@
                   bCourses
                 </a>
               </td>
-              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+              <td class="row-check"><%= assignment.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
+              <td class="row-check"><%= assignment.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="d-flex justify-content-center align-content-center">
                 <div class="d-flex justify-content-center form-check form-switch">
                   <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
@@ -36,7 +36,6 @@
         </tbody>
       </table>
       <div class="text-center">
-        <a href="/courses" class="btn btn-dark">Back</a>
         <button class="btn btn-info" id="sync-assignments-button" data-course-id="<%= @course.id %>">Sync Assignments</button>
       </div>
     </div>
