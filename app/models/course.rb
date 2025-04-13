@@ -49,9 +49,9 @@ class Course < ApplicationRecord
         documentation_desc: <<~DESC,
           Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.
         DESC
-        documentation_disp: "hidden",
-        custom_q1_disp: "hidden",
-        custom_q2_disp: "hidden"
+        documentation_disp: 'hidden',
+        custom_q1_disp: 'hidden',
+        custom_q2_disp: 'hidden'
       )
       form_setting.save!
     end
@@ -139,6 +139,10 @@ class Course < ApplicationRecord
 
     # Create or update User and UserToCourse records for current users
     users_data.each do |user_data|
+      # this line skips importing a user if the api doesn't return their email
+      # one case this is happening if the user was invited to the course but hasn't accepted
+      next if user_data['email'].blank?
+
       # Create or find the User model
       user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
         u.name = user_data['name']
