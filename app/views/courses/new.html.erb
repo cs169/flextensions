@@ -1,14 +1,19 @@
 <div class="container mt-4">
   <div class="row">
+    <div class="col-12 mb-4">
+      <a href="/courses" class="btn btn-secondary d-inline-flex align-items-center">
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Courses
+      </a>
+    </div>
     <div class="col-12">
-      <h5>Choose courses to set up extensions with:</h5>
+      <h5 class="mb-4">Choose courses to set up extensions with:</h5>
       <p>If you expect to see a class, but it is not listed, ensure the Course is not already setup with Flextensions and that its corresponding Canvas course is active.</p>
     </div>
     <% if @courses_teacher.any? %>
       <%= form_with url: courses_path, method: :post, class: "mt-3" do %>
-
-			<table class="table table-bordered table-striped" id="import-course-table">
-        <thead class="table-info">
+        <table class="table table-bordered table-striped" id="import-course-table">
+          <thead class="table-info">
             <tr>
               <th></th>
               <th>Semester</th>
@@ -20,13 +25,12 @@
           <tbody>
             <% @courses_teacher.sort_by { |c| DateTime.parse(c["created_at"]) }.reverse.each do |course| %>
               <tr>
-
-					<td class="d-flex justify-content-center align-content-center">
-						<div class="d-flex justify-content-center form-check form-switch">
-              <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
-							<label class="form-check-label" for="assignment-1-has-partner"></label>
-						</div>
-					</td>
+                <td class="d-flex justify-content-center align-content-center">
+                  <div class="d-flex justify-content-center form-check form-switch">
+                    <%= check_box_tag "courses[]", course["id"], false, id: "course_#{course["id"]}", class: "form-check-input" %>
+                    <label class="form-check-label" for="assignment-1-has-partner"></label>
+                  </div>
+                </td>
                 <td><%= DateTime.parse(course["created_at"]).strftime("%B %Y") %></td>
                 <td><%= course["course_code"] %></td>
                 <td><%= course["name"] %></td>
@@ -34,8 +38,8 @@
               </tr>
             <% end %>
           </tbody>
-      </table>
-      <%= submit_tag "Import Selected Courses", class: "btn btn-secondary" %>
+        </table>
+        <%= submit_tag "Import Selected Courses", class: "btn btn-secondary" %>
       <% end %>
     <% else %>
       <p class="alert alert-danger">No courses found or unable to fetch courses.</p>

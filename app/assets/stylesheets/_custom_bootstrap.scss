@@ -141,6 +141,30 @@
 	width: 100%;
 	min-height: auto;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+	.nav-back {
+		margin-bottom: 1rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		
+		.nav-link {
+			color: var(--bs-primary);
+			font-weight: 500;
+			
+			&:hover {
+				background-color: rgba(var(--bs-primary-rgb), 0.1);
+				color: var(--bs-primary);
+			}
+
+			i {
+				transition: transform 0.2s ease-in-out;
+			}
+
+			&:hover i {
+				transform: translateX(-4px);
+			}
+		}
+	}
 }
 
 @media (min-width: 992px) {
