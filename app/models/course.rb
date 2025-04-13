@@ -68,7 +68,7 @@ class Course < ApplicationRecord
     assignments = course_to_lms.fetch_assignments(token)
 
     # Keep track of external assignment IDs from Canvas
-    external_assignment_ids = assignments.map { |assignment_data| assignment_data['id'] }
+    external_assignment_ids = assignments.pluck('id')
 
     # Sync or update assignments
     assignments.each do |assignment_data|
