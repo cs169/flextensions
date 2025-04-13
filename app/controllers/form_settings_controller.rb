@@ -12,6 +12,7 @@ class FormSettingsController < ApplicationController
   end
 
   def update
+    @side_nav = 'form_settings'
     @form_setting = @course.form_setting || @course.build_form_setting
     flash.now[:notice] = 'Form settings updated successfully.' if @form_setting.update(form_setting_params)
     render :edit
