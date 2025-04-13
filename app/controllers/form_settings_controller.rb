@@ -12,9 +12,24 @@ class FormSettingsController < ApplicationController
   end
 
   def update
+    @side_nav = 'form_settings'
     @form_setting = @course.form_setting || @course.build_form_setting
-    if @form_setting.update(form_setting_params)
-      redirect_to course_path(@course), notice: 'Form settings updated successfully.'
+
+    permitted = form_setting_params.to_h
+    defaulted = {
+      reason_desc: '',
+      documentation_desc: '',
+      documentation_disp: '',
+      custom_q1: '',
+      custom_q1_desc: '',
+      custom_q1_disp: '',
+      custom_q2: '',
+      custom_q2_desc: '',
+      custom_q2_disp: ''
+    }.merge(permitted)
+
+    if @form_setting.update(defaulted)
+      redirect_to edit_course_form_setting_path(@course), notice: 'Form settings updated successfully.'
     else
       render :edit
     end
