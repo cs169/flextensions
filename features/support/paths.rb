@@ -17,6 +17,9 @@ module NavigationHelpers
     when /^Courses page$/
       '/courses'
 
+    when /^form settings page$/
+      "/courses/#{@course.id}/form_setting/edit"
+
     else
       begin
         page_name =~ /^the (.*) page$/
