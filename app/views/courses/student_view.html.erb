@@ -26,7 +26,12 @@
               <td class="row-check"><%= assignment.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="row-check"><%= assignment.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="text-center">
-                <a href="<%= new_course_request_path(@course)+ '?assignment_id='+ assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
+                <% existing_request = @course.requests.find_by(user: @user, assignment_id: assignment.id) %>
+                <% if existing_request.present? %>
+                  <a href="<%= course_request_path(@course, existing_request) %>" class="btn btn-sm btn-primary">Show</a>
+                <% else %>
+                  <a href="<%= new_course_request_path(@course) + '?assignment_id=' + assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
+                <% end %>
               </td>
             </tr>
           <% end %>

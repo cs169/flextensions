@@ -79,29 +79,38 @@
 				<%= f.text_area :reason, class: "form-control", id: "reason", rows: 2, required: true %>
 			</div>
 
+			<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
 			<div class="mb-3">
-				<%= f.label :additional_doc, "Additional Documentation", class: "form-label fw-bold" %>
-				
+				<%= f.label :documentation, "Additional Documentation", class: "form-label fw-bold" %>
 				<% if @form_settings.documentation_desc.presence %>
 					<p><%= @form_settings.documentation_desc %></p>
 				<% end %>
-				<%= f.text_area :additional_doc, class: "form-control", id: "additional-doc", rows: 2, required: true %>
+				<%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 2, required: @form_settings.documentation_disp == 'required'? true : false %>
 			</div>
-
+			<% end %>
+			
+			<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
 			<div class="mb-3">
-				<%= f.label :custom_question_1, "Custom Question 1", class: "form-label fw-bold" %>
-				<p>Custom Question 1 Description</p>
-				<%= f.text_area :custom_question_1, class: "form-control", id: "custom-question-1", rows: 2, required: true %>
+				<%= f.label :custom_q1, @form_settings.custom_q1, class: "form-label fw-bold" %>
+				<% if @form_settings.custom_q1_desc.presence %>
+					<p><%= @form_settings.custom_q1_desc %></p>
+				<% end %>
+				<%= f.text_area :custom_q1, class: "form-control", id: "custom-q1", rows: 2, required: @form_settings.custom_q1_disp == 'required'? true : false %>
 			</div>
+			<% end %>
 
+			<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
 			<div class="mb-3">
-				<%= f.label :custom_question_2, "Custom Question 2", class: "form-label fw-bold" %>
-				<p>Custom Question 2 Description</p>
-				<%= f.text_area :custom_question_2, class: "form-control", id: "custom-question-2", rows: 2, required: true %>
+				<%= f.label :custom_q2, @form_settings.custom_q2, class: "form-label fw-bold" %>
+				<% if @form_settings.custom_q2_desc.presence %>
+					<p><%= @form_settings.custom_q2_desc %></p>
+				<% end %>
+				<%= f.text_area :custom_q2, class: "form-control", id: "custom-q2", rows: 2, required: @form_settings.custom_q2_disp == 'required'? true : false %>
 			</div>
+			<% end %>
 
 			<div class="text-center">
-				<%= f.submit "Submit", class: "btn btn-secondary" %>
+				<%= f.submit "Submit", class: "btn btn-success" %>
 			</div>
 			<% end %>
 		</div>

@@ -99,7 +99,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_13_090741) do
   end
 
   create_table "requests", force: :cascade do |t|
-    t.string "requested_due_date"
+    t.datetime "requested_due_date"
     t.text "reason"
     t.text "documentation"
     t.text "custom_q1"

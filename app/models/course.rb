@@ -43,6 +43,7 @@ class Course < ApplicationRecord
   def self.create_or_update_from_canvas(course_data, token, _user)
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
+
     # Creating a 1 to 1 form_settings record to course since the instructor is only meant to update form_settings
     unless course.form_setting
       form_setting = course.build_form_setting(
@@ -55,6 +56,7 @@ class Course < ApplicationRecord
       )
       form_setting.save!
     end
+
     sync_assignments(course_to_lms, token)
     course.sync_enrollments_from_canvas(token)
     course

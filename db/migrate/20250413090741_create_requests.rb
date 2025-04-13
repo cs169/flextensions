@@ -1,7 +1,7 @@
 class CreateRequests < ActiveRecord::Migration[7.1]
   def change
     create_table :requests do |t|
-      t.string :requested_due_date
+      t.datetime :requested_due_date
       t.text :reason
       t.text :documentation
       t.text :custom_q1

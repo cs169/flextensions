@@ -4,6 +4,7 @@ class FormSettingsController < ApplicationController
 
   def edit
     @side_nav = 'form_settings'
+    @form_setting = @course.form_setting
   end
 
   def update

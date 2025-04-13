@@ -1,9 +1,62 @@
 <%= render "layouts/sidebar" %>
 <div class="container mt-4">
-	<div class="row">
-		<div class="col-12">
-            <%= render "courses/course_title" %>
-			<div class="alert alert-warning">There are no current requests. (student)</div>
-		</div>
-	</div>
+  <div class="row">
+    <div class="col-12">
+      <%= render "courses/course_title" %>
+      <% if @requests.any? %>
+        <table class="table table-bordered table-striped" id="requests-table">
+          <thead>
+            <tr class="table-info">
+              <th>Assignment</th>
+              <th>View</th>
+              <th>Original Due Date</th>
+              <th>Original Late Due Date</th>
+              <th>Requested Due Date</th>
+              <th># of Days</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @requests.each do |request| %>
+              <tr>
+                <td>
+                  <%= request.assignment ? request.assignment.name : "N/A" %>
+                </td>
+                <td>
+                  <% if request.assignment %>
+                    <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
+                      bCourses
+                    </a>
+                  <% end %>
+                </td>
+                <td>
+                  <%= request.assignment&.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
+                </td>
+                <td>
+                  <%= request.assignment&.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
+                </td>
+                <td>
+                  <%= request.requested_due_date.present? ? request.requested_due_date.strftime("%A, %B %d, %Y") : 'N/A' %>
+                </td>
+                <td>
+                  <% if request.assignment&.due_date && request.requested_due_date.present? %>
+                    <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </td>
+				<td><span class="badge text-bg-info">Pending</span></td>
+                <td class="text-center">
+                  <%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div class="alert alert-warning">There are no current requests.</div>
+      <% end %>
+    </div>
+  </div>
 </div>
