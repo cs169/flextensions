@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const switches = document.querySelectorAll(".toggle-enabled-switch");
+    const switches = document.querySelectorAll(".assignment-enabled-switch");
   
     switches.forEach((checkbox) => {
       checkbox.addEventListener("change", async (event) => {
