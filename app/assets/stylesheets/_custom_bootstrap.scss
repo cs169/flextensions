@@ -135,3 +135,19 @@
 		}
 	}
 }
+
+// Sidebar responsive styles
+.sidebar-container {
+	width: 100%;
+	min-height: auto;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 992px) {
+	.sidebar-container {
+		width: 240px;
+		min-height: 100vh;
+		border-bottom: none;
+		border-right: 1px solid rgba(0, 0, 0, 0.1);
+	}
+}
