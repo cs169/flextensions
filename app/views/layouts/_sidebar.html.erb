@@ -34,6 +34,14 @@
 				</a>
 			</li>
 		<% end %>
+		<% if @role == 'instructor' %>
+			<li>
+				<a href="<%= edit_course_form_setting_path(@course.id) %>" class="nav-link <%= @side_nav == 'form_settings' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
+					Form
+				</a>
+			</li>
+		<% end %>
 		<% if @role == 'student' %>
 			<li>
 				<a href="<%= course_extension_form_path(@course.id) %>" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">

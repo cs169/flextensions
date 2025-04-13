@@ -4,6 +4,7 @@ class Course < ApplicationRecord
   has_many :lmss, through: :course_to_lmss
   has_many :user_to_courses
   has_many :users, through: :user_to_courses
+  has_one :form_setting, dependent: :destroy
 
   # Validations
   validates :course_name, presence: true
