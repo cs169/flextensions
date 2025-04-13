@@ -39,6 +39,12 @@ Rails.application.routes.draw do
     resource :form_setting, only: [:edit, :update]
   end
 
+  resources :assignments do
+    member do
+      patch :toggle_enabled
+    end
+  end
+
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 
   get '/login/canvas', to: 'login#canvas', as: :bcourses_login
