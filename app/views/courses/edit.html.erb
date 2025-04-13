@@ -8,9 +8,6 @@
                     <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-form-tab" data-bs-toggle="pill" data-bs-target="#course-form" type="button" role="tab" aria-controls="course-form" aria-selected="true">Form</button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email</button>
                 </li>
             </ul>
@@ -49,108 +46,6 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="course-form" role="tabpanel" aria-labelledby="course-form-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="form-assignment" class="form-label">Assignment <strong>(required by default)</strong></label>
-                                <select class="form-control" id="form-assignment" rows="2" disabled>
-                                    <option>Assignment Name | Due Date: mm-dd-yyyy</option>
-                                </select>
-                            </div>
-                            <div class="row justify-content-around p-0">
-                                <div class="col-5 mb-3">
-                                    <label for="form-days" class="form-label">Number of Days <strong>(required by default)</strong></label>
-                                    <input type="text" class="form-control" id="form-days" readonly />
-                                </div>
-                                <div class="col-5 mb-3">
-                                    <label for="form-new-due-date" class="form-label">Requested Due Date <strong>(required by default)</strong></label>
-                                    <input type="date" class="form-control" id="form-new-due-date" value="" readonly />
-                                </div>
-                            </div>
-
-                            <div class="col-11 bg-light mb-3 py-4">
-                                <p><strong>Why do you need this extension? (required by default)</strong></p>
-                                <label for="form-reason" class="form-label">Custom Description</label>
-                                <textarea class="form-control mb-3" id="form-reason" rows="2"></textarea>
-                            </div>
-
-                            <div class="col-11 mb-3 py-4">
-                                <p><strong>Additional Documentation</strong></p>
-                                <p>Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form.</p>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-required">
-                                    <label class="form-check-label" for="form-documentation-state-required">
-                                        Required
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-optional">
-                                    <label class="form-check-label" for="form-documentation-state-optional">
-                                        Optional
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-hidden" checked>
-                                    <label class="form-check-label" for="form-documentation-state-hidden">
-                                        Hidden
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-11 bg-light mb-3 py-4">
-                                <p><strong>Additional Questions</strong></p>
-                                <label for="form-custom-1" class="form-label">Custom Question 1</label>
-                                <input type="text" class="form-control" id="form-custom-1" />
-                                <label for="form-custom-1-desc" class="form-label">Custom Question 1 Description</label>
-                                <textarea class="form-control" id="form-custom-1-desc" rows="2"></textarea>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-required">
-                                    <label class="form-check-label" for="form-custom-1-state-required">
-                                        Required
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-optional">
-                                    <label class="form-check-label" for="form-custom-1-state-optional">
-                                        Optional
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-hidden" checked>
-                                    <label class="form-check-label" for="form-custom-1-state-hidden">
-                                        Hidden
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-11 mb-3 py-4">
-                                <label for="form-custom-2" class="form-label">Custom Question 2</label>
-                                <input type="text" class="form-control" id="form-custom-2" />
-                                <label for="form-custom-2-desc" class="form-label">Custom Question 2 Description</label>
-                                <textarea class="form-control" id="form-custom-2-desc" rows="2"></textarea>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-required">
-                                    <label class="form-check-label" for="form-custom-2-state-required">
-                                        Required
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-optional">
-                                    <label class="form-check-label" for="form-custom-2-state-optional">
-                                        Optional
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-hidden" checked>
-                                    <label class="form-check-label" for="form-custom-2-state-hidden">
-                                        Hidden
-                                    </label>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
                     <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
                         <div class="row justify-content-center">
                             <div class="col-11 mb-3">
@@ -166,7 +61,6 @@
                 </div>
 
                 <div class="text-center mb-4">
-                    <a href="/courses" class="btn btn-dark">Back</a>
                     <input type="submit" class="btn btn-success" value="Save Settings" />
                 </div>
             </form>

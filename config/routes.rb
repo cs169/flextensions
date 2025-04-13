@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       delete :delete_all
     end
     resources :extensions, only: [:create]
+    resource :form_setting, only: [:edit, :update]
   end
 
   #Authentication routes
