@@ -64,19 +64,30 @@ class Course < ApplicationRecord
 
   # Sync assignments for the course
   def self.sync_assignments(course_to_lms, token)
+    # Fetch assignments from Canvas
     assignments = course_to_lms.fetch_assignments(token)
+
+    # Keep track of external assignment IDs from Canvas
+    external_assignment_ids = assignments.pluck('id')
+
+    # Sync or update assignments
     assignments.each do |assignment_data|
       sync_assignment(course_to_lms, assignment_data)
     end
+
+    # Delete assignments that no longer exist in Canvas
+    Assignment.where(course_to_lms_id: course_to_lms.id)
+              .where.not(external_assignment_id: external_assignment_ids)
+              .destroy_all
   end
 
   # Sync a single assignment
   def self.sync_assignment(course_to_lms, assignment_data)
-    Assignment.find_or_create_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id']) do |assignment|
-      assignment.name = assignment_data['name']
-      assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-      assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present? && (assignment.late_due_date.nil? || assignment.late_due_date < DateTime.parse(assignment_data['due_at']))
-    end
+    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
+    assignment.name = assignment_data['name']
+    assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+    assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present? && (assignment.late_due_date.nil? || assignment.late_due_date < DateTime.parse(assignment_data['due_at']))
+    assignment.save!
   end
 
   # Fetch users for a course from Canvas API
