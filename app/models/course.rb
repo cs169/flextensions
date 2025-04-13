@@ -64,10 +64,21 @@ class Course < ApplicationRecord
 
   # Sync assignments for the course
   def self.sync_assignments(course_to_lms, token)
+    # Fetch assignments from Canvas
     assignments = course_to_lms.fetch_assignments(token)
+
+    # Keep track of external assignment IDs from Canvas
+    external_assignment_ids = assignments.map { |assignment_data| assignment_data['id'] }
+
+    # Sync or update assignments
     assignments.each do |assignment_data|
       sync_assignment(course_to_lms, assignment_data)
     end
+
+    # Delete assignments that no longer exist in Canvas
+    Assignment.where(course_to_lms_id: course_to_lms.id)
+              .where.not(external_assignment_id: external_assignment_ids)
+              .destroy_all
   end
 
   # Sync a single assignment
