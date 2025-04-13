@@ -20,6 +20,14 @@
 		</li>
 		<% if @role == 'instructor' %>
 			<li>
+				<a href="<%= enrollments_course_path(@course.id) %>" class="nav-link <%= @side_nav == 'enrollments' ? 'active' : 'link-body-emphasis' %>">
+				<i class="fas fa-cog me-2"></i>
+				Enrollments
+				</a>
+			</li>
+		<% end %>
+		<% if @role == 'instructor' %>
+			<li>
 				<a href="<%= course_settings_path(@course.id) %>" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
 					<i class="fas fa-cog me-2"></i>
 					Settings
