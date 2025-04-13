@@ -17,9 +17,9 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
     @assignments = if @role == 'student'
-                     Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true)
+                     Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
                    else
-                     Assignment.where(course_to_lms_id: course_to_lms.id)
+                     Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
                    end
     render_role_based_view
   end
