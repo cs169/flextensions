@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments enrollments]
+  before_action :set_course, only: %i[show edit requests requests_new sync_assignments sync_enrollments enrollments]
   before_action :determine_user_role
 
   def index
@@ -41,19 +41,15 @@ class CoursesController < ApplicationController
     render_role_based_view('instructor_request_view', 'student_request_view')
   end
 
-  def form
+  def requests_new
     @side_nav = 'form'
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'student'
 
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
+    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
-  end
-
-  def new_request
-    redirect_to course_extension_form_path(params[:course_id], assignment_id: params[:assignment_id])
   end
 
   def create
