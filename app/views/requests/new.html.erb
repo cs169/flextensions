@@ -1,128 +1,109 @@
 <%= render "layouts/sidebar" %>
-<div class="container mt-4">
+<div class="container mt-4" data-controller="extension-form">
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<%= render "courses/course_title" %>
 
-			<%= form_with url: course_extensions_path(@course), method: :post, local: true do %>
+			<%= form_with(model: [@course, @request], method: :post, local: true) do |f| %>
+			<% if @request.errors.any? %>
+				<div id="error_explanation" class="alert alert-danger">
+					<h2><%= pluralize(@request.errors.count, "error") %> prohibited this request from being saved:</h2>
+					<ul>
+						<% @request.errors.full_messages.each do |msg| %>
+							<li><%= msg %></li>
+						<% end %>
+					</ul>
+				</div>
+			<% end %>
+
 			<div class="mb-3">
-				<label for="assignment_id" class="form-label">Assignment</label>
-				<select class="form-select" name="assignment_id" id="assignment_id" required>
-					<option value="" disabled selected>---</option>
-				<% @assignments.each do |assignment| %>
-					<option value="<%= assignment.id %>" data-original-due-date="<%= assignment.due_date.strftime('%Y-%m-%d') %>" <%= assignment.id == params[:assignment_id].to_i ? 'selected': '' %>><%= assignment.name + ' Due on ' + assignment.due_date.strftime('%B %d, %Y at %I:%M %p') %></option>
+				<%= f.label :assignment_id, "Assignment", class: "form-label fw-bold", for: "new-request-assignment-id" %>
+				<%= f.select :assignment_id,
+				options_for_select(
+					@assignments.map do |assignment|
+					[
+						"#{assignment.name}",
+						assignment.id,
+						{
+						"data-original-due-date" => assignment.due_date.strftime('%Y-%m-%d at %I:%M %p'),
+						"data-original-late-due-date" => assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p')
+						}
+					]
+					end,
+					params[:assignment_id].to_i
+				),
+				{ prompt: '---', required: true },
+				{
+					class: "form-select",
+					id: "new-request-assignment-id",
+					data: {
+					extension_form_target: "assignmentSelect",
+					action: "change->extension-form#updateAssignment"
+					}
+				}
+				%>
+			</div>
+
+			<div class="col-12 col-lg-5 mb-3">
+				<p>Due Date: <strong id="due-date"><%= @selected_assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') if @selected_assignment %></strong></p>
+			</div>
+			<div class="col-12 col-lg-5 mb-3">
+				<p>Late Due Date: <strong id="late-due-date"><%= @selected_assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') if @selected_assignment %></strong></p>
+			</div>
+
+			<div class="row justify-content-between align-items-center p-0">
+				<div class="col-5 mb-3">
+					<%= f.label :requested_due_date, "Requested Due Date", class: "form-label fw-bold", for: "new-request-requested-due-date" %>
+					<%= f.date_field :requested_due_date,
+						class: "form-control",
+						id: "new-request-requested-due-date",
+						value: (@selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment),
+						required: true,
+						data: { 
+							extension_form_target: "dueDateInput",
+							"original-due-date" => (@selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment),
+							action: "input->extension-form#updateDays"
+						} %>
+				</div>
+
+				<div class="col-12 col-lg-5 mb-3">
+					<p class="mb-0">Number of Days: <strong id="days" data-extension-form-target="daysDisplay">#</strong></p>
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<%= f.label :reason, "Why do you need this extension?", class: "form-label fw-bold" %>
+				<% if @form_settings.reason_desc.presence %>
+					<p><%= @form_settings.reason_desc %></p>
 				<% end %>
-				</select>
-			</div>
-
-			<div class="row justify-content-between p-0">
-				<div class="col-5 mb-3">
-					<label for="days" class="form-label">Number of Days</label>
-					<input type="number" class="form-control" id="days" value="1" min="1" required />
-				</div>
-				<div class="col-5 mb-3">
-					<label for="form-new-due-date" class="form-label">Requested Due Date</label>
-					<input type="date" class="form-control" id="form-new-due-date" data-original-due-date="<%= @selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment %>" value="<%= @selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment %>" required />
-				</div>
+				<%= f.text_area :reason, class: "form-control", id: "reason", rows: 2, required: true %>
 			</div>
 
 			<div class="mb-3">
-				<label for="reason" class="form-label">Why do you need this extension?</label>
-				<textarea class="form-control" name="reason" id="reason" rows="2" required></textarea>
+				<%= f.label :additional_doc, "Additional Documentation", class: "form-label fw-bold" %>
+				
+				<% if @form_settings.documentation_desc.presence %>
+					<p><%= @form_settings.documentation_desc %></p>
+				<% end %>
+				<%= f.text_area :additional_doc, class: "form-control", id: "additional-doc", rows: 2, required: true %>
 			</div>
 
 			<div class="mb-3">
-				<label for="additional-doc" class="form-label">Additional Documentation<p class="mt-1">Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form.</p></label>
-				<textarea class="form-control" name="additional_doc" id="additional-doc" rows="2" required></textarea>
+				<%= f.label :custom_question_1, "Custom Question 1", class: "form-label fw-bold" %>
+				<p>Custom Question 1 Description</p>
+				<%= f.text_area :custom_question_1, class: "form-control", id: "custom-question-1", rows: 2, required: true %>
 			</div>
 
 			<div class="mb-3">
-				<label for="custom-question-1" class="form-label">Custom Question 1<p class="mt-1">Custom Question 1 Description</p></label>
-				<textarea class="form-control" name="custom_question_1" id="custom-question-1" rows="2" required></textarea>
+				<%= f.label :custom_question_2, "Custom Question 2", class: "form-label fw-bold" %>
+				<p>Custom Question 2 Description</p>
+				<%= f.text_area :custom_question_2, class: "form-control", id: "custom-question-2", rows: 2, required: true %>
 			</div>
-
-			<div class="mb-3">
-				<label for="custom-question-2" class="form-label">Custom Question 2<p class="mt-1">Custom Question 2 Description</p></label>
-				<textarea class="form-control" name="custom_question_1" id="custom-question-2" rows="2" required></textarea>
-			</div>
-
 
 			<div class="text-center">
-				<button type="submit" class="btn btn-secondary">Submit</button>
+				<%= f.submit "Submit", class: "btn btn-secondary" %>
 			</div>
 			<% end %>
 		</div>
 	</div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-	const daysInput = document.getElementById("days");
-	const dueDateInput = document.getElementById("form-new-due-date");
-	const assignmentSelect = document.getElementById("assignment_id");
-
-	let originalDueDateStr = dueDateInput.dataset.originalDueDate;
-	let originalDueDate = new Date(originalDueDateStr);
-
-	if (originalDueDateStr) {
-		let minDate = new Date(originalDueDateStr);
-		minDate.setDate(minDate.getDate() + 1);
-		dueDateInput.min = minDate.toISOString().split("T")[0];
-		dueDateInput.value = minDate.toISOString().split("T")[0];
-
-		const currentDueDate = new Date(dueDateInput.value);
-		if (currentDueDate < minDate) {
-			dueDateInput.value = minDate.toISOString().split("T")[0];
-		}
-
-		const diffTime = currentDueDate - originalDueDate;
-		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-		daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
-	}
-
-	// Update due date when days input changes
-	daysInput.addEventListener("input", () => {
-		const days = parseInt(daysInput.value, 10);
-		if (!isNaN(days)) {
-			const newDate = new Date(originalDueDate);
-			newDate.setDate(originalDueDate.getDate() + days);
-			dueDateInput.value = newDate.toISOString().split("T")[0];
-		}
-	});
-
-	// Update days when due date changes
-	dueDateInput.addEventListener("input", () => {
-		const newDueDate = new Date(dueDateInput.value);
-		const diffTime = newDueDate - originalDueDate;
-		const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-		daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
-	});
-
-	// When assignment changes, update the data-original-due-date
-	assignmentSelect.addEventListener("change", () => {
-		const selectedOption = assignmentSelect.options[assignmentSelect.selectedIndex];
-		const newOriginalDueDate = selectedOption.dataset.originalDueDate;
-		console.log("Original due date from option:", newOriginalDueDate);
-
-		if (newOriginalDueDate) {
-			let minDate = new Date(newOriginalDueDate);
-			minDate.setDate(minDate.getDate() + 1);
-			dueDateInput.min = minDate.toISOString().split("T")[0];
-
-			dueDateInput.dataset.originalDueDate = newOriginalDueDate;
-			originalDueDate = new Date(newOriginalDueDate);
-
-			const currentDueDate = new Date(dueDateInput.value);
-			if (currentDueDate < minDate) {
-				dueDateInput.value = minDate.toISOString().split("T")[0];
-			}
-
-			// trigger update in days field in case due date changed
-			const newDueDate = new Date(dueDateInput.value);
-			const diffTime = newDueDate - originalDueDate;
-			const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-			daysInput.value = isNaN(diffDays) ? '' : Math.max(0, diffDays);
-		}
-	});
-});
-</script>

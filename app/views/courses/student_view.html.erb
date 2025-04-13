@@ -26,7 +26,7 @@
               <td class="row-check"><%= assignment.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="row-check"><%= assignment.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
               <td class="text-center">
-                <a href="<%= course_extension_form_path(@course)+ '?assignment_id='+ assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
+                <a href="<%= new_course_request_path(@course)+ '?assignment_id='+ assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
               </td>
             </tr>
           <% end %>

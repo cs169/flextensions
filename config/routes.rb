@@ -20,8 +20,8 @@ Rails.application.routes.draw do
   get '/courses/new', to: 'courses#new', as: :new_course
   get '/courses/:id', to: 'courses#show', as: :course
   get '/courses/:id/edit', to: 'courses#edit', as: :course_settings
-  get '/courses/:id/requests', to: 'courses#requests', as: :course_requests
-  get '/courses/:id/requests/new', to: 'courses#requests_new', as: :course_extension_form
+  # get '/courses/:id/requests', to: 'courses#requests', as: :course_requests
+  # get '/courses/:id/requests/new', to: 'courses#requests_new', as: :course_extension_form
   
   # Add the delete_all route for courses
   resources :courses do

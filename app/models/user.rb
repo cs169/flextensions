@@ -1,5 +1,9 @@
 # app/models/user.rb
 class User < ApplicationRecord
+  has_many :requests, dependent: :nullify
+  # This association is for when a request is processed by a different user:
+  has_many :processed_requests, class_name: 'Request', foreign_key: 'last_processed_by_id'
+
   validates :email, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, message: 'must be a valid email address' }
 

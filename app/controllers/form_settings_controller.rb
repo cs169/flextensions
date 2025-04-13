@@ -4,11 +4,6 @@ class FormSettingsController < ApplicationController
 
   def edit
     @side_nav = 'form_settings'
-    @form_setting = @course.form_setting || @course.build_form_setting(
-      documentation_desc: <<~DESC
-        Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form.
-      DESC
-    )
   end
 
   def update
