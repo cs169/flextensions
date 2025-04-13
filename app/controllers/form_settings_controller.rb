@@ -13,12 +13,8 @@ class FormSettingsController < ApplicationController
 
   def update
     @form_setting = @course.form_setting || @course.build_form_setting
-    if @form_setting.update(form_setting_params)
-      flash.now[:notice] = 'Form settings updated successfully.'
-      render :edit
-    else
-      render :edit
-    end
+    flash.now[:notice] = 'Form settings updated successfully.' if @form_setting.update(form_setting_params)
+    render :edit
   end
 
   private
