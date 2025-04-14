@@ -6,7 +6,7 @@
 
 			<%= form_with(model: [@course, @request], method: :post, local: true) do |f| %>
 			<% if @request.errors.any? %>
-				<div id="error_explanation" class="alert alert-danger">
+				<div id="error_explanation", class="alert alert-danger">
 					<h2><%= pluralize(@request.errors.count, "error") %> prohibited this request from being saved:</h2>
 					<ul>
 						<% @request.errors.full_messages.each do |msg| %>
@@ -73,7 +73,7 @@
 			</div>
 
 			<div class="mb-3">
-				<%= f.label :reason, "Why do you need this extension?", class: "form-label fw-bold" %>
+				<%= f.label :reason, "Why do you need this extension?", for: "reason", class: "form-label fw-bold" %>
 				<% if @form_settings.reason_desc.presence %>
 					<p><%= @form_settings.reason_desc %></p>
 				<% end %>
@@ -82,7 +82,7 @@
 
 			<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
 			<div class="mb-3">
-				<%= f.label :documentation, "Additional Documentation", class: "form-label fw-bold" %>
+				<%= f.label :documentation, "Additional Documentation", for: "documentation", class: "form-label fw-bold" %>
 				<% if @form_settings.documentation_desc.presence %>
 					<p><%= @form_settings.documentation_desc %></p>
 				<% end %>
@@ -92,7 +92,7 @@
 			
 			<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
 			<div class="mb-3">
-				<%= f.label :custom_q1, @form_settings.custom_q1, class: "form-label fw-bold" %>
+				<%= f.label :custom_q1, @form_settings.custom_q1, for: "custom-q1", class: "form-label fw-bold" %>
 				<% if @form_settings.custom_q1_desc.presence %>
 					<p><%= @form_settings.custom_q1_desc %></p>
 				<% end %>
@@ -102,7 +102,7 @@
 
 			<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
 			<div class="mb-3">
-				<%= f.label :custom_q2, @form_settings.custom_q2, class: "form-label fw-bold" %>
+				<%= f.label :custom_q2, @form_settings.custom_q2, for: "custom-q2", class: "form-label fw-bold" %>
 				<% if @form_settings.custom_q2_desc.presence %>
 					<p><%= @form_settings.custom_q2_desc %></p>
 				<% end %>
