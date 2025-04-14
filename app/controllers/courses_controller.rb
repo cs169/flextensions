@@ -25,7 +25,7 @@ class CoursesController < ApplicationController
   end
 
   def new
-    token = @user.canvas_token
+    token = @user.lms_credentials.first.token
     @courses = Course.fetch_courses(token)
     flash[:alert] = 'No courses found.' if @courses.empty?
 
@@ -41,7 +41,7 @@ class CoursesController < ApplicationController
   end
 
   def create
-    token = @user.canvas_token
+    token = @user.lms_credentials.first.token
     courses_teacher = filter_courses(Course.fetch_courses(token), %w[teacher ta])
     selected_courses = courses_teacher.select { |c| params[:courses]&.include?(c['id'].to_s) }
     selected_courses.each { |course_data| Course.create_or_update_from_canvas(course_data, token, @user) }
@@ -51,14 +51,14 @@ class CoursesController < ApplicationController
   def sync_assignments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    Course.create_or_update_from_canvas(course_data_for_sync, @user.canvas_token, @user)
+    Course.create_or_update_from_canvas(course_data_for_sync, @user.lms_credentials.first.token, @user)
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    @course.sync_enrollments_from_canvas(@user.canvas_token)
+    @course.sync_enrollments_from_canvas(@user.lms_credentials.first.token)
     render json: { message: 'Users synced successfully.' }, status: :ok
   end
 
