@@ -55,13 +55,13 @@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="email-template-select" class="form-label mb-0 fw-bold">Email Template</label>
                                     <div>
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTemplateModal">Add New Template</button>
+                                        <button type="button" class="btn btn-primary btn-sm" id="add-template">Add New Template</button>
                                         <button type="button" class="btn btn-secondary btn-sm" id="reset-template">Reset Template</button>
                                     </div>
                                 </div>
                                 <select class="form-select mb-3" id="email-template-select">
                                     <option value="default">Default Extension Template</option>
-                                    <option value="custom_approval">Custom Approval Process Template</option>
+                                    <option value="ta_review">TA Review Required Template</option>
                                     <option value="custom">Custom Template</option>
                                 </select>
                                 
@@ -127,30 +127,8 @@ Best regards,
     </div>
 </div>
 
-<!-- Add Template Modal -->
-<div class="modal fade" id="addTemplateModal" tabindex="-1" aria-labelledby="addTemplateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="addTemplateModalLabel">Add New Template</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="new-template-name" class="form-label fw-bold">Template Name</label>
-                    <input type="text" class="form-control" id="new-template-name" placeholder="Enter template name">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="save-new-template">Save Template</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
-// Template configurations
+// Template configurations for demonstration
 const templates = {
     default: {
         subject: "Extension Request Status: {{status}} - {{course_code}}",
@@ -168,20 +146,20 @@ If you have any questions, please contact the course staff.
 Best regards,
 {{course_name}} Staff`
     },
-    custom_approval: {
-        subject: "Extension Request Update - {{course_code}} - {{assignment_name}}",
+    ta_review: {
+        subject: "Extension Request Under Review - {{course_code}} - {{assignment_name}}",
         text: `Dear {{student_name}},
 
-We have reviewed your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}).
+Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) requires TA review.
 
-Request Status: {{status}}
-
-Extension Details:
+Request Details:
+- Assignment: {{assignment_name}}
 - Original Due Date: {{original_due_date}}
-- New Due Date: {{new_due_date}}
-- Extension Days Requested: {{extension_days}}
+- Requested Extension: {{extension_days}} days
 
-Please note that all extension requests are subject to our course policies. If you need to discuss this further, please attend office hours or contact the course staff.
+Your request will be reviewed by a TA during the next office hours. Please continue working on the assignment as if the original deadline still applies. You will receive another email once your request has been reviewed.
+
+If you need immediate assistance, please visit the course staff during office hours.
 
 Best regards,
 {{course_name}} Staff`
@@ -232,30 +210,16 @@ document.addEventListener('DOMContentLoaded', function() {
         showFlash('Template reset to default');
     });
 
-    // Save new template handler
-    document.getElementById('save-new-template').addEventListener('click', function() {
-        const templateName = document.getElementById('new-template-name').value.trim();
+    // Add template handler (simplified for demonstration)
+    document.getElementById('add-template').addEventListener('click', function() {
+        const templateName = prompt('Enter a name for the new template:');
         if (templateName) {
-            const templateValue = templateName.toLowerCase().replace(/\s+/g, '_');
             const option = document.createElement('option');
-            option.value = templateValue;
+            option.value = templateName.toLowerCase().replace(/\s+/g, '_');
             option.textContent = templateName;
             templateSelect.add(option);
-            templateSelect.value = templateValue;
-            
-            // Save current template content
-            templates[templateValue] = {
-                subject: subjectInput.value,
-                text: templateTextarea.value
-            };
-            
-            // Close modal and show success message
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addTemplateModal'));
-            modal.hide();
-            document.getElementById('new-template-name').value = '';
+            templateSelect.value = option.value;
             showFlash('New template added successfully');
-        } else {
-            showFlash('Please enter a template name', 'error');
         }
     });
 });
