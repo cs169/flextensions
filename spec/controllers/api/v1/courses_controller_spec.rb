@@ -93,7 +93,7 @@ RSpec.describe CoursesController, type: :controller do
     before do
       roles = %w[teacher ta student]
       roles.each do |role|
-        stub_request(:get, "https://ucberkeleysandbox.instructure.com//api/v1/courses/456/users?enrollment_type=#{role}")
+        stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users?enrollment_type=#{role}")
           .with(
             headers: {
               'Accept' => '*/*',
