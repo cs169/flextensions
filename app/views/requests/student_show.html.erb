@@ -21,7 +21,7 @@
 				<div class="col-5 mb-3">
 					<label class="form-label fw-bold">Requested Due Date</label>
 					<% if @request.requested_due_date.present? %>
-						<p><%= @request.requested_due_date.strftime('%Y-%m-%d') %></p>
+						<p><%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
 					<% else %>
 						<p>N/A</p>
 					<% end %>
