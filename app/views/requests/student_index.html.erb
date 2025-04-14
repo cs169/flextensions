@@ -10,7 +10,6 @@
               <th>Assignment</th>
               <th>View</th>
               <th>Original Due Date</th>
-              <th>Original Late Due Date</th>
               <th>Requested Due Date</th>
               <th># of Days</th>
               <th>Status</th>
@@ -32,9 +31,6 @@
                 </td>
                 <td>
                   <%= request.assignment&.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
-                </td>
-                <td>
-                  <%= request.assignment&.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
                 </td>
                 <td>
                   <%= request.requested_due_date.present? ? request.requested_due_date.strftime("%A, %B %d, %Y %I:%M %p") : 'N/A' %>

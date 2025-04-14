@@ -85,7 +85,15 @@ export default class extends Controller {
   
       this.dueDateInputTarget.dataset.originalDueDate = newOriginalDueDate;
       this.originalDueDate = new Date(newOriginalDueDate.split(" at ")[0]);
-  
+
+      // New code to update the due_time hidden field
+      const parts = newOriginalDueDate.split(" at ");
+      const timePart = parts[1] || '';
+      const dueTimeInput = document.getElementById("request_due_time");
+      if (dueTimeInput && timePart) {
+        dueTimeInput.value = this._convertTimeTo24Hour(timePart);
+      }
+
       this._updateDays();
   
       document.getElementById("due-date").textContent = newOriginalDueDate || '';
@@ -95,5 +103,18 @@ export default class extends Controller {
 
   _toDateString(date) {
     return date.toISOString().split("T")[0];
+  }
+
+  _convertTimeTo24Hour(timeStr) {
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    hours = parseInt(hours, 10);
+    if (modifier === 'PM' && hours !== 12) {
+      hours += 12;
+    }
+    if (modifier === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
   }
 }

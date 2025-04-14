@@ -56,6 +56,12 @@ class RequestsController < ApplicationController
   end
 
   def create
+    if params[:request][:requested_due_date].present? && params[:request][:due_time].present?
+      date_str = params[:request][:requested_due_date]
+      time_str = params[:request][:due_time]
+      combined = Time.zone.parse("#{date_str} #{time_str}")
+      params[:request][:requested_due_date] = combined
+    end
     @request = @course.requests.new(request_params)
     @request.user = @user
 
@@ -73,6 +79,13 @@ class RequestsController < ApplicationController
   def update
     @request = @course.requests.find_by(id: params[:id])
     redirect_to course_path(@course), alert: 'Request not found.' and return if @request.nil?
+
+    if params[:request][:requested_due_date].present? && params[:request][:due_time].present?
+      date_str = params[:request][:requested_due_date]
+      time_str = params[:request][:due_time]
+      combined = Time.zone.parse("#{date_str} #{time_str}")
+      params[:request][:requested_due_date] = combined
+    end
 
     if @request.update(request_params)
       redirect_to course_request_path(@course, @request), notice: 'Request was successfully updated.'
