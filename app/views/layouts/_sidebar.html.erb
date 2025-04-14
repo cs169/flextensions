@@ -1,55 +1,52 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary sidebar-container">
-	<div class="nav-back">
-		<a href="/courses" class="nav-link d-flex align-items-center">
-			<i class="fas fa-arrow-left me-2"></i>
-			Back to Courses
-		</a>
+	<div class="nav-back mb-3">
+		<%= link_to "/courses", class: "nav-link d-flex align-items-center" do %>
+			<div class="sidebar-icon-container">
+				<i class="fas fa-arrow-left fa-fw"></i>
+			</div>
+			<span class="sidebar-text">Back to Courses</span>
+		<% end %>
 	</div>
+
 	<ul class="nav nav-pills flex-column mb-auto">
-		<li class="nav-item">
-			<a href="<%= course_path(@course.id) %>" class="nav-link <%= @side_nav == 'show' ? 'active' : 'link-body-emphasis' %>">
-				<i class="fas fa-tasks me-2"></i>
-				Assignments
-			</a>
-		</li>
-		
-		<li>
-			<a href="<%= course_requests_path(@course.id) %>" class="nav-link <%= @side_nav == 'requests' ? 'active' : 'link-body-emphasis' %>">
-				<i class="fas fa-clock me-2"></i>
-				Requests
-			</a>
-		</li>
+		<%= render 'layouts/components/sidebar_menu_item',
+			path: course_path(@course.id),
+			icon: 'fas fa-tasks',
+			text: 'Assignments',
+			active: @side_nav == 'show' %>
+
+		<%= render 'layouts/components/sidebar_menu_item',
+			path: course_requests_path(@course.id),
+			icon: 'fas fa-clock',
+			text: 'Requests',
+			active: @side_nav == 'requests' %>
+
 		<% if @role == 'instructor' %>
-			<li>
-				<a href="<%= enrollments_course_path(@course.id) %>" class="nav-link <%= @side_nav == 'enrollments' ? 'active' : 'link-body-emphasis' %>">
-				<i class="fas fa-users me-2"></i>
-				Enrollments
-				</a>
-			</li>
+			<%= render 'layouts/components/sidebar_menu_item',
+				path: enrollments_course_path(@course.id),
+				icon: 'fas fa-users',
+				text: 'Enrollments',
+				active: @side_nav == 'enrollments' %>
+
+			<%= render 'layouts/components/sidebar_menu_item',
+				path: course_settings_path(@course.id),
+				icon: 'fas fa-cog',
+				text: 'Settings',
+				active: @side_nav == 'edit' %>
+
+			<%= render 'layouts/components/sidebar_menu_item',
+				path: edit_course_form_setting_path(@course.id),
+				icon: 'fas fa-file-alt',
+				text: 'Form',
+				active: @side_nav == 'form_settings' %>
 		<% end %>
-		<% if @role == 'instructor' %>
-			<li>
-				<a href="<%= course_settings_path(@course.id) %>" class="nav-link <%= @side_nav == 'edit' ? 'active' : 'link-body-emphasis' %>">
-					<i class="fas fa-cog me-2"></i>
-					Settings
-				</a>
-			</li>
-		<% end %>
-		<% if @role == 'instructor' %>
-			<li>
-				<a href="<%= edit_course_form_setting_path(@course.id) %>" class="nav-link <%= @side_nav == 'form_settings' ? 'active' : 'link-body-emphasis' %>">
-					<i class="fas fa-file-alt me-2"></i>
-					Form
-				</a>
-			</li>
-		<% end %>
+
 		<% if @role == 'student' %>
-			<li>
-				<a href="<%= new_course_request_path(@course.id) %>" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">
-					<i class="fas fa-cog me-2"></i>
-					Request Extension
-				</a>
-			</li>
+			<%= render 'layouts/components/sidebar_menu_item',
+				path: new_course_request_path(@course.id),
+				icon: 'fas fa-cog',
+				text: 'Request Extension',
+				active: @side_nav == 'form' %>
 		<% end %>
 	</ul>
 </div>
