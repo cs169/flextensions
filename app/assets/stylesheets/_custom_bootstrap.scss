@@ -141,6 +141,7 @@
 	width: 100%;
 	min-height: auto;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	position: relative;
 
 	.nav-back {
 		margin-bottom: 1rem;
@@ -171,6 +172,9 @@
 	.sidebar-container {
 		width: 240px;
 		min-height: 100vh;
+		height: 100%;
+		position: sticky;
+		top: 0;
 		border-bottom: none;
 		border-right: 1px solid rgba(0, 0, 0, 0.1);
 	}
