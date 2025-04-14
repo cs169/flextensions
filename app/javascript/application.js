@@ -5,3 +5,4 @@
 // import "@hotwired/turbo-rails"
 import "assignments"
 import "controllers"
+import "rails-ujs-override"
