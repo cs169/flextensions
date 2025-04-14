@@ -44,7 +44,7 @@ class SessionController < ApplicationController
 
   def find_or_create_user(user_data, full_token)
     # Find or create user in database
-    token = full_token.token
+    full_token.token
     user = nil
     if User.exists?(email: user_data['primary_email'])
       user = User.find_by(email: user_data['primary_email'])
@@ -59,7 +59,7 @@ class SessionController < ApplicationController
         name: user_data['name']
       )
     end
-    user.canvas_token = token
+    # user.canvas_token = token
     user.save!
     update_user_credential(user, full_token)
 
