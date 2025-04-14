@@ -556,7 +556,7 @@ DEPENDENCIES
   debug
   dotenv-rails
   faraday
-  font-awesome-sass (~> 6.5.1)
+  font-awesome-sass
   guard-rspec
   importmap-rails
   jbuilder
