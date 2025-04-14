@@ -3,6 +3,7 @@
 	<head>
 		<title>Flextensions</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta name="description" content="Manage and access extensions on assignments for Berkeley courses">
 		<%= csrf_meta_tags %>
 		<%= csp_meta_tag %>
 
@@ -11,8 +12,10 @@
 		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
 	</head>
 	<body class="d-flex flex-column h-100">
-		<%= render "layouts/header" %>
-		<main class="d-flex flex-column flex-lg-row flex-nowrap h-100 overflow-auto">
+		<header role="banner" aria-label="Site header">
+			<%= render "layouts/header" %>
+		</header>
+		<main class="d-flex flex-column flex-lg-row flex-nowrap h-100 overflow-auto" role="main" aria-label="Main content">
 			<%= yield %>
 		</main>
 		<%= render "layouts/footer" %>

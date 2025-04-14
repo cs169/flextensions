@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-4" role="region" aria-label="Welcome Content">
 	<% if flash[:alert] %>
   		<div class="alert alert-danger text-center" role="alert">
     		<%= flash[:alert] %>
@@ -10,7 +10,7 @@
 			<h1 class="text-center">Welcome to Flextensions!</h1>
 		</div>
 		<div class="col-12">
-			<p class="strong">
+			<p class="lead">
 				One stop solution to manage and access extensions on assignments of all your Berkeley courses, for course staff and students.
 			</p>
 			<p>
@@ -18,11 +18,11 @@
 				As a student, you will be able to see your available assignment extensions.
 			</p>
 			<p>
-				For detailed guidance on how to use the tool, please refer to the <a href="https://github.com/cs169/flextensions/wiki/" target="_blank" class="accessible-link">Wiki</a>. Otherwise, please login to get started.
+				For detailed guidance on how to use the tool, please refer to the <a href="https://github.com/cs169/flextensions/wiki/" target="_blank" class="accessible-link" aria-label="Open Wiki in new tab">Wiki</a>. Otherwise, please login to get started.
 			</p>
 		</div>
 		<div class="col-12 text-center">
-			<a href="/login" class="btn btn-secondary">Login</a>
+			<a href="/login" class="btn btn-secondary" role="button">Login</a>
 		</div>
 	</div>
 </div>
