@@ -1,16 +1,19 @@
 Given(/^I am using the "(light|dark|auto)" theme$/) do |theme|
-  # Change the theme using JavaScript
+  # Open the theme dropdown menu
+  find('.testid-theme-dropdown').click
+  sleep 0.5
+
+  # Click on the appropriate theme option
   case theme
   when 'light'
-    page.execute_script("document.documentElement.setAttribute('data-bs-theme', 'light'); localStorage.setItem('theme', 'light');")
+    find('.testid-theme-light').click
   when 'dark'
-    page.execute_script("document.documentElement.setAttribute('data-bs-theme', 'dark'); localStorage.setItem('theme', 'dark');")
+    find('.testid-theme-dark').click
   when 'auto'
-    page.execute_script("document.documentElement.setAttribute('data-bs-theme', window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); localStorage.setItem('theme', 'auto');")
+    find('.testid-theme-auto').click
   end
 
   sleep 0.5
-
   # Verify
   current_theme = page.evaluate_script("document.documentElement.getAttribute('data-bs-theme')")
 
