@@ -56,12 +56,7 @@ class RequestsController < ApplicationController
   end
 
   def create
-    if params[:request][:requested_due_date].present? && params[:request][:due_time].present?
-      date_str = params[:request][:requested_due_date]
-      time_str = params[:request][:due_time]
-      combined = Time.zone.parse("#{date_str} #{time_str}")
-      params[:request][:requested_due_date] = combined
-    end
+    merge_date_and_time!(params[:request])
     @request = @course.requests.new(request_params)
     @request.user = @user
 
@@ -80,12 +75,7 @@ class RequestsController < ApplicationController
     @request = @course.requests.find_by(id: params[:id])
     redirect_to course_path(@course), alert: 'Request not found.' and return if @request.nil?
 
-    if params[:request][:requested_due_date].present? && params[:request][:due_time].present?
-      date_str = params[:request][:requested_due_date]
-      time_str = params[:request][:due_time]
-      combined = Time.zone.parse("#{date_str} #{time_str}")
-      params[:request][:requested_due_date] = combined
-    end
+    merge_date_and_time!(params[:request])
 
     if @request.update(request_params)
       redirect_to course_request_path(@course, @request), notice: 'Request was successfully updated.'
@@ -139,6 +129,15 @@ class RequestsController < ApplicationController
     else
       redirect_to courses_path, alert: 'You do not have access to this course.'
     end
+  end
+
+  def merge_date_and_time!(request_params)
+    return unless request_params[:requested_due_date].present? && request_params[:due_time].present?
+
+    date_str = request_params[:requested_due_date]
+    time_str = request_params[:due_time]
+    combined = Time.zone.parse("#{date_str} #{time_str}")
+    request_params[:requested_due_date] = combined
   end
 
   def request_params
