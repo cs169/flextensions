@@ -4,17 +4,7 @@ class FormSettingsController < ApplicationController
 
   def edit
     @side_nav = 'form_settings'
-    @form_setting = @course.form_setting || @course.create_form_setting(
-      reason_desc: '',
-      documentation_desc: '',
-      documentation_disp: 'optional',
-      custom_q1: '',
-      custom_q1_desc: '',
-      custom_q1_disp: 'hidden',
-      custom_q2: '',
-      custom_q2_desc: '',
-      custom_q2_disp: 'hidden'
-    )
+    @form_setting = @course.form_setting
   end
 
   def update
@@ -45,16 +35,11 @@ class FormSettingsController < ApplicationController
 
   def set_course
     @course = Course.find_by(id: params[:course_id])
-    unless @course
-      flash[:alert] = 'Course not found.'
-      redirect_to courses_path and return
-    end
-
     @role = @course.user_role(@user)
-    return if @role == 'instructor'
+    return if @course
 
-    flash[:alert] = 'You do not have permission to access this page.'
-    redirect_to courses_path and return
+    flash[:alert] = 'Course not found.'
+    redirect_to courses_path
   end
 
   def form_setting_params
