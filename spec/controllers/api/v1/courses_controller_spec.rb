@@ -125,4 +125,78 @@ RSpec.describe CoursesController, type: :controller do
       expect(flash[:notice]).to eq('All your courses and associations have been deleted successfully.')
     end
   end
+  describe 'GET #new' do
+    before do
+      # Create a fake LMS credential with a token
+      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+
+      allow(Course).to receive(:fetch_courses).and_return([
+        {
+          'id' => '101',
+          'name' => 'Test Course 101',
+          'course_code' => 'TC101',
+          'enrollments' => [{ 'type' => 'teacher' }]
+        },
+        {
+          'id' => '102',
+          'name' => 'Test Course 102',
+          'course_code' => 'TC102',
+          'enrollments' => [{ 'type' => 'student' }]
+        }
+      ])
+    end
+
+    it 'fetches courses and categorizes them into teacher and student courses' do
+      get :new
+
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+
+      # You can check that @courses_teacher and @courses_student are set
+      expect(assigns(:courses_teacher)).not_to be_empty
+      expect(assigns(:courses_student)).not_to be_empty
+
+      # Teacher course should be categorized correctly
+      teacher_course = assigns(:courses_teacher).first
+      expect(teacher_course['enrollments'].first['type']).to eq('teacher')
+
+      # Student course should be categorized correctly
+      student_course = assigns(:courses_student).first
+      expect(student_course['enrollments'].first['type']).to eq('student')
+    end
+
+    it 'sets a flash alert if no courses are found' do
+      allow(Course).to receive(:fetch_courses).and_return([])
+
+      get :new
+
+      expect(flash[:alert]).to eq('No courses found.')
+    end
+  end
+  describe 'GET #enrollments' do
+    before do
+      # Create LMS credentials so user has a token
+      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+
+      # Add user as a teacher so they are allowed to view enrollments
+      UserToCourse.create!(user: user, course: course, role: 'teacher')
+
+      CourseToLms.create!(course: course, lms_id: 1)
+    end
+
+    context 'when user is an instructor' do
+      it 'renders the enrollments view successfully' do
+        get :enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:enrollments)
+        expect(assigns(:enrollments)).to_not be_nil
+
+        # Check that the enrollments include the user
+        enrollment_user_ids = assigns(:enrollments).map(&:user_id)
+        expect(enrollment_user_ids).to include(user.id)
+      end
+    end
+  end
+
 end
