@@ -48,13 +48,72 @@
 
                     <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
                         <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="email-template" class="form-label">Auto Reply Email Template</label>
-                                <textarea class="form-control" id="email-template" rows="10">maybe this can be a wysiwyg editor like TinyMCE</textarea>
+                            <div class="col-11">
+                                <div id="template-flash" class="mb-3"></div>
                             </div>
                             <div class="col-11 mb-3">
-                                <label for="email-template-html" class="form-label">Auto Reply Email Template (html)</label>
-                                <textarea class="form-control" id="email-template-html" rows="10">if you go with TinyMCE (which is a good option) the free version doesn't allow you to use raw html so we would need another textarea that would be for raw html and code to ignore the above textarea if this has content</textarea>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="email-template-select" class="form-label mb-0 fw-bold">Email Template</label>
+                                    <div>
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTemplateModal">Add New Template</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="reset-template">Reset Template</button>
+                                    </div>
+                                </div>
+                                <select class="form-select mb-3" id="email-template-select">
+                                    <option value="default">Default Extension Template</option>
+                                    <option value="custom_approval">Custom Approval Process Template</option>
+                                    <option value="custom">Custom Template</option>
+                                </select>
+                                
+                                <label for="email-subject" class="form-label fw-bold">Email Subject</label>
+                                <input type="text" class="form-control" id="email-subject" value="Extension Request Status: {{status}} - {{course_code}}" />
+                                <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
+                            </div>
+                            <div class="col-11 mb-3">
+                                <label for="email-template" class="form-label fw-bold">Email Body</label>
+                                <textarea class="form-control" id="email-template" rows="10">Dear {{student_name}},
+
+Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+
+Extension Details:
+- Original Due Date: {{original_due_date}}
+- New Due Date: {{new_due_date}}
+- Extension Days: {{extension_days}}
+
+If you have any questions, please contact the course staff.
+
+Best regards,
+{{course_name}} Staff</textarea>
+                                <div class="mt-2">
+                                    <p class="mb-2 fw-bold">Available Variables:</p>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <p class="mb-1 fw-bold">Student Information:</p>
+                                            <ul class="list-unstyled">
+                                                <li><code>{{student_name}}</code> - Full name of student</li>
+                                                <li><code>{{student_email}}</code> - Student's email</li>
+                                                <li><code>{{student_id}}</code> - Student's ID number</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mb-1 fw-bold">Course Information:</p>
+                                            <ul class="list-unstyled">
+                                                <li><code>{{course_name}}</code> - Course name</li>
+                                                <li><code>{{course_code}}</code> - Course code</li>
+                                                <li><code>{{assignment_name}}</code> - Assignment name</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <p class="mb-1 fw-bold">Extension Information:</p>
+                                            <ul class="list-unstyled">
+                                                <li><code>{{original_due_date}}</code> - Original due date</li>
+                                                <li><code>{{new_due_date}}</code> - New due date</li>
+                                                <li><code>{{extension_days}}</code> - Number of days extended</li>
+                                                <li><code>{{status}}</code> - Request status (Approved/Denied)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -67,3 +126,137 @@
         </div>
     </div>
 </div>
+
+<!-- Add Template Modal -->
+<div class="modal fade" id="addTemplateModal" tabindex="-1" aria-labelledby="addTemplateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="addTemplateModalLabel">Add New Template</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="new-template-name" class="form-label fw-bold">Template Name</label>
+                    <input type="text" class="form-control" id="new-template-name" placeholder="Enter template name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-new-template">Save Template</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Template configurations
+const templates = {
+    default: {
+        subject: "Extension Request Status: {{status}} - {{course_code}}",
+        text: `Dear {{student_name}},
+
+Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+
+Extension Details:
+- Original Due Date: {{original_due_date}}
+- New Due Date: {{new_due_date}}
+- Extension Days: {{extension_days}}
+
+If you have any questions, please contact the course staff.
+
+Best regards,
+{{course_name}} Staff`
+    },
+    custom_approval: {
+        subject: "Extension Request Update - {{course_code}} - {{assignment_name}}",
+        text: `Dear {{student_name}},
+
+We have reviewed your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}).
+
+Request Status: {{status}}
+
+Extension Details:
+- Original Due Date: {{original_due_date}}
+- New Due Date: {{new_due_date}}
+- Extension Days Requested: {{extension_days}}
+
+Please note that all extension requests are subject to our course policies. If you need to discuss this further, please attend office hours or contact the course staff.
+
+Best regards,
+{{course_name}} Staff`
+    }
+};
+
+// Show flash message
+function showFlash(message, type = 'success') {
+    const flashDiv = document.getElementById('template-flash');
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    flashDiv.innerHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    setTimeout(() => {
+        const alert = flashDiv.querySelector('.alert');
+        if (alert) {
+            alert.classList.remove('show');
+            setTimeout(() => flashDiv.innerHTML = '', 150);
+        }
+    }, 3000);
+}
+
+// Initialize templates
+document.addEventListener('DOMContentLoaded', function() {
+    const templateSelect = document.getElementById('email-template-select');
+    const subjectInput = document.getElementById('email-subject');
+    const templateTextarea = document.getElementById('email-template');
+    
+    // Template selection handler
+    templateSelect.addEventListener('change', function() {
+        const selectedTemplate = templates[this.value];
+        if (selectedTemplate) {
+            subjectInput.value = selectedTemplate.subject;
+            templateTextarea.value = selectedTemplate.text;
+            showFlash('Template loaded successfully');
+        }
+    });
+    
+    // Reset button handler
+    document.getElementById('reset-template').addEventListener('click', function() {
+        const defaultTemplate = templates['default'];
+        subjectInput.value = defaultTemplate.subject;
+        templateTextarea.value = defaultTemplate.text;
+        templateSelect.value = 'default';
+        showFlash('Template reset to default');
+    });
+
+    // Save new template handler
+    document.getElementById('save-new-template').addEventListener('click', function() {
+        const templateName = document.getElementById('new-template-name').value.trim();
+        if (templateName) {
+            const templateValue = templateName.toLowerCase().replace(/\s+/g, '_');
+            const option = document.createElement('option');
+            option.value = templateValue;
+            option.textContent = templateName;
+            templateSelect.add(option);
+            templateSelect.value = templateValue;
+            
+            // Save current template content
+            templates[templateValue] = {
+                subject: subjectInput.value,
+                text: templateTextarea.value
+            };
+            
+            // Close modal and show success message
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addTemplateModal'));
+            modal.hide();
+            document.getElementById('new-template-name').value = '';
+            showFlash('New template added successfully');
+        } else {
+            showFlash('Please enter a template name', 'error');
+        }
+    });
+});
+</script>
