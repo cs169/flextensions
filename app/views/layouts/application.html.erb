@@ -11,10 +11,12 @@
 		<%= javascript_importmap_tags %>
 		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
 	</head>
-	<body class="d-flex flex-column h-100">
+	<body class="d-flex flex-column min-vh-100">
 		<%= render "layouts/header" %>
-		<main class="d-flex flex-nowrap h-100 overflow-auto"> <!-- flex-shrink-0 -->
-			<%= yield %>
+		<main class="flex-grow-1">
+			<div class="d-flex flex-column flex-lg-row">
+				<%= yield %>
+			</div>
 		</main>
 		<%= render "layouts/confirm_modal" %>
 		<%= render "layouts/footer" %>
