@@ -64,11 +64,11 @@ class CoursesController < ApplicationController
 
   def enrollments
     @side_nav = 'enrollments'
-    puts(3333)
-    puts(@role)
+    Rails.logger.debug(3333)
+    Rails.logger.debug(@role)
     determine_user_role
-    puts(4444)
-    puts(@role)
+    Rails.logger.debug(4444)
+    Rails.logger.debug(@role)
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @enrollments = @course.user_to_courses.includes(:user)

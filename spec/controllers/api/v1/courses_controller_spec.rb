@@ -125,25 +125,26 @@ RSpec.describe CoursesController, type: :controller do
       expect(flash[:notice]).to eq('All your courses and associations have been deleted successfully.')
     end
   end
+
   describe 'GET #new' do
     before do
       # Create a fake LMS credential with a token
       user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
 
       allow(Course).to receive(:fetch_courses).and_return([
-        {
-          'id' => '101',
-          'name' => 'Test Course 101',
-          'course_code' => 'TC101',
-          'enrollments' => [{ 'type' => 'teacher' }]
-        },
-        {
-          'id' => '102',
-          'name' => 'Test Course 102',
-          'course_code' => 'TC102',
-          'enrollments' => [{ 'type' => 'student' }]
-        }
-      ])
+                                                            {
+                                                              'id' => '101',
+                                                              'name' => 'Test Course 101',
+                                                              'course_code' => 'TC101',
+                                                              'enrollments' => [{ 'type' => 'teacher' }]
+                                                            },
+                                                            {
+                                                              'id' => '102',
+                                                              'name' => 'Test Course 102',
+                                                              'course_code' => 'TC102',
+                                                              'enrollments' => [{ 'type' => 'student' }]
+                                                            }
+                                                          ])
     end
 
     it 'fetches courses and categorizes them into teacher and student courses' do
@@ -173,6 +174,7 @@ RSpec.describe CoursesController, type: :controller do
       expect(flash[:alert]).to eq('No courses found.')
     end
   end
+
   describe 'GET #enrollments' do
     before do
       # Create LMS credentials so user has a token
@@ -190,7 +192,7 @@ RSpec.describe CoursesController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response).to render_template(:enrollments)
-        expect(assigns(:enrollments)).to_not be_nil
+        expect(assigns(:enrollments)).not_to be_nil
 
         # Check that the enrollments include the user
         enrollment_user_ids = assigns(:enrollments).map(&:user_id)
@@ -198,5 +200,4 @@ RSpec.describe CoursesController, type: :controller do
       end
     end
   end
-
 end
