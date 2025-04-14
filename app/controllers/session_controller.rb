@@ -59,7 +59,6 @@ class SessionController < ApplicationController
         name: user_data['name']
       )
     end
-    # user.canvas_token = token
     user.save!
     update_user_credential(user, full_token)
 

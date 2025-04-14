@@ -60,10 +60,6 @@ RSpec.describe CoursesController, type: :controller do
   end
 
   describe 'POST #create' do
-    # before do
-    #   user.update(canvas_token: 'fake_token')
-    # end
-
     it 'redirects to courses_path after importing courses' do
       allow(Course).to receive_messages(fetch_courses: [
                                           { 'id' => '456', 'name' => 'New Canvas Course', 'course_code' => 'C101', 'enrollments' => [{ 'type' => 'teacher' }] }
@@ -78,7 +74,6 @@ RSpec.describe CoursesController, type: :controller do
 
   describe 'POST #sync_assignments' do
     it 'syncs assignments and returns OK' do
-      # user.update(canvas_token: 'fake_token')
       CourseToLms.create!(course: course, lms_id: 1)
       allow(Course).to receive(:create_or_update_from_canvas)
 
@@ -108,7 +103,6 @@ RSpec.describe CoursesController, type: :controller do
     end
 
     it 'syncs enrollments and returns OK' do
-      # user.update(canvas_token: 'fake_token')
       allow(course).to receive(:sync_enrollments_from_canvas)
 
       post :sync_enrollments, params: { id: course.id }
