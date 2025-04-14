@@ -1,0 +1,120 @@
+<%= render "layouts/sidebar" %>
+<div class="container mt-4" data-controller="extension-form">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <%= render "courses/course_title" %>
+
+      <%= form_with(model: [@course, @request], method: :patch, local: true) do |f| %>
+        <% if @request.errors.any? %>
+          <div id="error_explanation" class="alert alert-danger">
+            <h2><%= pluralize(@request.errors.count, "error") %> prohibited this request from being saved:</h2>
+            <ul>
+              <% @request.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= f.label :assignment_id, "Assignment", class: "form-label fw-bold", for: "edit-request-assignment-id" %>
+          <%= f.select :assignment_id,
+            options_for_select(
+              [
+                [
+                  @selected_assignment.name,
+                  @selected_assignment.id,
+                  {
+                    "data-original-due-date" => @selected_assignment.due_date.strftime('%Y-%m-%d at %I:%M %p'),
+                    "data-original-late-due-date" => @selected_assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p')
+                  }
+                ]
+              ],
+              @selected_assignment.id
+            ),
+            { prompt: '---', required: true },
+            {
+              class: "form-select",
+              id: "edit-request-assignment-id",
+              disabled: true,
+              data: {
+                extension_form_target: "assignmentSelect",
+                action: "change->extension-form#updateAssignment",
+                update_only: true
+              }
+            }
+          %>
+        </div>
+
+        <div class="col-12 col-lg-5 mb-3">
+          <p>Due Date: <strong id="due-date"><%= @selected_assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') if @selected_assignment %></strong></p>
+        </div>
+        <div class="col-12 col-lg-5 mb-3">
+          <p>Late Due Date: <strong id="late-due-date"><%= @selected_assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') if @selected_assignment %></strong></p>
+        </div>
+
+        <div class="row justify-content-between align-items-center p-0">
+          <div class="col-5 mb-3">
+            <%= f.hidden_field :due_time, value: (@selected_assignment.due_date.strftime('%H:%M') if @selected_assignment) %>
+            <%= f.label :requested_due_date, "Requested Due Date", class: "form-label fw-bold", for: "edit-request-requested-due-date" %>
+            <%= f.date_field :requested_due_date,
+              class: "form-control",
+              id: "edit-request-requested-due-date",
+              required: true,
+              data: { 
+                extension_form_target: "dueDateInput",
+                "original-due-date" => (@selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment),
+                action: "input->extension-form#updateDays"
+              } %>
+          </div>
+
+          <div class="col-12 col-lg-5 mb-3">
+            <p class="mb-0">Number of Days: <strong id="days" data-extension-form-target="daysDisplay">#</strong></p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :reason, "Why do you need this extension?", class: "form-label fw-bold" %>
+          <% if @form_settings.reason_desc.presence %>
+            <p><%= @form_settings.reason_desc %></p>
+          <% end %>
+          <%= f.text_area :reason, class: "form-control", id: "reason", rows: 2, required: true %>
+        </div>
+
+        <% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
+          <div class="mb-3">
+            <%= f.label :documentation, "Additional Documentation", class: "form-label fw-bold" %>
+            <% if @form_settings.documentation_desc.presence %>
+              <p><%= @form_settings.documentation_desc %></p>
+            <% end %>
+            <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 2, required: (@form_settings.documentation_disp == 'required') %>
+          </div>
+        <% end %>
+        
+        <% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
+          <div class="mb-3">
+            <%= f.label :custom_q1, @form_settings.custom_q1, class: "form-label fw-bold" %>
+            <% if @form_settings.custom_q1_desc.presence %>
+              <p><%= @form_settings.custom_q1_desc %></p>
+            <% end %>
+            <%= f.text_area :custom_q1, class: "form-control", id: "custom-q1", rows: 2, required: (@form_settings.custom_q1_disp == 'required') %>
+          </div>
+        <% end %>
+
+        <% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
+          <div class="mb-3">
+            <%= f.label :custom_q2, @form_settings.custom_q2, class: "form-label fw-bold" %>
+            <% if @form_settings.custom_q2_desc.presence %>
+              <p><%= @form_settings.custom_q2_desc %></p>
+            <% end %>
+            <%= f.text_area :custom_q2, class: "form-control", id: "custom-q2", rows: 2, required: (@form_settings.custom_q2_disp == 'required') %>
+          </div>
+        <% end %>
+
+        <div class="text-center">
+          <%= f.submit "Update", class: "btn btn-success" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
