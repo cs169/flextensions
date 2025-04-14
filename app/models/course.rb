@@ -5,6 +5,7 @@ class Course < ApplicationRecord
   has_many :user_to_courses
   has_many :users, through: :user_to_courses
   has_one :form_setting, dependent: :destroy
+  has_many :requests, dependent: :destroy
 
   # Validations
   validates :course_name, presence: true
@@ -42,6 +43,20 @@ class Course < ApplicationRecord
   def self.create_or_update_from_canvas(course_data, token, _user)
     course = find_or_create_course(course_data)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
+
+    # Creating a 1 to 1 form_settings record to course since the instructor is only meant to update form_settings
+    unless course.form_setting
+      form_setting = course.build_form_setting(
+        documentation_desc: <<~DESC,
+          Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.
+        DESC
+        documentation_disp: 'hidden',
+        custom_q1_disp: 'hidden',
+        custom_q2_disp: 'hidden'
+      )
+      form_setting.save!
+    end
+
     sync_assignments(course_to_lms, token)
     course.sync_enrollments_from_canvas(token)
     course
@@ -126,6 +141,10 @@ class Course < ApplicationRecord
 
     # Create or update User and UserToCourse records for current users
     users_data.each do |user_data|
+      # this line skips importing a user if the api doesn't return their email
+      # one case this is happening if the user was invited to the course but hasn't accepted
+      next if user_data['email'].blank?
+
       # Create or find the User model
       user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
         u.name = user_data['name']

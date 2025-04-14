@@ -45,8 +45,8 @@
 		<% end %>
 		<% if @role == 'student' %>
 			<li>
-				<a href="<%= course_extension_form_path(@course.id) %>" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">
-					<i class="fas fa-calendar-plus me-2"></i>
+				<a href="<%= new_course_request_path(@course.id) %>" class="nav-link <%= @side_nav == 'form' ? 'active' : 'link-body-emphasis' %>">
+					<i class="fas fa-cog me-2"></i>
 					Request Extension
 				</a>
 			</li>

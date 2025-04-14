@@ -67,7 +67,7 @@
 					</div>
 				</div>
 				<label for="form_setting_documentation_desc" class="form-label">Custom Description</label>
-				<%= f.text_area :documentation_desc, class: "form-control", id: "form_setting_documentation_desc", value: @form_setting.documentation_desc.presence ||"Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form." %>
+				<%= f.text_area :documentation_desc, class: "form-control", id: "form_setting_documentation_desc", value: @form_setting.documentation_desc.presence %>
 			</div>
 
 			<div class="bg-light mb-3 p-4">
