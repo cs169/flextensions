@@ -36,7 +36,7 @@
                   <%= request.assignment&.late_due_date&.strftime("%B %d, %Y %I:%M %p") || 'N/A' %>
                 </td>
                 <td>
-                  <%= request.requested_due_date.present? ? request.requested_due_date.strftime("%B %d, %Y") : 'N/A' %>
+                  <%= request.requested_due_date.present? ? request.requested_due_date.strftime("%B %d, %Y %I:%M %p") : 'N/A' %>
                 </td>
                 <td>
                   <% if request.assignment&.due_date && request.requested_due_date.present? %>
