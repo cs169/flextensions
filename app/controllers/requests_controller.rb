@@ -5,7 +5,6 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    Rails.logger.debug { "User role: #{@role}" }
     @requests = if @role == 'student'
                   @course.requests.where(user: @user).includes(:assignment)
                 else
