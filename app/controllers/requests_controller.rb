@@ -28,6 +28,7 @@ class RequestsController < ApplicationController
 
   def new
     @side_nav = 'form'
+
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'student'
 
     course_to_lms = @course.course_to_lms(1)
