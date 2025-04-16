@@ -5,6 +5,7 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
+    Rails.logger.debug { "User role: #{@role}" }
     @requests = if @role == 'student'
                   @course.requests.where(user: @user).includes(:assignment)
                 else
@@ -28,6 +29,7 @@ class RequestsController < ApplicationController
 
   def new
     @side_nav = 'form'
+
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'student'
 
     course_to_lms = @course.course_to_lms(1)
