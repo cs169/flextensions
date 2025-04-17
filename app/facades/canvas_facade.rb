@@ -138,16 +138,13 @@ class CanvasFacade < ExtensionFacadeBase
     create_response = create_assignment_override(
       courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
     )
-
     return create_response if create_response.status != 400
 
-    decoded_response = parse_create_override_response(create_response)
-    return create_response if valid_override_response?(decoded_response)
+    decoded_response = parse_create_response(create_response)
+    return create_response if override_has_errors?(decoded_response)
 
-    curr_override = get_existing_student_override(courseId, studentId, assignmentId)
-    raise NotFoundError, 'could not find student\'s override' if curr_override.nil?
-
-    handle_existing_override(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate)
+    curr_override = fetch_existing_override(courseId, studentId, assignmentId)
+    handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate)
   end
 
   private
@@ -227,32 +224,47 @@ class CanvasFacade < ExtensionFacadeBase
   # @param  [Faraday::Response] response the response to parse.
   # @return [OpenStruct] the parsed response.
   # @raises [FailedPipelineError] if the response body could not be parsed.
-  def parse_create_override_response(response)
+  def parse_create_response(response)
     JSON.parse(response.body, object_class: OpenStruct)
   rescue JSON::ParserError
     raise FailedPipelineError.new('Update Student Extension', 'Parse Creation Response')
   end
 
   ##
-  # Validates the response from creating an assignment override.
+  # Checks if the override has errors.
   #
-  # @param  [OpenStruct] decoded_response the decoded response to validate.
-  # @return [Boolean] true if the response is valid, false otherwise.
-  def valid_override_response?(decoded_response)
-    !decoded_response&.errors || decoded_response.errors.assignment_override_students.none? { |error| error&.type != 'taken' }
+  # @param  [OpenStruct] decoded_response the decoded response to check for errors.
+  # @return [Boolean] true if the override has errors, false otherwise.
+  def override_has_errors?(decoded_response)
+    decoded_response&.errors&.assignment_override_students&.any? { |error| error&.type != 'taken' }
   end
 
   ##
-  # Handles an existing override for a student.
+  # Fetches the existing override for a student.
   #
-  # @param  [Integer] courseId the courseId to handle the override in.
-  # @param  [OpenStruct] curr_override the existing override to handle.
-  # @param  [Integer] studentId the id of the student to handle the override for.
-  # @param  [Integer] assignmentId the assignmentId to handle the override for.
+  # @param  [Integer] courseId the courseId to fetch the override for.
+  # @param  [Integer] studentId the studentId to fetch the override for.
+  # @param  [Integer] assignmentId the assignmentId to fetch the override for.
+  # @return [OpenStruct] the existing override.
+  # @raises [NotFoundError] if the override could not be found.
+  def fetch_existing_override(courseId, studentId, assignmentId)
+    curr_override = get_existing_student_override(courseId, studentId, assignmentId)
+    raise NotFoundError, 'could not find student\'s override' if curr_override.nil?
+
+    curr_override
+  end
+
+  ##
+  # Handles the logic for updating or creating an override.
+  #
+  # @param  [Integer] courseId the courseId to handle the override logic for.
+  # @param  [OpenStruct] curr_override the current override to handle the logic for.
+  # @param  [Integer] studentId the studentId to handle the override logic for.
+  # @param  [Integer] assignmentId the assignmentId to handle the override logic for.
   # @param  [String] overrideTitle the title of the override.
   # @param  [String] newDueDate the new due date for the override.
-  # @return [Faraday::Response] the updated or new override.
-  def handle_existing_override(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate)
+  # @return [Faraday::Response] the response from updating or creating the override.
+  def handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate)
     if curr_override.student_ids.length == 1
       update_assignment_override(
         courseId, assignmentId, curr_override.id, curr_override.student_ids, overrideTitle, newDueDate,
