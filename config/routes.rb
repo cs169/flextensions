@@ -34,8 +34,8 @@ Rails.application.routes.draw do
     resources :extensions, only: [:create]
     resources :requests do
       member do
-        post :accept
-        post :deny
+        post :approve
+        post :reject
       end
     end
     resource :form_setting, only: [:edit, :update]

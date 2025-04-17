@@ -74,8 +74,8 @@
 			<% end %>
 
 			<div class="d-flex justify-content-center mt-4">
-              <button class="btn btn-success me-3">Approve</button>
-              <button class="btn btn-info me-3">Reject</button>
+			  <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
+			  <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-info me-3' %>
 			  <%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
 			  <%= button_to "Delete Request",
 				course_request_path(@course, @request),

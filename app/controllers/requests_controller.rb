@@ -96,7 +96,7 @@ class RequestsController < ApplicationController
     end
   end
 
-  def accept
+  def approve
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
@@ -118,7 +118,7 @@ class RequestsController < ApplicationController
     end
   end
 
-  def deny
+  def reject
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
