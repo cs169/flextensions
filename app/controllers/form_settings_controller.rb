@@ -42,7 +42,6 @@ class FormSettingsController < ApplicationController
       return
     end
     @role = @course.user_role(@user)
-    nil if @course
   end
 
   def form_setting_params
