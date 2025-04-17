@@ -5,58 +5,12 @@ export default class extends Controller {
   static targets = ["daysDisplay", "dueDateInput", "assignmentSelect"]
 
   connect() {
-    // Check if we're in update-only mode (e.g. in edit view)
     if (this.assignmentSelectTarget.dataset.updateOnly === "true") {
-      // Get the original due date string either from data or from the input value.
-      this.originalDueDateStr = this.dueDateInputTarget.dataset.originalDueDate || document.getElementById("edit-request-requested-due-date").value;
-      // Expect the value in update-only mode to be in "YYYY-MM-DD" format.
-      this.originalDueDate = new Date(this.originalDueDateStr);
-      
-      // Set the minimum requested date to be one day after the original due date.
-      const minDate = new Date(this.originalDueDate);
-      minDate.setDate(minDate.getDate() + 1);
-      this.dueDateInputTarget.min = this._toDateString(minDate);
-      // If the current input value is older than the minDate, update it.
-      let currentDueDate = new Date(this.dueDateInputTarget.value);
-      if (currentDueDate < minDate) {
-        this.dueDateInputTarget.value = this._toDateString(minDate);
-      }
-      
-      // Attach event listeners.
-      this.dueDateInputTarget.addEventListener("input", () => this._updateDays());
-      this.assignmentSelectTarget.addEventListener("change", () => this.updateAssignment());
-      this._updateDays();
-      return;
+      this._initializeUpdateOnlyMode();
     } else {
-      // Normal behavior for new view.
-      this.originalDueDateStr = this.dueDateInputTarget.dataset.originalDueDate;
-      if (this.originalDueDateStr && this.originalDueDateStr.includes(" at ")) {
-        this.originalDueDate = new Date(this.originalDueDateStr.split(" at ")[0]);
-      } else {
-        this.originalDueDateStr = this.dueDateInputTarget.value;
-        this.originalDueDate = new Date(this.originalDueDateStr);
-      }
+      this._initializeNormalMode();
     }
-  
-    if (this.originalDueDateStr) {
-      // In normal mode, add one day to set the minimum requested due date.
-      const minDate = new Date(this.originalDueDateStr.split(" at ")[0]);
-      minDate.setDate(minDate.getDate() + 1); // add one day
-      this.dueDateInputTarget.min = this._toDateString(minDate);
-      this.dueDateInputTarget.value = this._toDateString(minDate);
-  
-      // Ensure the input value is at least the min date.
-      const currentDueDate = new Date(this.dueDateInputTarget.value);
-      if (currentDueDate < minDate) {
-        this.dueDateInputTarget.value = this._toDateString(minDate);
-      }
-  
-      this._updateDays();
-    }
-  
-    // Attach listeners for any further changes.
-    this.dueDateInputTarget.addEventListener("input", () => this._updateDays());
-    this.assignmentSelectTarget.addEventListener("change", () => this.updateAssignment());
+    this._setupListeners();
   }
 
   // Public method so that the action "input->extension-form#updateDays" works.
@@ -116,5 +70,54 @@ export default class extends Controller {
       hours = 0;
     }
     return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  _initializeUpdateOnlyMode() {
+    this.originalDueDateStr =
+      this.dueDateInputTarget.dataset.originalDueDate ||
+      document.getElementById("edit-request-requested-due-date").value;
+    this.originalDueDate = new Date(this.originalDueDateStr);
+    const minDate = new Date(this.originalDueDate);
+    minDate.setDate(minDate.getDate() + 1);
+    this.dueDateInputTarget.min = this._toDateString(minDate);
+    let currentDueDate = new Date(this.dueDateInputTarget.value);
+    if (currentDueDate < minDate) {
+      this.dueDateInputTarget.value = this._toDateString(minDate);
+    }
+    this._updateDays();
+  }
+
+  _initializeNormalMode() {
+    this.originalDueDateStr = this.dueDateInputTarget.dataset.originalDueDate;
+    if (this.originalDueDateStr && this.originalDueDateStr.includes(" at ")) {
+      this.originalDueDate = new Date(
+        this.originalDueDateStr.split(" at ")[0]
+      );
+    } else {
+      this.originalDueDateStr = this.dueDateInputTarget.value;
+      this.originalDueDate = new Date(this.originalDueDateStr);
+    }
+    if (this.originalDueDateStr) {
+      const minDate = new Date(
+        this.originalDueDateStr.split(" at ")[0]
+      );
+      minDate.setDate(minDate.getDate() + 1);
+      this.dueDateInputTarget.min = this._toDateString(minDate);
+      this.dueDateInputTarget.value = this._toDateString(minDate);
+      const currentDueDate = new Date(this.dueDateInputTarget.value);
+      if (currentDueDate < minDate) {
+        this.dueDateInputTarget.value = this._toDateString(minDate);
+      }
+      this._updateDays();
+    }
+  }
+
+  _setupListeners() {
+    this.dueDateInputTarget.addEventListener("input", () =>
+      this._updateDays()
+    );
+    this.assignmentSelectTarget.addEventListener("change", () =>
+      this.updateAssignment()
+    );
   }
 }
