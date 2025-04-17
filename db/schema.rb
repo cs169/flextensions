@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_14_013025) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_14_234652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -27,20 +27,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_013025) do
     t.datetime "due_date"
     t.datetime "late_due_date"
     t.boolean "enabled", default: false
-  end
-
-  create_table "course_settings", force: :cascade do |t|
-    t.bigint "course_id", null: false
-    t.boolean "enable_student_requests", default: false
-    t.integer "auto_approve_days"
-    t.integer "auto_approve_dsp_days"
-    t.integer "max_auto_approve"
-    t.string "reply_email"
-    t.string "email_subject"
-    t.text "email_template"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -146,7 +132,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_013025) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "canvas_uid"
-    t.string "canvas_token"
     t.string "name"
     t.string "student_id"
     t.index ["canvas_uid"], name: "index_users_on_canvas_uid", unique: true
@@ -154,7 +139,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_013025) do
   end
 
   add_foreign_key "assignments", "course_to_lmss"
-  add_foreign_key "course_settings", "courses"
   add_foreign_key "course_to_lmss", "courses"
   add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"
