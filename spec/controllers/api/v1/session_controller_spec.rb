@@ -60,4 +60,82 @@ RSpec.describe SessionController, type: :controller do
       expect(flash[:alert]).to eq('Authentication failed. Invalid token.')
     end
   end
+  describe '#find_or_create_user and #update_user_credential' do
+    let(:user_data) do
+      {
+        'id' => '12345',
+        'name' => 'Test User',
+        'primary_email' => 'test@example.com',
+        'email' => 'test@example.com'
+      }
+    end
+
+    let(:mock_token) do
+      instance_double(OAuth2::AccessToken,
+                      token: 'new-token',
+                      refresh_token: 'new-refresh',
+                      expires_at: 2.hours.from_now.to_i)
+    end
+
+    context 'when user exists by email' do
+      let!(:existing_user) { User.create!(email: 'test@example.com', canvas_uid: 'old_uid') }
+
+      it 'updates canvas_uid and LMS credentials' do
+        expect {
+          controller.send(:find_or_create_user, user_data, mock_token)
+        }.to change { existing_user.reload.canvas_uid }.from('old_uid').to('12345')
+
+        creds = existing_user.reload.lms_credentials.first
+        expect(creds.token).to eq('new-token')
+        expect(creds. refresh_token).to eq('new-refresh')
+      end
+    end
+
+    context 'when user exists by canvas_uid' do
+      let!(:existing_user) { User.create!(email: 'old_email@example.com', canvas_uid: '12345') }
+
+      it 'updates email and LMS credentials' do
+        expect {
+          controller.send(:find_or_create_user, user_data, mock_token)
+        }.to change { existing_user.reload.email }.from('old_email@example.com').to('test@example.com')
+
+        creds = existing_user.reload.lms_credentials.first
+        expect(creds.token).to eq('new-token')
+        expect(creds.refresh_token).to eq('new-refresh')
+      end
+    end
+
+    context 'when user is new' do
+      it 'creates the user and LMS credentials' do
+        expect {
+          controller.send(:find_or_create_user, user_data, mock_token)
+        }.to change(User, :count).by(1)
+
+        user = User.find_by(canvas_uid: '12345')
+        expect(user.email).to eq('test@example.com')
+        expect(user.lms_credentials.first.token).to eq('new-token')
+      end
+    end
+
+    context 'when LMS credential already exists' do
+      let!(:user) do
+        User.create!(email: 'test@example.com', canvas_uid: '12345').tap do |u|
+          u.lms_credentials.create!(
+            lms_name: 'canvas',
+            token: 'old-token',
+            refresh_token: 'old-refresh',
+            expire_time: 1.hour.from_now
+          )
+        end
+      end
+
+      it 'updates existing LMS credential' do
+        controller.send(:update_user_credential, user, mock_token)
+
+        creds = user.reload.lms_credentials.first
+        expect(creds.token).to eq('new-token')
+        expect(creds.refresh_token).to eq('new-refresh')
+      end
+    end
+  end
 end

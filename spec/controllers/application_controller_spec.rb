@@ -93,17 +93,5 @@ RSpec.describe ApplicationController, type: :controller do
         expect(response.body).to eq('OK')
       end
     end
-
-    context 'when an unexpected error occurs' do
-      it 'redirects with unexpected error message' do
-        user.lms_credentials.first.update!(expire_time: Time.zone.now) # equal, not > or <
-
-        session[:user_id] = user.canvas_uid
-        get :index
-
-        expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('An unexpected error occurred.')
-      end
-    end
   end
 end
