@@ -6,6 +6,7 @@ RSpec.describe ApplicationController, type: :controller do
     def index
       render plain: 'OK'
     end
+
     def test_auth
       authenticated!
     end
@@ -27,6 +28,8 @@ RSpec.describe ApplicationController, type: :controller do
   end
 
   describe '#excluded_controller_action?' do
+    subject(:controller_instance) { controller }
+
     {
       'home' => 'index',
       'login' => 'canvas',
@@ -34,25 +37,25 @@ RSpec.describe ApplicationController, type: :controller do
       'rails/health' => 'show'
     }.each do |controller, action|
       it "excludes #{controller}##{action} from authentication" do
-        allow_any_instance_of(ApplicationController).to receive(:params)
+        allow_any_instance_of(described_class).to receive(:params)
           .and_return({ controller: controller, action: action })
 
-        expect(subject.excluded_controller_action?).to be true
+        expect(controller_instance.excluded_controller_action?).to be true
       end
     end
 
     it 'does not exclude unknown controller/action' do
       allow(controller).to receive(:params).and_return({ controller: 'courses', action: 'index' })
-    
-      expect(controller.send(:excluded_controller_action?)).to be nil
+
+      expect(controller.send(:excluded_controller_action?)).to be_nil
     end
-    
   end
 
   describe '#authenticated!' do
     before do
       allow(Rails.env).to receive(:test?).and_return(false)
     end
+
     context 'when in test environment' do
       it 'returns true if session user_id is set' do
         allow(Rails.env).to receive(:test?).and_return(true)
@@ -66,13 +69,12 @@ RSpec.describe ApplicationController, type: :controller do
     context 'when user is not found' do
       it 'resets session and redirects with alert' do
         session[:user_id] = 'nonexistent-id'
-        
+
         get :index
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq('User not found in the database.')
       end
     end
-
 
     context 'when user token has expired' do
       it 'resets session and redirects with alert' do

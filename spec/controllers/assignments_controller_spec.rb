@@ -5,6 +5,7 @@ RSpec.describe AssignmentsController, type: :controller do
   before do
     session[:user_id] = '123'
   end
+
   describe 'POST #toggle_enabled' do
     let!(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
     let!(:lms) { Lms.create!(lms_name: 'Canvas', use_auth_token: true) }

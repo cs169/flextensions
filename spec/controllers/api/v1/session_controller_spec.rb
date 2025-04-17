@@ -60,6 +60,7 @@ RSpec.describe SessionController, type: :controller do
       expect(flash[:alert]).to eq('Authentication failed. Invalid token.')
     end
   end
+
   describe '#find_or_create_user and #update_user_credential' do
     let(:user_data) do
       {
@@ -81,13 +82,13 @@ RSpec.describe SessionController, type: :controller do
       let!(:existing_user) { User.create!(email: 'test@example.com', canvas_uid: 'old_uid') }
 
       it 'updates canvas_uid and LMS credentials' do
-        expect {
+        expect do
           controller.send(:find_or_create_user, user_data, mock_token)
-        }.to change { existing_user.reload.canvas_uid }.from('old_uid').to('12345')
+        end.to change { existing_user.reload.canvas_uid }.from('old_uid').to('12345')
 
         creds = existing_user.reload.lms_credentials.first
         expect(creds.token).to eq('new-token')
-        expect(creds. refresh_token).to eq('new-refresh')
+        expect(creds.refresh_token).to eq('new-refresh')
       end
     end
 
@@ -95,9 +96,9 @@ RSpec.describe SessionController, type: :controller do
       let!(:existing_user) { User.create!(email: 'old_email@example.com', canvas_uid: '12345') }
 
       it 'updates email and LMS credentials' do
-        expect {
+        expect do
           controller.send(:find_or_create_user, user_data, mock_token)
-        }.to change { existing_user.reload.email }.from('old_email@example.com').to('test@example.com')
+        end.to change { existing_user.reload.email }.from('old_email@example.com').to('test@example.com')
 
         creds = existing_user.reload.lms_credentials.first
         expect(creds.token).to eq('new-token')
@@ -107,9 +108,9 @@ RSpec.describe SessionController, type: :controller do
 
     context 'when user is new' do
       it 'creates the user and LMS credentials' do
-        expect {
+        expect do
           controller.send(:find_or_create_user, user_data, mock_token)
-        }.to change(User, :count).by(1)
+        end.to change(User, :count).by(1)
 
         user = User.find_by(canvas_uid: '12345')
         expect(user.email).to eq('test@example.com')
