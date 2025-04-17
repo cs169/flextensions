@@ -106,7 +106,7 @@ class RequestsController < ApplicationController
 
     # Call Canvas API to create the assignment override
     response = canvas_facade.create_assignment_override(
-      @course.external_course_id,
+      @course.canvas_id,
       @request.assignment.external_assignment_id,
       [@request.user.canvas_uid],
       "Extension for #{@request.user.name}",
