@@ -9,13 +9,13 @@ RSpec.describe Extension, type: :model do
 
   describe 'associations' do
     it 'belongs to assignment' do
-      extension = Extension.new(assignment: assignment)
+      extension = described_class.new(assignment: assignment)
       expect(extension.assignment).to eq(assignment)
     end
 
     it 'has one user (optional)' do
       user = User.create!(email: 'student@example.com', canvas_uid: '123')
-      extension = Extension.create!(assignment: assignment)
+      extension = described_class.create!(assignment: assignment)
       allow(extension).to receive(:user).and_return(user)
       expect(extension.user).to eq(user)
     end
@@ -23,8 +23,8 @@ RSpec.describe Extension, type: :model do
 
   describe 'attributes and access' do
     it 'can store and retrieve new_due_date and external_extension_id' do
-      due_date = Time.zone.now + 3.days
-      extension = Extension.create!(
+      due_date = 3.days.from_now
+      extension = described_class.create!(
         assignment: assignment,
         student_email: 'student@example.com',
         new_due_date: due_date,
