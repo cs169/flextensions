@@ -1,15 +1,15 @@
 class SessionController < ApplicationController
   include TokenRefreshable
-
+  
   def create
     if params[:error].present? || params[:code].blank?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
       return
     end
-
     canvas_code = params[:code]
-    token = get_access_token(canvas_code)
 
+    token = get_access_token(canvas_code)
+    # Fetch user profile from Canvas API using the token
     response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?") do |req|
       req.headers['Authorization'] = "Bearer #{token.token}"
     end
@@ -29,24 +29,47 @@ class SessionController < ApplicationController
 
   private
 
+  # Everytime someone tries to log in, they have to get a new token.
+  # There is no way we reuse the token for login since when a user clicks
+  # the login button, they are redirected to the Canvas login page immediately.
   def get_access_token(code)
-    create_oauth_client.auth_code.get_token(code, redirect_uri: :canvas_callback)
+    client = OAuth2::Client.new(
+      ENV.fetch('CANVAS_CLIENT_ID', nil),
+      ENV.fetch('APP_KEY', nil),
+      site: ENV.fetch('CANVAS_URL', nil),
+      token_url: '/login/oauth2/token'
+    )
+    client.auth_code.get_token(code, redirect_uri: :canvas_callback)
   end
 
   def find_or_create_user(user_data, full_token)
-    user = User.find_or_initialize_by(canvas_uid: user_data['id'])
-    user.assign_attributes(
-      email: user_data['email'],
-      name: user_data['name']
-    )
+    # Find or create user in database
+    full_token.token
+    user = nil
+    if User.exists?(email: user_data['primary_email'])
+      user = User.find_by(email: user_data['primary_email'])
+      user.canvas_uid = user_data['id']
+    elsif User.exists?(canvas_uid: user_data['id'])
+      user = User.find_by(canvas_uid: user_data['id'])
+      user.email = user_data['email']
+    else
+      user = User.find_or_initialize_by(canvas_uid: user_data['id'])
+      user.assign_attributes(
+        email: user_data['email'],
+        name: user_data['name']
+      )
+    end
     user.save!
     update_user_credential(user, full_token)
 
+    # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
   end
 
   def update_user_credential(user, token)
+    # update user's lms credentials.
+    # Refresh token before it expires.
     if user.lms_credentials.any?
       user.lms_credentials.first.update(
         token: token.token,
@@ -56,7 +79,7 @@ class SessionController < ApplicationController
     else
       user.lms_credentials.create!(
         lms_name: 'canvas',
-        token: token.token,
+        token: token,
         refresh_token: token.refresh_token,
         expire_time: Time.zone.at(token.expires_at)
       )
