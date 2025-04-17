@@ -1,4 +1,6 @@
 class SessionController < ApplicationController
+  include TokenRefreshable
+
   def create
     if params[:error].present? || params[:code].blank?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
@@ -18,7 +20,6 @@ class SessionController < ApplicationController
       redirect_to courses_path, notice: 'Logged in!'
     else
       redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-      # Looking into the status code in response.status
     end
   end
 
@@ -31,7 +32,6 @@ class SessionController < ApplicationController
   # Everytime someone tries to log in, they have to get a new token.
   # There is no way we reuse the token for login since when a user clicks
   # the login button, they are redirected to the Canvas login page immediately.
-  # If you are looking for logic of refresh token,
   def get_access_token(code)
     client = OAuth2::Client.new(
       ENV.fetch('CANVAS_CLIENT_ID', nil),
@@ -83,40 +83,6 @@ class SessionController < ApplicationController
         refresh_token: token.refresh_token,
         expire_time: Time.zone.at(token.expires_at)
       )
-    end
-  end
-
-  def refresh_user_token(user)
-    # Get the user's credentials
-    credential = user.lms_credentials.first
-    return unless credential&.refresh_token
-
-    # Create OAuth2 client
-    client = OAuth2::Client.new(
-      ENV.fetch('CANVAS_CLIENT_ID', nil),
-      ENV.fetch('APP_KEY', nil),
-      site: ENV.fetch('CANVAS_URL', nil),
-      token_url: '/login/oauth2/token'
-    )
-
-    # Use refresh token to get a new access token
-    begin
-      token = OAuth2::AccessToken.from_hash(
-        client,
-        refresh_token: credential.refresh_token
-      ).refresh!
-
-      # Update the user's credentials with the new token
-      credential.update(
-        token: token.token,
-        refresh_token: token.refresh_token || credential.refresh_token, # Keep old refresh token if new one not provided
-        expire_time: Time.zone.at(token.expires_at)
-      )
-
-      token.token
-    rescue OAuth2::Error => e
-      Rails.logger.error "Failed to refresh token: #{e.message}"
-      nil
     end
   end
 end
