@@ -96,6 +96,40 @@ class RequestsController < ApplicationController
     end
   end
 
+  def accept
+    @request = @course.requests.find_by(id: params[:id])
+    return redirect_to course_path(@course), alert: 'Request not found.' unless @request
+    return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
+
+    extension = Extension.new(
+      assignment_id: @request.assignment_id,
+      student_email: @request.user.email,
+      initial_due_date: @request.assignment.due_date,
+      new_due_date: @request.requested_due_date,
+      external_extension_id: @request.external_extension_id,
+      last_processed_by_id: @user.id
+    )
+
+    if extension.save
+      @request.destroy
+      redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully.'
+    else
+      redirect_to course_requests_path(@course), alert: 'Failed to create extension.'
+    end
+  end
+
+  def deny
+    @request = @course.requests.find_by(id: params[:id])
+    return redirect_to course_path(@course), alert: 'Request not found.' unless @request
+    return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
+
+    if @request.destroy
+      redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
+    else
+      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
+    end
+  end
+
   private
 
   def set_course_role_from_settings
