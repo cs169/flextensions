@@ -1,6 +1,6 @@
 class SessionController < ApplicationController
   include TokenRefreshable
-  
+
   def create
     if params[:error].present? || params[:code].blank?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
