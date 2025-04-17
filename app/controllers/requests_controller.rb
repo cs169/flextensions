@@ -101,20 +101,44 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
 
-    extension = Extension.new(
-      assignment_id: @request.assignment_id,
-      student_email: @request.user.email,
-      initial_due_date: @request.assignment.due_date,
-      new_due_date: @request.requested_due_date,
-      external_extension_id: @request.external_extension_id,
-      last_processed_by_id: @user.id
+    # Initialize the CanvasFacade
+    canvas_facade = CanvasFacade.new(@user.lms_credentials.first.token)
+
+    # Call Canvas API to create the assignment override
+    response = canvas_facade.create_assignment_override(
+      @course.external_course_id,
+      @request.assignment.external_assignment_id,
+      [@request.user.canvas_uid],
+      "Extension for #{@request.user.name}",
+      @request.requested_due_date.iso8601,
+      nil, # Unlock date (optional)
+      nil  # Lock date (optional)
     )
 
-    if extension.save
-      @request.destroy
-      redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully.'
+    Rails.logger.info "Canvas API response: #{response.status} - #{response.body}"
+
+    if response.success?
+      # Parse the response to get the override details
+      assignment_override = JSON.parse(response.body)
+
+      # Create a local Extension record
+      extension = Extension.new(
+        assignment_id: @request.assignment_id,
+        student_email: @request.user.email,
+        initial_due_date: @request.assignment.due_date,
+        new_due_date: assignment_override['due_at'],
+        external_extension_id: assignment_override['id'],
+        last_processed_by_id: @user.id
+      )
+
+      if extension.save
+        @request.destroy
+        redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully in Canvas.'
+      else
+        redirect_to course_requests_path(@course), alert: 'Extension created in Canvas, but failed to save locally.'
+      end
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to create extension.'
+      redirect_to course_requests_path(@course), alert: "Failed to create extension in Canvas: #{response.body}"
     end
   end
 
