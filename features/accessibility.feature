@@ -9,7 +9,7 @@ Feature: Accessibility Testing
     Given I am on the "Home page"
     Then the page should be axe clean
 
-  @a11y @javascript @skip
+  @a11y @javascript
   Scenario: Courses page should be accessible
     Given I am logged in as a user
     And I am on the "Courses page"
@@ -28,14 +28,14 @@ Feature: Accessibility Testing
     And I am using the "dark" theme
     Then the page should be axe clean
     
-  @a11y @theme @javascript @skip
+  @a11y @theme @javascript
   Scenario: Courses page should be accessible in light mode
     Given I am logged in as a user
     And I am on the "Courses page"
     And I am using the "light" theme
     Then the page should be axe clean
     
-  @a11y @theme @javascript @skip
+  @a11y @theme @javascript
   Scenario: Courses page should be accessible in dark mode
     Given I am logged in as a user
     And I am on the "Courses page"
