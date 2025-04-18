@@ -10,8 +10,7 @@
 				</div>
 				<div class="card-body">
 					<!-- Display Assignment Information -->
-					<div class="mb-4">
-						<h6 class="border-bottom pb-2 mb-3">Assignment Information</h6>
+					<div class="mb-4 border-bottom">
 						<% if @request.assignment.present? %>
 							<p class="mb-2"><strong><%= @request.assignment.name %></strong></p>
 							<div class="row">
@@ -28,8 +27,7 @@
 					</div>
 
 					<!-- Display Requested Due Date and Number of Days -->
-					<div class="mb-4">
-						<h6 class="border-bottom pb-2 mb-3">Extension Details</h6>
+					<div class="mb-1">
 						<div class="row">
 							<div class="col-md-6">
 								<p><strong>Requested Due Date: </strong>
@@ -52,7 +50,7 @@
 						<% if @form_settings.reason_desc.present? %>
 							<p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
 						<% end %>
-						<div class="p-3 bg-light">
+						<div class="p-3 bg-light rounded">
 							<%= @request.reason %>
 						</div>
 					</div>
