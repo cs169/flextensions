@@ -4,24 +4,24 @@
 		<div class="col-12">
 			<%= render "courses/course_title" %>
 			<div class="mb-3">
-				<label for="form-assignment" class="form-label">Assignment <strong>(required by default)</strong></label>
+				<label for="form-assignment" class="form-label"><strong>Assignment</strong> (required)</label>
 				<select class="form-control bg-" id="form-assignment" rows="2" disabled>
 					<option>Assignment Name | Due Date: mm-dd-yyyy</option>
 				</select>
 			</div>
 			<div class="col-12 col-lg-5 mb-3">
-				<p>Due Date: <strong>mm-dd-yyyy</strong></p>
+					<p><strong>Due Date:</strong> mm-dd-yyyy</p>
 			</div>
 			<div class="col-12 col-lg-5 mb-3">
-				<p>Late Due Date: <strong>mm-dd-yyyy</strong></p>
+					<p><strong>Late Due Date:</strong> mm-dd-yyyy</p>
 			</div>
 			<div class="row justify-content-between align-items-center p-0">
 				<div class="cold-12 col-lg-5 mb-3">
-					<label for="form-new-due-date" class="form-label">Requested Due Date <strong>(required by default)</strong></label>
+					<label for="form-new-due-date" class="form-label"><strong>Requested Due Date</strong> (required)</label>
 					<input type="date" class="form-control bg-body-secondary" id="form-new-due-date" value="" readonly />
 				</div>
 				<div class="col-12 col-lg-5 mb-3">
-					<p>Number of Days: <strong>#</strong></p>
+						<p><strong>Number of Days:</strong> #</p>
 				</div>
 			</div>
 						
@@ -38,7 +38,7 @@
 			<% end %>
 
 			<div class="bg-light mb-3 p-4">
-				<p><strong>Why do you need this extension? (required by default)</strong></p>
+				<p><strong>Why do you need this extension?</strong> (required)</p>
 				<label for="form_setting_reason_desc" class="form-label">Custom Description</label>
 				<%= f.text_area :reason_desc, class: "form-control", id: "form_setting_reason_desc" %>
 			</div>
