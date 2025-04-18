@@ -6,7 +6,7 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
+    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).order(created_at: :desc)
     render_role_based_view
   end
 
