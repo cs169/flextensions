@@ -44,7 +44,7 @@
 		<% if @role == 'student' %>
 			<%= render 'layouts/components/sidebar_menu_item',
 				path: new_course_request_path(@course.id),
-				icon: 'fas fa-cog',
+				icon: 'fas fa-solid fa-file-pen',
 				text: 'Request Extension',
 				active: @side_nav == 'form' %>
 		<% end %>
