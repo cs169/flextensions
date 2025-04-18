@@ -115,7 +115,9 @@ class RequestsController < ApplicationController
       overrides = JSON.parse(overrides_response.body)
 
       # Check if an override exists for the user
-      existing_override = overrides.find { |override| override['student_ids'].include?(@request.user.canvas_uid) }
+      existing_override = overrides.find do |override|
+        override['student_ids'].map(&:to_i).include?(@request.user.canvas_uid.to_i)
+      end
 
       Rails.logger.info "Existing override: #{existing_override}"
 
