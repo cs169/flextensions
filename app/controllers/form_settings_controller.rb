@@ -2,6 +2,7 @@ class FormSettingsController < ApplicationController
   before_action :authenticated!
   before_action :authenticate_user
   before_action :set_course
+  before_action :set_pending_request_count
 
   def edit
     @side_nav = 'form_settings'

@@ -1,6 +1,7 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
   before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments]
+  before_action :set_pending_request_count
   before_action :determine_user_role
 
   def index
