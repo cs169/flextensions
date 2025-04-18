@@ -24,13 +24,13 @@
                       bCourses
                     </a>
                   </td>
-                  <td class="text-center"><%= assignment.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %></td>
+                  <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d, %Y %-I:%M%P") || 'N/A' %></td>
                   <td class="text-center">
                     <% last_approved_request = @course.requests.where(user: @user, assignment_id: assignment.id, status: 'approved').order(:updated_at).last %>
                     <% if last_approved_request.present? %>
-                      <%= last_approved_request.requested_due_date.strftime("%A, %B %d, %Y %I:%M %p") %>
+                      <%= last_approved_request.requested_due_date.strftime("%a, %b %-d, %Y %-I:%M%P") %>
                     <% else %>
-                      <%= assignment.late_due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
+                      <%= assignment.late_due_date&.strftime("%a, %b %-d, %Y %-I:%M%P") || 'N/A' %>
                     <% end %>
                   </td>
                   <td class="text-center">

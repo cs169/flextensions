@@ -13,74 +13,95 @@
 				<% end %>
 			</div>
 			
-			<!-- Display Assignment Information -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">Assignment</label>
-				<% if @request.assignment.present? %>
-					<p><%= @request.assignment.name %></p>
-					<p>Original Due Date: <strong><%= @request.assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
-					<p>Original Late Due Date: <strong><%= @request.assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
-				<% else %>
-					<p>N/A</p>
-				<% end %>
-			</div>
+			<div class="card mb-4 rounded-0">
+				<div class="card-header bg-light">
+					<h5 class="mb-0 bg-blue">Extension Request Details</h5>
+				</div>
+				<div class="card-body">
+					<!-- Display Assignment Information -->
+					<div class="mb-4 border-bottom">
+						<% if @request.assignment.present? %>
+							<p class="mb-2"><strong><%= @request.assignment.name %></strong></p>
+							<div class="row">
+								<div class="col-md-6">
+									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+								</div>
+								<div class="col-md-6">
+									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+								</div>
+							</div>
+						<% else %>
+							<p>N/A</p>
+						<% end %>
+					</div>
 
-			<!-- Display Requested Due Date and Number of Days -->
-			<div class="row justify-content-between align-items-center p-0">
-				<div class="col-5 mb-3">
-					<label class="form-label fw-bold">Requested Due Date</label>
-					<% if @request.requested_due_date.present? %>
-						<p><%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
-					<% else %>
-						<p>N/A</p>
-					<% end %>
-				</div>
-				<div class="col-12 col-lg-5 mb-3">
-					<p class="mb-0">Number of Days: <strong><%= @number_of_days || '#' %></strong></p>
-				</div>
-			</div>
+					<!-- Display Requested Due Date and Number of Days -->
+					<div class="mb-1">
+						<div class="row">
+							<div class="col-md-6">
+								<p><strong>Requested Due Date: </strong>
+								<% if @request.requested_due_date.present? %>
+									<%= @request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %>
+								<% else %>
+									N/A
+								<% end %>
+								</p>
+							</div>
+							<div class="col-md-6">
+								<p><strong>Number of Days: </strong><%= @number_of_days || '#' %></p>
+							</div>
+						</div>
+					</div>
 
-			<!-- Display Reason for Extension -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">Why do you need this extension?</label>
-				<% if @form_settings.reason_desc.present? %>
-					<p><%= @form_settings.reason_desc %></p>
-				<% end %>
-				<p><%= @request.reason %></p>
-			</div>
+					<!-- Display Reason for Extension -->
+					<div class="mb-4">
+						<h6 class="mb-2">Reason for Extension</h6>
+						<% if @form_settings.reason_desc.present? %>
+							<p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
+						<% end %>
+						<div class="p-3 bg-light rounded">
+							<%= @request.reason %>
+						</div>
+					</div>
 
-			<!-- Display Additional Documentation if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
-				<div class="mb-3">
-					<label class="form-label fw-bold">Additional Documentation</label>
-					<% if @form_settings.documentation_desc.present? %>
-						<p><%= @form_settings.documentation_desc %></p>
+					<!-- Display Additional Documentation if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
+						<div class="mb-4">
+							<h6 class="mb-2">Additional Documentation</h6>
+							<% if @form_settings.documentation_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.documentation %>
+							</div>
+						</div>
 					<% end %>
-					<p><%= @request.documentation %></p>
-				</div>
-			<% end %>
-			
-			<!-- Display Custom Question 1 if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
-				<div class="mb-3">
-					<label class="form-label fw-bold"><%= @form_settings.custom_q1 %></label>
-					<% if @form_settings.custom_q1_desc.present? %>
-						<p><%= @form_settings.custom_q1_desc %></p>
+					
+					<!-- Display Custom Question 1 if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
+						<div class="mb-4">
+							<h6 class="mb-2"><%= @form_settings.custom_q1 %></h6>
+							<% if @form_settings.custom_q1_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.custom_q1_desc %></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.custom_q1 %>
+							</div>
+						</div>
 					<% end %>
-					<p><%= @request.custom_q1 %></p>
-				</div>
-			<% end %>
-			
-			<!-- Display Custom Question 2 if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
-				<div class="mb-3">
-					<label class="form-label fw-bold"><%= @form_settings.custom_q2 %></label>
-					<% if @form_settings.custom_q2_desc.present? %>
-						<p><%= @form_settings.custom_q2_desc %></p>
+					
+					<!-- Display Custom Question 2 if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
+						<div class="mb-4">
+							<h6 class="border-bottom pb-2 mb-3"><%= @form_settings.custom_q2 %></h6>
+							<% if @form_settings.custom_q2_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.custom_q2_desc %></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.custom_q2 %>
+							</div>
+						</div>
 					<% end %>
-					<p><%= @request.custom_q2 %></p>
-				</div>
-			<% end %>
 
 			<!-- Display Buttons Only if Status is Pending -->
 			<% if @request.status == 'pending' %>

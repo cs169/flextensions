@@ -31,10 +31,10 @@
                     <% end %>
                     </td>
                     <td class="text-center">
-                    <%= request.assignment&.due_date&.strftime("%A, %B %d, %Y %I:%M %p") || 'N/A' %>
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
                     </td>
                     <td class="text-center">
-                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime("%A, %B %d, %Y %I:%M %p") : 'N/A' %>
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') : 'N/A' %>
                     </td>
                     <td class="text-center">
                     <% if request.assignment&.due_date && request.requested_due_date.present? %>
@@ -57,6 +57,7 @@
                     </td>
                     <td class="text-center">
                     <%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+                    <%= link_to 'Edit', edit_course_request_path(@course, request), class: "btn btn-sm btn-secondary ms-1" %>
                     </td>
                 </tr>
                 <% end %>
