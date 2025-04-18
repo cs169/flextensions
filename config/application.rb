@@ -38,7 +38,7 @@ module Flextensions
 
     # Don't generate system test files.
     # config.active_record.default_timezone = :utc
-    config.time_zone = 'Pacific Time (US & Canada)'
+    # config.time_zone = 'Pacific Time (US & Canada)'
     config.generators.system_tests = nil
   end
 end
