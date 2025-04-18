@@ -48,6 +48,7 @@ class ApplicationController < ActionController::Base
     return unless defined?(@course) && @course.present? && defined?(@user) && @user.present?
     # only calculating pending requests count if the role is instructor so we don't show it to students
     return unless @course.user_role(@user) == 'instructor'
+
     @pending_requests_count = @course.requests.where(status: 'pending').count
   end
 end

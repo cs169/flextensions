@@ -13,6 +13,7 @@ class RequestsController < ApplicationController
 
   def history
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
+
     @side_nav = 'requests'
     @requests = @course.requests.includes(:assignment).where.not(status: 'pending').order(created_at: :asc)
     render_role_based_view(view: 'history')
@@ -175,6 +176,4 @@ class RequestsController < ApplicationController
       redirect_to course_path(@course), alert: 'This action can only be performed on pending requests.'
     end
   end
-
-  
 end
