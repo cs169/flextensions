@@ -2,7 +2,7 @@ class RequestsController < ApplicationController
   before_action :authenticate_user
   before_action :set_course_role_from_settings
   before_action :authenticate_course
-  before_action :ensure_request_is_pending, only: %i[update destroy approve reject]
+  before_action :ensure_request_is_pending, only: %i[update approve reject]
 
   def index
     @side_nav = 'requests'
@@ -88,6 +88,7 @@ class RequestsController < ApplicationController
   end
 
   def destroy
+    return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
     @request = @course.requests.find_by(id: params[:id])
     if @request
       @request.destroy
