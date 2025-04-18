@@ -12,7 +12,7 @@
 
 common: &default_settings
   # Required license key associated with your New Relic account.
-  license_key: $NEW_RELIC_LICENSE_KEY
+  license_key: <%= ENV["NEW_RELIC_LICENSE_KEY"] %>
   # i want to get this from the .env file
 
   # Your application name. Renaming here affects where data displays in New
