@@ -1,96 +1,108 @@
 <%= render "layouts/sidebar" %>
 <div class="container mt-4">
-	<div class="row justify-content-center">
-		<div class="col-12">
-			<%= render "courses/course_title" %>
-			
-			<!-- Display Assignment Information -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">Assignment</label>
-				<% if @request.assignment.present? %>
-					<p><%= @request.assignment.name %></p>
-					<p>Original Due Date: <strong><%= @request.assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
-					<p>Original Late Due Date: <strong><%= @request.assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
-				<% else %>
-					<p>N/A</p>
-				<% end %>
-			</div>
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <%= render "courses/course_title" %>
 
-			<!-- Display Requested Due Date and Number of Days -->
-			<div class="row justify-content-between align-items-center p-0">
-				<div class="col-5 mb-3">
-					<label class="form-label fw-bold">Requested Due Date</label>
-					<% if @request.requested_due_date.present? %>
-						<p><%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
-					<% else %>
-						<p>N/A</p>
-					<% end %>
-				</div>
-				<div class="col-12 col-lg-5 mb-3">
-					<p class="mb-0">Number of Days: <strong><%= @number_of_days || '#' %></strong></p>
-				</div>
-			</div>
+            <!-- Display Status at the Top -->
+            <div class="mb-3 text-center">
+                <% if @request.status == 'approved' %>
+                    <span class="badge text-bg-success">Approved</span>
+                <% elsif @request.status == 'denied' %>
+                    <span class="badge text-bg-danger">Denied</span>
+                <% end %>
+            </div>
 
-			<!-- Display Reason for Extension -->
-			<div class="mb-3">
-				<label class="form-label fw-bold">Why do you need this extension?</label>
-				<% if @form_settings.reason_desc.present? %>
-					<p><%= @form_settings.reason_desc %></p>
-				<% end %>
-				<p><%= @request.reason %></p>
-			</div>
+            <!-- Display Assignment Information -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Assignment</label>
+                <% if @request.assignment.present? %>
+                    <p><%= @request.assignment.name %></p>
+                    <p>Original Due Date: <strong><%= @request.assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
+                    <p>Original Late Due Date: <strong><%= @request.assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
+                <% else %>
+                    <p>N/A</p>
+                <% end %>
+            </div>
 
-			<!-- Display Additional Documentation if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
-				<div class="mb-3">
-					<label class="form-label fw-bold">Additional Documentation</label>
-					<% if @form_settings.documentation_desc.present? %>
-						<p><%= @form_settings.documentation_desc %></p>
-					<% end %>
-					<p><%= @request.documentation %></p>
-				</div>
-			<% end %>
-			
-			<!-- Display Custom Question 1 if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
-				<div class="mb-3">
-					<label class="form-label fw-bold"><%= @form_settings.custom_q1 %></label>
-					<% if @form_settings.custom_q1_desc.present? %>
-						<p><%= @form_settings.custom_q1_desc %></p>
-					<% end %>
-					<p><%= @request.custom_q1 %></p>
-				</div>
-			<% end %>
-			
-			<!-- Display Custom Question 2 if applicable -->
-			<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
-				<div class="mb-3">
-					<label class="form-label fw-bold"><%= @form_settings.custom_q2 %></label>
-					<% if @form_settings.custom_q2_desc.present? %>
-						<p><%= @form_settings.custom_q2_desc %></p>
-					<% end %>
-					<p><%= @request.custom_q2 %></p>
-				</div>
-			<% end %>
+            <!-- Display Requested Due Date and Number of Days -->
+            <div class="row justify-content-between align-items-center p-0">
+                <div class="col-5 mb-3">
+                    <label class="form-label fw-bold">Requested Due Date</label>
+                    <% if @request.requested_due_date.present? %>
+                        <p><%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
+                    <% else %>
+                        <p>N/A</p>
+                    <% end %>
+                </div>
+                <div class="col-12 col-lg-5 mb-3">
+                    <p class="mb-0">Number of Days: <strong><%= @number_of_days || '#' %></strong></p>
+                </div>
+            </div>
 
-			<div class="d-flex justify-content-center mt-4">
-			  <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
-			  <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-info me-3' %>
-			  <%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
-			  <%= button_to "Delete Request",
-				course_request_path(@course, @request),
-				method: :delete,
-				class: "btn btn-danger",
-				data: {
-					confirm: "Are you sure you want to delete this request?",
-					confirm_title: "Confirm Deletion",
-					confirm_body: "This request will be permanently removed and cannot be recovered.",
-					confirm_ok: "Yes, delete it",
-					confirm_cancel: "Cancel",
-					confirm_ok_class: "btn btn-danger",
-					confirm_cancel_class: "btn btn-secondary"
-				} %>
-			</div>
-		</div>
-	</div>
+            <!-- Display Reason for Extension -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Why do you need this extension?</label>
+                <% if @form_settings.reason_desc.present? %>
+                    <p><%= @form_settings.reason_desc %></p>
+                <% end %>
+                <p><%= @request.reason %></p>
+            </div>
+
+            <!-- Display Additional Documentation if applicable -->
+            <% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Additional Documentation</label>
+                    <% if @form_settings.documentation_desc.present? %>
+                        <p><%= @form_settings.documentation_desc %></p>
+                    <% end %>
+                    <p><%= @request.documentation %></p>
+                </div>
+            <% end %>
+            
+            <!-- Display Custom Question 1 if applicable -->
+            <% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><%= @form_settings.custom_q1 %></label>
+                    <% if @form_settings.custom_q1_desc.present? %>
+                        <p><%= @form_settings.custom_q1_desc %></p>
+                    <% end %>
+                    <p><%= @request.custom_q1 %></p>
+                </div>
+            <% end %>
+            
+            <!-- Display Custom Question 2 if applicable -->
+            <% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
+                <div class="mb-3">
+                    <label class="form-label fw-bold"><%= @form_settings.custom_q2 %></label>
+                    <% if @form_settings.custom_q2_desc.present? %>
+                        <p><%= @form_settings.custom_q2_desc %></p>
+                    <% end %>
+                    <p><%= @request.custom_q2 %></p>
+                </div>
+            <% end %>
+
+            <!-- Display Buttons Only if Status is Pending -->
+            <% if @request.status == 'pending' %>
+                <div class="d-flex justify-content-center mt-4">
+                  <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
+                  <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-info me-3' %>
+                  <%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
+                  <%= button_to "Delete Request",
+                    course_request_path(@course, @request),
+                    method: :delete,
+                    class: "btn btn-danger",
+                    data: {
+                        confirm: "Are you sure you want to delete this request?",
+                        confirm_title: "Confirm Deletion",
+                        confirm_body: "This request will be permanently removed and cannot be recovered.",
+                        confirm_ok: "Yes, delete it",
+                        confirm_cancel: "Cancel",
+                        confirm_ok_class: "btn btn-danger",
+                        confirm_cancel_class: "btn btn-secondary"
+                    } %>
+                </div>
+            <% end %>
+        </div>
+    </div>
 </div>

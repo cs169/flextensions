@@ -2,6 +2,7 @@ class RequestsController < ApplicationController
   before_action :authenticate_user
   before_action :set_course_role_from_settings
   before_action :authenticate_course
+  before_action :ensure_request_is_pending, only: %i[update destroy approve reject]
 
   def index
     @side_nav = 'requests'
@@ -219,5 +220,15 @@ class RequestsController < ApplicationController
 
   def authenticate_course
     redirect_to courses_path, alert: 'Course not found.' unless @course
+  end
+
+  # Ensure the request status is pending before allowing certain actions
+  def ensure_request_is_pending
+    @request = @course.requests.find_by(id: params[:id])
+    if @request.nil?
+      redirect_to course_path(@course), alert: 'Request not found.'
+    elsif @request.status != 'pending'
+      redirect_to course_path(@course), alert: 'This action can only be performed on pending requests.'
+    end
   end
 end
