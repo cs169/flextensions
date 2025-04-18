@@ -2,7 +2,7 @@ class RequestsController < ApplicationController
   before_action :authenticate_user
   before_action :set_course_role_from_settings
   before_action :authenticate_course
-  # before_action :ensure_request_is_pending, only: %i[update destroy approve reject]
+  before_action :ensure_request_is_pending, only: %i[update destroy approve reject]
 
   def index
     @side_nav = 'requests'
