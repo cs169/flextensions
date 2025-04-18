@@ -22,7 +22,10 @@ jobs:
       RAILS_ENV: test
       RUBY_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      CANVAS_URL: http://bcourses.test.instructure.com/
+      CANVAS_URL: https://ucberkeleysandbox.instructure.com
+      CANVAS_TEST_USERNAME: ${{ secrets.CANVAS_TEST_USERNAME }}
+      CANVAS_TEST_PASSWORD: ${{ secrets.CANVAS_TEST_PASSWORD }}
+      CANVAS_TEST_NAME: ${{ secrets.CANVAS_TEST_NAME }}
       
     steps:
     - uses: actions/checkout@v3
