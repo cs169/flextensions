@@ -46,6 +46,7 @@
                     <td class="text-center"><span class="badge text-bg-info">Pending</span></td>
                     <td class="text-center">
                     <%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+                    <%= link_to 'Edit', edit_course_request_path(@course, request), class: "btn btn-sm btn-secondary ms-1" %>
                     </td>
                 </tr>
                 <% end %>
