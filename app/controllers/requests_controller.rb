@@ -132,7 +132,7 @@ class RequestsController < ApplicationController
       )
 
       if extension.save
-        @request.destroy
+        @request.update(stats: 'approved', external_extension_id: assignment_override['id'])
         redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully in Canvas.'
       else
         redirect_to course_requests_path(@course), alert: 'Extension created in Canvas, but failed to save locally.'
@@ -147,7 +147,7 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
 
-    if @request.destroy
+    if @request.update(status: 'denied')
       redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
