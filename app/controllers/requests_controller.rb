@@ -48,7 +48,7 @@ class RequestsController < ApplicationController
       redirect_to course_request_path(@course, @request), notice: 'Your extension request has been submitted.'
     else
       flash.now[:alert] = 'There was a problem submitting your request.'
-course_to_lms = @course.course_to_lms(1)
+      course_to_lms = @course.course_to_lms(1)
       @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
       @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
       render :new

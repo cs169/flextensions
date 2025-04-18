@@ -17,9 +17,7 @@ class Request < ApplicationRecord
   def approve(canvas_facade)
     existing_override = existing_override(canvas_facade)
 
-    if existing_override
-      delete_override(canvas_facade, existing_override['id'])
-    end
+    delete_override(canvas_facade, existing_override['id']) if existing_override
 
     response = create_override(canvas_facade)
     return false unless response.success?
