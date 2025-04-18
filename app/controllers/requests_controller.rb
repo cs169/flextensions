@@ -106,49 +106,54 @@ class RequestsController < ApplicationController
     # Initialize the CanvasFacade
     canvas_facade = CanvasFacade.new(@user.lms_credentials.first.token)
 
-    # Check if there is an existing approved request for this user and assignment
-    existing_approved_request = @course.requests.find_by(
-      user: @request.user,
-      assignment_id: @request.assignment_id,
-      status: 'approved'
-    )
+    # Fetch all assignment overrides for the assignment
+    overrides_response = canvas_facade.get_assignment_overrides(@course.canvas_id, @request.assignment.external_assignment_id)
 
-    if existing_approved_request
-      # Call Canvas API to update the existing assignment override
-      response = canvas_facade.update_assignment_override(
-        @course.canvas_id,
-        @request.assignment.external_assignment_id,
-        existing_approved_request.external_extension_id,
-        [@request.user.canvas_uid],
-        "Extension for #{@request.user.name}",
-        @request.requested_due_date.iso8601,
-        nil, # Unlock date (optional)
-        nil  # Lock date (optional)
-      )
-    else
-      # Call Canvas API to create a new assignment override
-      response = canvas_facade.create_assignment_override(
-        @course.canvas_id,
-        @request.assignment.external_assignment_id,
-        [@request.user.canvas_uid],
-        "Extension for #{@request.user.name}",
-        @request.requested_due_date.iso8601,
-        nil, # Unlock date (optional)
-        nil  # Lock date (optional)
-      )
-    end
+    if overrides_response.success?
+      overrides = JSON.parse(overrides_response.body)
 
-    Rails.logger.info "Canvas API response: #{response.status} - #{response.body}"
+      # Check if an override exists for the user
+      existing_override = overrides.find { |override| override['student_ids'].include?(@request.user.canvas_uid) }
 
-    if response.success?
-      assignment_override = JSON.parse(response.body)
-      if @request.update(status: 'approved', external_extension_id: assignment_override['id'])
-        redirect_to course_requests_path(@course), notice: 'Request approved and extension created/updated successfully in Canvas.'
+      if existing_override
+        # Call Canvas API to update the existing assignment override
+        response = canvas_facade.update_assignment_override(
+          @course.canvas_id,
+          @request.assignment.external_assignment_id,
+          existing_override['id'],
+          [@request.user.canvas_uid],
+          "Extension for #{@request.user.name}",
+          @request.requested_due_date.iso8601,
+          nil, # Unlock date (optional)
+          nil  # Lock date (optional)
+        )
       else
-        redirect_to course_requests_path(@course), alert: 'Extension created/updated in Canvas, but failed to save locally.'
+        # Call Canvas API to create a new assignment override
+        response = canvas_facade.create_assignment_override(
+          @course.canvas_id,
+          @request.assignment.external_assignment_id,
+          [@request.user.canvas_uid],
+          "Extension for #{@request.user.name}",
+          @request.requested_due_date.iso8601,
+          nil, # Unlock date (optional)
+          nil  # Lock date (optional)
+        )
+      end
+
+      Rails.logger.info "Canvas API response: #{response.status} - #{response.body}"
+
+      if response.success?
+        assignment_override = JSON.parse(response.body)
+        if @request.update(status: 'approved', external_extension_id: assignment_override['id'])
+          redirect_to course_requests_path(@course), notice: 'Request approved and extension created/updated successfully in Canvas.'
+        else
+          redirect_to course_requests_path(@course), alert: 'Extension created/updated in Canvas, but failed to save locally.'
+        end
+      else
+        redirect_to course_requests_path(@course), alert: "Failed to create/update extension in Canvas: #{response.body}"
       end
     else
-      redirect_to course_requests_path(@course), alert: "Failed to create/update extension in Canvas: #{response.body}"
+      redirect_to course_requests_path(@course), alert: "Failed to fetch assignment overrides from Canvas: #{overrides_response.body}"
     end
   end
 
