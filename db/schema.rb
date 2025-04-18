@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_14_234652) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
   create_enum "form_display_status", ["required", "optional", "hidden"]
+  create_enum "request_status", ["pending", "approved", "denied"]
 
   create_table "assignments", force: :cascade do |t|
     t.string "name"
@@ -27,6 +28,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_234652) do
     t.datetime "due_date"
     t.datetime "late_due_date"
     t.boolean "enabled", default: false
+  end
+
+  create_table "course_settings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.boolean "enable_student_requests", default: false
+    t.integer "auto_approve_days"
+    t.integer "auto_approve_dsp_days"
+    t.integer "max_auto_approve"
+    t.string "reply_email"
+    t.string "email_subject"
+    t.text "email_template"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -111,6 +126,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_234652) do
     t.bigint "last_processed_by_user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.enum "status", default: "pending", null: false, enum_type: "request_status"
     t.index ["assignment_id"], name: "index_requests_on_assignment_id"
     t.index ["course_id"], name: "index_requests_on_course_id"
     t.index ["last_processed_by_user_id"], name: "index_requests_on_last_processed_by_user_id"
@@ -139,6 +155,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_234652) do
   end
 
   add_foreign_key "assignments", "course_to_lmss"
+  add_foreign_key "course_settings", "courses"
   add_foreign_key "course_to_lmss", "courses"
   add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"

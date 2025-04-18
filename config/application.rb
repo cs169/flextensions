@@ -37,6 +37,8 @@ module Flextensions
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.
+    config.active_record.default_timezone = :utc
+    config.time_zone = 'Pacific Time (US & Canada)'
     config.generators.system_tests = nil
   end
 end
