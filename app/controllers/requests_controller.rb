@@ -2,12 +2,20 @@ class RequestsController < ApplicationController
   before_action :authenticate_user
   before_action :set_course_role_from_settings
   before_action :authenticate_course
+  before_action :set_pending_request_count
   before_action :ensure_request_is_pending, only: %i[update approve reject]
 
   def index
     @side_nav = 'requests'
-    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).order(created_at: :asc)
+    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending').order(created_at: :asc)
     render_role_based_view
+  end
+
+  def history
+    return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
+    @side_nav = 'requests'
+    @requests = @course.requests.includes(:assignment).where.not(status: 'pending').order(created_at: :asc)
+    render_role_based_view(view: 'history')
   end
 
   def show
@@ -113,6 +121,14 @@ class RequestsController < ApplicationController
     redirect_to courses_path
   end
 
+  # Renders a view based on user role, defaulting to current controller and action.
+  #
+  # You can override the controller or action like so:
+  #   render_role_based_view(controller: 'custom_controller', view: 'custom_action')
+  #
+  # By default, it uses:
+  #   controller = controller_name (e.g. "requests")
+  #   view       = action_name     (e.g. "new")
   def render_role_based_view(options = {})
     ctrl  = options[:controller] || controller_name
     act   = options[:view] || action_name
@@ -159,4 +175,6 @@ class RequestsController < ApplicationController
       redirect_to course_path(@course), alert: 'This action can only be performed on pending requests.'
     end
   end
+
+  
 end

@@ -6,10 +6,10 @@
       <% if @requests.any? %>
 		<div class="row justify-content-between mb-2">
 			<div class="col-12 col-lg-6 align-content-center">
-				<p class="mb-0">There are <span class="badge rounded-pill text-bg-danger"><%= @requests.count %></span> pending requests</p>
+				<p class="mb-0">There are <span class="badge rounded-pill text-bg-success"><%= @requests.count %></span> processed requests</p>
 			</div>
 			<div class="col-12 col-lg-6 text-lg-end">
-				<a href="<%= history_course_requests_path(@course)%>" class="btn btn-sm btn-warning">View old requests</a>
+				<a href="<%= course_requests_path(@course)%>" class="btn btn-sm btn-warning">View Pending Requests</a>
 			</div>
 		</div>
 	  	<div class="table-responsive">
@@ -24,7 +24,7 @@
 				<th class="text-center align-content-center" style="min-width: 175px;">Requested Due Date</th>
 				<th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
                 <th class="text-center align-content-center">Status</th>
-				<th class="text-center align-content-center" style="min-width: 220px;">Actions</th>
+				<th class="text-center align-content-center">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -69,8 +69,6 @@
 					</td>
 					<td class="text-center align-content-center">
 					<%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
-					<%= link_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
-					<%= link_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
 					</td>
 				</tr>
 				<% end %>

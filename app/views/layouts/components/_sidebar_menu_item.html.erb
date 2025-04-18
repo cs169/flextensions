@@ -1,8 +1,8 @@
 <li class="nav-item">
   <%= link_to path, class: "nav-link d-flex align-items-center #{active ? 'active' : 'link-body-emphasis'}" do %>
-    <div class="sidebar-icon-container">
+    <div class="sidebar-icon-container ms-3">
       <i class="<%= icon %> fa-fw me-3"></i>
     </div>
-    <span class="sidebar-text"><%= text %></span>
+    <span class="sidebar-text"><%= text.html_safe %></span>
   <% end %>
 </li> 

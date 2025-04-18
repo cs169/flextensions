@@ -1,5 +1,5 @@
 <%= render "layouts/sidebar" %>
-<div class="container mt-4">
+<div class="container-fluid mt-4">
   <div class="row">
     <div class="col-12">
         <%= render "courses/course_title" %>
@@ -19,7 +19,7 @@
                 <tr>
                   <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
                   <td><%= assignment.name %></td>
-                  <td>
+                  <td class="text-center">
                     <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
                       bCourses
                     </a>
