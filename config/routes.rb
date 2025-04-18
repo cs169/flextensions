@@ -32,7 +32,12 @@ Rails.application.routes.draw do
       delete :delete_all
     end
     resources :extensions, only: [:create]
-    resources :requests
+    resources :requests do
+      member do
+        post :approve
+        post :reject
+      end
+    end
     resource :form_setting, only: [:edit, :update]
   end
 

@@ -43,7 +43,18 @@
                         N/A
                     <% end %>
                     </td>
-                    <td class="text-center"><span class="badge text-bg-info">Pending</span></td>
+                    <td class="text-center">
+                      <% case request.status %>
+                      <% when 'pending' %>
+                        <span class="badge text-bg-info">Pending</span>
+                      <% when 'approved' %>
+                        <span class="badge text-bg-success">Approved</span>
+                      <% when 'denied' %>
+                        <span class="badge text-bg-danger">Denied</span>
+                      <% else %>
+                        <span class="badge text-bg-secondary">Unknown</span>
+                      <% end %>
+                    </td>
                     <td class="text-center">
                     <%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
                     </td>
