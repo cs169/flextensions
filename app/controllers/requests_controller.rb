@@ -117,6 +117,8 @@ class RequestsController < ApplicationController
       # Check if an override exists for the user
       existing_override = overrides.find { |override| override['student_ids'].include?(@request.user.canvas_uid) }
 
+      Rails.logger.info "Existing override: #{existing_override}"
+
       if existing_override
         # Call Canvas API to update the existing assignment override
         response = canvas_facade.update_assignment_override(
