@@ -55,14 +55,12 @@
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="email-template-select" class="form-label mb-0 fw-bold">Email Template</label>
                                     <div>
-                                        <button type="button" class="btn btn-primary btn-sm" id="add-template">Add New Template</button>
                                         <button type="button" class="btn btn-secondary btn-sm" id="reset-template">Reset Template</button>
                                     </div>
                                 </div>
                                 <select class="form-select mb-3" id="email-template-select">
                                     <option value="default">Default Extension Template</option>
                                     <option value="ta_review">TA Review Required Template</option>
-                                    <option value="custom">Custom Template</option>
                                 </select>
                                 
                                 <label for="email-subject" class="form-label fw-bold">Email Subject</label>
@@ -208,19 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
         templateTextarea.value = defaultTemplate.text;
         templateSelect.value = 'default';
         showFlash('Template reset to default');
-    });
-
-    // Add template handler (simplified for demonstration)
-    document.getElementById('add-template').addEventListener('click', function() {
-        const templateName = prompt('Enter a name for the new template:');
-        if (templateName) {
-            const option = document.createElement('option');
-            option.value = templateName.toLowerCase().replace(/\s+/g, '_');
-            option.textContent = templateName;
-            templateSelect.add(option);
-            templateSelect.value = option.value;
-            showFlash('New template added successfully');
-        }
     });
 });
 </script>
