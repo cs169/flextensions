@@ -105,41 +105,49 @@ class RequestsController < ApplicationController
     # Initialize the CanvasFacade
     canvas_facade = CanvasFacade.new(@user.lms_credentials.first.token)
 
-    # Call Canvas API to create the assignment override
-    response = canvas_facade.create_assignment_override(
-      @course.canvas_id,
-      @request.assignment.external_assignment_id,
-      [@request.user.canvas_uid],
-      "Extension for #{@request.user.name}",
-      @request.requested_due_date.iso8601,
-      nil, # Unlock date (optional)
-      nil  # Lock date (optional)
+    # Check if there is an existing approved request for this user and assignment
+    existing_approved_request = @course.requests.find_by(
+      user: @request.user,
+      assignment_id: @request.assignment_id,
+      status: 'approved'
     )
+
+    if existing_approved_request
+      # Call Canvas API to update the existing assignment override
+      response = canvas_facade.update_assignment_override(
+        @course.canvas_id,
+        @request.assignment.external_assignment_id,
+        existing_approved_request.external_extension_id,
+        [@request.user.canvas_uid],
+        "Extension for #{@request.user.name}",
+        @request.requested_due_date.iso8601,
+        nil, # Unlock date (optional)
+        nil  # Lock date (optional)
+      )
+    else
+      # Call Canvas API to create a new assignment override
+      response = canvas_facade.create_assignment_override(
+        @course.canvas_id,
+        @request.assignment.external_assignment_id,
+        [@request.user.canvas_uid],
+        "Extension for #{@request.user.name}",
+        @request.requested_due_date.iso8601,
+        nil, # Unlock date (optional)
+        nil  # Lock date (optional)
+      )
+    end
 
     Rails.logger.info "Canvas API response: #{response.status} - #{response.body}"
 
     if response.success?
-      # Parse the response to get the override details
       assignment_override = JSON.parse(response.body)
-
-      # Create a local Extension record
-      extension = Extension.new(
-        assignment_id: @request.assignment_id,
-        student_email: @request.user.email,
-        initial_due_date: @request.assignment.due_date,
-        new_due_date: assignment_override['due_at'],
-        external_extension_id: assignment_override['id'],
-        last_processed_by_id: @user.id
-      )
-
-      if extension.save
-        @request.update(status: 'approved', external_extension_id: assignment_override['id'])
-        redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully in Canvas.'
+      if @request.update(status: 'approved', external_extension_id: assignment_override['id'])
+        redirect_to course_requests_path(@course), notice: 'Request approved and extension created/updated successfully in Canvas.'
       else
-        redirect_to course_requests_path(@course), alert: 'Extension created in Canvas, but failed to save locally.'
+        redirect_to course_requests_path(@course), alert: 'Extension created/updated in Canvas, but failed to save locally.'
       end
     else
-      redirect_to course_requests_path(@course), alert: "Failed to create extension in Canvas: #{response.body}"
+      redirect_to course_requests_path(@course), alert: "Failed to create/update extension in Canvas: #{response.body}"
     end
   end
 
