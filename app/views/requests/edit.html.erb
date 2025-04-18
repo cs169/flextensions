@@ -22,8 +22,9 @@
             <% end %>
 
             <div class="mb-4">
-              <div class="mb-3">
-                <%= f.label :assignment_id, "Assignment", class: "form-label", for: "edit-request-assignment-id" %>
+                <%= f.label :assignment_id, "Assignment", class: "form-label", for: "edit-request-assignment-id" do %>
+                  Assignment<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+                <% end %>
                 <%= f.select :assignment_id,
                   options_for_select(
                     [
@@ -31,8 +32,8 @@
                         @selected_assignment.name,
                         @selected_assignment.id,
                         {
-                          "data-original-due-date" => @selected_assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P'),
-                          "data-original-late-due-date" => @selected_assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P')
+                          "data-original-due-date" => @selected_assignment.due_date.strftime('%a, %b %-d, %Y at %-I:%M %p'),
+                          "data-original-late-due-date" => @selected_assignment.late_due_date.strftime('%a, %b %-d, %Y at %-I:%M %p')
                         }
                       ]
                     ],
@@ -40,7 +41,7 @@
                   ),
                   { prompt: '---', required: true },
                   {
-                    class: "form-select",
+                    class: "mb-3 form-select",
                     id: "edit-request-assignment-id",
                     disabled: true,
                     data: {
@@ -50,7 +51,6 @@
                     }
                   }
                 %>
-              </div>
               
               <div class="row">
                 <div class="col-md-6 mb-2">
@@ -66,7 +66,9 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <%= f.hidden_field :due_time, value: (@selected_assignment.due_date.strftime('%H:%M') if @selected_assignment) %>
-                  <%= f.label :requested_due_date, "Requested Due Date", class: "form-label", for: "edit-request-requested-due-date" %>
+                  <%= f.label :requested_due_date, class: "form-label", for: "edit-request-requested-due-date" do %>
+                    Requested Due Date<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+                  <% end %>
                   <%= f.date_field :requested_due_date,
                     class: "form-control",
                     id: "edit-request-requested-due-date",
@@ -85,7 +87,9 @@
             </div>
 
             <div class="mb-4">
-              <h6 class="mb-2">Reason for Extension</h6>
+              <h6 class="mb-2">
+                Reason for Extension<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+              </h6>
               <% if @form_settings.reason_desc.presence %>
                 <p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
               <% end %>
@@ -94,7 +98,9 @@
 
             <% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
               <div class="mb-4">
-                <h6 class="mb-2">Additional Documentation</h6>
+                <h6 class="mb-2">
+                  Additional Documentation<% if @form_settings.documentation_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+                </h6>
                 <% if @form_settings.documentation_desc.presence %>
                   <p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
                 <% end %>
@@ -104,7 +110,9 @@
             
             <% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
               <div class="mb-4">
-                <h6 class="mb-2"><%= @form_settings.custom_q1 %></h6>
+                <h6 class="mb-2">
+                  <%= @form_settings.custom_q1 %><% if @form_settings.custom_q1_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+                </h6>
                 <% if @form_settings.custom_q1_desc.presence %>
                   <p class="text-muted small mb-2"><%= @form_settings.custom_q1_desc %></p>
                 <% end %>
@@ -114,7 +122,9 @@
 
             <% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
               <div class="mb-4">
-                <h6 class="mb-2"><%= @form_settings.custom_q2 %></h6>
+                <h6 class="mb-2">
+                  <%= @form_settings.custom_q2 %><% if @form_settings.custom_q2_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+                </h6>
                 <% if @form_settings.custom_q2_desc.presence %>
                   <p class="text-muted small mb-2"><%= @form_settings.custom_q2_desc %></p>
                 <% end %>
