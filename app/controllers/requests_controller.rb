@@ -132,7 +132,7 @@ class RequestsController < ApplicationController
       )
 
       if extension.save
-        @request.update(stats: 'approved', external_extension_id: assignment_override['id'])
+        @request.update(status: 'approved', external_extension_id: assignment_override['id'])
         redirect_to course_requests_path(@course), notice: 'Request accepted and extension created successfully in Canvas.'
       else
         redirect_to course_requests_path(@course), alert: 'Extension created in Canvas, but failed to save locally.'
