@@ -13,7 +13,7 @@
 				<th class="text-center" style="min-width: 110px;">Student ID</th>
 				<th class="text-center" style="min-width: 200px;">Original Due Date</th>
 				<th class="text-center" style="min-width: 200px;">Original Late Due Date</th>
-				<th style="min-width: 175px;">Requested Due Date</th>
+				<th class="text-center" style="min-width: 175px;">Requested Due Date</th>
 				<th class="text-center" style="min-width: 90px;"># of Days</th>
 				<th class="text-center">Actions</th>
 				</tr>
@@ -31,13 +31,13 @@
 					<%= request.user.try(:student_id) || 'N/A' %>
 					</td>
 					<td class="text-center">
-					<%= request.assignment&.due_date&.strftime("%B %d, %Y %I:%M %p") || 'N/A' %>
+					<%= request.assignment&.due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
 					</td>
 					<td class="text-center">
-					<%= request.assignment&.late_due_date&.strftime("%B %d, %Y %I:%M %p") || 'N/A' %>
+					<%= request.assignment&.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
 					</td>
 					<td class="text-center">
-					<%= request.requested_due_date.present? ? request.requested_due_date.strftime("%B %d, %Y %I:%M %p") : 'N/A' %>
+					<%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') : 'N/A' %>
 					</td>
 					<td class="text-center">
 					<% if request.assignment&.due_date && request.requested_due_date.present? %>

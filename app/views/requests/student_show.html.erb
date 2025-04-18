@@ -15,10 +15,10 @@
 							<p class="mb-2"><strong><%= @request.assignment.name %></strong></p>
 							<div class="row">
 								<div class="col-md-6">
-									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
+									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
 								</div>
 								<div class="col-md-6">
-									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
+									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
 								</div>
 							</div>
 						<% else %>
@@ -32,7 +32,7 @@
 							<div class="col-md-6">
 								<p><strong>Requested Due Date: </strong>
 								<% if @request.requested_due_date.present? %>
-									<%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %>
+									<%= @request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %>
 								<% else %>
 									N/A
 								<% end %>

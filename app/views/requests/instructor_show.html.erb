@@ -9,8 +9,8 @@
 				<label class="form-label fw-bold">Assignment</label>
 				<% if @request.assignment.present? %>
 					<p><%= @request.assignment.name %></p>
-					<p>Original Due Date: <strong><%= @request.assignment.due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
-					<p>Original Late Due Date: <strong><%= @request.assignment.late_due_date.strftime('%Y-%m-%d at %I:%M %p') %></strong></p>
+					<p>Original Due Date: <strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></strong></p>
+					<p>Original Late Due Date: <strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></strong></p>
 				<% else %>
 					<p>N/A</p>
 				<% end %>
@@ -21,7 +21,7 @@
 				<div class="col-5 mb-3">
 					<label class="form-label fw-bold">Requested Due Date</label>
 					<% if @request.requested_due_date.present? %>
-						<p><%= @request.requested_due_date.strftime('%Y-%m-%d at %I:%M %p') %></p>
+						<p><%= @request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
 					<% else %>
 						<p>N/A</p>
 					<% end %>
