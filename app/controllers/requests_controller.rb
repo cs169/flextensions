@@ -110,6 +110,8 @@ class RequestsController < ApplicationController
     overrides_response = canvas_facade.get_assignment_overrides(@course.canvas_id, @request.assignment.external_assignment_id)
 
     if overrides_response.success?
+      Rails.logger.info "Canvas API response: #{overrides_response.status} - #{overrides_response.body}"
+
       overrides = JSON.parse(overrides_response.body)
 
       # Check if an override exists for the user
