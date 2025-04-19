@@ -5,8 +5,16 @@ class CourseSettingsController < ApplicationController
   before_action :set_pending_request_count
 
   # Default template settings
-  DEFAULT_EMAIL_SUBJECT = 'Extension Request Status: {{status}} - {{course_code}}'
-  DEFAULT_EMAIL_TEMPLATE = "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff"
+  DEFAULT_EMAIL_SUBJECT = 'Extension Request Status: {{status}} - {{course_code}}'.freeze
+  DEFAULT_EMAIL_TEMPLATE = "Dear {{student_name}},\n\n
+  Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+  \n\nExtension Details:
+  \n- Original Due Date: {{original_due_date}}
+  \n- New Due Date: {{new_due_date}}
+  \n- Extension Days: {{extension_days}}
+  \n\nIf you have any questions, please contact the course staff.
+  \n\nBest regards,
+  \n{{course_name}} Staff".freeze
 
   def update
     @side_nav = 'course_settings'
