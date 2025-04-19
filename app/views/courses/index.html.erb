@@ -77,7 +77,14 @@
                         <tr>
                             <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
                             <td><%= user_to_course.course.course_code %></td>
-                            <td><%= user_to_course.course.created_at.strftime("%B %Y") %></td>
+                            <td>
+                              <% month = user_to_course.course.created_at.month %>
+                              <%= case month
+                                  when 1..5 then 'Spring'
+                                  when 6..7 then 'Summer'
+                                  when 8..12 then 'Fall'
+                                  end %>
+                            </td>
                         </tr>
                     <% end %>
                 </tbody>
