@@ -146,98 +146,95 @@ RSpec.describe RequestsController, type: :controller do
   end
 
   describe 'GET #history' do
-  before do
-    session[:user_id] = instructor.canvas_uid
-    UserToCourse.create!(user: instructor, course: course, role: 'teacher')
-    FormSetting.create!(course: course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
-    request.update!(status: 'approved')
+    before do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+      FormSetting.create!(course: course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+      request.update!(status: 'approved')
+    end
+
+    it 'renders history for instructors' do
+      get :history, params: { course_id: course.id }
+      expect(response).to render_template('requests/instructor_history')
+    end
+
+    it 'redirects students from history page' do
+      session[:user_id] = user.canvas_uid
+      get :history, params: { course_id: course.id }
+      expect(response).to redirect_to(course_path(course.id))
+      expect(flash[:alert]).to eq('You do not have access to this page.')
+    end
   end
 
-  it 'renders history for instructors' do
-    get :history, params: { course_id: course.id }
-    expect(response).to render_template('requests/instructor_history')
-  end
-
-  it 'redirects students from history page' do
-    session[:user_id] = user.canvas_uid
-    get :history, params: { course_id: course.id }
-    expect(response).to redirect_to(course_path(course.id))
-    expect(flash[:alert]).to eq('You do not have access to this page.')
-  end
-end
-
-describe 'POST #approve' do
-  before do
-    session[:user_id] = instructor.canvas_uid
-    UserToCourse.create!(user: instructor, course: course, role: 'teacher')
-    instructor.lms_credentials.create!(
-      lms_name:    'canvas',
-      token:       'instructor_token',
-      refresh_token:'instructor_refresh',
-      expire_time: 1.hour.from_now
-    )
-    FormSetting.create!(
-      course:             course,
-      documentation_disp: 'hidden',
-      custom_q1_disp:     'hidden',
-      custom_q2_disp:     'hidden'
-    )
-
-    # stub out Canvas bits so that your Request#approve never blows up
-    stub_request(:get,  "#{ENV['CANVAS_URL']}/api/v1/courses/456/assignments/x1/overrides")
-      .with(headers: { 'Authorization' => 'Bearer instructor_token' })
-      .to_return(status: 200, body: '[]', headers: {})
-
-    stub_request(:post, "#{ENV['CANVAS_URL']}/api/v1/courses/456/assignments/x1/overrides")
-      .with(headers: { 'Authorization' => 'Bearer instructor_token' })
-      .to_return(
-        status: 200,
-        body:   { id: 'override-1' }.to_json,
-        headers:{ 'Content-Type' => 'application/json' }
+  describe 'POST #approve' do
+    before do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+      instructor.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'instructor_token',
+        refresh_token: 'instructor_refresh',
+        expire_time: 1.hour.from_now
       )
+      FormSetting.create!(
+        course: course,
+        documentation_disp: 'hidden',
+        custom_q1_disp: 'hidden',
+        custom_q2_disp: 'hidden'
+      )
+
+      # stub out Canvas bits so that your Request#approve never blows up
+      stub_request(:get,  "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/assignments/x1/overrides")
+        .with(headers: { 'Authorization' => 'Bearer instructor_token' })
+        .to_return(status: 200, body: '[]', headers: {})
+
+      stub_request(:post, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/assignments/x1/overrides")
+        .with(headers: { 'Authorization' => 'Bearer instructor_token' })
+        .to_return(
+          status: 200,
+          body: { id: 'override-1' }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+    end
+
+    it 'approves a pending request' do
+      allow(request).to receive(:approve).and_return(true)
+
+      post :approve, params: { course_id: course.id, id: request.id }
+
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:notice]).to match(/approved/i)
+    end
+
+    # it 'shows error if approval fails' do
+    #   # stub the *same* request to return false here
+    #   allow(request).to receive(:approve).and_return(false)
+
+    #   post :approve, params: { course_id: course.id, id: request.id }
+
+    #   expect(response).to redirect_to(course_requests_path(course))
+    #   expect(flash[:alert]).to match(/failed/i)
+    # end
   end
 
-  it 'approves a pending request' do
-    allow(request).to receive(:approve).and_return(true)
+  describe 'POST #reject' do
+    before do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+      FormSetting.create!(course: course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+    end
 
-    post :approve, params: { course_id: course.id, id: request.id }
+    it 'rejects a pending request' do
+      post :reject, params: { course_id: course.id, id: request.id }
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:notice]).to match(/denied/i)
+    end
 
-    expect(response).to redirect_to(course_requests_path(course))
-    expect(flash[:notice]).to match(/approved/i)
+    it 'shows error if rejection fails' do
+      allow_any_instance_of(Request).to receive(:reject).and_return(false)
+      post :reject, params: { course_id: course.id, id: request.id }
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:alert]).to match(/failed/i)
+    end
   end
-
-  # it 'shows error if approval fails' do
-  #   # stub the *same* request to return false here
-  #   allow(request).to receive(:approve).and_return(false)
-
-  #   post :approve, params: { course_id: course.id, id: request.id }
-
-  #   expect(response).to redirect_to(course_requests_path(course))
-  #   expect(flash[:alert]).to match(/failed/i)
-  # end
-end
-
-
-
-describe 'POST #reject' do
-  before do
-    session[:user_id] = instructor.canvas_uid
-    UserToCourse.create!(user: instructor, course: course, role: 'teacher')
-    FormSetting.create!(course: course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
-  end
-
-  it 'rejects a pending request' do
-    post :reject, params: { course_id: course.id, id: request.id }
-    expect(response).to redirect_to(course_requests_path(course))
-    expect(flash[:notice]).to match(/denied/i)
-  end
-
-  it 'shows error if rejection fails' do
-    allow_any_instance_of(Request).to receive(:reject).and_return(false)
-    post :reject, params: { course_id: course.id, id: request.id }
-    expect(response).to redirect_to(course_requests_path(course))
-    expect(flash[:alert]).to match(/failed/i)
-  end
-end
-
 end
