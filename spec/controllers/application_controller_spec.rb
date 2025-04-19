@@ -83,7 +83,7 @@ RSpec.describe ApplicationController, type: :controller do
 
         get :index
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('User token has expired.')
+        expect(flash[:alert]).to eq('User token has expired. Please login again.')
       end
     end
 
