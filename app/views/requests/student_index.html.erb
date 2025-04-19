@@ -29,13 +29,13 @@
                       <% end %>
                     </td>
 					<td class="text-center align-content-center">
-					<%= request.created_at.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %>
+					<%= request.created_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
 					</td>
                     <td class="text-center align-content-center">
-                    <%= request.assignment&.due_date&.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %>
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
                     </td>
                     <td class="text-center align-content-center">
-                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a %b %-d, %-I:%M%P') : 'N/A' %>
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
                     </td>
                     <td class="text-center align-content-center">
                     <% if request.assignment&.due_date && request.requested_due_date.present? %>

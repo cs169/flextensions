@@ -22,9 +22,9 @@
                     <i class="fas fa-up-right-from-square"></i>
                   </a>
                 </td>
-                <td class="text-center"><%= assignment.due_date&.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %></td>
-                <td class="text-center"><%= assignment.late_due_date&.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %></td>
-                <td class="d-flex justify-content-center align-content-center">
+                <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+                <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+                <td class="justify-content-center align-content-center">
                   <div class="d-flex justify-content-center form-check form-switch">
                     <input class="form-check-input assignment-enabled-switch" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-enabled" <%= 'checked' if assignment.enabled %> data-assignment-id="<%= assignment.id %>" data-url="<%= toggle_enabled_assignment_path(assignment) %>">
                     <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
