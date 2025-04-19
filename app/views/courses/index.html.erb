@@ -79,10 +79,11 @@
                             <td><%= user_to_course.course.course_code %></td>
                             <td>
                               <% month = user_to_course.course.created_at.month %>
+                              <% year = user_to_course.course.created_at.year %>
                               <%= case month
-                                  when 1..5 then 'Spring'
-                                  when 6..7 then 'Summer'
-                                  when 8..12 then 'Fall'
+                                  when 1..5 then "Spring #{year}"
+                                  when 6..7 then "Summer #{year}"
+                                  when 8..12 then "Fall #{year}"
                                   end %>
                             </td>
                         </tr>
