@@ -8,6 +8,7 @@
           <thead>
             <tr class="table-info">
               <th>Assignment</th>
+              <th class="text-center" >View</th>
               <th class="text-center" style="min-width: 215px;">Due Date</th>
               <th class="text-center" style="min-width: 215px;">Late Due Date</th>
               <th class="text-center" style="width: 50px;">Enable</th>
@@ -17,9 +18,10 @@
             <% @assignments.each do |assignment| %>
               <tr>
                 <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                <td><%= assignment.name %>
+                <td><%= assignment.name %></td>
+                <td class="text-center">
                   <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                    <i class="fas fa-up-right-from-square"></i>
+                    bCourses
                   </a>
                 </td>
                 <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
