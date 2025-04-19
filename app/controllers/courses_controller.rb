@@ -97,7 +97,7 @@ class CoursesController < ApplicationController
     # Delete courses that no longer have any user-to-course associations
     Course.where.missing(:user_to_courses).destroy_all
 
-    redirect_to courses_path, notice: 'All your courses, assignments, extensions, and associations have been deleted successfully.'
+    redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
   end
 
   private
