@@ -3,112 +3,140 @@
     <div class="row">
         <div class="col-12">
             <%= render "courses/course_title" %>
-            <ul class="nav nav-pills mb-3 justify-content-center" id="courses-tab" role="tablist">
+            <ul class="nav nav-pills mb-4 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General</button>
+                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email</button>
+                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email Settings</button>
                 </li>
             </ul>
-            <form action="/courses/<% @course.id %>edit">
+            <%= form_with(model: @course.course_setting || @course.build_course_setting, url: course_course_setting_path(@course), method: :patch) do |form| %>
                 <div class="tab-content" id="courses-tabContent">
                     <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
-                        <div class="mb-3 row justify-content-center">
-                            <div class="col-11 form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
-                                <label class="form-check-label h4" for="course-enable">Enable Students to request extensions</label>
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Extension Request Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2 row">
+                                    <div class="col-12 form-check form-switch ms-3">
+                                        <%= form.check_box :enable_student_requests, class: "form-check-input", role: "switch", id: "course-enable" %>
+                                        <%= form.label :enable_student_requests, "Enable Students to request extensions", class: "form-check-label h5", for: "course-enable" %>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-1">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <%= form.number_field :auto_approve_days, min: 1, step: 1, class: "form-control", placeholder: "number of days", id: "auto-approve-days" %>
+                                            <%= form.label :auto_approve_days, "Auto approve within days", for: "auto-approve-days" %>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <%= form.number_field :auto_approve_dsp_days, min: 1, step: 1, class: "form-control", placeholder: "number of days", id: "auto-approve-dsp-days" %>
+                                            <%= form.label :auto_approve_dsp_days, "Auto approve within days (DSP)", for: "auto-approve-dsp-days" %>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-floating mb-3">
+                                            <%= form.number_field :max_auto_approve, min: 1, step: 1, class: "form-control", placeholder: "number", id: "max-auto-approve" %>
+                                            <%= form.label :max_auto_approve, "Maximum requests to auto approve", for: "max-auto-approve" %>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve" class="col-sm-3 col-form-label">Auto approve within days </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve" placeholder="number of days">
+                        
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Email Configuration</h5>
                             </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve-dsp" class="col-sm-3 col-form-label">Auto approve within days (DSP) </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="number of days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="max-auto-approve" class="col-sm-3 col-form-label">Maximum requests to auto approve</label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="max-auto-approve" placeholder="number">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-reject" class="col-sm-3 col-form-label">Course Reply Email Address</label>
-                            <div class="col-sm-8">
-                            <input type="email" min="1" step="1" class="form-control" id="auto-reject" placeholder="example@email.com">
+                            <div class="card-body">
+                                <div class="mb-2 row">
+                                    <div class="col-12 form-check form-switch ms-3">
+                                        <%= form.check_box :enable_emails, class: "form-check-input", role: "switch", id: "email-enable" %>
+                                        <%= form.label :enable_emails, "Enable Email Notifications", class: "form-check-label h5", for: "email-enable" %>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-floating mb-3">
+                                    <%= form.email_field :reply_email, class: "form-control email-field", placeholder: "example@email.com", id: "reply-email" %>
+                                    <%= form.label :reply_email, "Course Reply Email Address", for: "reply-email" %>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11">
-                                <div id="template-flash" class="mb-3"></div>
-                            </div>
-                            <div class="col-11 mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label for="email-template-select" class="form-label mb-0 fw-bold">Email Template</label>
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Email Template</h5>
                                     <div>
                                         <button type="button" class="btn btn-secondary btn-sm" id="reset-template">Reset Template</button>
                                     </div>
                                 </div>
-                                <select class="form-select mb-3" id="email-template-select">
-                                    <option value="default">Default Extension Template</option>
-                                    <option value="ta_review">TA Review Required Template</option>
-                                </select>
-                                
-                                <label for="email-subject" class="form-label fw-bold">Email Subject</label>
-                                <input type="text" class="form-control" id="email-subject" value="Extension Request Status: {{status}} - {{course_code}}" />
-                                <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
                             </div>
-                            <div class="col-11 mb-3">
-                                <label for="email-template" class="form-label fw-bold">Email Body</label>
-                                <textarea class="form-control" id="email-template" rows="10">Dear {{student_name}},
-
-Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
-
-Extension Details:
-- Original Due Date: {{original_due_date}}
-- New Due Date: {{new_due_date}}
-- Extension Days: {{extension_days}}
-
-If you have any questions, please contact the course staff.
-
-Best regards,
-{{course_name}} Staff</textarea>
-                                <div class="mt-2">
-                                    <p class="mb-2 fw-bold">Available Variables:</p>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <p class="mb-1 fw-bold">Student Information:</p>
-                                            <ul class="list-unstyled">
-                                                <li><code>{{student_name}}</code> - Full name of student</li>
-                                                <li><code>{{student_email}}</code> - Student's email</li>
-                                                <li><code>{{student_id}}</code> - Student's ID number</li>
-                                            </ul>
+                            <div class="card-body">
+                                <div id="template-flash" class="mb-3"></div>
+                                
+                                <div class="mb-3">
+                                    <label for="email-template-select" class="form-label mb-0 fw-bold">Template Type</label>
+                                    <select class="form-select mb-3 email-field" id="email-template-select">
+                                        <option value="default">Default Extension Template</option>
+                                        <option value="ta_review">TA Review Required Template</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email-subject" class="form-label fw-bold">Email Subject</label>
+                                    <%= form.text_field :email_subject, class: "form-control email-field", id: "email-subject" %>
+                                    <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email-template" class="form-label fw-bold">Email Body</label>
+                                    <%= form.text_area :email_template, class: "form-control email-field", id: "email-template", rows: 10 %>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <div class="card border">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">Available Variables</h6>
                                         </div>
-                                        <div class="col-md-4">
-                                            <p class="mb-1 fw-bold">Course Information:</p>
-                                            <ul class="list-unstyled">
-                                                <li><code>{{course_name}}</code> - Course name</li>
-                                                <li><code>{{course_code}}</code> - Course code</li>
-                                                <li><code>{{assignment_name}}</code> - Assignment name</li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <p class="mb-1 fw-bold">Extension Information:</p>
-                                            <ul class="list-unstyled">
-                                                <li><code>{{original_due_date}}</code> - Original due date</li>
-                                                <li><code>{{new_due_date}}</code> - New due date</li>
-                                                <li><code>{{extension_days}}</code> - Number of days extended</li>
-                                                <li><code>{{status}}</code> - Request status (Approved/Denied)</li>
-                                            </ul>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <p class="mb-1 fw-bold">Student Information:</p>
+                                                    <ul class="list-unstyled">
+                                                        <li><code>{{student_name}}</code> - Full name of student</li>
+                                                        <li><code>{{student_email}}</code> - Student's email</li>
+                                                        <li><code>{{student_id}}</code> - Student's ID number</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <p class="mb-1 fw-bold">Course Information:</p>
+                                                    <ul class="list-unstyled">
+                                                        <li><code>{{course_name}}</code> - Course name</li>
+                                                        <li><code>{{course_code}}</code> - Course code</li>
+                                                        <li><code>{{assignment_name}}</code> - Assignment name</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <p class="mb-1 fw-bold">Extension Information:</p>
+                                                    <ul class="list-unstyled">
+                                                        <li><code>{{original_due_date}}</code> - Original due date</li>
+                                                        <li><code>{{new_due_date}}</code> - New due date</li>
+                                                        <li><code>{{extension_days}}</code> - Number of days extended</li>
+                                                        <li><code>{{status}}</code> - Request status (Approved/Denied)</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -117,95 +145,11 @@ Best regards,
                     </div>
                 </div>
 
+
                 <div class="text-center mb-4">
-                    <input type="submit" class="btn btn-success" value="Save Settings" />
+                    <%= form.submit "Save Settings", class: "btn btn-success btn-md" %>
                 </div>
-            </form>
+            <% end %>
         </div>
     </div>
 </div>
-
-<script>
-// Template configurations for demonstration
-const templates = {
-    default: {
-        subject: "Extension Request Status: {{status}} - {{course_code}}",
-        text: `Dear {{student_name}},
-
-Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
-
-Extension Details:
-- Original Due Date: {{original_due_date}}
-- New Due Date: {{new_due_date}}
-- Extension Days: {{extension_days}}
-
-If you have any questions, please contact the course staff.
-
-Best regards,
-{{course_name}} Staff`
-    },
-    ta_review: {
-        subject: "Extension Request Under Review - {{course_code}} - {{assignment_name}}",
-        text: `Dear {{student_name}},
-
-Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) requires TA review.
-
-Request Details:
-- Assignment: {{assignment_name}}
-- Original Due Date: {{original_due_date}}
-- Requested Extension: {{extension_days}} days
-
-Your request will be reviewed by a TA during the next office hours. Please continue working on the assignment as if the original deadline still applies. You will receive another email once your request has been reviewed.
-
-If you need immediate assistance, please visit the course staff during office hours.
-
-Best regards,
-{{course_name}} Staff`
-    }
-};
-
-// Show flash message
-function showFlash(message, type = 'success') {
-    const flashDiv = document.getElementById('template-flash');
-    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-    flashDiv.innerHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    setTimeout(() => {
-        const alert = flashDiv.querySelector('.alert');
-        if (alert) {
-            alert.classList.remove('show');
-            setTimeout(() => flashDiv.innerHTML = '', 150);
-        }
-    }, 3000);
-}
-
-// Initialize templates
-document.addEventListener('DOMContentLoaded', function() {
-    const templateSelect = document.getElementById('email-template-select');
-    const subjectInput = document.getElementById('email-subject');
-    const templateTextarea = document.getElementById('email-template');
-    
-    // Template selection handler
-    templateSelect.addEventListener('change', function() {
-        const selectedTemplate = templates[this.value];
-        if (selectedTemplate) {
-            subjectInput.value = selectedTemplate.subject;
-            templateTextarea.value = selectedTemplate.text;
-            showFlash('Template loaded successfully');
-        }
-    });
-    
-    // Reset button handler
-    document.getElementById('reset-template').addEventListener('click', function() {
-        const defaultTemplate = templates['default'];
-        subjectInput.value = defaultTemplate.subject;
-        templateTextarea.value = defaultTemplate.text;
-        templateSelect.value = 'default';
-        showFlash('Template reset to default');
-    });
-});
-</script>

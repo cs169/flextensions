@@ -42,6 +42,7 @@ Rails.application.routes.draw do
       end
     end
     resource :form_setting, only: [:edit, :update]
+    resource :course_setting, only: [:update]
   end
 
   resources :assignments do
