@@ -142,8 +142,9 @@ RSpec.describe CourseSettingsController, type: :controller do
         enabled: true
       )
     end
-    let!(:pending_request) do
-      Request.create!(
+
+    it 'sets the pending requests count correctly' do
+      pending_request = Request.create!(
         course: course,
         assignment: assignment,
         user: user,
@@ -151,9 +152,7 @@ RSpec.describe CourseSettingsController, type: :controller do
         reason: 'Test reason',
         requested_due_date: 5.days.from_now
       )
-    end
 
-    it 'sets the pending requests count' do
       post :update, params: {
         course_id: course.id,
         course_settings: { enable_extensions: true },
@@ -161,6 +160,7 @@ RSpec.describe CourseSettingsController, type: :controller do
       }
 
       expect(assigns(:pending_requests_count)).to eq(1)
+      expect(assigns(:pending_requests_count)).to eq(Request.where(id: pending_request.id, status: 'pending').count)
     end
   end
 end
