@@ -196,7 +196,7 @@
 </div>
 
 <script>
-  // Function to update URL parameter without page reload
+  // Update URL parameter without page reload
   function updateUrlParam(tabName) {
     const url = new URL(window.location);
     url.searchParams.set('tab', tabName);
@@ -213,7 +213,6 @@
     const autoApproveDspField = document.getElementById('auto-approve-dsp');
     const maxAutoApproveField = document.getElementById('max-auto-approve');
     
-    // Function to toggle email fields based on checkbox
     function toggleEmailFields() {
       const isEnabled = emailToggle.checked;
       replyEmailField.disabled = !isEnabled || !extensionsToggle.checked;
@@ -221,22 +220,16 @@
       emailTemplateField.disabled = !isEnabled || !extensionsToggle.checked;
     }
     
-    // Function to toggle all settings based on extensions checkbox
     function toggleAllSettings() {
       const isEnabled = extensionsToggle.checked;
       emailToggle.disabled = !isEnabled;
       autoApproveField.disabled = !isEnabled;
       autoApproveDspField.disabled = true; // Always disabled as it's under construction
       maxAutoApproveField.disabled = !isEnabled;
-      
-      // Also update email fields
       toggleEmailFields();
     }
     
-    // Initialize state
     toggleAllSettings();
-    
-    // Add event listeners for changes
     extensionsToggle.addEventListener('change', toggleAllSettings);
     emailToggle.addEventListener('change', toggleEmailFields);
   });
