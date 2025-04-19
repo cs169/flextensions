@@ -30,6 +30,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
     t.boolean "enabled", default: false
   end
 
+  create_table "course_settings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.boolean "enable_student_requests", default: false
+    t.integer "auto_approve_days"
+    t.integer "auto_approve_dsp_days"
+    t.integer "max_auto_approve"
+    t.string "reply_email"
+    t.string "email_subject"
+    t.text "email_template"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_course_settings_on_course_id"
+  end
+
   create_table "course_to_lmss", force: :cascade do |t|
     t.bigint "lms_id"
     t.bigint "course_id"
@@ -141,6 +155,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
   end
 
   add_foreign_key "assignments", "course_to_lmss"
+  add_foreign_key "course_settings", "courses"
   add_foreign_key "course_to_lmss", "courses"
   add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"
