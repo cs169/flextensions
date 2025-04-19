@@ -5,16 +5,34 @@
             <%= render "courses/course_title" %>
             <ul class="nav nav-pills mb-4 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General Settings</button>
+                    <button class="nav-link <%= params[:tab] == 'email' ? '' : 'active' %>" 
+                            id="course-default-tab" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#course-default" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="course-default" 
+                            aria-selected="<%= params[:tab] == 'email' ? 'false' : 'true' %>"
+                            onclick="document.getElementById('tab').value='general'; updateUrlParam('general');">General Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email Settings</button>
+                    <button class="nav-link <%= params[:tab] == 'email' ? 'active' : '' %>" 
+                            id="course-email-tab" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#course-email" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="course-email" 
+                            aria-selected="<%= params[:tab] == 'email' ? 'true' : 'false' %>"
+                            onclick="document.getElementById('tab').value='email'; updateUrlParam('email');">Email Settings</button>
                 </li>
             </ul>
-            <form action="/courses/<% @course.id %>edit">
+            <%= form_with url: course_settings_update_path, method: :post do |form| %>
+                <%= hidden_field_tag :course_id, @course.id %>
+                <%= hidden_field_tag :tab, params[:tab] || 'general' %>
                 <div class="tab-content" id="courses-tabContent">
                     <!-- General Settings Card -->
-                    <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
+                    <div class="tab-pane fade <%= params[:tab] == 'email' ? '' : 'show active' %>" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light">
                                 <h5 class="card-title mb-0">General Settings</h5>
@@ -22,36 +40,64 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
+                                        <%= hidden_field_tag 'course_settings[enable_extensions]', false %>
+                                        <%= check_box_tag 'course_settings[enable_extensions]', 
+                                                         true, 
+                                                         @course.course_settings&.enable_extensions, 
+                                                         class: 'form-check-input', 
+                                                         id: 'course-enable' %>
                                         <label class="form-check-label" for="course-enable">Enable Students to request extensions</label>
                                     </div>
                                 </div>
                                 
-                                
-                                
                                 <div class="mb-3 row">
                                     <label for="auto-approve" class="col-sm-4 col-form-label">Auto approve within days</label>
                                     <div class="col-sm-8">
-                                        <input type="number" min="1" step="1" class="form-control" id="auto-approve" placeholder="Number of days">
+                                        <%= number_field_tag 'course_settings[auto_approve_days]', 
+                                                           @course.course_settings&.auto_approve_days, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'auto-approve', 
+                                                           placeholder: 'Number of days' %>
                                     </div>
                                 </div>
                                 
                                 <div class="mb-3 row">
                                     <label for="auto-approve-dsp" class="col-sm-4 col-form-label">Auto approve within days (DSP)</label>
                                     <div class="col-sm-8">
-                                        <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="Number of days">
+                                        <%= number_field_tag 'course_settings[auto_approve_dsp_days]', 
+                                                           @course.course_settings&.auto_approve_dsp_days, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'auto-approve-dsp', 
+                                                           placeholder: 'Number of days',
+                                                           disabled: true %>
+                                        <small class="text-muted"><em>This feature is currently under construction.</em></small>
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3 row">
+                                <div class="mb-3 row border-bottom pb-3">
                                     <label for="max-auto-approve" class="col-sm-4 col-form-label">Maximum requests to auto approve</label>
                                     <div class="col-sm-8">
-                                        <input type="number" min="1" step="1" class="form-control" id="max-auto-approve" placeholder="Number">
+                                        <%= number_field_tag 'course_settings[max_auto_approve]', 
+                                                           @course.course_settings&.max_auto_approve, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'max-auto-approve', 
+                                                           placeholder: 'Number' %>
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="enable-email">
+                                        <%= hidden_field_tag 'course_settings[enable_emails]', false %>
+                                        <%= check_box_tag 'course_settings[enable_emails]', 
+                                                         true, 
+                                                         @course.course_settings&.enable_emails, 
+                                                         class: 'form-check-input', 
+                                                         id: 'enable-email' %>
                                         <label class="form-check-label" for="enable-email">Enable email notifications</label>
                                     </div>
                                 </div>
@@ -59,7 +105,12 @@
                                 <div class="mb-3 row">
                                     <label for="reply-email" class="col-sm-4 col-form-label">Course Reply Email Address</label>
                                     <div class="col-sm-8">
-                                        <input type="email" class="form-control" id="reply-email" placeholder="example@email.com">
+                                        <%= email_field_tag 'course_settings[reply_email]', 
+                                                          @course.course_settings&.reply_email, 
+                                                          class: 'form-control', 
+                                                          id: 'reply-email', 
+                                                          placeholder: 'example@berkeley.edu',
+                                                          disabled: !@course.course_settings&.enable_emails %>
                                     </div>
                                 </div>
                             </div>
@@ -67,33 +118,36 @@
                     </div>
 
                     <!-- Email Settings Card -->
-                    <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
+                    <div class="tab-pane fade <%= params[:tab] == 'email' ? 'show active' : '' %>" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
-                            <div class="card-header bg-light">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-0">Email Template</h5>
+                                <%= button_tag "Reset to Default", 
+                                              name: "reset_email_template", 
+                                              value: "true", 
+                                              class: "btn btn-secondary btn-sm",
+                                              type: "submit",
+                                              disabled: !@course.course_settings&.enable_extensions %>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="email-subject" class="form-label">Email Subject</label>
-                                    <input type="text" class="form-control" id="email-subject" value="Extension Request Status: {{status}} - {{course_code}}">
+                                    <%= text_field_tag 'course_settings[email_subject]', 
+                                                     @course.course_settings&.email_subject || "Extension Request Status: {{status}} - {{course_code}}", 
+                                                     class: 'form-control', 
+                                                     id: 'email-subject',
+                                                     disabled: !@course.course_settings&.enable_emails %>
                                     <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
                                 </div>
                                 
                                 <div class="mb-3">
                                     <label for="email-template" class="form-label">Email Body</label>
-                                    <textarea class="form-control" id="email-template" rows="10">Dear {{student_name}},
-
-Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
-
-Extension Details:
-- Original Due Date: {{original_due_date}}
-- New Due Date: {{new_due_date}}
-- Extension Days: {{extension_days}}
-
-If you have any questions, please contact the course staff.
-
-Best regards,
-{{course_name}} Staff</textarea>
+                                    <%= text_area_tag 'course_settings[email_template]', 
+                                                    @course.course_settings&.email_template || "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff", 
+                                                    class: 'form-control', 
+                                                    id: 'email-template', 
+                                                    rows: 10,
+                                                    disabled: !@course.course_settings&.enable_emails %>
                                 </div>
                                 
                                 <div class="card bg-light mt-3">
@@ -134,9 +188,56 @@ Best regards,
                 </div>
 
                 <div class="text-center mb-4">
-                    <button type="submit" class="btn btn-success px-4">Save Settings</button>
+                    <%= form.submit 'Save Settings', class: 'btn btn-success px-4' %>
                 </div>
-            </form>
+            <% end %>
         </div>
     </div>
 </div>
+
+<script>
+  // Function to update URL parameter without page reload
+  function updateUrlParam(tabName) {
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.pushState({}, '', url);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const extensionsToggle = document.getElementById('course-enable');
+    const emailToggle = document.getElementById('enable-email');
+    const replyEmailField = document.getElementById('reply-email');
+    const emailSubjectField = document.getElementById('email-subject');
+    const emailTemplateField = document.getElementById('email-template');
+    const autoApproveField = document.getElementById('auto-approve');
+    const autoApproveDspField = document.getElementById('auto-approve-dsp');
+    const maxAutoApproveField = document.getElementById('max-auto-approve');
+    
+    // Function to toggle email fields based on checkbox
+    function toggleEmailFields() {
+      const isEnabled = emailToggle.checked;
+      replyEmailField.disabled = !isEnabled || !extensionsToggle.checked;
+      emailSubjectField.disabled = !isEnabled || !extensionsToggle.checked;
+      emailTemplateField.disabled = !isEnabled || !extensionsToggle.checked;
+    }
+    
+    // Function to toggle all settings based on extensions checkbox
+    function toggleAllSettings() {
+      const isEnabled = extensionsToggle.checked;
+      emailToggle.disabled = !isEnabled;
+      autoApproveField.disabled = !isEnabled;
+      autoApproveDspField.disabled = true; // Always disabled as it's under construction
+      maxAutoApproveField.disabled = !isEnabled;
+      
+      // Also update email fields
+      toggleEmailFields();
+    }
+    
+    // Initialize state
+    toggleAllSettings();
+    
+    // Add event listeners for changes
+    extensionsToggle.addEventListener('change', toggleAllSettings);
+    emailToggle.addEventListener('change', toggleEmailFields);
+  });
+</script>
