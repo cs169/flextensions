@@ -9,7 +9,7 @@
             <thead>
                 <tr class="table-info">
                 <th>Assignment</th>
-                <th class="text-center align-content-center" style="min-width: 80px;">View</th>
+				<th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
                 <th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
@@ -22,19 +22,20 @@
                 <tr>
                     <td class="align-content-center">
                     <%= request.assignment ? request.assignment.name : "N/A" %>
-                    </td>
-                    <td class="text-center align-content-center">
-                    <% if request.assignment %>
+                      <% if request.assignment # i don't know why we have this condition here or above %>
                         <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
-                        bCourses
+                          <i class="fas fa-up-right-from-square"></i>
                         </a>
-                    <% end %>
+                      <% end %>
+                    </td>
+					<td class="text-center align-content-center">
+					<%= request.created_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+					</td>
+                    <td class="text-center align-content-center">
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
                     </td>
                     <td class="text-center align-content-center">
-                    <%= request.assignment&.due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
-                    </td>
-                    <td class="text-center align-content-center">
-                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') : 'N/A' %>
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
                     </td>
                     <td class="text-center align-content-center">
                     <% if request.assignment&.due_date && request.requested_due_date.present? %>
@@ -56,7 +57,7 @@
                       <% end %>
                     </td>
                     <td class="text-center align-content-center">
-                    <%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+                    <%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
                     <% if request&.status == 'pending' %>
                     <%= link_to 'Edit', edit_course_request_path(@course, request), class: "btn btn-sm btn-secondary ms-1" %>
                     <% end %>

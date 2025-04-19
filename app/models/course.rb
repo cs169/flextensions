@@ -48,7 +48,7 @@ class Course < ApplicationRecord
     unless course.form_setting
       form_setting = course.build_form_setting(
         documentation_desc: <<~DESC,
-          Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.
+          Please provide links to any additional details if relevant.
         DESC
         documentation_disp: 'hidden',
         custom_q1_disp: 'hidden',
