@@ -8,7 +8,6 @@
           <thead>
             <tr class="table-info">
               <th>Assignment</th>
-              <th class="text-center">View</th>
               <th class="text-center" style="min-width: 215px;">Due Date</th>
               <th class="text-center" style="min-width: 215px;">Late Due Date</th>
               <th class="text-center" style="width: 50px;">Enable</th>
@@ -18,14 +17,13 @@
             <% @assignments.each do |assignment| %>
               <tr>
                 <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                <td><%= assignment.name %></td>
-                <td class="text-center">
+                <td><%= assignment.name %>
                   <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                    bCourses
+                    <i class="fas fa-up-right-from-square"></i>
                   </a>
                 </td>
-                <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %></td>
-                <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %></td>
+                <td class="text-center"><%= assignment.due_date&.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %></td>
+                <td class="text-center"><%= assignment.late_due_date&.strftime('%a %b %-d, %-I:%M%P') || 'N/A' %></td>
                 <td class="d-flex justify-content-center align-content-center">
                   <div class="d-flex justify-content-center form-check form-switch">
                     <input class="form-check-input assignment-enabled-switch" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-enabled" <%= 'checked' if assignment.enabled %> data-assignment-id="<%= assignment.id %>" data-url="<%= toggle_enabled_assignment_path(assignment) %>">
