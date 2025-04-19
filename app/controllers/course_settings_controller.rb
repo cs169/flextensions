@@ -21,7 +21,6 @@ class CourseSettingsController < ApplicationController
     @course_settings = @course.course_settings || @course.build_course_settings
 
     if params[:reset_email_template].present?
-      # Handle reset template request
       reset_email_templates
       redirect_to course_settings_path(@course, tab: 'email'), notice: 'Email templates reset to defaults.'
     elsif @course_settings.update(course_settings_params)
