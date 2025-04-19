@@ -1,0 +1,2 @@
+class CourseSetting < ApplicationRecord
+end

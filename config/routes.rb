@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
   #   mount RackSessionAccess::Engine => '/rack_session'
