@@ -1,18 +1,18 @@
 <div class="row">
-<div class="col-12 col-lg-6">
-    <h4 class="mb-4"><%= @course.course_name %> / <%= @course.course_code %> <span class="badge text-bg-warning"><%= @role.capitalize %></span></h4>
-</div>
 <% flash.each do |type, message| %>
   <% bootstrap_class = case type.to_sym
      when :notice then 'alert-success'
      when :alert then 'alert-danger'
      else 'alert-info'
      end %>
-    <div class="col-12 col-lg-6">
+    <div class="col-12">
         <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" data-controller="auto-dismiss">
             <%= message %>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 <% end %>
+<div class="col-12">
+    <h4 class="mb-4"><%= @course.course_name %> / <%= @course.course_code %> <span class="badge text-bg-warning"><%= @role.capitalize %></span></h4>
+</div>
 </div>
