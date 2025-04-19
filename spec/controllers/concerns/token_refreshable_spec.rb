@@ -6,6 +6,7 @@ RSpec.describe TokenRefreshable, type: :controller do
     include TokenRefreshable
     # rubocop:enable RSpec/DescribedClass
 
+
     def dummy_action
       with_valid_token(current_user) do |token|
         render plain: "Token: #{token}"
@@ -31,7 +32,7 @@ RSpec.describe TokenRefreshable, type: :controller do
   end
 
   before do
-    stub_request(:post, "#{ENV.fetch('CANVAS_URL', nil)}login/oauth2/token")
+    stub_request(:post, "#{ENV.fetch('CANVAS_URL', nil)}/login/oauth2/token")
       .with(
         body: { 'grant_type' => 'refresh_token', 'refresh_token' => 'refresh_token' },
         headers: {
