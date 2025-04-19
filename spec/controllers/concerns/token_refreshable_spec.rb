@@ -31,7 +31,7 @@ RSpec.describe TokenRefreshable, type: :controller do
   end
 
   before do
-    stub_request(:post, "#{ENV.fetch('CANVAS_URL', nil)}login/oauth2/token")
+    stub_request(:post, "#{ENV.fetch('CANVAS_URL', nil)}/login/oauth2/token")
       .with(
         body: { 'grant_type' => 'refresh_token', 'refresh_token' => 'refresh_token' },
         headers: {
