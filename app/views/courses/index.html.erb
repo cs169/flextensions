@@ -1,91 +1,98 @@
 <div class="container mt-4">
-	<div class="row justify-content-center">
-		<div class="col-12">
-			
-			<div class="row">
-			<div class="col-12 col-lg-6">
-				<h1 class="mb-4">Courses Dashboard</h1>
-			</div>
+    <div class="row justify-content-center">
+        <div class="col-12">
+            
+            <div class="row">
 			<% flash.each do |type, message| %>
-			<% bootstrap_class = case type.to_sym
-				when :notice then 'alert-success'
-				when :alert then 'alert-danger'
-				else 'alert-info'
-				end %>
-				<div class="col-12 col-lg-6">
-					<div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" data-controller="auto-dismiss">
-						<%= message %>
-						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>
+            <% bootstrap_class = case type.to_sym
+                when :notice then 'alert-success'
+                when :alert then 'alert-danger'
+                else 'alert-info'
+                end %>
+                <div class="col-12">
+                    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" data-controller="auto-dismiss">
+                        <%= message %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            <% end %>
+				<div class="col-12">
+					<h1 class="mb-4">Courses Dashboard</h1>
 				</div>
-			<% end %>
-			</div>
-		</div>
-		<div class="col-12 mb-4">
-			<h2 class="h4">Staff Course Offerings</h2>
-			<p>
-				The following course offerings are those where you are a staff member. You can now manage their exams. You can add more courses by clicking the button below.
-			</p>
+            </div>
+        </div>
 
-			<% if @teacher_courses.any? %>
-			<table class="table table-bordered table-striped" id="assignments-table">
-				<thead class="table-info">
-					<tr>
-						<th>Name</th>
-						<th>Course</th>
-						<th>Role</th>
-					</tr>
-				</thead>
-				<tbody>
-					<% @teacher_courses.each do |user_to_course| %>
-						<tr>
-							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
-							<td><%= user_to_course.course.course_code %></td>
-							<td><%= user_to_course.role.capitalize %></td>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-			<% else %>
-				<div class="alert alert-warning">You are not an instructor in any course offerings with flextensions set up.</div>
-			<% end %>
+        <% if @teacher_courses.any? %>
+        <div class="col-12 mb-4">
+            <h2 class="h4">Staff Courses</h2>
+            <p>
+                The following courses are those where you are a staff member. You can now manage their extensions. You can add more courses by clicking the button below.
+            </p>
 
-			<div class="text-center my-3">
-				<a href="/courses/new" class="btn btn-secondary">Import courses from Canvas</a>
-			</div>
-			<div class="text-center">
-				<%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
-			</div>
-		</div>
+            <table class="table table-bordered table-striped" id="assignments-table">
+                <thead class="table-info">
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @teacher_courses.each do |user_to_course| %>
+                        <tr>
+                            <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
+                            <td><%= user_to_course.course.course_code %></td>
+                            <td><%= user_to_course.role.capitalize %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
 
-		<div class="col-12 mb-4">
-			<h2 class="h4">Student Course Offerings</h2>
-			<p>
-				The following course offerings that you are a student of already have flextensions set up. You can now view your own seat assignments and exam schedule. If you expect to see a course here but it is not here, your course staff have not yet set up exams for the course yet in this system. Contact your course staff.
-			</p>
+            <div class="text-center my-3">
+                <a href="/courses/new" class="btn btn-secondary">Import courses from Canvas</a>
+            </div>
+            <div class="text-center">
+                <%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
+            </div>
+        </div>
+        <% end %>
 
-			<% if @student_courses.any? %>
-			<table class="table table-bordered table-striped" id="student-assignments-table">
-				<thead class="table-info">
-					<tr>
-						<th>Name</th>
-						<th>Course</th>
-						<th>Role</th>
-					</tr>
-				</thead>
-				<tbody>
-					<% @student_courses.each do |user_to_course| %>
-						<tr>
-							<td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
-							<td><%= user_to_course.course.course_code %></td>
-							<td><%= user_to_course.role.capitalize %></td>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-			<% else %>
-				<div class="alert alert-warning">You are not a student in any course offerings with flextensions set up.</div>
-			<% end %>
-		</div>
-	</div>
+        <div class="col-12 mb-4">
+            <h2 class="h4">Student Courses</h2>
+            <p>
+                The following courses that you are a student of already have flextensions set up. You can now view and make extensions. If you expect to see a course here but it is not here, your course staff have not yet set up flextensions for the course yet in this system. Contact your course staff.
+            </p>
+
+            <% if @student_courses.any? %>
+            <table class="table table-bordered table-striped" id="student-assignments-table">
+                <thead class="table-info">
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Term</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @student_courses.each do |user_to_course| %>
+                        <tr>
+                            <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
+                            <td><%= user_to_course.course.course_code %></td>
+                            <td>
+                              <% month = user_to_course.course.created_at.month %>
+                              <% year = user_to_course.course.created_at.year %>
+                              <%= case month
+                                  when 1..5 then "Spring #{year}"
+                                  when 6..7 then "Summer #{year}"
+                                  when 8..12 then "Fall #{year}"
+                                  end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+            <% else %>
+                <div class="alert alert-warning">You are not a student in any courses with flextensions set up.</div>
+            <% end %>
+        </div>
+    </div>
 </div>

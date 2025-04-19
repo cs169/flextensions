@@ -23,7 +23,10 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                                                                  SimpleCov::Formatter::JSONFormatter
                                                                ])
 
-SimpleCov.start 'rails'
+SimpleCov.start 'rails' do
+  # add_filter '/app/controllers/api'
+  # add_filter '/app/controllers/bcourses_controller.rb'
+end
 
 RSpec.configure do |config|
   # Exclude accessibility tests by default
