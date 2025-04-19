@@ -7,7 +7,14 @@ class CoursesController < ApplicationController
   def index
     Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
-    @student_courses = UserToCourse.includes(:course).where(user: @user, role: 'student')
+
+    # Only show courses to students if extensions are enabled at the course level
+    student_courses = UserToCourse.includes(course: :course_settings).where(user: @user, role: 'student')
+    @student_courses = student_courses.select do |utc|
+      # Include courses where course_settings is nil (not yet configured) or extensions are enabled
+      course_settings = utc.course.course_settings
+      course_settings.nil? || course_settings.enable_extensions
+    end
   end
 
   def show
@@ -16,6 +23,12 @@ class CoursesController < ApplicationController
 
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+
+    # Redirect students if extensions are disabled at the course level
+    if @role == 'student'
+      course_settings = @course.course_settings
+      return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' if course_settings && !course_settings.enable_extensions
+    end
 
     @assignments = if @role == 'student'
                      Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)

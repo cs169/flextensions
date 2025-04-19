@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const token = document.querySelector('meta[name="csrf-token"]').content;
   
-          await fetch(url, {
+          const response = await fetch(url, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -18,6 +18,17 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({ enabled: enabled }),
           });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            // If the server returned a redirect URL, navigate to it to display the flash message
+            if (data.redirect_to) {
+              window.location.href = data.redirect_to;
+              return;
+            }
+            throw new Error(data.error || 'Error updating assignment');
+          }
   
           console.log(`Assignment ${assignmentId} enabled: ${enabled}`);
         } catch (error) {

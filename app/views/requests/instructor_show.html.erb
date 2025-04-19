@@ -4,6 +4,15 @@
 		<div class="col-12">
 			<%= render "courses/course_title" %>
 			
+			<% course_settings = @course.course_settings %>
+			<% extensions_enabled = course_settings.nil? || course_settings.enable_extensions %>
+			
+			<% unless extensions_enabled %>
+			<div class="alert alert-warning">
+				<strong>Extensions are disabled for this course.</strong> To process extension requests, please enable extensions in <a href="<%= course_settings_path(@course, tab: 'general') %>">Course Settings</a>.
+			</div>
+			<% end %>
+			
 			<div class="card mb-4 rounded-0">
 				<div class="card-header bg-light d-flex justify-content-between">
 					<h5 class="mb-0 bg-blue">Extension Request Details</h5>
@@ -102,8 +111,13 @@
 			<!-- Display Buttons -->
 			<div class="d-flex justify-content-center mt-4">
 			  <% if @request.status == 'pending' %>
-				<%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
-				<%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-danger me-3' %>
+			    <% if extensions_enabled %>
+				  <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
+				  <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-danger me-3' %>
+				<% else %>
+				  <button class="btn btn-success me-3" disabled>Approve</button>
+				  <button class="btn btn-danger me-3" disabled>Reject</button>
+				<% end %>
 				<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
 				<%= link_to 'Back', course_requests_path(@course), class: "btn btn-dark" %>
 			  <% else %>
