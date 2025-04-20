@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_19_081719) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
 
   create_table "course_settings", force: :cascade do |t|
     t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "enable_extensions", default: false
     t.integer "auto_approve_days", default: 0
     t.integer "auto_approve_dsp_days", default: 0
@@ -40,8 +42,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_18_015921) do
     t.string "reply_email"
     t.string "email_subject", default: "Extension Request Status: {{status}} - {{course_code}}"
     t.text "email_template", default: "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 
