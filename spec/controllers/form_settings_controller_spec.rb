@@ -7,6 +7,7 @@ RSpec.describe FormSettingsController, type: :controller do
 
   before do
     session[:user_id] = user.canvas_uid
+    allow_any_instance_of(Course).to receive(:user_role).and_return('instructor')
     course.create_form_setting!(
       documentation_disp: 'hidden',
       custom_q1_disp: 'optional',
@@ -110,6 +111,18 @@ RSpec.describe FormSettingsController, type: :controller do
         }
         expect(response).to redirect_to(root_path)
         expect(flash[:alert]).to eq('User not found in the database.')
+      end
+    end
+
+    context 'when user is a student' do
+      before do
+        allow_any_instance_of(Course).to receive(:user_role).and_return('student')
+      end
+
+      it 'denies access and redirects to courses path' do
+        patch :update, params: valid_params
+        expect(response).to redirect_to(courses_path)
+        expect(flash[:alert]).to eq('You do not have access to this page.')
       end
     end
   end

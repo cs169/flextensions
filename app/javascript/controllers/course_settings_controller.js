@@ -4,10 +4,8 @@ export default class extends Controller {
   static targets = ["emailField", "tab"]
   
   connect() {
-    // Initialize the form state when controller is connected
     this.toggleEmailFields();
     
-    // Add event listener to the email toggle
     const emailToggle = document.getElementById('enable-email');
     if (emailToggle) {
       emailToggle.addEventListener('change', this.toggleEmailFields.bind(this));
@@ -30,7 +28,6 @@ export default class extends Controller {
     url.searchParams.set('tab', tabName);
     window.history.pushState({}, '', url);
     
-    // Update hidden field value
     const tabInput = document.getElementById('tab');
     if (tabInput) {
       tabInput.value = tabName;
