@@ -12,16 +12,21 @@ class CourseToLms < ApplicationRecord
       req.params['include[]'] = 'all_dates' # Include all dates in the response
     end
 
-    
     if response.success?
       assignments = JSON.parse(response.body)
-      Rails.logger.info "Assignments fetched successfully: #{assignments}"
 
       # Process assignments to extract base dates
       assignments.each do |assignment|
         if assignment['all_dates']
           base_date = assignment['all_dates'].find { |date| date['base'] == true }
-          assignment['base_date'] = base_date if base_date
+          if base_date
+            assignment['base_date'] = base_date
+            Rails.logger.info "Base date found for assignment #{assignment['id']}: #{base_date}"
+          else
+            Rails.logger.warn "No base date found for assignment #{assignment['id']}"
+          end
+        else
+          Rails.logger.warn "No 'all_dates' field for assignment #{assignment['id']}"
         end
       end
 
