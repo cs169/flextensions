@@ -22,7 +22,8 @@ RSpec.describe CourseToLms, type: :model do
           headers: {
             'Authorization' => "Bearer #{token}",
             'Content-Type' => 'application/json'
-          }
+          },
+          query: { 'include[]' => 'all_dates' }
         )
         .to_return(status: 200, body: assignments_response.to_json, headers: { 'Content-Type' => 'application/json' })
     end
