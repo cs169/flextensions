@@ -1,5 +1,6 @@
 <%= render "layouts/sidebar" %>
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4"
+     data-controller="course-settings">
     <div class="row">
         <div class="col-12">
             <%= render "courses/course_title" %>
@@ -13,7 +14,9 @@
                             role="tab" 
                             aria-controls="course-default" 
                             aria-selected="<%= params[:tab] == 'email' ? 'false' : 'true' %>"
-                            onclick="document.getElementById('tab').value='general'; updateUrlParam('general');">General Settings</button>
+                            data-course-settings-target="tab"
+                            data-action="click->course-settings#updateUrlParam"
+                            data-tab="general">General Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link <%= params[:tab] == 'email' ? 'active' : '' %>" 
@@ -24,7 +27,9 @@
                             role="tab" 
                             aria-controls="course-email" 
                             aria-selected="<%= params[:tab] == 'email' ? 'true' : 'false' %>"
-                            onclick="document.getElementById('tab').value='email'; updateUrlParam('email');">Email Settings</button>
+                            data-course-settings-target="tab"
+                            data-action="click->course-settings#updateUrlParam"
+                            data-tab="email">Email Settings</button>
                 </li>
             </ul>
             <%= form_with url: course_settings_update_path, method: :post do |form| %>
@@ -109,7 +114,8 @@
                                                           @course.course_settings&.reply_email, 
                                                           class: 'form-control', 
                                                           id: 'reply-email', 
-                                                          placeholder: 'example@berkeley.edu',
+                                                          placeholder: 'example@example.com',
+                                                          data: { course_settings_target: "emailField" },
                                                           disabled: !@course.course_settings&.enable_emails %>
                                     </div>
                                 </div>
@@ -191,26 +197,3 @@
         </div>
     </div>
 </div>
-
-<script>
-  // Update URL parameter without page reload
-  function updateUrlParam(tabName) {
-    const url = new URL(window.location);
-    url.searchParams.set('tab', tabName);
-    window.history.pushState({}, '', url);
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const extensionsToggle = document.getElementById('course-enable');
-    const emailToggle = document.getElementById('enable-email');
-    const replyEmailField = document.getElementById('reply-email');
-    
-    function toggleEmailFields() {
-      const isEnabled = emailToggle.checked;
-      replyEmailField.disabled = !isEnabled;
-    }
-    
-    toggleEmailFields();
-    emailToggle.addEventListener('change', toggleEmailFields);
-  });
-</script>

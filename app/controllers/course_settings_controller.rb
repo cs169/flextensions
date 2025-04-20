@@ -2,6 +2,7 @@ class CourseSettingsController < ApplicationController
   before_action :authenticated!
   before_action :authenticate_user
   before_action :set_course
+  before_action :ensure_instructor_role
   before_action :set_pending_request_count
 
   # Default template settings
@@ -72,5 +73,12 @@ class CourseSettingsController < ApplicationController
 
   def set_pending_request_count
     @pending_requests_count = Request.where(course_id: @course&.id, status: 'pending').count
+  end
+
+  def ensure_instructor_role
+    return if @role == 'instructor'
+
+    flash[:alert] = 'You do not have access to this page.'
+    redirect_to courses_path
   end
 end
