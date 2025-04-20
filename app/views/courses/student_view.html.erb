@@ -8,7 +8,6 @@
             <thead>
               <tr class="table-info">
                 <th>Assignment</th>
-                <th class="text-center">View</th>
                 <th class="text-center" style="min-width: 215px;">Due Date</th>
                 <th class="text-center" style="min-width: 215px;">Late Due Date</th>
                 <th class="text-center" style="width: 50px;">Request</th>
@@ -18,25 +17,24 @@
               <% @assignments.each do |assignment| %>
                 <tr>
                   <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                  <td><%= assignment.name %></td>
-                  <td class="text-center">
-                    <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                      bCourses
-                    </a>
+                  <td><%= assignment.name %>
+                        <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
+                          <i class="fas fa-up-right-from-square"></i>
+                        </a>
                   </td>
-                  <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d, %Y %-I:%M%P") || 'N/A' %></td>
+                  <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %></td>
                   <td class="text-center">
                     <% last_approved_request = @course.requests.where(user: @user, assignment_id: assignment.id, status: 'approved').order(:updated_at).last %>
                     <% if last_approved_request.present? %>
-                      <%= last_approved_request.requested_due_date.strftime("%a, %b %-d, %Y %-I:%M%P") %>
+                      <%= last_approved_request.requested_due_date.strftime("%a, %b %-d at %-I:%M%P") %>
                     <% else %>
-                      <%= assignment.late_due_date&.strftime("%a, %b %-d, %Y %-I:%M%P") || 'N/A' %>
+                      <%= assignment.late_due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %>
                     <% end %>
                   </td>
                   <td class="text-center">
-                    <% existing_request = @course.requests.find_by(user: @user, assignment_id: assignment.id) %>
+                    <% existing_request = @course.requests.where(user: @user, assignment_id: assignment.id).order(id: :desc).first %>
                     <% if existing_request.present? %>
-                      <a href="<%= course_request_path(@course, existing_request) %>" class="btn btn-sm btn-primary">Show</a>
+                      <a href="<%= course_request_path(@course, existing_request) %>" class="btn btn-sm btn-primary">View</a>
                     <% else %>
                       <a href="<%= new_course_request_path(@course) + '?assignment_id=' + assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
                     <% end %>

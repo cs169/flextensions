@@ -49,7 +49,7 @@ class Course < ApplicationRecord
     unless course.form_setting
       form_setting = course.build_form_setting(
         documentation_desc: <<~DESC,
-          Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.
+          Please provide links to any additional details if relevant.
         DESC
         documentation_disp: 'hidden',
         custom_q1_disp: 'hidden',
@@ -103,7 +103,7 @@ class Course < ApplicationRecord
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
     assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-    assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present? && (assignment.late_due_date.nil? || assignment.late_due_date < DateTime.parse(assignment_data['due_at']))
+    assignment.late_due_date = DateTime.parse(assignment_data['lock_at']) if assignment_data['lock_at'].present?
     assignment.save!
   end
 
