@@ -105,8 +105,8 @@
 				  <% if @request.status == 'pending' %>
 					<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
 					<%= button_to "Cancel Request",
-						course_request_path(@course, @request),
-						method: :cancel,
+						cancel_course_request_path(@course, @request),
+						method: :post,
 						class: "btn btn-danger me-3",
 						data: {
 							confirm: "Are you sure you want to cancel this request?",
