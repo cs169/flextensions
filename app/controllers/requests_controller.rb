@@ -179,10 +179,8 @@ class RequestsController < ApplicationController
   end
 
   def check_extensions_enabled_for_students
-    # Only apply this check for students
     return unless @role == 'student'
 
-    # Check if extensions are disabled for this course
     course_settings = @course.course_settings
     return unless course_settings && !course_settings.enable_extensions
 
