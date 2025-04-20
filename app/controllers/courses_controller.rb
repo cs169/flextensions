@@ -105,6 +105,10 @@ class CoursesController < ApplicationController
     CourseToLms.where(course_id: user_courses).destroy_all
     UserToCourse.where(course_id: user_courses).destroy_all
 
+    # Delete course_settings and form_settings associated with the user's courses
+    CourseSettings.where(course_id: user_courses).destroy_all
+    FormSetting.where(course_id: user_courses).destroy_all
+
     # Delete courses that no longer have any user-to-course associations
     Course.where.missing(:user_to_courses).destroy_all
 
