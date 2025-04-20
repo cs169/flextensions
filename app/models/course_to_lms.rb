@@ -19,14 +19,7 @@ class CourseToLms < ApplicationRecord
       assignments.each do |assignment|
         if assignment['all_dates']
           base_date = assignment['all_dates'].find { |date| date['base'] == true }
-          if base_date
-            assignment['base_date'] = base_date
-            Rails.logger.info "Base date found for assignment #{assignment['id']}: #{base_date}"
-          else
-            Rails.logger.warn "No base date found for assignment #{assignment['id']}"
-          end
-        else
-          Rails.logger.warn "No 'all_dates' field for assignment #{assignment['id']}"
+          assignment['base_date'] = base_date
         end
       end
 

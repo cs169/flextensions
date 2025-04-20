@@ -101,8 +101,17 @@ class Course < ApplicationRecord
   def self.sync_assignment(course_to_lms, assignment_data)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
-    assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
+
+    # Extract due_at from base_date if present
+    if assignment_data['base_date'] && assignment_data['base_date']['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['base_date']['due_at'])
+    elsif assignment_data['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['due_at'])
+    end
+
+    # Extract lock_at for late_due_date
     assignment.late_due_date = DateTime.parse(assignment_data['lock_at']) if assignment_data['lock_at'].present?
+
     assignment.save!
   end
 
