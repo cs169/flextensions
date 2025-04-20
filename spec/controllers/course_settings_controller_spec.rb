@@ -24,102 +24,99 @@ RSpec.describe CourseSettingsController, type: :controller do
     end
 
     describe 'POST #update' do
-      context 'when course settings do not exist' do
-        it 'creates new course settings' do
-          # First explicitly check no settings exist
-          expect(CourseSettings.where(course_id: course.id).count).to eq(0)
+      it 'creates new course settings when none exist' do
+        # First explicitly check no settings exist
+        expect(CourseSettings.where(course_id: course.id).count).to eq(0)
 
-          post :update, params: {
-            course_id: course.id,
-            course_settings: {
-              enable_extensions: 'true',
-              auto_approve_days: '3',
-              auto_approve_dsp_days: '5',
-              enable_emails: 'true'
-            },
-            tab: 'general'
-          }
+        post :update, params: {
+          course_id: course.id,
+          course_settings: {
+            enable_extensions: 'true',
+            auto_approve_days: '3',
+            auto_approve_dsp_days: '5',
+            enable_emails: 'true'
+          },
+          tab: 'general'
+        }
 
-          # Now verify a new settings record was created
-          expect(CourseSettings.where(course_id: course.id).count).to eq(1)
-          expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
-          expect(flash[:notice]).to eq('Course settings updated successfully.')
-          settings = CourseSettings.find_by(course_id: course.id)
-          expect(settings.enable_extensions).to be true
-          expect(settings.auto_approve_days).to eq(3)
-        end
+        # Now verify a new settings record was created
+        expect(CourseSettings.where(course_id: course.id).count).to eq(1)
+        expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
+        expect(flash[:notice]).to eq('Course settings updated successfully.')
+        settings = CourseSettings.find_by(course_id: course.id)
+        expect(settings.enable_extensions).to be true
+        expect(settings.auto_approve_days).to eq(3)
       end
 
-      context 'when course settings already exist' do
-        let!(:course_settings) do
-          CourseSettings.create!(
-            course: course,
-            enable_extensions: false,
-            auto_approve_days: 1,
-            auto_approve_dsp_days: 2,
-            max_auto_approve: 5,
-            enable_emails: false
-          )
-        end
+      it 'updates existing course settings' do
+        # Create existing settings
+        course_settings = CourseSettings.create!(
+          course: course,
+          enable_extensions: false,
+          auto_approve_days: 1,
+          auto_approve_dsp_days: 2,
+          max_auto_approve: 5,
+          enable_emails: false
+        )
 
-        it 'updates existing course settings' do
-          expect(CourseSettings.where(course_id: course.id).count).to eq(1)
+        expect(CourseSettings.where(course_id: course.id).count).to eq(1)
 
-          post :update, params: {
-            course_id: course.id,
-            course_settings: {
-              enable_extensions: 'true',
-              auto_approve_days: '3'
-            },
-            tab: 'general'
-          }
+        post :update, params: {
+          course_id: course.id,
+          course_settings: {
+            enable_extensions: 'true',
+            auto_approve_days: '3'
+          },
+          tab: 'general'
+        }
 
-          expect(CourseSettings.where(course_id: course.id).count).to eq(1) # Still only 1 record
-          expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
-          expect(flash[:notice]).to eq('Course settings updated successfully.')
+        expect(CourseSettings.where(course_id: course.id).count).to eq(1) # Still only 1 record
+        expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
+        expect(flash[:notice]).to eq('Course settings updated successfully.')
 
-          # Force reload to get updated values
-          course_settings.reload
-          expect(course_settings.enable_extensions).to be true
-          expect(course_settings.auto_approve_days).to eq(3)
-        end
-
-        it 'handles update failures gracefully' do
-          expect(CourseSettings.where(course_id: course.id).count).to eq(1)
-          allow_any_instance_of(CourseSettings).to receive(:update).and_return(false)
-
-          post :update, params: {
-            course_id: course.id,
-            course_settings: { enable_extensions: 'true' },
-            tab: 'general'
-          }
-
-          expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
-          expect(flash[:alert]).to eq('Failed to update course settings.')
-        end
+        # Force reload to get updated values
+        course_settings.reload
+        expect(course_settings.enable_extensions).to be true
+        expect(course_settings.auto_approve_days).to eq(3)
       end
 
-      context 'resetting email templates' do
-        let!(:course_settings) do
-          CourseSettings.create!(
-            course: course,
-            enable_extensions: true,
-            email_subject: 'Custom Subject',
-            email_template: 'Custom Template'
-          )
-        end
+      it 'handles update failures gracefully' do
+        CourseSettings.create!(
+          course: course,
+          enable_extensions: false,
+          auto_approve_days: 1
+        )
 
-        it 'resets email templates and redirects' do
-          post :update, params: {
-            course_id: course.id,
-            reset_email_template: true,
-            tab: 'email'
-          }
+        expect(CourseSettings.where(course_id: course.id).count).to eq(1)
+        allow_any_instance_of(CourseSettings).to receive(:update).and_return(false)
 
-          expect(response).to redirect_to(course_settings_path(course.id, tab: 'email'))
-          expect(flash[:notice]).to eq('Email templates reset to defaults.')
-          # We won't test the exact content since that requires knowledge of the constants
-        end
+        post :update, params: {
+          course_id: course.id,
+          course_settings: { enable_extensions: 'true' },
+          tab: 'general'
+        }
+
+        expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
+        expect(flash[:alert]).to eq('Failed to update course settings.')
+      end
+
+      it 'resets email templates and redirects' do
+        CourseSettings.create!(
+          course: course,
+          enable_extensions: true,
+          email_subject: 'Custom Subject',
+          email_template: 'Custom Template'
+        )
+
+        post :update, params: {
+          course_id: course.id,
+          reset_email_template: true,
+          tab: 'email'
+        }
+
+        expect(response).to redirect_to(course_settings_path(course.id, tab: 'email'))
+        expect(flash[:notice]).to eq('Email templates reset to defaults.')
+        # We won't test the exact content since that requires knowledge of the constants
       end
     end
   end
@@ -142,18 +139,19 @@ RSpec.describe CourseSettingsController, type: :controller do
       UserToCourse.create!(user: instructor, course: course, role: 'instructor')
       allow_any_instance_of(Course).to receive(:user_role).with(instructor).and_return('instructor')
 
-      @controller.instance_variable_set(:@pending_requests_count, nil)
-
       # Create settings to enable extensions
       CourseSettings.create!(
         course: course,
         enable_extensions: true
       )
+
+      # Clear instance variables before each test
+      controller.instance_variable_set(:@pending_requests_count, nil)
     end
 
     it 'sets the correct pending requests count' do
       # Create a pending request with all required fields
-      request = Request.create!(
+      Request.create!(
         course: course,
         assignment: assignment,
         status: 'pending',
@@ -163,7 +161,8 @@ RSpec.describe CourseSettingsController, type: :controller do
       )
 
       # Stub the count query to ensure it returns 1
-      allow(Request).to receive(:where).with(course_id: course.id, status: 'pending').and_return(double(count: 1))
+      requests = instance_double(ActiveRecord::Relation, count: 1)
+      allow(Request).to receive(:where).with(course_id: course.id, status: 'pending').and_return(requests)
 
       post :update, params: {
         course_id: course.id,
@@ -176,7 +175,8 @@ RSpec.describe CourseSettingsController, type: :controller do
 
     it 'handles when there are no pending requests' do
       # Stub the count query to ensure it returns 0
-      allow(Request).to receive(:where).with(course_id: course.id, status: 'pending').and_return(double(count: 0))
+      requests = instance_double(ActiveRecord::Relation, count: 0)
+      allow(Request).to receive(:where).with(course_id: course.id, status: 'pending').and_return(requests)
 
       post :update, params: {
         course_id: course.id,
