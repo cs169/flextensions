@@ -44,8 +44,7 @@
                            id="assignment-<%= assignment.id %>-enabled" 
                            <%= 'checked' if assignment.enabled %> 
                            data-assignment-id="<%= assignment.id %>" 
-                           data-url="<%= toggle_enabled_assignment_path(assignment) %>"
-                           <%= 'disabled' unless extensions_enabled %>>
+                           data-url="<%= toggle_enabled_assignment_path(assignment) %>">
                     <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
                   </div>
                 </td>

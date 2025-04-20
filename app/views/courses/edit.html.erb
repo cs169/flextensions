@@ -126,8 +126,7 @@
                                               name: "reset_email_template", 
                                               value: "true", 
                                               class: "btn btn-secondary btn-sm",
-                                              type: "submit",
-                                              disabled: !@course.course_settings&.enable_extensions %>
+                                              type: "submit" %>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
@@ -135,8 +134,7 @@
                                     <%= text_field_tag 'course_settings[email_subject]', 
                                                      @course.course_settings&.email_subject || "Extension Request Status: {{status}} - {{course_code}}", 
                                                      class: 'form-control', 
-                                                     id: 'email-subject',
-                                                     disabled: !@course.course_settings&.enable_emails %>
+                                                     id: 'email-subject' %>
                                     <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
                                 </div>
                                 
@@ -146,8 +144,7 @@
                                                     @course.course_settings&.email_template || "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff", 
                                                     class: 'form-control', 
                                                     id: 'email-template', 
-                                                    rows: 10,
-                                                    disabled: !@course.course_settings&.enable_emails %>
+                                                    rows: 10 %>
                                 </div>
                                 
                                 <div class="card bg-light mt-3">
@@ -207,30 +204,13 @@
     const extensionsToggle = document.getElementById('course-enable');
     const emailToggle = document.getElementById('enable-email');
     const replyEmailField = document.getElementById('reply-email');
-    const emailSubjectField = document.getElementById('email-subject');
-    const emailTemplateField = document.getElementById('email-template');
-    const autoApproveField = document.getElementById('auto-approve');
-    const autoApproveDspField = document.getElementById('auto-approve-dsp');
-    const maxAutoApproveField = document.getElementById('max-auto-approve');
     
     function toggleEmailFields() {
       const isEnabled = emailToggle.checked;
-      replyEmailField.disabled = !isEnabled || !extensionsToggle.checked;
-      emailSubjectField.disabled = !isEnabled || !extensionsToggle.checked;
-      emailTemplateField.disabled = !isEnabled || !extensionsToggle.checked;
+      replyEmailField.disabled = !isEnabled;
     }
     
-    function toggleAllSettings() {
-      const isEnabled = extensionsToggle.checked;
-      emailToggle.disabled = !isEnabled;
-      autoApproveField.disabled = !isEnabled;
-      autoApproveDspField.disabled = true; // Always disabled as it's under construction
-      maxAutoApproveField.disabled = !isEnabled;
-      toggleEmailFields();
-    }
-    
-    toggleAllSettings();
-    extensionsToggle.addEventListener('change', toggleAllSettings);
+    toggleEmailFields();
     emailToggle.addEventListener('change', toggleEmailFields);
   });
 </script>

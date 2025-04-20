@@ -41,11 +41,11 @@ RSpec.describe AssignmentsController, type: :controller do
         course_settings.update!(enable_extensions: false)
       end
 
-      it 'does not enable the assignment and returns unprocessable_entity status' do
+      it 'still allows enabling the assignment and returns ok status' do
         post :toggle_enabled, params: { id: assignment.id, enabled: true }
 
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(assignment.reload.enabled).to be false
+        expect(response).to have_http_status(:ok)
+        expect(assignment.reload.enabled).to be true
       end
     end
   end

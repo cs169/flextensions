@@ -79,8 +79,10 @@
 					</td>
 					<td class="text-center align-content-center">
 					<%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
-					<%= link_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
-					<%= link_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
+					<div class="btn-group d-inline-flex">
+						<%= button_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
+						<%= button_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
+					</div>
 					</td>
 				</tr>
 				<% end %>
