@@ -9,10 +9,23 @@ class CourseToLms < ApplicationRecord
     response = Faraday.get(url) do |req|
       req.headers['Authorization'] = "Bearer #{token}"
       req.headers['Content-Type'] = 'application/json'
+      req.params['include[]'] = 'all_dates' # Include all dates in the response
     end
 
+    
     if response.success?
-      JSON.parse(response.body)
+      assignments = JSON.parse(response.body)
+      Rails.logger.info "Assignments fetched successfully: #{assignments}"
+
+      # Process assignments to extract base dates
+      assignments.each do |assignment|
+        if assignment['all_dates']
+          base_date = assignment['all_dates'].find { |date| date['base'] == true }
+          assignment['base_date'] = base_date if base_date
+        end
+      end
+
+      assignments
     else
       Rails.logger.error "Failed to fetch assignments: #{response.status} - #{response.body}"
       []
