@@ -101,9 +101,9 @@
                 <h6 class="mb-2">
                   Additional Documentation<% if @form_settings.documentation_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
                 </h6>
-				<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
                 <% if @form_settings.documentation_desc.presence %>
-                  <p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+                    <p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+                    <p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
                 <% end %>
                 <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 3, required: (@form_settings.documentation_disp == 'required') %>
               </div>

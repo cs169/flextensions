@@ -64,9 +64,9 @@
 					<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
 						<div class="mb-4">
 							<h6 class="mb-2">Additional Documentation</h6>
-							<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
 							<% if @form_settings.documentation_desc.present? %>
 								<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+								<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
 							<% end %>
 							<div class="p-3 bg-light">
 								<%= @request.documentation %>
