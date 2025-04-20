@@ -164,7 +164,7 @@ RSpec.describe RequestsController, type: :controller do
       post :cancel, params: { course_id: course.id, id: request.id }
 
       expect(response).to redirect_to(course_requests_path(course))
-      expect(flash[:alert]).to match(/Failed to cancel the request./i)
+      expect(flash[:alert]).to match('Failed to cancel the request.')
       expect(request.reload.status).not_to eq('denied')
     end
   end

@@ -86,7 +86,7 @@ class RequestsController < ApplicationController
     if @request.reject(@user)
       redirect_to course_requests_path(@course), notice: 'Request canceled successfully.'
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to canceled the request.'
+      redirect_to course_requests_path(@course), alert: 'Failed to cancel the request.'
     end
   end
 
