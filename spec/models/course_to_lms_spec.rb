@@ -38,6 +38,13 @@ RSpec.describe CourseToLms, type: :model do
     context 'when the API call fails' do
       before do
         stub_request(:get, "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/123/assignments")
+          .with(
+            headers: {
+              'Authorization' => "Bearer #{token}",
+              'Content-Type' => 'application/json'
+            },
+            query: { 'include[]' => 'all_dates' }
+          )
           .to_return(status: 500, body: 'Internal Server Error')
       end
 
