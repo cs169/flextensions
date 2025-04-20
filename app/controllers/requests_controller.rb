@@ -83,12 +83,13 @@ class RequestsController < ApplicationController
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
 
+    Rails.logger.info "Cancelling request: #{@request.inspect}"
     if @request.reject(@user)
-      redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
+      redirect_to course_requests_path(@course), notice: 'Request cancelled successfully.'
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
+      redirect_to course_requests_path(@course), alert: 'Failed to cancelled the request.'
     end
-    redirect_to course_path(@course), notice: 'Request was successfully deleted.'
+    
   end
 
   def approve
