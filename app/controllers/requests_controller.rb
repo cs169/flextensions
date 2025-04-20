@@ -15,7 +15,7 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @side_nav = 'requests'
-    @requests = @course.requests.includes(:assignment).where.not(status: 'pending').order(created_at: :asc)
+    @requests = @course.requests.includes(:assignment, :last_processed_by_user).where.not(status: 'pending').order(created_at: :asc)
     render_role_based_view(view: 'history')
   end
 
@@ -90,20 +90,20 @@ class RequestsController < ApplicationController
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
-
-    if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token))
+  
+    if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
     end
   end
-
+  
   def reject
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
-
-    if @request.reject
+  
+    if @request.reject(@user)
       redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
