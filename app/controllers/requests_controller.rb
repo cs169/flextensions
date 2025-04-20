@@ -84,9 +84,9 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
 
     if @request.reject(@user)
-      redirect_to course_requests_path(@course), notice: 'Request cancelled successfully.'
+      redirect_to course_requests_path(@course), notice: 'Request canceled successfully.'
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to cancelled the request.'
+      redirect_to course_requests_path(@course), alert: 'Failed to canceled the request.'
     end
   end
 
