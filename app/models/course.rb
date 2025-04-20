@@ -5,6 +5,7 @@ class Course < ApplicationRecord
   has_many :user_to_courses
   has_many :users, through: :user_to_courses
   has_one :form_setting, dependent: :destroy
+  has_one :course_settings, dependent: :destroy
   has_many :requests, dependent: :destroy
 
   # Validations
@@ -55,6 +56,35 @@ class Course < ApplicationRecord
         custom_q2_disp: 'hidden'
       )
       form_setting.save!
+    end
+
+    # Create a 1-to-1 course_settings record if it doesn't exist
+    unless course.course_settings
+      course_settings = course.build_course_settings(
+        enable_extensions: false,
+        auto_approve_days: 0,
+        auto_approve_dsp_days: 0,
+        max_auto_approve: 0,
+        enable_emails: false,
+        reply_email: nil,
+        email_subject: 'Extension Request Status: {{status}} - {{course_code}}',
+        email_template: <<~TEMPLATE
+          Dear {{student_name}},
+
+          Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+
+          Extension Details:
+          - Original Due Date: {{original_due_date}}
+          - New Due Date: {{new_due_date}}
+          - Extension Days: {{extension_days}}
+
+          If you have any questions, please contact the course staff.
+
+          Best regards,
+          {{course_name}} Staff
+        TEMPLATE
+      )
+      course_settings.save!
     end
 
     sync_assignments(course_to_lms, token)

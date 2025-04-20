@@ -4,6 +4,8 @@
 		<div class="col-12">
 			<%= render "courses/course_title" %>
 			
+			<%= render "shared/extension_status_warning", course: @course %>
+			
 			<div class="card mb-4 rounded-0">
 				<div class="card-header bg-light d-flex justify-content-between">
 					<h5 class="mb-0 bg-blue">Extension Request Details</h5>
@@ -103,8 +105,8 @@
 			<!-- Display Buttons -->
 			<div class="d-flex justify-content-center mt-4">
 			  <% if @request.status == 'pending' %>
-				<%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
-				<%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-danger me-3' %>
+			    <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
+			    <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-danger me-3' %>
 				<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
 				<%= link_to 'Back', course_requests_path(@course), class: "btn btn-dark" %>
 			  <% else %>

@@ -3,6 +3,9 @@
   <div class="row">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      
+      <%= render "shared/extension_status_warning", course: @course %>
+      
       <div class="table-responsive">
         <table class="table table-bordered table-striped" id="enrollments-table">
           <thead>

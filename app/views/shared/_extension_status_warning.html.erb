@@ -1,0 +1,10 @@
+<%
+  course_settings = course.course_settings
+  extensions_enabled = course_settings.nil? || course_settings.enable_extensions
+%>
+
+<% unless extensions_enabled %>
+<div class="alert alert-warning">
+  <strong>Flextensions is disabled for this course.</strong> To allow to students to see this course, please enable extensions in <a href="<%= course_settings_path(course, tab: 'general') %>">Course Settings</a>.
+</div>
+<% end %> 

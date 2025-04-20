@@ -3,6 +3,9 @@
   <div class="row">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      
+      <%= render "shared/extension_status_warning", course: @course %>
+      
       <div class="table-responsive">
         <table class="table table-bordered table-striped" id="assignments-table">
           <thead>
@@ -11,24 +14,30 @@
               <th class="text-center" >View</th>
               <th class="text-center" style="min-width: 215px;">Due Date</th>
               <th class="text-center" style="min-width: 215px;">Late Due Date</th>
-              <th class="text-center" style="width: 50px;">Enable</th>
+              <th class="text-center" style="width: 80px;">Enable</th>
             </tr>
           </thead>
           <tbody>
             <% @assignments.each do |assignment| %>
               <tr>
                 <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                <td><%= assignment.name %></td>
+                <td class="text-break"><%= assignment.name %></td>
                 <td class="text-center">
                   <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
                     bCourses
                   </a>
                 </td>
-                <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+
+                       <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
                 <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
                 <td class="justify-content-center align-content-center">
-                  <div class="d-flex justify-content-center form-check form-switch">
-                    <input class="form-check-input assignment-enabled-switch" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-enabled" <%= 'checked' if assignment.enabled %> data-assignment-id="<%= assignment.id %>" data-url="<%= toggle_enabled_assignment_path(assignment) %>">
+                  <div class="form-check form-switch mx-auto" style="width: 45px;">
+                    <input class="form-check-input assignment-enabled-switch" type="checkbox" 
+                           role="switch" 
+                           id="assignment-<%= assignment.id %>-enabled" 
+                           <%= 'checked' if assignment.enabled %> 
+                           data-assignment-id="<%= assignment.id %>" 
+                           data-url="<%= toggle_enabled_assignment_path(assignment) %>">
                     <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
                   </div>
                 </td>

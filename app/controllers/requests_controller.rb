@@ -3,6 +3,7 @@ class RequestsController < ApplicationController
   before_action :set_course_role_from_settings
   before_action :authenticate_course
   before_action :set_pending_request_count
+  before_action :check_extensions_enabled_for_students
   before_action :ensure_request_is_pending, only: %i[update approve reject]
 
   def index
@@ -175,5 +176,14 @@ class RequestsController < ApplicationController
     elsif @request.status != 'pending'
       redirect_to course_path(@course), alert: 'This action can only be performed on pending requests.'
     end
+  end
+
+  def check_extensions_enabled_for_students
+    return unless @role == 'student'
+
+    course_settings = @course.course_settings
+    return unless course_settings && !course_settings.enable_extensions
+
+    redirect_to courses_path, alert: 'Extensions are not enabled for this course.'
   end
 end

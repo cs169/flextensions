@@ -3,6 +3,9 @@
 	<div class="row">
 		<div class="col-12">
 			<%= render "courses/course_title" %>
+			
+			<%= render "shared/extension_status_warning", course: @course %>
+			
 			<div class="mb-3 px-4">
 				<label for="form-assignment" class="form-label"><strong>Assignment</strong> (always required)</label>
 				<select class="form-control bg-" id="form-assignment" rows="2" disabled>

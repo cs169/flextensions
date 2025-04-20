@@ -10,6 +10,7 @@ RSpec.describe AssignmentsController, type: :controller do
     let!(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
     let!(:lms) { Lms.create!(lms_name: 'Canvas', use_auth_token: true) }
     let!(:course_to_lms) { CourseToLms.create!(course: course, lms: lms, external_course_id: '123') }
+    let!(:course_settings) { CourseSettings.create!(course: course, enable_extensions: true) }
     let!(:assignment) do
       Assignment.create!(
         name: 'Test Assignment',
@@ -33,6 +34,19 @@ RSpec.describe AssignmentsController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(assignment.reload.enabled).to be false
+    end
+
+    context 'when course-level extensions are disabled' do
+      before do
+        course_settings.update!(enable_extensions: false)
+      end
+
+      it 'still allows enabling the assignment and returns ok status' do
+        post :toggle_enabled, params: { id: assignment.id, enabled: true }
+
+        expect(response).to have_http_status(:ok)
+        expect(assignment.reload.enabled).to be true
+      end
     end
   end
 end

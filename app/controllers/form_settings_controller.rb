@@ -2,6 +2,7 @@ class FormSettingsController < ApplicationController
   before_action :authenticated!
   before_action :authenticate_user
   before_action :set_course
+  before_action :ensure_instructor_role
   before_action :set_pending_request_count
 
   def edit
@@ -58,5 +59,12 @@ class FormSettingsController < ApplicationController
     return unless @user.nil?
 
     redirect_to root_path, alert: 'User not found in the database.'
+  end
+
+  def ensure_instructor_role
+    return if @role == 'instructor'
+
+    flash[:alert] = 'You do not have access to this page.'
+    redirect_to courses_path
   end
 end
