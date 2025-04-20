@@ -19,8 +19,8 @@
 				<th>Assignment</th>
 				<th class="text-center align-content-center" style="min-width: 160px;">User Name</th>
 				<th class="text-center align-content-center" style="min-width: 110px;">Student ID</th>
+				<th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
 				<th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
-				<th class="text-center align-content-center" style="min-width: 198px;">Original Late Due Date</th>
 				<th class="text-center align-content-center" style="min-width: 175px;">Requested Due Date</th>
 				<th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
                 <th class="text-center align-content-center">Status</th>
@@ -40,13 +40,13 @@
 					<%= request.user.try(:student_id) || 'N/A' %>
 					</td>
 					<td class="text-center align-content-center">
-					<%= request.assignment&.due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
+					<%= request.created_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
 					</td>
 					<td class="text-center align-content-center">
-					<%= request.assignment&.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %>
+					<%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
 					</td>
 					<td class="text-center align-content-center">
-					<%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') : 'N/A' %>
+					<%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
 					</td>
 					<td class="text-center align-content-center">
 					<% if request.assignment&.due_date && request.requested_due_date.present? %>
@@ -68,7 +68,7 @@
                     </td>
 					</td>
 					<td class="text-center align-content-center">
-					<%= link_to 'Show', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+					<%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
 					<%= link_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
 					<%= link_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
 					</td>
