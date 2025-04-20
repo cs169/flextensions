@@ -110,7 +110,11 @@ class Course < ApplicationRecord
     end
 
     # Extract lock_at for late_due_date
-    assignment.late_due_date = DateTime.parse(assignment_data['lock_at']) if assignment_data['lock_at'].present?
+    if assignment_data['base_date'] && assignment_data['base_date']['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['base_date']['lock_at'])
+    elsif assignment_data['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['lock_at'])
+    end
 
     assignment.save!
   end
