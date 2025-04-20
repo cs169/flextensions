@@ -105,8 +105,8 @@
 						<% if @form_settings.documentation_desc.presence %>
 							<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
 						<% end %>
-						<%= f.text_area :documentation, class: "form-control mb-2", id: "documentation", rows: 3, required: @form_settings.documentation_disp == 'required'? true : false %>
 						<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
+						<%= f.text_area :documentation, class: "form-control mb-2", id: "documentation", rows: 3, required: @form_settings.documentation_disp == 'required'? true : false %>
 					</div>
 					<% end %>
 					
