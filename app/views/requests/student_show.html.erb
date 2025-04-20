@@ -104,16 +104,16 @@
 				<div class="d-flex justify-content-center mt-4">
 				  <% if @request.status == 'pending' %>
 					<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
-					<%= button_to "Delete Request",
+					<%= button_to "Cancel Request",
 						course_request_path(@course, @request),
-						method: :delete,
+						method: :cancel,
 						class: "btn btn-danger me-3",
 						data: {
-							confirm: "Are you sure you want to delete this request?",
-							confirm_title: "Confirm Deletion",
-							confirm_body: "This request will be permanently removed and cannot be recovered.",
+							confirm: "Are you sure you want to cancel this request?",
+							confirm_title: "Confirm Cancellation",
+							confirm_body: "This request will be canceled and cannot be recovered.",
 							confirm_ok: "Yes, delete it",
-							confirm_cancel: "Cancel",
+							confirm_cancel: "No, keep it",
 							confirm_ok_class: "btn btn-danger",
 							confirm_cancel_class: "btn btn-secondary"
 						} %>
