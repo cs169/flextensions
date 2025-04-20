@@ -4,6 +4,22 @@ RSpec.describe FormSettingsController, type: :controller do
   let(:user) { User.create!(email: 'instructor@example.com', canvas_uid: '12345', name: 'Instructor') }
   let(:course) { Course.create!(course_name: 'Algorithms', canvas_id: '789', course_code: 'CS101') }
   let(:user_to_course) { UserToCourse.create!(user: user, course: course, role: 'teacher') }
+  let(:valid_params) do
+    {
+      course_id: course.id,
+      form_setting: {
+        reason_desc: 'Updated reason',
+        documentation_desc: 'Provide docs',
+        documentation_disp: 'required',
+        custom_q1: 'Q1?',
+        custom_q1_desc: 'Desc 1',
+        custom_q1_disp: 'optional',
+        custom_q2: 'Q2?',
+        custom_q2_desc: 'Desc 2',
+        custom_q2_disp: 'optional'
+      }
+    }
+  end
 
   before do
     session[:user_id] = user.canvas_uid
@@ -46,23 +62,6 @@ RSpec.describe FormSettingsController, type: :controller do
 
   describe 'PATCH #update' do
     context 'with valid params' do
-      let(:valid_params) do
-        {
-          course_id: course.id,
-          form_setting: {
-            reason_desc: 'Updated reason',
-            documentation_desc: 'Provide docs',
-            documentation_disp: 'required',
-            custom_q1: 'Q1?',
-            custom_q1_desc: 'Desc 1',
-            custom_q1_disp: 'optional',
-            custom_q2: 'Q2?',
-            custom_q2_desc: 'Desc 2',
-            custom_q2_disp: 'optional'
-          }
-        }
-      end
-
       it 'updates the form setting and redirects' do
         patch :update, params: valid_params
         expect(response).to redirect_to(edit_course_form_setting_path(course))
