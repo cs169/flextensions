@@ -50,7 +50,7 @@ RSpec.describe FormSettingsController, type: :controller do
     end
 
     context 'when not logged in' do
-      before { session[:user_id] = nil }
+      before { session[:user_id] = 'non_existent_id' }
 
       it 'redirects to root_path' do
         get :edit, params: { course_id: course.id }
@@ -101,7 +101,7 @@ RSpec.describe FormSettingsController, type: :controller do
     end
 
     context 'when not logged in' do
-      before { session[:user_id] = nil }
+      before { session[:user_id] = 'non_existent_id' }
 
       it 'redirects to root_path' do
         patch :update, params: {
