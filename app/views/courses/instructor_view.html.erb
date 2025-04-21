@@ -1,0 +1,70 @@
+<%= render "layouts/sidebar" %>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <%= render "courses/course_title" %>
+      <table class="table table-bordered table-striped" id="assignments-table">
+        <thead>
+          <tr class="table-info">
+            <th>Assignment</th>
+            <th>View</th>
+            <th>Due Date</th>
+            <th>Late Due Date</th>
+            <th style="width: 50px;">Enable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @assignments.each do |assignment| %>
+            <tr>
+              <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
+              <td class="row-check"><%= assignment.name %></td>
+              <td>
+                <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
+                  bCourses
+                </a>
+              </td>
+              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
+              <td class="d-flex justify-content-center align-content-center">
+                <div class="d-flex justify-content-center form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
+                  <label class="form-check-label" for="assignment-<%= assignment.id %>-has-partner"></label>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="text-center">
+        <a href="/courses" class="btn btn-dark">Back</a>
+        <button class="btn btn-info" id="sync-assignments-button" data-course-id="<%= @course.id %>">Sync Assignments</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("sync-assignments-button").addEventListener("click", function () {
+  const courseId = this.getAttribute("data-course-id");
+  fetch(`/courses/${courseId}/sync_assignments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to sync assignments.");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert(data.message || "Assignments synced successfully.");
+      location.reload(); // Reload the page to reflect updated assignments
+    })
+    .catch((error) => {
+      alert(error.message || "An error occurred while syncing assignments.");
+    });
+});
+</script>

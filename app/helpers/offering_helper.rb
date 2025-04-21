@@ -1,0 +1,2 @@
+module OfferingHelper
+end

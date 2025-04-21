@@ -7,11 +7,9 @@ class FailedPipelineError < StandardError
   # @param [String] pipeline the pipeline that failed.
   # @param [String] errorStage the stage in the pipeline the failure occured at.
   # @param [String] additionalMessage any additional info for the error (defaults to "")
-  def initialize(pipeline, errorStage, additionalMessage="")
+  def initialize(pipeline, errorStage, additionalMessage = '')
     message = "An error occured with #{pipeline} at #{errorStage}"
-    if (additionalMessage.length >= 0)
-      message += ": #{additionalMessage}"
-    end
+    message += ": #{additionalMessage}" if additionalMessage.length >= 0
     super(message)
   end
 end

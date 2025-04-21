@@ -3,6 +3,10 @@ module Api
     class UsersController < BaseController
       include ActionController::Flash
 
+      def index
+        render json: 'the index method of UsersController is not yet implemented'.to_json, status: :not_implemented
+      end
+
       def create
         email = params[:email]
 
@@ -19,16 +23,13 @@ module Api
         if new_user.save
           render json: { message: 'User created successfully', user: new_user }, status: :created
         else
-          render json: { message: 'Failed to create user', errors: new_user.errors.full_messages }, status: :unprocessable_entity
+          render json: { message: 'Failed to create user', errors: new_user.errors.full_messages },
+                 status: :unprocessable_entity
         end
       end
-  
-      def index
-        render :json => 'the index method of UsersController is not yet implemented'.to_json, status: 501
-      end
-  
+
       def destroy
-        render :json => 'the destroy method of UsersController is not yet implemented'.to_json, status: 501
+        render json: 'the destroy method of UsersController is not yet implemented'.to_json, status: :not_implemented
       end
     end
   end

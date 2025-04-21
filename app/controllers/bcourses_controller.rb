@@ -1,11 +1,11 @@
 class BcoursesController < ApplicationController
   require 'lms_api'
-
+  skip_before_action :authenticated!
   def index
     # For dev,test,staging, they share the same canvas_test_url
     canvas_url = Rails.application.credentials.canvas.url
     # Assuming LMS::Canvas.new expects a token directly. Adjust as needed for actual API wrapper usage.
-    canvas_api_key = Rails.application.credentials.canvas.api_key   # this will be obtained from omniauth in later iterations
+    canvas_api_key = Rails.application.credentials.canvas.api_key # this will be obtained from omniauth in later iterations
     api = LMS::Canvas.new(canvas_url, canvas_api_key)
 
     # Fetch courses list
@@ -18,7 +18,7 @@ class BcoursesController < ApplicationController
     @error = "Network connection error: #{e.message}"
   rescue Net::ReadTimeout, Net::OpenTimeout => e
     @error = "Network timeout: #{e.message}"
-  rescue => e
+  rescue StandardError => e
     @error = "An unexpected error occurred: #{e.message}"
   end
 end

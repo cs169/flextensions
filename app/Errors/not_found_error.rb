@@ -5,7 +5,7 @@ class NotFoundError < StandardError
   # Constructor for the error.
   #
   # @param [String] message the error message (defaults to "Not Found Error").
-  def initialize(message="Not Found Error")
-    super(message)
+  def initialize(message = 'Not Found Error')
+    super
   end
 end

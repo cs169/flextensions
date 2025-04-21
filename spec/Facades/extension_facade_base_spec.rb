@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe ExtensionFacadeBase do
-  let(:facade) { described_class.new() }
+  let(:facade) { described_class.new }
   let(:mockCourseId) { 16 }
   let(:mockStudentId) { 22 }
   let(:mockAssignmentId) { 18 }
@@ -9,12 +9,14 @@ describe ExtensionFacadeBase do
 
   describe 'provision_extension' do
     it 'throws not implemented error' do
-      expect { facade.provision_extension(
-        mockCourseId,
-        mockStudentId,
-        mockAssignmentId,
-        mockDate
-      ) }.to raise_error(NotImplementedError)
+      expect do
+        facade.provision_extension(
+          mockCourseId,
+          mockStudentId,
+          mockAssignmentId,
+          mockDate
+        )
+      end.to raise_error(NotImplementedError)
     end
   end
 end
