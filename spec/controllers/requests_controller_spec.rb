@@ -137,11 +137,35 @@ RSpec.describe RequestsController, type: :controller do
     end
   end
 
-  describe 'DELETE #destroy' do
-    it 'deletes the request' do
-      delete :destroy, params: { course_id: course.id, id: request.id }
+  describe 'POST #cancel' do
+    before do
+      session[:user_id] = user.canvas_uid
+      UserToCourse.create!(user: user, course: course, role: 'student')
+    end
+
+    it 'cancels the request and updates its status to denied' do
+      post :cancel, params: { course_id: course.id, id: request.id }
+
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:notice]).to match(/Request canceled successfully./i)
+      expect(request.reload.status).to eq('denied')
+    end
+
+    it 'redirects if the request is not found' do
+      post :cancel, params: { course_id: course.id, id: '9999' }
+
       expect(response).to redirect_to(course_path(course))
-      expect(flash[:notice]).to match(/deleted/)
+      expect(flash[:alert]).to eq('Request not found.')
+    end
+
+    it 'does not cancel a request if it fails to update' do
+      allow_any_instance_of(Request).to receive(:reject).and_return(false)
+
+      post :cancel, params: { course_id: course.id, id: request.id }
+
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:alert]).to match('Failed to cancel the request.')
+      expect(request.reload.status).not_to eq('denied')
     end
   end
 

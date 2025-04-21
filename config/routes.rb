@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       member do
         post :approve
         post :reject
+        post :cancel
       end
     end
     resource :form_setting, only: [:edit, :update]

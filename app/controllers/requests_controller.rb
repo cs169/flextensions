@@ -79,12 +79,15 @@ class RequestsController < ApplicationController
     end
   end
 
-  def destroy
+  def cancel
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
 
-    @request.destroy
-    redirect_to course_path(@course), notice: 'Request was successfully deleted.'
+    if @request.reject(@user)
+      redirect_to course_requests_path(@course), notice: 'Request canceled successfully.'
+    else
+      redirect_to course_requests_path(@course), alert: 'Failed to cancel the request.'
+    end
   end
 
   def approve
