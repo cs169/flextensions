@@ -1,18 +1,16 @@
 require 'rails_helper'
 require 'lms_api'
 
-RSpec.describe "Bcourses", type: :request do
+RSpec.describe 'Bcourses', type: :request do
   describe 'GET /index' do
-    let(:canvas_api_key) { 'test_api_key' } 
-    let(:api_mock) { instance_double('LMS::Canvas') }
-    let(:courses) { [{'name' => 'Course 1'}, {'name' => 'Course 2'}] }
-    
-    before do
+    let(:canvas_api_key) { 'test_api_key' }
+    let(:api_mock) { instance_double(LMS::Canvas) }
+    let(:courses) { [{ 'name' => 'Course 1' }, { 'name' => 'Course 2' }] }
 
+    before do
       # Stub to return the URL
-      allow(Rails.application.credentials.canvas).to receive(:url).and_return("https://ucberkeley.test.instructure.com")
       # Stub to return the API key
-      allow(Rails.application.credentials.canvas).to receive(:api_key).and_return('test_api_key')
+      allow(Rails.application.credentials.canvas).to receive_messages(url: 'https://ucberkeley.test.instructure.com', api_key: 'test_api_key')
       allow(LMS::Canvas).to receive(:new).and_return(api_mock)
       allow(api_mock).to receive(:api_get_request).and_return(courses)
     end
@@ -28,7 +26,8 @@ RSpec.describe "Bcourses", type: :request do
     end
 
     context 'when token is expired' do
-      let(:error_message) { "Token expired and needs refresh" }
+      let(:error_message) { 'Token expired and needs refresh' }
+
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(LMS::Canvas::RefreshTokenRequired, 'Refresh token required')
       end
@@ -41,7 +40,8 @@ RSpec.describe "Bcourses", type: :request do
     end
 
     context 'when there is a network connection error' do
-      let(:error_message) { "Network connection error" }
+      let(:error_message) { 'Network connection error' }
+
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(SocketError, 'Connection refused')
       end
@@ -54,7 +54,8 @@ RSpec.describe "Bcourses", type: :request do
     end
 
     context 'when API call fails due to a StandardError (Unexpected Error)' do
-      let(:error_message) { "An unexpected error occurred: Error" }
+      let(:error_message) { 'An unexpected error occurred: Error' }
+
       before do
         allow(api_mock).to receive(:api_get_request).and_raise(StandardError, 'Error')
       end
@@ -65,6 +66,5 @@ RSpec.describe "Bcourses", type: :request do
         expect(response.body).to include(error_message)
       end
     end
-    
   end
 end
