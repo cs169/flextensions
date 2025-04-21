@@ -16,9 +16,6 @@ module Api
         mock_course
         mock_lms
         mock_course_to_lms
-      end
-
-      before do
         allow(controller).to receive(:authenticated!).and_return(true)
       end
 
