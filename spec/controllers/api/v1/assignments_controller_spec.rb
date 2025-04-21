@@ -18,6 +18,10 @@ module Api
         mock_course_to_lms
       end
 
+      before do
+        allow(controller).to receive(:authenticated!).and_return(true)
+      end
+
       after do
         LmsCredential.destroy_all
         Extension.destroy_all
