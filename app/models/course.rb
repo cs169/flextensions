@@ -95,6 +95,7 @@ class Course < ApplicationRecord
   # Find or create the course
   def self.find_or_create_course(course_data)
     course = find_or_initialize_by(canvas_id: course_data['id'])
+    Rails.logger.info "Course data: #{course_data.inspect}"
     course.course_name = course_data['name']
     course.course_code = course_data['course_code']
     course.save!
