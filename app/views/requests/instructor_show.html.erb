@@ -25,7 +25,7 @@
 									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
 								</div>
 								<div class="col-md-6">
-									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %></p>
 								</div>
 							</div>
 						<% else %>

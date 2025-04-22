@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_19_081719) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_21_085323) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -128,6 +128,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_19_081719) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.enum "status", default: "pending", null: false, enum_type: "request_status"
+    t.boolean "auto_approved", default: false
     t.index ["assignment_id"], name: "index_requests_on_assignment_id"
     t.index ["course_id"], name: "index_requests_on_course_id"
     t.index ["last_processed_by_user_id"], name: "index_requests_on_last_processed_by_user_id"

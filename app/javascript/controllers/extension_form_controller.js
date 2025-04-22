@@ -28,7 +28,7 @@ export default class extends Controller {
   updateAssignment() {
     const selectedOption = this.assignmentSelectTarget.selectedOptions[0];
     const newOriginalDueDate = selectedOption.dataset.originalDueDate;
-    const newLateDueDate = selectedOption.dataset.originalLateDueDate;
+    const newLateDueDate = selectedOption.dataset.originalLateDueDate || 'N/A';
   
     if (newOriginalDueDate) {
       const minDate = new Date(newOriginalDueDate.split(" at ")[0]);
