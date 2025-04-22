@@ -34,7 +34,7 @@
 									assignment.id,
 									{
 									"data-original-due-date" => assignment.due_date.strftime('%a, %b %-d, %Y at %-I:%M %p'),
-									"data-original-late-due-date" => assignment.late_due_date.strftime('%a, %b %-d, %Y at %-I:%M %p')
+									"data-original-late-due-date" => assignment.late_due_date&.strftime('%a, %b %-d, %Y at %-I:%M %p')
 									}
 								]
 								end,
@@ -57,7 +57,7 @@
 								<p><strong>Original Due Date: </strong><span id="due-date"><%= @selected_assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') if @selected_assignment %></span></p>
 							</div>
 							<div class="col-md-6 mb-2">
-								<p><strong>Original Late Due Date: </strong><span id="late-due-date"><%= @selected_assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') if @selected_assignment %></span></p>
+								<p><strong>Original Late Due Date: </strong><span id="late-due-date"><%= @selected_assignment&.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' if @selected_assignment %></span></p>
 							</div>
 						</div>
 					</div>
