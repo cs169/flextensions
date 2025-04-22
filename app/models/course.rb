@@ -101,9 +101,10 @@ class Course < ApplicationRecord
     end
 
     if response.success?
-      canvas_course = JSON.parse(response.body)
-      self.course_name = canvas_course['name']
-      self.course_code = canvas_course['course_code']
+      course = find_or_initialize_by(canvas_id: canvas_id)
+      course.course_name = course_name
+      course.course_code = course_code
+      course.save!
     end
     course
   end
@@ -130,8 +131,7 @@ class Course < ApplicationRecord
     end
 
     # Delete assignments that no longer exist in Canvas
-    Assignment.where(course_to_lms_id: course_to_lms.id)
-              .where.not(external_assignment_id: external_assignment_ids).destroy_all
+    Assignment.where(course_to_lms_id: course_to_lms.id).where.not(external_assignment_id: external_assignment_ids).destroy_all
   end
 
   # Sync a single assignment
