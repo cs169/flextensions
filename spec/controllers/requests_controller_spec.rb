@@ -165,7 +165,8 @@ RSpec.describe RequestsController, type: :controller do
           assignment: assignment,
           reason: 'Previous request',
           requested_due_date: 3.days.from_now,
-          status: 'approved'
+          status: 'approved',
+          auto_approved: true
         )
 
         post :create, params: {

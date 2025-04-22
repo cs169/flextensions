@@ -64,5 +64,3 @@ test_lms_credential = LmsCredential.create!({
   token: "test token",
   external_user_id: "44444",
 })
-
-

@@ -225,14 +225,15 @@ RSpec.describe Request, type: :model do
     context 'when user has reached max auto approvals' do
       before do
         course_settings.update(max_auto_approve: 1)
-        # Create a previously approved request
+        # Create a previously approved request that was auto-approved
         described_class.create!(
           user: user,
           course: course,
           assignment: assignment,
           reason: 'Previous request',
           requested_due_date: 3.days.from_now,
-          status: 'approved'
+          status: 'approved',
+          auto_approved: true
         )
       end
 
