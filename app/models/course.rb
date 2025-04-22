@@ -94,11 +94,21 @@ class Course < ApplicationRecord
 
   # Find or create the course
   def self.find_or_create_course(course_data)
-    course = find_or_initialize_by(canvas_id: course_data['id'])
-    Rails.logger.info "Course data: #{course_data.inspect}"
-    course.course_name = course_data['name']
-    course.course_code = course_data['course_code']
-    course.save!
+    canvas_id = course_data['id']
+    response = Faraday.get("#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}") do |req|
+      req.headers['Authorization'] = "Bearer #{ENV.fetch('CANVAS_API_TOKEN')}" # Replace with the token variable
+      req.headers['Content-Type'] = 'application/json'
+    end
+
+    if response.success?
+      canvas_course = JSON.parse(response.body)
+      course_name = canvas_course['name']
+      course_code = canvas_course['course_code']
+    else
+      Rails.logger.error "Failed to fetch course details from Canvas: #{response.status} - #{response.body}"
+      course_name = course_data['name']
+      course_code = course_data['course_code']
+    end
     course
   end
 
