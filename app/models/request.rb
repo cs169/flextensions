@@ -35,6 +35,7 @@ class Request < ApplicationRecord
     return 'Course settings not found.' unless course_settings
 
     template = course_settings.email_template
+    subject = course_settings.email_subject
 
     # Define the placeholders and their corresponding values
     placeholders = {
@@ -50,10 +51,17 @@ class Request < ApplicationRecord
 
     # Replace placeholders in the template using regex
     placeholders.each do |placeholder, value|
+      subject = subject.gsub(placeholder, value || 'N/A')
       template = template.gsub(placeholder, value || 'N/A')
     end
 
-    template
+    { subject: subject, template: template }
+  end
+
+  def send_email_response
+    email_response = generate_email_response
+    Rails.logger.info("Request email subject: #{email_response[:subject]}")
+    Rails.logger.info("Request email body: #{email_response[:template]}")
   end
 
   private

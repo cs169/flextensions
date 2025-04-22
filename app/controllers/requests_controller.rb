@@ -96,8 +96,8 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
 
     if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
-      request_email = @request.generate_email_response
-      redirect_to course_requests_path(@course), notice: request_email
+      @request.send_email_response if @course.course_settings&.enable_emails
+      redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
     end
@@ -109,8 +109,8 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
 
     if @request.reject(@user)
-      request_email = @request.generate_email_response
-      redirect_to course_requests_path(@course), notice: request_email
+      @request.send_email_response if @course.course_settings&.enable_emails
+      redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
     end
