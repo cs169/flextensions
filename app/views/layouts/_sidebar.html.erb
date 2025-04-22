@@ -18,7 +18,7 @@
 		<%= render 'layouts/components/sidebar_menu_item',
 			path: course_requests_path(@course.id),
 			icon: 'fas fa-clock',
-			text: "Requests <span class=\"badge rounded-pill float-end text-bg-danger\">#{@pending_requests_count}</span>",
+			text: "Requests  <span class=\"badge rounded-pill float-end text-bg-danger ms-2\">#{@pending_requests_count}</span>",
 			active: @side_nav == 'requests' %>
 
 		<% if @role == 'instructor' %>

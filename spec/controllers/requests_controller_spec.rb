@@ -75,6 +75,117 @@ RSpec.describe RequestsController, type: :controller do
       expect(flash[:notice]).to match(/submitted/)
     end
 
+    context 'with auto-approval enabled' do
+      before do
+        CourseSettings.create!(
+          course: course,
+          enable_extensions: true,
+          auto_approve_days: 5,
+          max_auto_approve: 3
+        )
+
+        assignment.update(due_date: 1.day.from_now)
+
+        # Mock the SystemUserService
+        system_user = User.create!(email: 'system@example.com', canvas_uid: '999', name: 'System')
+        allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
+
+        # Mock Canvas facade
+        allow_any_instance_of(CanvasFacade).to receive(:get_assignment_overrides).and_return(
+          instance_double(Faraday::Response, success?: true, body: [].to_json)
+        )
+        allow_any_instance_of(CanvasFacade).to receive(:create_assignment_override).and_return(
+          instance_double(Faraday::Response, success?: true, body: { id: 'override-1' }.to_json)
+        )
+      end
+
+      it 'auto-approves eligible requests' do
+        post :create, params: {
+          course_id: course.id,
+          request: {
+            assignment_id: assignment.id,
+            reason: 'Sick',
+            requested_due_date: 3.days.from_now.to_s,
+            due_time: '10:00'
+          }
+        }
+
+        created_request = Request.last
+        expect(created_request.status).to eq('approved')
+        expect(created_request.auto_approved).to be true
+        expect(response).to redirect_to(course_request_path(course, created_request))
+        expect(flash[:notice]).to match(/approved/)
+      end
+
+      it 'submits without auto-approval when extension is too long' do
+        post :create, params: {
+          course_id: course.id,
+          request: {
+            assignment_id: assignment.id,
+            reason: 'Sick',
+            requested_due_date: 10.days.from_now.to_s,
+            due_time: '10:00'
+          }
+        }
+
+        created_request = Request.last
+        expect(created_request.status).not_to eq('approved')
+        expect(created_request.auto_approved).to be_falsey
+        expect(response).to redirect_to(course_request_path(course, created_request))
+        expect(flash[:notice]).to match(/submitted/)
+      end
+
+      it 'redirects when auto-approval is disabled' do
+        CourseSettings.update(course.course_settings.id, enable_extensions: false)
+        course.reload
+
+        post :create, params: {
+          course_id: course.id,
+          request: {
+            assignment_id: assignment.id,
+            reason: 'Sick',
+            requested_due_date: 3.days.from_now.to_s,
+            due_time: '10:00'
+          }
+        }
+
+        # Should redirect with the appropriate message
+        expect(response).to redirect_to(courses_path)
+        expect(flash[:alert]).to eq('Extensions are not enabled for this course.')
+        expect(Request.last).to be_nil # No request should be created
+      end
+
+      it 'submits without auto-approval when max approvals reached' do
+        CourseSettings.update(course.course_settings.id, max_auto_approve: 1)
+
+        # Create a pre-existing approved request
+        Request.create!(
+          user: user,
+          course: course,
+          assignment: assignment,
+          reason: 'Previous request',
+          requested_due_date: 3.days.from_now,
+          status: 'approved',
+          auto_approved: true
+        )
+
+        post :create, params: {
+          course_id: course.id,
+          request: {
+            assignment_id: assignment.id,
+            reason: 'Sick',
+            requested_due_date: 3.days.from_now.to_s,
+            due_time: '10:00'
+          }
+        }
+
+        created_request = Request.last
+        expect(created_request.status).not_to eq('approved')
+        expect(response).to redirect_to(course_request_path(course, created_request))
+        expect(flash[:notice]).to match(/submitted/)
+      end
+    end
+
     it 're-renders new if the request is invalid' do
       post :create, params: {
         course_id: course.id,
