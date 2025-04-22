@@ -30,6 +30,32 @@ class Request < ApplicationRecord
     update(status: 'denied', last_processed_by_user_id: processed_user_id.id)
   end
 
+  def generate_email_response
+    course_settings = course.course_settings
+    return 'Course settings not found.' unless course_settings
+
+    template = course_settings.email_template
+
+    # Define the placeholders and their corresponding values
+    placeholders = {
+      '{{student_name}}' => user.name,
+      '{{assignment_name}}' => assignment.name,
+      '{{course_name}}' => course.course_name,
+      '{{course_code}}' => course.course_code,
+      '{{status}}' => status.capitalize,
+      '{{original_due_date}}' => assignment.due_date&.strftime('%a, %b %-d, %Y %-I:%M %p'),
+      '{{new_due_date}}' => requested_due_date&.strftime('%a, %b %-d, %Y %-I:%M %p'),
+      '{{extension_days}}' => calculate_days_difference.to_s
+    }
+
+    # Replace placeholders in the template using regex
+    placeholders.each do |placeholder, value|
+      template = template.gsub(placeholder, value || 'N/A')
+    end
+
+    template
+  end
+
   private
 
   def existing_override(canvas_facade)
