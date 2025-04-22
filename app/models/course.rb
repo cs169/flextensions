@@ -102,8 +102,8 @@ class Course < ApplicationRecord
 
     if response.success?
       course = find_or_initialize_by(canvas_id: canvas_id)
-      course.course_name = course_name
-      course.course_code = course_code
+      course.course_name = response.body['name']
+      course.course_code = response.body['course_code']
       course.save!
     end
     course
