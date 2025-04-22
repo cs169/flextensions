@@ -35,14 +35,14 @@ class Request < ApplicationRecord
   end
 
   def auto_approval_eligible_for_course?
-    return false unless course&.course_settings.present?
+    return false if course&.course_settings.blank?
 
     course.course_settings.enable_extensions &&
       course.course_settings.auto_approve_days.positive?
   end
 
   def eligible_for_auto_approval?
-    return false unless course&.course_settings.present?
+    return false if course&.course_settings.blank?
     return false unless course.course_settings.enable_extensions?
     return false if course.course_settings.auto_approve_days.zero?
 

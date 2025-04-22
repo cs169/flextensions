@@ -23,7 +23,7 @@ RSpec.describe Request, type: :model do
     )
   end
   let(:request) do
-    Request.create!(
+    described_class.create!(
       user: user,
       course: course,
       assignment: assignment,
@@ -45,13 +45,13 @@ RSpec.describe Request, type: :model do
 
   describe 'validations' do
     it 'validates presence of requested_due_date' do
-      request = Request.new(reason: 'Test')
+      request = described_class.new(reason: 'Test')
       expect(request.valid?).to be false
       expect(request.errors[:requested_due_date]).to include("can't be blank")
     end
 
     it 'validates presence of reason' do
-      request = Request.new(requested_due_date: 1.day.from_now)
+      request = described_class.new(requested_due_date: 1.day.from_now)
       expect(request.valid?).to be false
       expect(request.errors[:reason]).to include("can't be blank")
     end
@@ -83,7 +83,7 @@ RSpec.describe Request, type: :model do
         due_time: '14:30'
       }
 
-      Request.merge_date_and_time!(params)
+      described_class.merge_date_and_time!(params)
 
       expect(params[:requested_due_date]).to be_a(Time)
       expect(params[:requested_due_date].strftime('%Y-%m-%d %H:%M')).to eq('2023-05-15 14:30')
@@ -93,7 +93,7 @@ RSpec.describe Request, type: :model do
       params = { due_time: '14:30' }
       original_params = params.dup
 
-      Request.merge_date_and_time!(params)
+      described_class.merge_date_and_time!(params)
 
       expect(params).to eq(original_params)
     end
@@ -102,7 +102,7 @@ RSpec.describe Request, type: :model do
       params = { requested_due_date: '2023-05-15' }
       original_params = params.dup
 
-      Request.merge_date_and_time!(params)
+      described_class.merge_date_and_time!(params)
 
       expect(params).to eq(original_params)
     end
@@ -110,7 +110,7 @@ RSpec.describe Request, type: :model do
 
   describe '#calculate_days_difference' do
     it 'calculates the difference in days between requested due date and assignment due date' do
-      request = Request.new(
+      request = described_class.new(
         requested_due_date: assignment.due_date + 3.days,
         assignment: assignment
       )
@@ -208,7 +208,7 @@ RSpec.describe Request, type: :model do
 
     context 'when requested date is before assignment due date' do
       let(:early_request) do
-        Request.create!(
+        described_class.create!(
           user: user,
           course: course,
           assignment: assignment,
@@ -226,7 +226,7 @@ RSpec.describe Request, type: :model do
       before do
         course_settings.update(max_auto_approve: 1)
         # Create a previously approved request
-        Request.create!(
+        described_class.create!(
           user: user,
           course: course,
           assignment: assignment,
@@ -246,7 +246,7 @@ RSpec.describe Request, type: :model do
         course_settings.update(max_auto_approve: 0)
         # Create several previously approved requests
         3.times do |i|
-          Request.create!(
+          described_class.create!(
             user: user,
             course: course,
             assignment: assignment,
@@ -264,7 +264,7 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#try_auto_approval' do
-    let(:canvas_facade) { instance_double('CanvasFacade') }
+    let(:canvas_facade) { instance_double(CanvasFacade) }
 
     before do
       course_settings
@@ -273,9 +273,7 @@ RSpec.describe Request, type: :model do
 
     context 'when auto approval is eligible and successful' do
       before do
-        allow(request).to receive(:auto_approval_eligible_for_course?).and_return(true)
-        allow(request).to receive(:eligible_for_auto_approval?).and_return(true)
-        allow(request).to receive(:auto_approve).and_return(true)
+        allow(request).to receive_messages(auto_approval_eligible_for_course?: true, eligible_for_auto_approval?: true, auto_approve: true)
       end
 
       it 'returns true' do
@@ -316,8 +314,7 @@ RSpec.describe Request, type: :model do
 
     context 'when request is not eligible for auto approval' do
       before do
-        allow(request).to receive(:auto_approval_eligible_for_course?).and_return(true)
-        allow(request).to receive(:eligible_for_auto_approval?).and_return(false)
+        allow(request).to receive_messages(auto_approval_eligible_for_course?: true, eligible_for_auto_approval?: false)
       end
 
       it 'returns false' do
@@ -327,13 +324,12 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#auto_approve' do
-    let(:canvas_facade) { instance_double('CanvasFacade') }
+    let(:canvas_facade) { instance_double(CanvasFacade) }
     let(:system_user) { User.create!(email: 'system@example.com', canvas_uid: '789', name: 'System') }
 
     before do
       allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
-      allow(request).to receive(:eligible_for_auto_approval?).and_return(true)
-      allow(request).to receive(:approve).and_return(true)
+      allow(request).to receive_messages(eligible_for_auto_approval?: true, approve: true)
     end
 
     it 'calls approve with the system user' do
@@ -348,8 +344,7 @@ RSpec.describe Request, type: :model do
 
     context 'when the system user does not exist yet' do
       before do
-        allow(SystemUserService).to receive(:auto_approval_user).and_return(nil)
-        allow(SystemUserService).to receive(:ensure_auto_approval_user_exists).and_return(system_user)
+        allow(SystemUserService).to receive_messages(auto_approval_user: nil, ensure_auto_approval_user_exists: system_user)
       end
 
       it 'creates a system user' do
@@ -375,8 +370,7 @@ RSpec.describe Request, type: :model do
 
     context 'when no system user can be found or created' do
       before do
-        allow(SystemUserService).to receive(:auto_approval_user).and_return(nil)
-        allow(SystemUserService).to receive(:ensure_auto_approval_user_exists).and_return(nil)
+        allow(SystemUserService).to receive_messages(auto_approval_user: nil, ensure_auto_approval_user_exists: nil)
       end
 
       it 'returns false' do
@@ -401,13 +395,12 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#approve' do
-    let(:canvas_facade) { instance_double('CanvasFacade') }
-    let(:overrides_response) { instance_double('Response', success?: true, body: [].to_json) }
-    let(:create_response) { instance_double('Response', success?: true, body: { 'id' => 'override-1' }.to_json) }
+    let(:canvas_facade) { instance_double(CanvasFacade) }
+    let(:overrides_response) { instance_double(Response, success?: true, body: [].to_json) }
+    let(:create_response) { instance_double(Response, success?: true, body: { 'id' => 'override-1' }.to_json) }
 
     before do
-      allow(canvas_facade).to receive(:get_assignment_overrides).and_return(overrides_response)
-      allow(canvas_facade).to receive(:create_assignment_override).and_return(create_response)
+      allow(canvas_facade).to receive_messages(get_assignment_overrides: overrides_response, create_assignment_override: create_response)
     end
 
     it 'creates an override in Canvas' do
@@ -441,7 +434,7 @@ RSpec.describe Request, type: :model do
 
     context 'when an existing override exists' do
       let(:existing_override) { { 'id' => 'existing-override', 'student_ids' => [user.canvas_uid.to_s] } }
-      let(:overrides_response) { instance_double('Response', success?: true, body: [existing_override].to_json) }
+      let(:overrides_response) { instance_double(Response, success?: true, body: [existing_override].to_json) }
 
       before do
         allow(canvas_facade).to receive(:delete_assignment_override).and_return(true)
@@ -459,7 +452,7 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when creating the override fails' do
-      let(:create_response) { instance_double('Response', success?: false) }
+      let(:create_response) { instance_double(Response, success?: false) }
 
       it 'returns false' do
         expect(request.approve(canvas_facade, instructor)).to be false

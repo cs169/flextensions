@@ -92,10 +92,10 @@ RSpec.describe RequestsController, type: :controller do
 
         # Mock Canvas facade
         allow_any_instance_of(CanvasFacade).to receive(:get_assignment_overrides).and_return(
-          instance_double('Response', success?: true, body: [].to_json)
+          instance_double(Response, success?: true, body: [].to_json)
         )
         allow_any_instance_of(CanvasFacade).to receive(:create_assignment_override).and_return(
-          instance_double('Response', success?: true, body: { id: 'override-1' }.to_json)
+          instance_double(Response, success?: true, body: { id: 'override-1' }.to_json)
         )
       end
 
