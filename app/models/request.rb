@@ -5,7 +5,6 @@ class Request < ApplicationRecord
   belongs_to :last_processed_by_user, class_name: 'User', optional: true
 
   delegate :form_setting, to: :course, allow_nil: true
-
   validates :requested_due_date, :reason, presence: true
 
   scope :for_user, ->(user) { where(user: user).includes(:assignment) }
@@ -13,8 +12,31 @@ class Request < ApplicationRecord
     where(user: user, course: course, status: 'approved')
   }
 
+  # Class methods
+  def self.merge_date_and_time!(request_params)
+    return unless request_params[:requested_due_date].present? && request_params[:due_time].present?
+
+    combined = Time.zone.parse("#{request_params[:requested_due_date]} #{request_params[:due_time]}")
+    request_params[:requested_due_date] = combined
+  end
+
   def calculate_days_difference
     (requested_due_date.to_date - assignment.due_date.to_date).to_i
+  end
+
+  def try_auto_approval(current_user)
+    return false unless auto_approval_eligible_for_course?
+
+    token = current_user.lms_credentials.first&.token
+    return false unless token.present? && eligible_for_auto_approval?
+
+    canvas_facade = CanvasFacade.new(token)
+    auto_approve(canvas_facade)
+  end
+
+  def auto_approval_eligible_for_course?
+    course.course_settings&.enable_extensions &&
+      course.course_settings.auto_approve_days.positive?
   end
 
   def eligible_for_auto_approval?

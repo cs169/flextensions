@@ -46,11 +46,11 @@ class RequestsController < ApplicationController
   end
 
   def create
-    merge_date_and_time!(params[:request])
+    Request.merge_date_and_time!(params[:request])
     @request = @course.requests.new(request_params.merge(user: @user))
 
     if @request.save
-      handle_auto_approval
+      process_created_request
     else
       handle_request_error
     end
@@ -60,7 +60,7 @@ class RequestsController < ApplicationController
     @request = @course.requests.find_by(id: params[:id])
     return redirect_to course_path(@course), alert: 'Request not found.' unless @request
 
-    merge_date_and_time!(params[:request])
+    Request.merge_date_and_time!(params[:request])
 
     if @request.update(request_params)
       redirect_to course_request_path(@course, @request), notice: 'Request was successfully updated.'
@@ -96,6 +96,16 @@ class RequestsController < ApplicationController
 
   private
 
+  def process_created_request
+    if @request.try_auto_approval(@user)
+      redirect_to course_request_path(@course, @request),
+                  notice: 'Your extension request has been approved.'
+    else
+      redirect_to course_request_path(@course, @request),
+                  notice: 'Your extension request has been submitted.'
+    end
+  end
+
   def set_request
     @side_nav = 'requests'
     @request = @course.requests.includes(:assignment).find_by(id: params[:id])
@@ -112,27 +122,6 @@ class RequestsController < ApplicationController
     @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
-  end
-
-  def handle_auto_approval
-    auto_approval_enabled = @course.course_settings&.enable_extensions &&
-                            @course.course_settings.auto_approve_days.positive?
-
-    if auto_approval_enabled && attempt_auto_approval
-      redirect_to course_request_path(@course, @request),
-                  notice: 'Your extension request has been automatically approved.'
-    else
-      redirect_to course_request_path(@course, @request),
-                  notice: 'Your extension request has been submitted.'
-    end
-  end
-
-  def attempt_auto_approval
-    token = @user.lms_credentials.first&.token
-    return false unless token.present? && @request.eligible_for_auto_approval?
-
-    canvas_facade = CanvasFacade.new(token)
-    @request.auto_approve(canvas_facade)
   end
 
   def set_course_role_from_settings
@@ -159,13 +148,6 @@ class RequestsController < ApplicationController
     else
       redirect_to courses_path, alert: 'You do not have access to this course.'
     end
-  end
-
-  def merge_date_and_time!(request_params)
-    return unless request_params[:requested_due_date].present? && request_params[:due_time].present?
-
-    combined = Time.zone.parse("#{request_params[:requested_due_date]} #{request_params[:due_time]}")
-    request_params[:requested_due_date] = combined
   end
 
   def request_params
