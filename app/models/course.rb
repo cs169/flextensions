@@ -94,10 +94,11 @@ class Course < ApplicationRecord
 
   # Find or create the course
   def self.find_or_create_course(course_data)
-    find_or_create_by(canvas_id: course_data['id']) do |c|
-      c.course_name = course_data['name']
-      c.course_code = course_data['course_code']
-    end
+    course = find_or_initialize_by(canvas_id: course_data['id'])
+    course.course_name = course_data['name']
+    course.course_code = course_data['course_code']
+    course.save!
+    course
   end
 
   # Find or create the CourseToLms record
