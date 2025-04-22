@@ -8,8 +8,8 @@ class Request < ApplicationRecord
   validates :requested_due_date, :reason, presence: true
 
   scope :for_user, ->(user) { where(user: user).includes(:assignment) }
-  scope :approved_for_user_in_course, lambda { |user, course|
-    where(user: user, course: course, status: 'approved')
+  scope :auto_approved_for_user_in_course, lambda { |user, course|
+    where(user: user, course: course, status: 'approved', auto_approved: true)
   }
 
   # Class methods
@@ -54,7 +54,7 @@ class Request < ApplicationRecord
     return true if max_approvals.zero? # If max is 0, there's no limit
 
     # Count how many requests have already been auto-approved for this student in this course
-    approved_count = Request.approved_for_user_in_course(user, course).count
+    approved_count = Request.auto_approved_for_user_in_course(user, course).count
     approved_count < max_approvals
   end
 
