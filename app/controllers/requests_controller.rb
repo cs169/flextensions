@@ -24,7 +24,7 @@ class RequestsController < ApplicationController
 
   def show
     @assignment = @request.assignment
-    @number_of_days = @request.calculate_days_difference if @request.requested_due_date.present? && @assignment&.due_date.present?
+    @number_of_days = @request.calculate_days_difference if @request.requested_due_date && @assignment&.due_date
     render_role_based_view
   end
 
@@ -100,11 +100,9 @@ class RequestsController < ApplicationController
 
   def process_created_request
     if @request.try_auto_approval(@user)
-      redirect_to course_request_path(@course, @request),
-                  notice: 'Your extension request has been approved.'
+      redirect_to course_request_path(@course, @request), notice: 'Your extension request has been approved.'
     else
-      redirect_to course_request_path(@course, @request),
-                  notice: 'Your extension request has been submitted.'
+      redirect_to course_request_path(@course, @request), notice: 'Your extension request has been submitted.'
     end
   end
 
