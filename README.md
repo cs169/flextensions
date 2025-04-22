@@ -72,3 +72,8 @@ We recommend developing in this order:
 1. [ucberkeleysandbox.instructure.com](ucberkeleysandbox.instructure.com) (no risk) - this is the one for which this repo currently has oauth2 keys (secrets)
 2. [bcourses.test.instructure.com](bcourses.test.instructure.com) (no risk of impacting courses, but contains real data)
 3. [bcourses.berkeley.edu](bcourses.berkeley.edu)
+
+## Recent Schema Changes
+
+### April 22, 2025
+- Added `auto_approved` column to the `requests` table. Be sure to run `rails db:migrate` to apply this change.
