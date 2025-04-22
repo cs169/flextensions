@@ -27,7 +27,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<% @requests.each do |request| %>
+				<% @requests.sort_by { |request| request.updated_at }.reverse.each do |request| %>
 				<tr>
 					<td class="align-content-center">
 					<%= request.assignment ? request.assignment.name : "N/A" %>

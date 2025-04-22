@@ -18,12 +18,12 @@ class Request < ApplicationRecord
   end
 
   def eligible_for_auto_approval?
-    puts "Course settings: #{course.course_settings.inspect}"
+    Rails.logger.debug { "Course settings: #{course.course_settings.inspect}" }
     return false unless course&.course_settings&.enable_extensions
     return false if course.course_settings.auto_approve_days.zero?
 
     days_difference = calculate_days_difference
-    puts "Days difference: #{days_difference}"
+    Rails.logger.debug { "Days difference: #{days_difference}" }
     return false if days_difference <= 0 || days_difference > course.course_settings.auto_approve_days
 
     # Check if this would be within the maximum auto-approvals for this student
