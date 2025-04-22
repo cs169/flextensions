@@ -396,8 +396,8 @@ RSpec.describe Request, type: :model do
 
   describe '#approve' do
     let(:canvas_facade) { instance_double(CanvasFacade) }
-    let(:overrides_response) { instance_double(Response, success?: true, body: [].to_json) }
-    let(:create_response) { instance_double(Response, success?: true, body: { 'id' => 'override-1' }.to_json) }
+    let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [].to_json) }
+    let(:create_response) { instance_double(Faraday::Response, success?: true, body: { 'id' => 'override-1' }.to_json) }
 
     before do
       allow(canvas_facade).to receive_messages(get_assignment_overrides: overrides_response, create_assignment_override: create_response)
@@ -434,7 +434,7 @@ RSpec.describe Request, type: :model do
 
     context 'when an existing override exists' do
       let(:existing_override) { { 'id' => 'existing-override', 'student_ids' => [user.canvas_uid.to_s] } }
-      let(:overrides_response) { instance_double(Response, success?: true, body: [existing_override].to_json) }
+      let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [existing_override].to_json) }
 
       before do
         allow(canvas_facade).to receive(:delete_assignment_override).and_return(true)
@@ -452,7 +452,7 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when creating the override fails' do
-      let(:create_response) { instance_double(Response, success?: false) }
+      let(:create_response) { instance_double(Faraday::Response, success?: false) }
 
       it 'returns false' do
         expect(request.approve(canvas_facade, instructor)).to be false
