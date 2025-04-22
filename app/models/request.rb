@@ -123,7 +123,11 @@ class Request < ApplicationRecord
   end
 
   def send_email_response
+    course_email = course.course_settings.reply_email.presence || 'flextensions@berkeley.edu'
+    student_email = user.email
     email_response = generate_email_response
+    Rails.logger.info("Sending email to: #{student_email}")
+    Rails.logger.info("Sending email from: #{course_email}")
     Rails.logger.info("Request email subject: #{email_response[:subject]}")
     Rails.logger.info("Request email body: #{email_response[:template]}")
   end
