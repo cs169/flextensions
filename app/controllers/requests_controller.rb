@@ -55,6 +55,20 @@ class RequestsController < ApplicationController
     @request = @course.requests.new(request_params.merge(user: @user))
 
     if @request.save
+      # Check if the request is eligible for auto-approval
+      if @course.course_settings&.enable_extensions && @course.course_settings.auto_approve_days.positive?
+        # Get a Canvas token to perform the action
+        token = @user.lms_credentials.first&.token
+
+        if token.present? && @request.eligible_for_auto_approval?
+          canvas_facade = CanvasFacade.new(token)
+          if @request.auto_approve(canvas_facade)
+            redirect_to course_request_path(@course, @request), notice: 'Your extension request has been automatically approved.'
+            return
+          end
+        end
+      end
+
       redirect_to course_request_path(@course, @request), notice: 'Your extension request has been submitted.'
     else
       flash.now[:alert] = 'There was a problem submitting your request.'

@@ -64,3 +64,13 @@ test_lms_credential = LmsCredential.create!({
   token: "test token",
   external_user_id: "44444",
 })
+
+# Create the Auto-Approval System User if it doesn't exist
+unless User.exists?(email: 'auto_approval@system.com')
+  User.create!(
+    email: 'auto_approval@system.com',
+    name: 'Automatic Approval System',
+    canvas_uid: 'auto_system'
+  )
+  puts 'Created Auto-Approval System User'
+end
