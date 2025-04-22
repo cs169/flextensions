@@ -42,7 +42,7 @@ class Course < ApplicationRecord
 
   # Create or find a course and its associated CourseToLms and assignments
   def self.create_or_update_from_canvas(course_data, token, _user)
-    course = find_or_create_course(course_data)
+    course = find_or_create_course(course_data, token)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
 
     # Creating a 1 to 1 form_settings record to course since the instructor is only meant to update form_settings
@@ -93,7 +93,7 @@ class Course < ApplicationRecord
   end
 
   # Find or create the course
-  def self.find_or_create_course(course_data)
+  def self.find_or_create_course(course_data, token)
     canvas_id = course_data['id']
     response = Faraday.get("#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}") do |req|
       req.headers['Authorization'] = "Bearer #{token}"
