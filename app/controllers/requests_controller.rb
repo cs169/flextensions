@@ -35,8 +35,19 @@ class RequestsController < ApplicationController
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+
+    # Filter out assignments that already have pending requests from this user
+    @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+
+    @all_assignments = all_assignments # Keep full list for reference
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
+
+    if @selected_assignment && @selected_assignment.has_pending_request_for_user?(@user, @course)
+      pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
+      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.'
+    end
+
     @request = @course.requests.new
   end
 
@@ -48,6 +59,12 @@ class RequestsController < ApplicationController
   def create
     Request.merge_date_and_time!(params[:request])
     @request = @course.requests.new(request_params.merge(user: @user))
+
+    # Check if the assignment already has a pending request
+    if Assignment.find(request_params[:assignment_id]).has_pending_request_for_user?(@user, @course)
+      redirect_to course_requests_path(@course), alert: 'You already have a pending request for this assignment.'
+      return
+    end
 
     if @request.save
       process_created_request
