@@ -36,12 +36,11 @@ class RequestsController < ApplicationController
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
     # Get all enabled assignments for this course
-    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    @all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
 
     # Filter out assignments that already have pending requests from this user
-    @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+    @assignments = @all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
 
-    @all_assignments = all_assignments # Keep full list for reference
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
 
     if @selected_assignment&.has_pending_request_for_user?(@user, @course)
@@ -103,16 +102,18 @@ class RequestsController < ApplicationController
     if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
       @request.send_email_response if @course.course_settings&.enable_emails
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
+    else
+      redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
     end
-    redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
   end
 
   def reject
     if @request.reject(@user)
       @request.send_email_response if @course.course_settings&.enable_emails
       redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
+    else
+      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
     end
-    redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
   end
 
   private
@@ -130,8 +131,7 @@ class RequestsController < ApplicationController
 
   def handle_request_error
     flash.now[:alert] = 'There was a problem submitting your request.'
-    course_to_lms = @course.course_to_lms(1)
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+    @assignments = Assignment.where(course_to_lms_id: @course.course_to_lms(1).id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
   end
