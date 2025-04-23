@@ -80,7 +80,12 @@ class RequestsController < ApplicationController
     Request.merge_date_and_time!(params[:request])
 
     if @request.update(request_params)
-      redirect_to course_request_path(@course, @request), notice: 'Request was successfully updated.'
+      # Check if the updated request is eligible for auto-approval
+      if @request.status == 'pending' && @request.try_auto_approval(@user)
+        redirect_to course_request_path(@course, @request), notice: 'Your request was updated and has been approved.'
+      else
+        redirect_to course_request_path(@course, @request), notice: 'Request was successfully updated.'
+      end
     else
       flash.now[:alert] = 'There was a problem updating the request.'
       render :edit
