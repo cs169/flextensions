@@ -11,6 +11,6 @@ class Assignment < ApplicationRecord
 
   # Check if there's a pending request for this assignment by a specific user
   def has_pending_request_for_user?(user, course)
-    requests.where(user: user, course: course, status: 'pending').exists?
+    requests.exists?(user: user, course: course, status: 'pending')
   end
 end

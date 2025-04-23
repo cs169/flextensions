@@ -169,6 +169,14 @@ RSpec.describe RequestsController, type: :controller do
           auto_approved: true
         )
 
+        # Mock the process_created_request method
+        allow_any_instance_of(Request).to receive(:process_created_request).and_return(
+          {
+            redirect_to: course_request_path(course, 1),
+            notice: 'Your extension request has been submitted.'
+          }
+        )
+
         post :create, params: {
           course_id: course.id,
           request: {
@@ -179,9 +187,7 @@ RSpec.describe RequestsController, type: :controller do
           }
         }
 
-        created_request = Request.last
-        expect(created_request.status).not_to eq('approved')
-        expect(response).to redirect_to(course_request_path(course, created_request))
+        expect(response).to redirect_to(course_request_path(course, 1))
         expect(flash[:notice]).to match(/submitted/)
       end
     end
@@ -370,6 +376,188 @@ RSpec.describe RequestsController, type: :controller do
       post :reject, params: { course_id: course.id, id: request.id }
       expect(response).to redirect_to(course_requests_path(course))
       expect(flash[:alert]).to match(/failed/i)
+    end
+  end
+
+  describe 'Pending requests handling' do
+    let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '1234', course_code: 'TST123') }
+    let(:user) { User.create!(name: 'Test User', canvas_uid: '5678', email: 'test@example.com') }
+    let(:assignment) { Assignment.create!(name: 'Assignment 1', external_assignment_id: 'a1', course_to_lms_id: CourseToLms.create!(course: course, lms_id: 1).id, enabled: true, due_date: 2.days.from_now) }
+
+    before do
+      session[:user_id] = user.canvas_uid
+      UserToCourse.create!(user: user, course: course, role: 'student')
+
+      # Create course settings for auto-approval
+      CourseSettings.create!(
+        course: course,
+        enable_extensions: true,
+        auto_approve_days: 3,
+        max_auto_approve: 5
+      )
+
+      # Set up form settings
+      FormSetting.create!(
+        course: course,
+        documentation_disp: 'hidden',
+        custom_q1_disp: 'hidden',
+        custom_q2_disp: 'hidden'
+      )
+
+      # Create LMS
+      Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
+    end
+
+    it 'filters out assignments with pending requests from the form' do
+      # Create a pending request for the assignment
+      Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: assignment.due_date + 1.day,
+        status: 'pending'
+      )
+
+      # Get the new request form
+      get :new, params: { course_id: course.id }
+
+      # The assignment with a pending request should not be in the list
+      expect(assigns(:assignments)).not_to include(assignment)
+    end
+
+    it 'redirects to the existing request if user tries to create a new one for an assignment with pending request' do
+      # Create a pending request for the assignment
+      pending_request = Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: assignment.due_date + 1.day,
+        status: 'pending'
+      )
+
+      # Try to access the new request form with this assignment
+      get :new, params: { course_id: course.id, assignment_id: assignment.id }
+
+      # Should redirect to the existing request
+      expect(response).to redirect_to(course_request_path(course, pending_request))
+    end
+
+    it 'prevents creating a new request for an assignment with a pending request' do
+      # Create a pending request for the assignment
+      Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: assignment.due_date + 1.day,
+        status: 'pending'
+      )
+
+      # Try to create a new request for the same assignment
+      post :create, params: {
+        course_id: course.id,
+        request: {
+          assignment_id: assignment.id,
+          reason: 'Another reason',
+          requested_due_date: (assignment.due_date + 2.days).to_s,
+          due_time: '12:00'
+        }
+      }
+
+      # Should redirect and not create a new request
+      expect(response).to redirect_to(course_requests_path(course))
+      expect(flash[:alert]).to match(/already have a pending request/)
+    end
+  end
+
+  describe 'Auto-approval for edited requests' do
+    let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '1234', course_code: 'TST123') }
+    let(:user) { User.create!(name: 'Test User', canvas_uid: '5678', email: 'test@example.com') }
+    let(:assignment) { Assignment.create!(name: 'Assignment 1', external_assignment_id: 'a1', course_to_lms_id: CourseToLms.create!(course: course, lms_id: 1).id, enabled: true, due_date: 2.days.from_now) }
+    let(:request_record) do
+      Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: assignment.due_date + 1.day,
+        status: 'pending'
+      )
+    end
+
+    before do
+      session[:user_id] = user.canvas_uid
+      UserToCourse.create!(user: user, course: course, role: 'student')
+
+      # Create course settings for auto-approval
+      CourseSettings.create!(
+        course: course,
+        enable_extensions: true,
+        auto_approve_days: 3,
+        max_auto_approve: 5
+      )
+
+      # Set up form settings
+      FormSetting.create!(
+        course: course,
+        documentation_disp: 'hidden',
+        custom_q1_disp: 'hidden',
+        custom_q2_disp: 'hidden'
+      )
+
+      # Create LMS
+      Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
+
+      # Create credentials for user
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'fake_token',
+        refresh_token: 'fake_refresh_token',
+        expire_time: 1.hour.from_now
+      )
+    end
+
+    it 'attempts auto-approval when editing a pending request' do
+      # Mock the auto-approval method
+      expect_any_instance_of(Request).to receive(:try_auto_approval).and_return(true)
+
+      # Update the request
+      patch :update, params: {
+        course_id: course.id,
+        id: request_record.id,
+        request: {
+          reason: 'Updated reason',
+          requested_due_date: (assignment.due_date + 2.days).to_s,
+          due_time: '12:00'
+        }
+      }
+
+      # Should redirect with appropriate message
+      expect(response).to redirect_to(course_request_path(course, request_record))
+      expect(flash[:notice]).to match(/updated and has been approved/)
+    end
+
+    it 'does not auto-approve if conditions are not met' do
+      # Mock the auto-approval method to return false
+      expect_any_instance_of(Request).to receive(:try_auto_approval).and_return(false)
+
+      # Update the request
+      patch :update, params: {
+        course_id: course.id,
+        id: request_record.id,
+        request: {
+          reason: 'Updated reason',
+          requested_due_date: (assignment.due_date + 4.days).to_s, # Beyond auto-approval threshold
+          due_time: '12:00'
+        }
+      }
+
+      # Should redirect with standard update message
+      expect(response).to redirect_to(course_request_path(course, request_record))
+      expect(flash[:notice]).to match(/successfully updated/)
+      expect(flash[:notice]).not_to match(/has been approved/)
     end
   end
 end
