@@ -103,18 +103,16 @@ class RequestsController < ApplicationController
     if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
       @request.send_email_response if @course.course_settings&.enable_emails
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
-    else
-      redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
     end
+    redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
   end
 
   def reject
     if @request.reject(@user)
       @request.send_email_response if @course.course_settings&.enable_emails
       redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
-    else
-      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
     end
+    redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
   end
 
   private
