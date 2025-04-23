@@ -23,6 +23,36 @@ class Request < ApplicationRecord
     request_params[:requested_due_date] = combined
   end
 
+  # Process a newly created request, including auto-approval check
+  def process_created_request(current_user)
+    if try_auto_approval(current_user)
+      {
+        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+        notice: 'Your extension request has been approved.'
+      }
+    else
+      {
+        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+        notice: 'Your extension request has been submitted.'
+      }
+    end
+  end
+
+  # Handle request update and check for auto-approval
+  def process_update(current_user)
+    if status == 'pending' && try_auto_approval(current_user)
+      {
+        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+        notice: 'Your request was updated and has been approved.'
+      }
+    else
+      {
+        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+        notice: 'Request was successfully updated.'
+      }
+    end
+  end
+
   def calculate_days_difference
     (requested_due_date.to_date - assignment.due_date.to_date).to_i
   end
@@ -52,11 +82,9 @@ class Request < ApplicationRecord
     days_difference = calculate_days_difference
     return false if days_difference <= 0 || days_difference > course.course_settings.auto_approve_days
 
-    # Check if this would be within the maximum auto-approvals for this student
     max_approvals = course.course_settings.max_auto_approve
     return true if max_approvals.zero? # If max is 0, there's no limit
 
-    # Count how many requests have already been auto-approved for this student in this course
     auto_approved_count = Request.auto_approved_for_user_in_course(user, course).count
     auto_approved_count < max_approvals
   end
@@ -64,10 +92,7 @@ class Request < ApplicationRecord
   def auto_approve(canvas_facade)
     return false unless eligible_for_auto_approval?
 
-    # Get the auto-approval system user
     system_user = SystemUserService.auto_approval_user
-
-    # If the system user doesn't exist yet, create it
     system_user ||= SystemUserService.ensure_auto_approval_user_exists
 
     return false unless system_user
@@ -110,13 +135,8 @@ class Request < ApplicationRecord
 
   def create_override(canvas_facade)
     canvas_facade.create_assignment_override(
-      course.canvas_id,
-      assignment.external_assignment_id,
-      [user.canvas_uid],
-      "Extension for #{user.name}",
-      requested_due_date.iso8601,
-      nil, # Unlock date (optional)
-      nil  # Lock date (optional)
+      course.canvas_id, assignment.external_assignment_id, [user.canvas_uid], "Extension for #{user.name}",
+      requested_due_date.iso8601, nil, nil
     )
   end
 end

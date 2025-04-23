@@ -26,6 +26,13 @@
 							<%= f.label :assignment_id, class: "form-label", for: "new-request-assignment-id" do %>
 								Select Assignment<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
 							<% end %>
+							
+							<% if @all_assignments.size != @assignments.size %>
+								<div class="alert alert-info mb-3">
+									<small>Some assignments are not shown because you already have pending requests for them. Please check your <a href="<%= course_requests_path(@course) %>">requests</a> to view or edit them.</small>
+								</div>
+							<% end %>
+							
 							<%= f.select :assignment_id,
 							options_for_select(
 								@assignments.map do |assignment|

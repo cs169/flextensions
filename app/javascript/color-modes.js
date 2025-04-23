@@ -16,7 +16,7 @@
       return storedTheme
     }
 
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'dark' : 'light'
+    return 'light' // Default to light mode
   }
 
   const setTheme = theme => {

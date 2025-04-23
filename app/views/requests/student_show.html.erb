@@ -11,6 +11,8 @@
 						<span class="badge fs-6 text-bg-success">Approved</span>
 					<% elsif @request.status == 'denied' %>
 						<span class="badge fs-6 text-bg-danger">Denied</span>
+					<% elsif @request.status == 'pending' %>
+						<span class="badge fs-6 text-bg-info">Pending</span>
 					<% end %>
 				</div>
 				<div class="card-body">
@@ -103,7 +105,7 @@
 			<!-- Display Buttons Only if Status is Pending -->
 				<div class="d-flex justify-content-center mt-4">
 				  <% if @request.status == 'pending' %>
-					<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
+					<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-primary me-3" %>
 					<%= button_to "Cancel Request",
 						cancel_course_request_path(@course, @request),
 						method: :post,
