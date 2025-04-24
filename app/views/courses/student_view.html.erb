@@ -17,10 +17,13 @@
               <% @assignments.each do |assignment| %>
                 <tr>
                   <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                  <td><%= assignment.name %>
-                        <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                          <i class="fas fa-up-right-from-square"></i>
-                        </a>
+                  <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span><%= assignment.name %></span>
+                      <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="ms-2">
+                        View <i class="fas fa-up-right-from-square"></i>
+                      </a>
+                    </div>
                   </td>
                   <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %></td>
                   <td class="text-center">
