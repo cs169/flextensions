@@ -19,7 +19,7 @@
                   <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
                   <td><%= assignment.name %>
                         <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                          <i class="fas fa-up-right-from-square"></i>
+                          <i class="fas fa-up-right-from-square"></i> View
                         </a>
                   </td>
                   <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %></td>
