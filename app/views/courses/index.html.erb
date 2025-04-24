@@ -55,6 +55,10 @@
                 <%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
             </div>
         </div>
+        <% else %>
+        <div class="text-center mt-4">
+          <p>If you are an instructor, you can <a href="<%= new_course_path %>">import a course</a>.</p>
+        </div>
         <% end %>
 
         <div class="col-12 mb-4">

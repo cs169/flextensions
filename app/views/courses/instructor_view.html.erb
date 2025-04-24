@@ -11,7 +11,6 @@
           <thead>
             <tr class="table-info">
               <th>Assignment</th>
-              <th class="text-center" >View</th>
               <th class="text-center" style="min-width: 215px;">Due Date</th>
               <th class="text-center" style="min-width: 215px;">Late Due Date</th>
               <th class="text-center" style="width: 80px;">Enable</th>
@@ -21,14 +20,15 @@
             <% @assignments.each do |assignment| %>
               <tr>
                 <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                <td class="text-break"><%= assignment.name %></td>
-                <td class="text-center">
-                  <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                    bCourses
-                  </a>
+                <td class="text-break">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span><%= assignment.name %></span>
+                    <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="ms-2">
+                      bCourses <i class="fas fa-up-right-from-square"></i>
+                    </a>
+                  </div>
                 </td>
-
-                       <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+                <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
                 <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
                 <td class="justify-content-center align-content-center">
                   <div class="form-check form-switch mx-auto" style="width: 45px;">
