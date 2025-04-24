@@ -8,8 +8,8 @@
             <thead>
               <tr class="table-info">
                 <th>Assignment</th>
-                <th class="text-center" style="min-width: 215px;">Due Date</th>
-                <th class="text-center" style="min-width: 215px;">Late Due Date</th>
+                <th class="text-center" style="min-width: 215px;">Original Due Date</th>
+                <th class="text-center" style="min-width: 215px;">Extended Due Date</th>
                 <th class="text-center" style="width: 50px;">Request</th>
               </tr>
             </thead>
@@ -31,7 +31,7 @@
                     <% if last_approved_request.present? %>
                       <%= last_approved_request.requested_due_date.strftime("%a, %b %-d at %-I:%M%P") %>
                     <% else %>
-                      <%= assignment.late_due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %>
+                      <%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %>
                     <% end %>
                   </td>
                   <td class="text-center">
