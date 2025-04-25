@@ -94,11 +94,8 @@ class Course < ApplicationRecord
 
   # Find or create the course
   def self.find_or_create_course(course_data, token)
-    canvas_id = course_data['id']
-    response = Faraday.get("#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}") do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-    end
+    canvas_facade = CanvasFacade.new(token)
+    response = canvas_facade.get_course(course_data['id'])
 
     if response.success?
       course = find_or_initialize_by(canvas_id: canvas_id)
