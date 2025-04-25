@@ -140,8 +140,17 @@ class Course < ApplicationRecord
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
 
-    assignment.due_date = assignment_data['base_date']&.dig('due_at').present? ? DateTime.parse(assignment_data['base_date']['due_at']) : DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-    assignment.late_due_date = assignment_data['base_date']&.dig('lock_at').present? ? DateTime.parse(assignment_data['base_date']['lock_at']) : DateTime.parse(assignment_data['lock_at']) if assignment_data['lock_at'].present?
+    if assignment_data['base_date'] && assignment_data['base_date']['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['base_date']['due_at'])
+    elsif assignment_data['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['due_at'])
+    end
+
+    if assignment_data['base_date'] && assignment_data['base_date']['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['base_date']['lock_at'])
+    elsif assignment_data['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['lock_at'])
+    end
 
     assignment.save!
   end

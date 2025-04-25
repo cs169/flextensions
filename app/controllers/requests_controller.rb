@@ -24,7 +24,7 @@ class RequestsController < ApplicationController
 
   def show
     @assignment = @request.assignment
-    @number_of_days = @request.calculate_days_difference if @request.requested_due_date && @assignment&.due_date
+    @number_of_days = @request.calculate_days_difference if @request.requested_due_date.present? && @assignment&.due_date.present?
     render_role_based_view
   end
 
