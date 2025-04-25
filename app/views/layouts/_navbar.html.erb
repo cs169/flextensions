@@ -28,7 +28,7 @@
 						<!-- Display this when there's a logged-in user -->
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle testid-username" href="#" data-bs-toggle="dropdown"
-								aria-expanded="false"><%= session[:username] %></a>
+								aria-expanded="false" aria-label="User menu for <%= session[:username] %>"><%= session[:username] %></a>
 							<ul class="dropdown-menu">
 								<li><a class="dropdown-item testid-logout-button" href="/logout/">Logout</a></li>
 							</ul>

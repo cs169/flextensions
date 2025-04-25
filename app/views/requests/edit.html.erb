@@ -3,6 +3,7 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      <h1 class="sr-only">Edit Extension Request</h1>
 
       <div class="card mb-4 rounded-0">
         <div class="card-header bg-light">
@@ -93,7 +94,8 @@
               <% if @form_settings.reason_desc.presence %>
                 <p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
               <% end %>
-              <%= f.text_area :reason, class: "form-control", id: "reason", rows: 3, required: true %>
+              <%= f.label :reason, "Reason for Extension", class: "visually-hidden" %>
+              <%= f.text_area :reason, class: "form-control", id: "reason", rows: 3, required: true, aria: { describedby: @form_settings.reason_desc.present? ? "reason-desc" : nil } %>
             </div>
 
             <% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
@@ -105,7 +107,8 @@
                     <p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
                     <p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
                 <% end %>
-                <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 3, required: (@form_settings.documentation_disp == 'required') %>
+                <%= f.label :documentation, "Additional Documentation", class: "visually-hidden" %>
+                <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 3, required: (@form_settings.documentation_disp == 'required'), aria: { describedby: @form_settings.documentation_desc.present? ? "documentation-desc" : nil } %>
               </div>
             <% end %>
             
