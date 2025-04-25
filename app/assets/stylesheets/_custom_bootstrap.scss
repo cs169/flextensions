@@ -25,14 +25,51 @@
     border-width: 0;
 }
 
-// Fix for code element contrast
 code {
     color: #800f50; 
     font-weight: 500; 
 }
 
-[data-bs-theme="dark"] code {
-    color: #ff9bd0;
+// Fix for dark theme contrast issues
+[data-bs-theme="dark"] {
+	
+	code {
+		color: #ff9bd0;
+	}
+
+	a {
+    color: #a0c4ff;
+    &:hover {
+      color: #ccdeff;
+    }
+  }
+  
+  .sidebar-container .nav-link {
+    color: #a0c4ff !important;
+
+    .sidebar-text {
+      color: #a0c4ff !important;
+    }
+    
+    &:hover {
+      color: #ccdeff !important;
+      .sidebar-text {
+        color: #ccdeff !important;
+      }
+    }
+  }
+  
+  .bg-light, .card-header.bg-light, .bg-light-subtle {
+    color: #212529 !important;
+    
+    h2, h3, h4, h5, h6, p, label, .form-label, strong, code, li {
+      color: #212529 !important;
+    }
+    
+    code {
+      color: #800f50 !important;
+    }
+  }
 }
 
 .b-example-divider {
