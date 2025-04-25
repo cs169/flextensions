@@ -25,6 +25,15 @@
     border-width: 0;
 }
 
+code {
+    color: #6e0202 !important;
+
+	[data-bs-theme="dark"] & {
+		color: #ffffff !important;
+		font-weight: 500;
+	}
+}
+
 // Fix for dark theme contrast issues
 [data-bs-theme="dark"] {
 	
@@ -37,10 +46,10 @@
   
   // Override only non-sidebar links or apply special cases
   .sidebar-container .nav-link:not(.active) {
-    color: #a0c4ff !important;
+    color: #f3f8fe !important;
 
     .sidebar-text {
-      color: #a0c4ff !important;
+      color: #ffffff !important;
     }
     
     &:hover {
@@ -54,13 +63,10 @@
   .bg-light, .card-header.bg-light, .bg-light-subtle {
     color: #212529 !important;
     
-    h2, h3, h4, h5, h6, p, label, .form-label, strong, code, li {
+    h2, h3, h4, h5, h6, p, label, .form-label, strong, li {
       color: #212529 !important;
     }
     
-    code {
-      color: #6d0c44 !important;
-    }
   }
 }
 
@@ -144,6 +150,10 @@
 	&:hover, &:focus {
 		color: #FFFFFF !important;
 		text-decoration: underline;
+	}
+
+	[data-bs-theme="dark"] & {
+		color: #ffffff !important;
 	}
 }
 
