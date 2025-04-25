@@ -129,7 +129,9 @@ class Course < ApplicationRecord
     end
 
     # Delete assignments that no longer exist in Canvas
-    Assignment.where(course_to_lms_id: course_to_lms.id).where.not(external_assignment_id: external_assignment_ids).destroy_all
+    Assignment.where(course_to_lms_id: course_to_lms.id)
+              .where.not(external_assignment_id: external_assignment_ids)
+              .destroy_all
   end
 
   # Sync a single assignment
@@ -137,12 +139,14 @@ class Course < ApplicationRecord
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
 
+    # Extract due_at from base_date if present
     if assignment_data['base_date'] && assignment_data['base_date']['due_at'].present?
       assignment.due_date = DateTime.parse(assignment_data['base_date']['due_at'])
     elsif assignment_data['due_at'].present?
       assignment.due_date = DateTime.parse(assignment_data['due_at'])
     end
 
+    # Extract lock_at for late_due_date
     if assignment_data['base_date'] && assignment_data['base_date']['lock_at'].present?
       assignment.late_due_date = DateTime.parse(assignment_data['base_date']['lock_at'])
     elsif assignment_data['lock_at'].present?
@@ -205,6 +209,8 @@ class Course < ApplicationRecord
   end
 
   def sync_enrollments_from_canvas(token)
-    %w[student teacher ta].each { |role| sync_users_from_canvas(token, role) }
+    sync_users_from_canvas(token, 'student')
+    sync_users_from_canvas(token, 'teacher')
+    sync_users_from_canvas(token, 'ta')
   end
 end

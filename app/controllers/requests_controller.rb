@@ -131,7 +131,8 @@ class RequestsController < ApplicationController
 
   def handle_request_error
     flash.now[:alert] = 'There was a problem submitting your request.'
-    @assignments = Assignment.where(course_to_lms_id: @course.course_to_lms(1).id, enabled: true).order(:name)
+    course_to_lms = @course.course_to_lms(1)
+    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
   end
