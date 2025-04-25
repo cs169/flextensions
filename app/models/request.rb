@@ -112,13 +112,13 @@ class Request < ApplicationRecord
     return false unless response.success?
 
     assignment_override = JSON.parse(response.body)
-    send_email_response if course.course_settings&.enable_emails
     update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: assignment_override['id'])
+    send_email_response if course.course_settings&.enable_emails
   end
 
   def reject(processed_user_id)
-    send_email_response if course.course_settings&.enable_emails
     update(status: 'denied', last_processed_by_user_id: processed_user_id.id)
+    send_email_response if course.course_settings&.enable_emails
   end
 
   def generate_email_response
