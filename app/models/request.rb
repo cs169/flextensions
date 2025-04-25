@@ -150,6 +150,8 @@ class Request < ApplicationRecord
   end
 
   def send_email_response
+    return unless course.course_settings&.enable_emails
+
     course_email = course.course_settings.reply_email.presence || 'flextensions@berkeley.edu'
     student_email = user.email
     email_response = generate_email_response
