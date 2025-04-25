@@ -36,10 +36,12 @@ class RequestsController < ApplicationController
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
     # Get all enabled assignments for this course
-    @all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
 
     # Filter out assignments that already have pending requests from this user
-    @assignments = @all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+    @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+
+    @has_pending = all_assignments.size != @assignments.size
 
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
 
