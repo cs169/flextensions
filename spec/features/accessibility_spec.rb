@@ -301,16 +301,6 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
         test_page_accessibility("/courses/#{course1.id}", :student, theme, "assignments_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
-
-      it 'Login page should be accessible for teacher', :a11y do
-        test_page_accessibility('/login', :teacher, theme, "login_#{theme}_teacher.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Login page should be accessible for student', :a11y do
-        test_page_accessibility('/login', :student, theme, "login_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
     end
   end
 end

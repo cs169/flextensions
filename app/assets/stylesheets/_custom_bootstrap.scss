@@ -25,18 +25,9 @@
     border-width: 0;
 }
 
-code {
-    color: #800f50; 
-    font-weight: 500; 
-}
-
 // Fix for dark theme contrast issues
 [data-bs-theme="dark"] {
 	
-	code {
-		color: #ff9bd0;
-	}
-
 	a {
     color: #a0c4ff;
     &:hover {
@@ -44,7 +35,8 @@ code {
     }
   }
   
-  .sidebar-container .nav-link {
+  // Override only non-sidebar links or apply special cases
+  .sidebar-container .nav-link:not(.active) {
     color: #a0c4ff !important;
 
     .sidebar-text {
@@ -67,7 +59,7 @@ code {
     }
     
     code {
-      color: #800f50 !important;
+      color: #6d0c44 !important;
     }
   }
 }
@@ -158,9 +150,6 @@ code {
 .navbar-dark .nav-link.active {
 	font-weight: bold;
 }
-
-
-// custom
 
 @media (min-width: 992px) {
 	.color-mode-toggler {
@@ -271,6 +260,11 @@ code {
 	.sidebar-text {
 		flex: 1;
 		font-size: 0.9375rem;
+		color: #000000 !important;
+		
+		[data-bs-theme="dark"] & {
+			color: #ffffff;
+		}
 	}
 }
 
