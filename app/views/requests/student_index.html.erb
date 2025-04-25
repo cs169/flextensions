@@ -23,8 +23,8 @@
                     <td class="align-content-center">
                     <%= request.assignment ? request.assignment.name : "N/A" %>
                       <% if request.assignment # i don't know why we have this condition here or above %>
-                        <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
-                          <i class="fas fa-up-right-from-square"></i>
+                        <a class="text-decoration-none" href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
+                          <i class="fas fa-up-right-from-square"></i> 
                         </a>
                       <% end %>
                     </td>
