@@ -112,10 +112,12 @@ class Request < ApplicationRecord
     return false unless response.success?
 
     assignment_override = JSON.parse(response.body)
+    send_email_response if course.course_settings&.enable_emails
     update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: assignment_override['id'])
   end
 
   def reject(processed_user_id)
+    send_email_response if course.course_settings&.enable_emails
     update(status: 'denied', last_processed_by_user_id: processed_user_id.id)
   end
 
@@ -148,6 +150,8 @@ class Request < ApplicationRecord
   end
 
   def send_email_response
+    return unless course.course_settings&.enable_emails
+
     course_email = course.course_settings.reply_email.presence || 'flextensions@berkeley.edu'
     student_email = user.email
     email_response = generate_email_response
