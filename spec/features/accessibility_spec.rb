@@ -149,6 +149,32 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     expect(page.evaluate_script("document.documentElement.getAttribute('data-bs-theme')")).to eq(theme)
   end
 
+  # Helper for page setup and accessibility testing
+  def test_page_accessibility(path, user_type = :teacher, theme = 'light', screenshot_name = nil)
+    user_type == :teacher ? mock_teacher_login : mock_student_login
+
+    visit path
+
+    # Wait for page to load and set theme
+    wait_for_page_to_load
+    set_theme(theme)
+
+    # Take screenshot
+    screenshot_name ||= "#{path.tr('/', '_')}_#{theme}_#{user_type}.png"
+    page.save_screenshot(screenshot_name)
+  end
+
+  # Helper for waiting for page load
+  def wait_for_page_to_load
+    # Wait up to 2 seconds for page to be ready
+    Timeout.timeout(2) do
+      sleep(0.1) until page.evaluate_script('document.readyState') == 'complete'
+    end
+  rescue Timeout::Error
+    # If timeout occurs, give a small additional time
+    sleep(0.5)
+  end
+
   before do
     WebMock.allow_net_connect!
 
@@ -167,6 +193,9 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     end
 
     Capybara.javascript_driver = :selenium_chrome
+
+    # Set a default wait time
+    Capybara.default_max_wait_time = 3
 
     # Create credentials for API calls
     teacher1.lms_credentials.create!(
@@ -202,200 +231,112 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
   %w[light dark].each do |theme|
     context "with #{theme} theme" do
       it 'Home page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit '/'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("home_#{theme}_teacher.png")
+        test_page_accessibility('/', :teacher, theme, "home_#{theme}_teacher.png")
         expect(page).to be_axe_clean
       end
 
       it 'Home page should be accessible for student', :a11y do
-        mock_student_login
-        visit '/'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("home_#{theme}_student.png")
+        test_page_accessibility('/', :student, theme, "home_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
 
       it 'Courses page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit '/courses'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("courses_#{theme}_teacher.png")
+        test_page_accessibility('/courses', :teacher, theme, "courses_#{theme}_teacher.png")
         expect(page).to be_axe_clean
       end
 
       it 'Courses page should be accessible for student', :a11y do
-        mock_student_login
-        visit '/courses'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("courses_#{theme}_student.png")
+        test_page_accessibility('/courses', :student, theme, "courses_#{theme}_student.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Course details page should be accessible for teacher', :a11y do
+        test_page_accessibility("/courses/#{course1.id}", :teacher, theme, "course_details_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Course details page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}", :student, theme, "course_details_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
 
       it 'New course page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit '/courses/new'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("new_course_#{theme}_teacher.png")
+        test_page_accessibility('/courses/new', :teacher, theme, "new_course_#{theme}_teacher.png")
         expect(page).to be_axe_clean
       end
 
       it 'New course page should be accessible for student', :a11y do
-        mock_student_login
-        visit '/courses/new'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("new_course_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Assignments page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("assignments_#{theme}_teacher.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Assignments page should be accessible for student', :a11y do
-        mock_student_login
-        visit "/courses/#{course1.id}"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("assignments_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Extension requests page should be accessible for student', :a11y do
-        mock_student_login
-        visit "/courses/#{course1.id}/requests"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("extension_requests_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'New extension request page should be accessible for student', :a11y do
-        mock_student_login
-        visit "/courses/#{course1.id}/requests/new"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("new_extension_request_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Extension request details page should be accessible for student', :a11y do
-        mock_student_login
-        visit "/courses/#{course1.id}/requests/#{c1_request1.id}"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("extension_request_details_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Edit extension request page should be accessible for student', :a11y do
-        mock_student_login
-        visit "/courses/#{course1.id}/requests/#{c1_request1.id}/edit"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("edit_extension_request_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Login page should be accessible for student', :a11y do
-        visit '/login'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("login_#{theme}_student.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Course enrollments page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/enrollments"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("course_enrollments_#{theme}_teacher.png")
-        expect(page).to be_axe_clean
-      end
-
-      it 'Extension requests page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/requests"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("extension_requests_#{theme}_teacher.png")
+        test_page_accessibility('/courses/new', :student, theme, "new_course_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
 
       it 'Course settings page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/edit?tab=general"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("course_settings_#{theme}_teacher.png")
+        test_page_accessibility("/courses/#{course1.id}/edit?tab=general", :teacher, theme, "course_settings_#{theme}_teacher.png")
         expect(page).to be_axe_clean
       end
 
       it 'Course Email settings page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/edit?tab=email"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("course_email_settings_#{theme}_teacher.png")
+        test_page_accessibility("/courses/#{course1.id}/edit?tab=email", :teacher, theme, "course_email_settings_#{theme}_teacher.png")
         expect(page).to be_axe_clean
       end
 
-      it 'Edit form settings page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/form_setting/edit"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("edit_form_settings_#{theme}_teacher.png")
+      it 'Course enrollments page should be accessible for teacher', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/enrollments", :teacher, theme, "course_enrollments_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'New extension request page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/requests/new", :student, theme, "new_extension_request_#{theme}_student.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Extension requests page should be accessible for teacher', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/requests", :teacher, theme, "extension_requests_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Extension requests page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/requests", :student, theme, "extension_requests_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
 
       it 'Extension request details page should be accessible for teacher', :a11y do
-        mock_teacher_login
-        visit "/courses/#{course1.id}/requests/#{c1_request1.id}"
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("extension_request_details_#{theme}_teacher.png")
+        test_page_accessibility("/courses/#{course1.id}/requests/#{c1_request1.id}", :teacher, theme, "extension_request_details_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Extension request details page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/requests/#{c1_request1.id}", :student, theme, "extension_request_details_#{theme}_student.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Edit extension request page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/requests/#{c1_request1.id}/edit", :student, theme, "edit_extension_request_#{theme}_student.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Edit form settings page should be accessible for teacher', :a11y do
+        test_page_accessibility("/courses/#{course1.id}/form_setting/edit", :teacher, theme, "edit_form_settings_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Assignments page should be accessible for teacher', :a11y do
+        test_page_accessibility("/courses/#{course1.id}", :teacher, theme, "assignments_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Assignments page should be accessible for student', :a11y do
+        test_page_accessibility("/courses/#{course1.id}", :student, theme, "assignments_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
 
       it 'Login page should be accessible for teacher', :a11y do
-        visit '/login'
-        sleep 2
-        set_theme(theme)
-        sleep 1
-        page.save_screenshot("login_#{theme}_teacher.png")
+        test_page_accessibility('/login', :teacher, theme, "login_#{theme}_teacher.png")
+        expect(page).to be_axe_clean
+      end
+
+      it 'Login page should be accessible for student', :a11y do
+        test_page_accessibility('/login', :student, theme, "login_#{theme}_student.png")
         expect(page).to be_axe_clean
       end
     end
