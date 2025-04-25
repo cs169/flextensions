@@ -6,7 +6,3 @@
 import "assignments"
 import "controllers"
 import "rails-ujs-override"
-import "datatables"
-import "jquery";
-import "datatables.net";
-import "datatables.net-dt";
