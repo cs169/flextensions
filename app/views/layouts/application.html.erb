@@ -7,18 +7,9 @@
 		<%= csrf_meta_tags %>
 		<%= csp_meta_tag %>
 
-		<!-- DataTables CSS -->
-		<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-
 		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 		<%= javascript_importmap_tags %>
 		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
-
-		<!-- jQuery (required for DataTables) -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-		<!-- DataTables JS -->
-		<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 	</head>
 	<body class="d-flex flex-column min-vh-100">
 		<%= render "layouts/header" %>
