@@ -2,3 +2,22 @@
 # yarn lockfile v1
 
 
+"datatables.net-bs5@^2.2.2":
+  "integrity" "sha512-0mAbpUf0EpnIEc0RlN6vSrSk9y/+NuReiwDpjHYY3RfzdvH6Lt0+7Q9OU5RIbYxaFxES/z60thxdrw7IUFnBhw=="
+  "resolved" "https://registry.npmjs.org/datatables.net-bs5/-/datatables.net-bs5-2.2.2.tgz"
+  "version" "2.2.2"
+  dependencies:
+    "datatables.net" "2.2.2"
+    "jquery" ">=1.7"
+
+"datatables.net@^2.2.2", "datatables.net@2.2.2":
+  "integrity" "sha512-gfODIKE3gpgbVeZy2QGj2Dq9roO6hy00S+k1knklrqlMyAMrh1wt0Q6ryBUM7gU96U77ysbq8dYhxFdmcC/oPQ=="
+  "resolved" "https://registry.npmjs.org/datatables.net/-/datatables.net-2.2.2.tgz"
+  "version" "2.2.2"
+  dependencies:
+    "jquery" ">=1.7"
+
+"jquery@>=1.7":
+  "integrity" "sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg=="
+  "resolved" "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz"
+  "version" "3.7.1"

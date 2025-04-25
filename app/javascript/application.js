@@ -6,3 +6,4 @@
 import "assignments"
 import "controllers"
 import "rails-ujs-override"
+import "datatables"

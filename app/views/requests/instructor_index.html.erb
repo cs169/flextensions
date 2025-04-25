@@ -1,6 +1,3 @@
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <%= render "layouts/sidebar" %>
 <div class="container-fluid mt-4">
   <div class="row">
@@ -19,7 +16,7 @@
 
       <% if @requests.any? %>
         <div class="table-responsive">
-          <table class="table table-bordered table-striped" id="requests-table">
+          <table class="table table-bordered table-striped datatable" id="requests-table">
             <thead>
               <tr class="table-info">
                 <th>Assignment</th>
@@ -30,7 +27,7 @@
                 <th class="text-center align-content-center" style="min-width: 175px;">Requested Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
                 <th class="text-center align-content-center">Status</th>
-                <th class="text-center align-content-center" style="min-width: 220px;">Actions</th>
+                <th class="text-center align-content-center no-sort" style="min-width: 220px;">Actions</th>
               </tr>
             </thead>
             <tbody>

@@ -9,5 +9,9 @@
     "dev": "overmind s -f Procfile.dev"
   },
   "author": "CS169l flextensions development team",
-  "license": "BSD-2-Clause"
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "datatables.net": "^2.2.2",
+    "datatables.net-bs5": "^2.2.2"
+  }
 }
