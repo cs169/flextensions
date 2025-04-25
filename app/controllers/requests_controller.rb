@@ -41,7 +41,8 @@ class RequestsController < ApplicationController
     # Filter out assignments that already have pending requests from this user
     @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
 
-    @all_assignments = all_assignments # Keep full list for reference
+    @has_pending = all_assignments.size != @assignments.size
+
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
 
     if @selected_assignment&.has_pending_request_for_user?(@user, @course)
