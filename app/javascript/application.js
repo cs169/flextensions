@@ -9,6 +9,7 @@ import "rails-ujs-override"
 
 // Import jQuery and DataTables
 import "jquery";
+window.$ = window.jQuery = require("jquery");
 import "datatables.net";
 
 // Initialize DataTables
