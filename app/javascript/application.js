@@ -10,7 +10,6 @@ import "rails-ujs-override"
 // Import jQuery and DataTables
 import "jquery";
 import "datatables.net";
-import "datatables.net-dt";
 
 // Initialize DataTables
 document.addEventListener("DOMContentLoaded", () => {

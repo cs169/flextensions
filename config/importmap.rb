@@ -14,4 +14,4 @@ pin "assignments", to: "assignments.js"
 # Pin DataTables and jQuery
 pin "jquery", to: "https://ga.jspm.io/npm:jquery@3.7.1/dist/jquery.js"
 pin "datatables.net", to: "https://ga.jspm.io/npm:datatables.net@1.13.6/js/jquery.dataTables.js"
-pin "datatables.net-dt", to: "https://ga.jspm.io/npm:datatables.net-dt@1.13.6/css/jquery.dataTables.css"
+#pin "datatables.net-dt", to: "https://ga.jspm.io/npm:datatables.net-dt@1.13.6/css/jquery.dataTables.css"
