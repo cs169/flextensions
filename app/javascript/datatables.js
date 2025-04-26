@@ -1,5 +1,5 @@
 // Initialize DataTables
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("turbo:load", () => {
     $('#requests-table').DataTable({
       paging: true,
       searching: true,

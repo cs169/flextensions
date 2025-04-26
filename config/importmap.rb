@@ -10,9 +10,11 @@ pin "rails-ujs-override", to: "rails-ujs-override.js"
 pin "bootstrap", to: "bootstrap.min.js", preload: true
 pin "@popperjs/core", to: "popper.js", preload: true
 pin "assignments", to: "assignments.js"
-pin "datatables", to: "datatables.js"
+
 
 # Pin DataTables and jQuery
 pin "jquery", to: "https://ga.jspm.io/npm:jquery@3.7.1/dist/jquery.js"
 pin "datatables.net", to: "https://ga.jspm.io/npm:datatables.net@1.13.6/js/jquery.dataTables.js"
 #pin "datatables.net-dt", to: "https://ga.jspm.io/npm:datatables.net-dt@1.13.6/css/jquery.dataTables.css"
+
+pin "datatables", to: "datatables.js"
