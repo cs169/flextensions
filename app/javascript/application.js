@@ -11,3 +11,4 @@ import "rails-ujs-override"
 import "jquery";
 import "datatables.net";
 import "datatables"
+import "requests"

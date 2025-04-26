@@ -1,5 +1,5 @@
 // Initialize DataTables
-document.addEventListener("turbo:load", () => {
+document.addEventListener("DOMContentLoaded", () => {
     $('#requests-table').DataTable({
       paging: true,
       searching: true,
@@ -8,6 +8,6 @@ document.addEventListener("turbo:load", () => {
       columnDefs: [
         { orderable: false, targets: "no-sort" } // Disable sorting for columns with the "no-sort" class
       ],
-      order: [[3, "desc"]] // Default sort by the "Requested At" column in ascending order
+      order: [[3, "asc"]] // Default sort by the "Requested At" column in ascending order
     });
   });
