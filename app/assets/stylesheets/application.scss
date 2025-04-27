@@ -18,3 +18,13 @@
  @import "bootstrap";
  @import "custom_bootstrap";
  @import "font-awesome";
+
+.table-responsive {
+  max-width: 100%; /* Ensure the table does not exceed the container width */
+  overflow-x: auto; /* Add horizontal scrolling if the table is too wide */
+}
+
+.table {
+  table-layout: auto; /* Allow columns to adjust their width automatically */
+  word-wrap: break-word; /* Prevent text from overflowing in table cells */
+}
