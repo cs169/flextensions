@@ -43,8 +43,12 @@
                   <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
                     <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
                   </td>
-                  <td class="text-center align-content-center"><%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
-                  <td class="text-center align-content-center"><%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %></td>
+                  <td class="text-center align-content-center" data-order="<%= request.assignment&.due_date&.iso8601 %>">
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.requested_due_date&.iso8601 %>">
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
+                  </td>
                   <td class="text-center align-content-center">
                     <% if request.assignment&.due_date && request.requested_due_date.present? %>
                       <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
