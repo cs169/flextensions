@@ -7,12 +7,11 @@
 		<%= csrf_meta_tags %>
 		<%= csp_meta_tag %>
 
-		<%= render "layouts/components/color_mode_critical" %>
+		<%= stylesheet_link_tag "application" %>
+		<%= render "layouts/components/css_imports" %>
 
-		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-		<%= stylesheet_link_tag "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css", media: "all" %>
 		<%= javascript_importmap_tags %>
-		<%= javascript_include_tag "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js", defer: true %>
+		<%= render "layouts/components/color_mode_critical" %>
 	</head>
 	<body class="d-flex flex-column min-vh-100">
 		<%= render "layouts/header" %>
