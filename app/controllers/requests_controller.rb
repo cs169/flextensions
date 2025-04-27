@@ -10,7 +10,11 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending')
+    if params[:show_all] == "true"
+      @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).order(created_at: :desc)
+    else
+      @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending')
+    end
     render_role_based_view
   end
 
@@ -18,7 +22,7 @@ class RequestsController < ApplicationController
     return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @side_nav = 'requests'
-    @requests = @course.requests.includes(:assignment, :last_processed_by_user).where.not(status: 'pending').order(created_at: :asc)
+    @requests = @course.requests.includes(:assignment, :last_processed_by_user).order(created_at: :asc)
     render_role_based_view(view: 'history')
   end
 
