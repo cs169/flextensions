@@ -20,7 +20,7 @@
 
       <% if @requests.any? %>
         <div class="table-responsive">
-          <table class="table table-bordered table-striped datatable" id="requests-table" data-controller="requests">
+          <table class="table table-bordered table-striped datatable" id="requests-table" data-controller="requests" data-search-query="<%= @search_query %>">
             <thead>
               <tr class="table-info">
                 <th>Assignment</th>

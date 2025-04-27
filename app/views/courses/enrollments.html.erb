@@ -19,7 +19,9 @@
           <tbody>
             <% @enrollments.each do |enrollment| %>
               <tr>
-                <td><%= enrollment.user.name %></td>
+                <td>
+                  <%= link_to enrollment.user.name, course_requests_path(@course, search: enrollment.user.name), class: "text-decoration-none" %>
+                </td>
                 <td class="text-center"><%= enrollment.user.student_id %></td>
                 <td class="text-center"><%= enrollment.user.email %></td>
                 <td class="text-center"><%= enrollment.role.capitalize %></td>

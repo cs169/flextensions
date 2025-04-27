@@ -15,6 +15,10 @@ class RequestsController < ApplicationController
                 else
                   @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
                 end
+
+    # Pass the search query to the view
+    @search_query = params[:search]
+
     render_role_based_view
   end
 
