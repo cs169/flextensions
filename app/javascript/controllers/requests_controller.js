@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
+    static targets = ["toggleButton"];
+
     connect() {
         if (!$.fn.DataTable.isDataTable('#requests-table')) {
             this.table = $('#requests-table').DataTable({
@@ -19,7 +21,7 @@ export default class extends Controller {
         this.filterPendingRequests();
 
         // Add event listener for the toggle button
-        document.getElementById('toggle-requests').addEventListener('click', () => {
+        this.toggleButtonTarget.addEventListener('click', () => {
             this.toggleRequests();
         });
     }
@@ -42,7 +44,7 @@ export default class extends Controller {
     }
 
     toggleRequests() {
-        const button = document.getElementById('toggle-requests');
+        const button = this.toggleButtonTarget;
         if (button.textContent === 'View All Requests') {
             this.showAllRequests();
             button.textContent = 'Show Pending Requests';
