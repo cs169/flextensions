@@ -9,9 +9,9 @@
         <div class="col-6 align-content-center">
           <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger"><%= @requests.count %></span> pending requests</p>
         </div>
-        <div class="col-6 text-end">
-          <a href="<%= history_course_requests_path(@course) %>" class="btn btn-sm btn-warning">View old requests</a>
-        </div>
+        <div class="mb-3">
+			<button id="toggle-requests" class="btn btn-sm btn-secondary">View All Requests</button>
+		</div>
       </div>
 
       <% if @requests.any? %>
@@ -32,7 +32,7 @@
             </thead>
             <tbody>
               <% @requests.each do |request| %>
-                <tr>
+                <tr data-status="<%= request.status %>">
                   <td class="align-content-center"><%= request.assignment ? request.assignment.name : "N/A" %></td>
                   <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
                   <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
