@@ -34,9 +34,6 @@ Rails.application.routes.draw do
     end
     resources :extensions, only: [:create]
     resources :requests do
-      collection do
-        get :history
-      end
       member do
         post :approve
         post :reject
