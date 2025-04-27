@@ -9,9 +9,10 @@ export default class extends Controller {
                 ordering: true,
                 info: true,
                 columnDefs: [
-                    { orderable: false, targets: "no-sort" } // Disable sorting for columns with the "no-sort" class
+                    { orderable: false, targets: "no-sort" }, // Disable sorting for columns with the "no-sort" class
+                    { type: "date", targets: 3 } // Ensure the "Requested At" column (index 3) is sorted by date
                 ],
-                order: [[3, "asc"]] // Default sort by the "Requested At" column in ascending order
+                order: [[3, "asc"]]
             });
         }
     }

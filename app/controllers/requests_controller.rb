@@ -11,9 +11,9 @@ class RequestsController < ApplicationController
   def index
     @side_nav = 'requests'
     if params[:show_all] == "true"
-      @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).order(created_at: :desc)
+      @requests = @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
     else
-      @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending')
+      @requests = @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
     end
     render_role_based_view
   end
