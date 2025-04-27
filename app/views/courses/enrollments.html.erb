@@ -7,7 +7,7 @@
       <%= render "shared/extension_status_warning", course: @course %>
       
       <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="enrollments-table">
+        <table class="table table-bordered table-striped datatable" id="enrollments-table" data-controller="enrollments">
           <thead>
             <tr class="table-info">
               <th>Name</th>
