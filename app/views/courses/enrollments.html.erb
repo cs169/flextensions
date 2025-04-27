@@ -20,7 +20,12 @@
             <% @enrollments.each do |enrollment| %>
               <tr>
                 <td>
-                  <%= link_to enrollment.user.name, course_requests_path(@course, search: enrollment.user.name, show_all: 'true'), class: "text-decoration-none" %>
+                  <%= link_to(
+                    enrollment.user.student_id.present? ? course_requests_path(@course, search: enrollment.user.student_id, show_all: 'true') : course_requests_path(@course, search: enrollment.user.name, show_all: 'true'),
+                    class: "text-decoration-none"
+                  ) do %>
+                    <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
+                  <% end %>
                 </td>
                 <td class="text-center"><%= enrollment.user.student_id %></td>
                 <td class="text-center"><%= enrollment.user.email %></td>
