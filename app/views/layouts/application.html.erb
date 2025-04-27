@@ -12,6 +12,7 @@
 		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 		<%= stylesheet_link_tag "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css", media: "all" %>
 		<%= javascript_importmap_tags %>
+		<%= javascript_include_tag "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js", defer: true %>
 	</head>
 	<body class="d-flex flex-column min-vh-100">
 		<%= render "layouts/header" %>
