@@ -78,15 +78,7 @@ class CoursesController < ApplicationController
     @side_nav = 'enrollments'
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
-    @enrollments = @course.user_to_courses.includes(:user).sort_by do |enrollment|
-      role_priority = case enrollment.role
-                      when 'teacher' then 0
-                      when 'ta' then 1
-                      when 'student' then 2
-                      else 3
-                      end
-      [role_priority, enrollment.user.name.downcase]
-    end
+    @enrollments = @course.user_to_courses.includes(:user)
   end
 
   # DELETES ALL COURSES, ASSIGNMENTS, EXTENSIONS, AND USER-TO-COURSE MAPPINGS
