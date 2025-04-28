@@ -7,7 +7,7 @@ on:
 
 jobs:
   rspec:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16
@@ -16,6 +16,8 @@ jobs:
         ports:
           - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
@@ -30,10 +32,10 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-    - name: Install Dependencies
-      run: |
-        gem install bundler
-        bundle install --jobs 4 --retry 3
+    # - name: Install Dependencies
+    #   run: |
+    #     gem install bundler
+    #     bundle install --jobs 4 --retry 3
     - name: Setup Database
       run: |
         bundle exec rails db:create
