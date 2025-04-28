@@ -479,6 +479,12 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#send_email_response' do
+    before do
+      ENV['DEFAULT_FROM_EMAIL'] = 'flextensions@berkeley.edu'
+      course_settings
+      allow(EmailService).to receive(:send_email)
+    end
+
     let(:course_settings) do
       CourseSettings.create!(
         course: course,
@@ -490,11 +496,6 @@ RSpec.describe Request, type: :model do
           Your extension request has been {{status}}.
         TEMPLATE
       )
-    end
-
-    before do
-      course_settings
-      allow(EmailService).to receive(:send_email)
     end
 
     it 'calls EmailService.send_email with correct parameters' do
