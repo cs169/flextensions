@@ -79,4 +79,12 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   config.hosts << "flextensions.lvh.me:3000"
+
+  # Action Mailer settings
+  config.action_mailer.delivery_method = :letter_opener
+
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST", "localhost"),
+    port: ENV.fetch("APP_PORT", "3000")
+  }
 end
