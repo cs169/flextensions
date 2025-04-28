@@ -102,7 +102,7 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem 'web-console'
 
-  # for debug
+  # TODO: Deprecate+remove this.
   gem 'byebug'
 
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
@@ -112,6 +112,7 @@ group :development do
   # gem "spring"
 
   # Ruby static code analyzer and formatter
+  # TODO: Move these to a :linters, :development group
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false

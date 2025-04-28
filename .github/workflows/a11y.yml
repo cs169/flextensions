@@ -2,9 +2,9 @@
 name: Accessibility Tests
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+  workflow_dispatch:
+
 jobs:
   a11y_test:
     runs-on: ubuntu-latest
@@ -16,27 +16,22 @@ jobs:
         ports:
          - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       CANVAS_URL: http://bcourses.test.instructure.com/
     steps:
      - uses: actions/checkout@v3
      - name: Set up Ruby
        uses: ruby/setup-ruby@v1
        with:
-         ruby-version: 3.3.0
          bundler-cache: true
-     - name: Install Dependencies
-       run: |
-         gem install bundler
-         bundle install --jobs 4 --retry 3
      - name: Set up Database
        run: |
-         bundle exec rails db:create
-         bundle exec rails db:migrate
+         bundle exec rails db:setup
      - name: Create separate Chrome data directories
        run: |
          mkdir -p /tmp/chrome-data-cucumber

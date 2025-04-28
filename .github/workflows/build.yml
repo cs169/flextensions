@@ -17,6 +17,8 @@ jobs:
         ports:
           - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
@@ -38,10 +40,6 @@ jobs:
       uses: browser-actions/setup-chrome@v1
       with:
         chrome-version: stable
-    # - name: Install Dependencies
-    #   run: |
-    #     gem install bundler
-    #     bundle install --jobs 4 --retry 3
     - name: Setup Database
       run: |
         bundle exec rails db:setup
