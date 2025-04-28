@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100" data-bs-theme="auto">
+<html lang="en">
 	<head>
 		<title>Flextensions</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,10 +13,15 @@
 		<%= javascript_importmap_tags %>
 		<%= render "layouts/components/color_mode_critical" %>
 	</head>
-	<body class="d-flex flex-column min-vh-100">
+	<body class="d-flex flex-column vh-100">
 		<%= render "layouts/header" %>
-		<main class="flex-grow-1">
-			<div class="d-flex flex-column flex-lg-row">
+		<main class="d-flex flex-grow-1 overflow-hidden">
+			<% unless (controller.controller_name == "home" && controller.action_name == "index") ||  (controller.controller_name == "courses" && ["index", "new"].include?(controller.action_name)) %>
+				<% if @course.present? %>
+					<%= render 'layouts/sidebar' %>
+				<% end %>
+			<% end %>
+			<div class="flex-grow-1 overflow-auto p-3">
 				<%= yield %>
 			</div>
 		</main>
