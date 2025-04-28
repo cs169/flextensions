@@ -17,7 +17,9 @@
 		<%= render "layouts/header" %>
 		<main class="d-flex flex-grow-1 overflow-hidden">
 			<% unless (controller.controller_name == "home" && controller.action_name == "index") ||  (controller.controller_name == "courses" && ["index", "new"].include?(controller.action_name)) %>
-				<%= render "layouts/sidebar" %>
+				<% if @course.present? %>
+					<%= render 'layouts/sidebar' %>
+				<% end %>
 			<% end %>
 			<div class="flex-grow-1 overflow-auto p-3">
 				<%= yield %>
