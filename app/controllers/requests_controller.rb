@@ -10,16 +10,16 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending').order(created_at: :asc)
+    @requests = if params[:show_all] == 'true'
+                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
+                else
+                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
+                end
+
+    # Pass the search query to the view
+    @search_query = params[:search]
+
     render_role_based_view
-  end
-
-  def history
-    return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
-
-    @side_nav = 'requests'
-    @requests = @course.requests.includes(:assignment, :last_processed_by_user).where.not(status: 'pending').order(created_at: :asc)
-    render_role_based_view(view: 'history')
   end
 
   def show
@@ -41,7 +41,8 @@ class RequestsController < ApplicationController
     # Filter out assignments that already have pending requests from this user
     @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
 
-    @all_assignments = all_assignments # Keep full list for reference
+    @has_pending = all_assignments.size != @assignments.size
+
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
 
     if @selected_assignment&.has_pending_request_for_user?(@user, @course)

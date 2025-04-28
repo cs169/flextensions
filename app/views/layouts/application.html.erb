@@ -7,9 +7,11 @@
 		<%= csrf_meta_tags %>
 		<%= csp_meta_tag %>
 
-		<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+		<%= stylesheet_link_tag "application" %>
+		<%= render "layouts/components/css_imports" %>
+
 		<%= javascript_importmap_tags %>
-		<%= javascript_include_tag "color-modes", "data-turbo-track": "reload" %>
+		<%= render "layouts/components/color_mode_critical" %>
 	</head>
 	<body class="d-flex flex-column min-vh-100">
 		<%= render "layouts/header" %>

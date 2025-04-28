@@ -32,16 +32,37 @@ RSpec.describe Course, type: :model do
   end
 
   describe '.find_or_create_course' do
+    let(:token) { 'fake_token' }
+
     it 'creates a new course if not found' do
-      course = described_class.find_or_create_course(course_data)
+      # Stub the Faraday request
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
+
+      # Call the method
+      course = described_class.find_or_create_course(course_data, token)
+
+      # Expectations
       expect(course).to be_persisted
       expect(course.course_name).to eq('Intro to RSpec')
+      expect(course.course_code).to eq('RSPEC101')
     end
 
     it 'returns existing course if already created' do
+      # Create an existing course
       existing = described_class.create!(canvas_id: 'canvas_123', course_name: 'Intro to RSpec', course_code: 'RSPEC101')
-      course = described_class.find_or_create_course(course_data)
+
+      # Stub the Faraday request
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
+
+      # Call the method
+      course = described_class.find_or_create_course(course_data, token)
+
+      # Expectations
       expect(course.id).to eq(existing.id)
+      expect(course.course_name).to eq('Intro to RSpec')
+      expect(course.course_code).to eq('RSPEC101')
     end
   end
 
@@ -109,6 +130,8 @@ RSpec.describe Course, type: :model do
     it 'creates course, course_to_lms, form_setting, syncs assignments and enrollments' do
       allow(described_class).to receive(:sync_assignments)
       allow_any_instance_of(described_class).to receive(:sync_enrollments_from_canvas)
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
 
       expect do
         described_class.create_or_update_from_canvas(course_data, 'fake_token', instance_double(User))

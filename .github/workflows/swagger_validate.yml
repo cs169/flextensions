@@ -2,10 +2,7 @@ name: Swagger
 
 on:
   push:
-    branches:
-      - master
-      - main
-  pull_request: {}
+  pull_request:
 
 jobs:
   swagger:

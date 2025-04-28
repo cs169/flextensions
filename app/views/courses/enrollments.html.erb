@@ -8,7 +8,7 @@
       <%= render "shared/extension_status_warning", course: @course %>
       
       <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="enrollments-table">
+        <table class="table table-bordered table-striped datatable" id="enrollments-table" data-controller="enrollments">
           <thead>
             <tr class="table-info">
               <th>Name</th>
@@ -20,10 +20,17 @@
           <tbody>
             <% @enrollments.each do |enrollment| %>
               <tr>
-                <td><%= enrollment.user.name %></td>
+                <td>
+                  <%= link_to(
+                    enrollment.user.student_id.present? ? course_requests_path(@course, search: enrollment.user.student_id, show_all: 'true') : course_requests_path(@course, search: enrollment.user.name, show_all: 'true'),
+                    class: "text-decoration-none"
+                  ) do %>
+                    <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
+                  <% end %>
+                </td>
                 <td class="text-center"><%= enrollment.user.student_id %></td>
                 <td class="text-center"><%= enrollment.user.email %></td>
-                <td class="text-center"><%= enrollment.role.capitalize %></td>
+                <td class="text-center"><%= enrollment.role.downcase.capitalize %></td>
               </tr>
             <% end %>
           </tbody>

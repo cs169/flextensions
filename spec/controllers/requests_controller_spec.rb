@@ -286,27 +286,6 @@ RSpec.describe RequestsController, type: :controller do
     end
   end
 
-  describe 'GET #history' do
-    before do
-      session[:user_id] = instructor.canvas_uid
-      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
-      FormSetting.create!(course: course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
-      request.update!(status: 'approved')
-    end
-
-    it 'renders history for instructors' do
-      get :history, params: { course_id: course.id }
-      expect(response).to render_template('requests/instructor_history')
-    end
-
-    it 'redirects students from history page' do
-      session[:user_id] = user.canvas_uid
-      get :history, params: { course_id: course.id }
-      expect(response).to redirect_to(course_path(course.id))
-      expect(flash[:alert]).to eq('You do not have access to this page.')
-    end
-  end
-
   describe 'POST #approve' do
     before do
       session[:user_id] = instructor.canvas_uid

@@ -1,0 +1,31 @@
+import { Controller } from "@hotwired/stimulus";
+import DataTable from "datatables.net";
+
+export default class extends Controller {
+	connect() {
+		if (!DataTable.isDataTable('#enrollments-table')) {
+			// Define a custom sorting function for the Role column
+			DataTable.ext.type.order['role-pre'] = function (data) {
+				const rolePriority = { teacher: 4, ta: 2, student: 3 };
+				if (typeof data !== 'string') {
+					data = String(data).trim();
+				}
+				return rolePriority[data.toLowerCase()] || 4;
+			};
+
+			new DataTable('#enrollments-table', {
+				paging: true,
+				searching: true,
+				ordering: true,
+				info: true,
+				columns: [
+					null, // Name
+					null, // Email
+					null, // Section
+					{ orderDataType: 'role-pre' } // Role column (custom sort)
+				],
+				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
+			});
+		}
+	}
+}
