@@ -20,6 +20,8 @@ jobs:
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
+      # TODO: This should not be required, but a few specs rely on it by using ENV.fetch.
+      CANVAS_URL: https://ucberkeleysandbox.instructure.com
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
     steps:
