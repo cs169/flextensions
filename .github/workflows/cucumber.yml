@@ -24,12 +24,16 @@ jobs:
       RAILS_ENV: test
       RUBY_ENV: test
       CANVAS_URL: http://bcourses.test.instructure.com/
-
+      CHROME_DATA_DIR: /tmp/chrome-data-cucumber
+      COVERAGE: "true"
+      SELENIUM_HEADLESS: "true"
+      SELENIUM_DRIVER_VERSION: stable
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: 3.3.0
         bundler-cache: true
     - name: Install Chrome and ChromeDriver
       uses: browser-actions/setup-chrome@v1
@@ -48,8 +52,3 @@ jobs:
         DISPLAY=:99
         Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
         bundle exec cucumber features/ --tags '@javascript and not @skip and not @wip and not @a11y' --profile selenium_chrome_headless
-      env:
-        CHROME_DATA_DIR: /tmp/chrome-data-cucumber
-        COVERAGE: "true"
-        SELENIUM_HEADLESS: "true"
-        SELENIUM_DRIVER_VERSION: stable
