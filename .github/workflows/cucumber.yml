@@ -38,12 +38,9 @@ jobs:
       uses: browser-actions/setup-chrome@v1
       with:
         chrome-version: stable
-    # TODO: THis should work correctly using db:prepared but cuke/a11y tests fail
-    #
     - name: Setup Database
       run: |
-        bundle exec rails db:create
-        bundle exec rails db:schema:load
+        bundle exec rails db:setup
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-cucumber
     - name: Run Non-JavaScript Cucumber Tests
