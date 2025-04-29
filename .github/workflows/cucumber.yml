@@ -43,7 +43,6 @@ jobs:
     - name: Setup Database
       run: |
         bundle exec rails db:create
-        bundle exec rails db:migrate
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-cucumber
     - name: Run Non-JavaScript Cucumber Tests
