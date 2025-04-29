@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-0" aria-label="Thirteenth navbar example">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 	<div class="container-fluid">
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-center"
 			aria-controls="navbar-center" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,7 +12,7 @@
 		</div>
 
 		<div class="collapse navbar-collapse d-lg-flex" id="navbar-center">
-			<a class="navbar-brand col-lg-3 me-0 color-mode-toggler-m" href="./">Flextensions</a>
+			<a class="navbar-brand col-lg-3 me-0 color-mode-toggler-m" href="/courses">Flextensions</a>
 			<ul class="navbar-nav col-lg-6 justify-content-lg-center">
 				<li class="nav-item">
 					<a class="nav-link active" aria-current="page" href="/courses">Home</a>
@@ -50,3 +50,17 @@
 		</div>
 	</div>
 </nav>
+
+<% unless (controller.controller_name == "home" && controller.action_name == "index") ||  (controller.controller_name == "courses" && ["index", "new"].include?(controller.action_name)) %>
+<!-- Mobile Sidebar Toggle Button (arrow) -->
+<button id="mobileSidebarToggle" 
+		class="btn btn-light btn-sm d-md-none"
+		type="button"
+		data-controller="sidebar"
+		data-sidebar-target="toggleBtn"
+		data-action="click->sidebar#toggleSidebar"
+		aria-label="Open sidebar"
+		style="display: none;">
+	<i class="fa-solid fa-arrow-right"></i>
+</button>
+<% end %>

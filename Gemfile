@@ -43,6 +43,8 @@ gem 'bootsnap', require: false
 
 gem 'lms-api'
 
+gem 'newrelic_rpm'
+
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
 
@@ -52,7 +54,6 @@ gem 'lms-api'
 # gem "image_processing", "~> 1.2"
 
 gem 'bootstrap', '~> 5.3.3'
-gem 'jquery-rails'
 gem 'sassc-rails', '~> 2.1' # dependency for bootstrap #03-10-2025 this is deprecated but still works
 # gem 'dartsass-sprockets' # alternative to sassc-rails, this is recommended but bootstrap 5.3.3 is still using "deprecated" @import statements which this gem doesn't like
 gem 'json'
@@ -67,10 +68,14 @@ gem 'ostruct'
 gem 'omniauth'
 gem 'omniauth-oauth2'
 
+# Font Awesome for icons
+gem 'font-awesome-sass'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
+  gem 'shoulda-matchers', '~> 5.0'
 end
 
 group :test do
@@ -117,4 +122,8 @@ group :development do
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
+
+  gem 'letter_opener'
 end
+
+gem 'rails-controller-testing', '~> 1.0'

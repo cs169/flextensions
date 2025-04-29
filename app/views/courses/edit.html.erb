@@ -1,175 +1,200 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
+<div class="container-fluid mb-5"
+     data-controller="course-settings">
     <div class="row">
         <div class="col-12">
             <%= render "courses/course_title" %>
-            <ul class="nav nav-pills mb-3 justify-content-center" id="courses-tab" role="tablist">
+            <ul class="nav nav-pills mb-4 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="course-default-tab" data-bs-toggle="pill" data-bs-target="#course-default" type="button" role="tab" aria-controls="course-default" aria-selected="false">General</button>
+                    <button class="nav-link <%= params[:tab] == 'email' ? '' : 'active' %>" 
+                            id="course-default-tab" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#course-default" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="course-default" 
+                            aria-selected="<%= params[:tab] == 'email' ? 'false' : 'true' %>"
+                            data-course-settings-target="tab"
+                            data-action="click->course-settings#updateUrlParam"
+                            data-tab="general">General Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-form-tab" data-bs-toggle="pill" data-bs-target="#course-form" type="button" role="tab" aria-controls="course-form" aria-selected="true">Form</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="course-email-tab" data-bs-toggle="pill" data-bs-target="#course-email" type="button" role="tab" aria-controls="course-email" aria-selected="true">Email</button>
+                    <button class="nav-link <%= params[:tab] == 'email' ? 'active' : '' %>" 
+                            id="course-email-tab" 
+                            data-bs-toggle="pill" 
+                            data-bs-target="#course-email" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="course-email" 
+                            aria-selected="<%= params[:tab] == 'email' ? 'true' : 'false' %>"
+                            data-course-settings-target="tab"
+                            data-action="click->course-settings#updateUrlParam"
+                            data-tab="email">Email Settings</button>
                 </li>
             </ul>
-            <form action="/courses/<% @course.id %>edit">
+            <%= form_with url: course_settings_update_path, method: :post do |form| %>
+                <%= hidden_field_tag :course_id, @course.id %>
+                <%= hidden_field_tag :tab, params[:tab] || 'general' %>
                 <div class="tab-content" id="courses-tabContent">
-                    <div class="tab-pane fade show active" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
-                        <div class="mb-3 row justify-content-center">
-                            <div class="col-11 form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="course-enable">
-                                <label class="form-check-label h4" for="course-enable">Enable Students to request extensions</label>
+                    <!-- General Settings Card -->
+                    <div class="tab-pane fade <%= params[:tab] == 'email' ? '' : 'show active' %>" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
+                        <div class="card rounded-0 mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">General Settings</h5>
                             </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve" class="col-sm-3 col-form-label">Auto approve within days </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve" placeholder="number of days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-approve-dsp" class="col-sm-3 col-form-label">Auto approve within days (DSP) </label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="auto-approve-dsp" placeholder="number of days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="max-auto-approve" class="col-sm-3 col-form-label">Maximum requests to auto approve</label>
-                            <div class="col-sm-8">
-                            <input type="number" min="1" step="1" class="form-control" id="max-auto-approve" placeholder="number">
-                            </div>
-                        </div>
-                        <div class="mb-3 row justify-content-center">
-                            <label for="auto-reject" class="col-sm-3 col-form-label">Course Reply Email Address</label>
-                            <div class="col-sm-8">
-                            <input type="email" min="1" step="1" class="form-control" id="auto-reject" placeholder="example@email.com">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="course-form" role="tabpanel" aria-labelledby="course-form-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="form-assignment" class="form-label">Assignment <strong>(required by default)</strong></label>
-                                <select class="form-control" id="form-assignment" rows="2" disabled>
-                                    <option>Assignment Name | Due Date: mm-dd-yyyy</option>
-                                </select>
-                            </div>
-                            <div class="row justify-content-around p-0">
-                                <div class="col-5 mb-3">
-                                    <label for="form-days" class="form-label">Number of Days <strong>(required by default)</strong></label>
-                                    <input type="text" class="form-control" id="form-days" readonly />
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <%= hidden_field_tag 'course_settings[enable_extensions]', false %>
+                                        <%= check_box_tag 'course_settings[enable_extensions]', 
+                                                         true, 
+                                                         @course.course_settings&.enable_extensions, 
+                                                         class: 'form-check-input', 
+                                                         id: 'course-enable' %>
+                                        <label class="form-check-label" for="course-enable">Enable Students to request extensions</label>
+                                    </div>
                                 </div>
-                                <div class="col-5 mb-3">
-                                    <label for="form-new-due-date" class="form-label">Requested Due Date <strong>(required by default)</strong></label>
-                                    <input type="date" class="form-control" id="form-new-due-date" value="" readonly />
+                                
+                                <div class="mb-3 row">
+                                    <label for="auto-approve" class="col-sm-4 col-form-label">Auto approve within days</label>
+                                    <div class="col-sm-8">
+                                        <%= number_field_tag 'course_settings[auto_approve_days]', 
+                                                           @course.course_settings&.auto_approve_days, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'auto-approve', 
+                                                           placeholder: 'Number of days' %>
+                                        <small class="text-muted">Extensions requested within this many days will be automatically approved, subject to the maximum limit below.</small>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="col-11 bg-light mb-3 py-4">
-                                <p><strong>Why do you need this extension? (required by default)</strong></p>
-                                <label for="form-reason" class="form-label">Custom Description</label>
-                                <textarea class="form-control mb-3" id="form-reason" rows="2"></textarea>
-                            </div>
-
-                            <div class="col-11 mb-3 py-4">
-                                <p><strong>Additional Documentation</strong></p>
-                                <p>Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out the course staff before submitting this form.</p>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-required">
-                                    <label class="form-check-label" for="form-documentation-state-required">
-                                        Required
-                                    </label>
+                                
+                                <div class="mb-3 row">
+                                    <label for="auto-approve-dsp" class="col-sm-4 col-form-label">Auto approve within days (DSP)</label>
+                                    <div class="col-sm-8">
+                                        <%= number_field_tag 'course_settings[auto_approve_dsp_days]', 
+                                                           @course.course_settings&.auto_approve_dsp_days, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'auto-approve-dsp', 
+                                                           placeholder: 'Number of days',
+                                                           disabled: true %>
+                                        <small class="text-muted"><em>This feature is currently under construction.</em></small>
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-optional">
-                                    <label class="form-check-label" for="form-documentation-state-optional">
-                                        Optional
-                                    </label>
+                                
+                                <div class="mb-3 row border-bottom pb-3">
+                                    <label for="max-auto-approve" class="col-sm-4 col-form-label">Maximum requests to auto approve</label>
+                                    <div class="col-sm-8">
+                                        <%= number_field_tag 'course_settings[max_auto_approve]', 
+                                                           @course.course_settings&.max_auto_approve, 
+                                                           min: 0, 
+                                                           step: 1, 
+                                                           class: 'form-control', 
+                                                           id: 'max-auto-approve', 
+                                                           placeholder: 'Number' %>
+                                        <small class="text-muted">This limit applies per student per course. Set to zero for no limit on auto-approved requests.</small>
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-documentation-state" id="form-documentation-state-hidden" checked>
-                                    <label class="form-check-label" for="form-documentation-state-hidden">
-                                        Hidden
-                                    </label>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <%= hidden_field_tag 'course_settings[enable_emails]', false %>
+                                        <%= check_box_tag 'course_settings[enable_emails]', 
+                                                         true, 
+                                                         @course.course_settings&.enable_emails, 
+                                                         class: 'form-check-input', 
+                                                         id: 'enable-email' %>
+                                        <label class="form-check-label" for="enable-email">Enable email notifications</label>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="col-11 bg-light mb-3 py-4">
-                                <p><strong>Additional Questions</strong></p>
-                                <label for="form-custom-1" class="form-label">Custom Question 1</label>
-                                <input type="text" class="form-control" id="form-custom-1" />
-                                <label for="form-custom-1-desc" class="form-label">Custom Question 1 Description</label>
-                                <textarea class="form-control" id="form-custom-1-desc" rows="2"></textarea>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-required">
-                                    <label class="form-check-label" for="form-custom-1-state-required">
-                                        Required
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-optional">
-                                    <label class="form-check-label" for="form-custom-1-state-optional">
-                                        Optional
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-1-state" id="form-custom-1-state-hidden" checked>
-                                    <label class="form-check-label" for="form-custom-1-state-hidden">
-                                        Hidden
-                                    </label>
+                                
+                                <div class="mb-3 row">
+                                    <label for="reply-email" class="col-sm-4 col-form-label">Course Reply Email Address</label>
+                                    <div class="col-sm-8">
+                                        <%= email_field_tag 'course_settings[reply_email]', 
+                                                          @course.course_settings&.reply_email, 
+                                                          class: 'form-control', 
+                                                          id: 'reply-email', 
+                                                          placeholder: 'example@example.com',
+                                                          data: { course_settings_target: "emailField" },
+                                                          disabled: !@course.course_settings&.enable_emails %>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="col-11 mb-3 py-4">
-                                <label for="form-custom-2" class="form-label">Custom Question 2</label>
-                                <input type="text" class="form-control" id="form-custom-2" />
-                                <label for="form-custom-2-desc" class="form-label">Custom Question 2 Description</label>
-                                <textarea class="form-control" id="form-custom-2-desc" rows="2"></textarea>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-required">
-                                    <label class="form-check-label" for="form-custom-2-state-required">
-                                        Required
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-optional">
-                                    <label class="form-check-label" for="form-custom-2-state-optional">
-                                        Optional
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="form-custom-2-state" id="form-custom-2-state-hidden" checked>
-                                    <label class="form-check-label" for="form-custom-2-state-hidden">
-                                        Hidden
-                                    </label>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
-                        <div class="row justify-content-center">
-                            <div class="col-11 mb-3">
-                                <label for="email-template" class="form-label">Auto Reply Email Template</label>
-                                <textarea class="form-control" id="email-template" rows="10">maybe this can be a wysiwyg editor like TinyMCE</textarea>
+                    <!-- Email Settings Card -->
+                    <div class="tab-pane fade <%= params[:tab] == 'email' ? 'show active' : '' %>" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
+                        <div class="card rounded-0 mb-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Email Template</h5>
+                                <%= button_tag "Reset to Default", 
+                                              name: "reset_email_template", 
+                                              value: "true", 
+                                              class: "btn btn-secondary btn-sm",
+                                              type: "submit" %>
                             </div>
-                            <div class="col-11 mb-3">
-                                <label for="email-template-html" class="form-label">Auto Reply Email Template (html)</label>
-                                <textarea class="form-control" id="email-template-html" rows="10">if you go with TinyMCE (which is a good option) the free version doesn't allow you to use raw html so we would need another textarea that would be for raw html and code to ignore the above textarea if this has content</textarea>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="email-subject" class="form-label">Email Subject</label>
+                                    <%= text_field_tag 'course_settings[email_subject]', 
+                                                     @course.course_settings&.email_subject || "Extension Request Status: {{status}} - {{course_code}}", 
+                                                     class: 'form-control', 
+                                                     id: 'email-subject' %>
+                                    <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email-template" class="form-label">Email Body</label>
+                                    <%= text_area_tag 'course_settings[email_template]', 
+                                                    @course.course_settings&.email_template || "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff", 
+                                                    class: 'form-control', 
+                                                    id: 'email-template', 
+                                                    rows: 10 %>
+                                </div>
+                                
+                                <div class="card bg-light mt-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Available Variables</h6>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p class="mb-1 fw-bold">Student Information:</p>
+                                                <ul class="list-unstyled">
+                                                    <li><code>{{student_name}}</code> - Full name</li>
+                                                    <li><code>{{student_email}}</code> - Email</li>
+                                                    <li><code>{{student_id}}</code> - ID number</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1 fw-bold">Course Information:</p>
+                                                <ul class="list-unstyled">
+                                                    <li><code>{{course_name}}</code> - Course name</li>
+                                                    <li><code>{{course_code}}</code> - Course code</li>
+                                                    <li><code>{{assignment_name}}</code> - Assignment</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="mb-1 fw-bold">Extension Information:</p>
+                                                <ul class="list-unstyled">
+                                                    <li><code>{{original_due_date}}</code> - Original due date</li>
+                                                    <li><code>{{new_due_date}}</code> - New due date</li>
+                                                    <li><code>{{extension_days}}</code> - Days extended</li>
+                                                    <li><code>{{status}}</code> - Status (Approved/Denied)</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="text-center mb-4">
-                    <a href="/courses" class="btn btn-dark">Back</a>
-                    <input type="submit" class="btn btn-success" value="Save Settings" />
+                    <%= form.submit 'Save Settings', class: 'btn btn-success px-4' %>
                 </div>
-            </form>
+            <% end %>
         </div>
     </div>
 </div>

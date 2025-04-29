@@ -1,42 +1,52 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
+<div class="container-fluid mb-5">
   <div class="row">
     <div class="col-12">
       <%= render "courses/course_title" %>
-      <table class="table table-bordered table-striped" id="assignments-table">
-        <thead>
-          <tr class="table-info">
-            <th>Assignment</th>
-            <th>View</th>
-            <th>Due Date</th>
-            <th>Late Due Date</th>
-            <th style="width: 50px;">Enable</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @assignments.each do |assignment| %>
-            <tr>
-              <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-              <td class="row-check"><%= assignment.name %></td>
-              <td>
-                <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank">
-                  bCourses
-                </a>
-              </td>
-              <td class="row-check"><%= assignment.due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="row-check"><%= assignment.late_due_date&.strftime("%B %d, %Y") || 'N/A' %></td>
-              <td class="d-flex justify-content-center align-content-center">
-                <div class="d-flex justify-content-center form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="assignment-<%= assignment.id %>-has-partner">
-                  <label class="form-check-label" for="assignment-<%= assignment.id %>-has-partner"></label>
-                </div>
-              </td>
+      
+      <%= render "shared/extension_status_warning", course: @course %>
+      
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="assignments-table">
+          <thead>
+            <tr class="table-info">
+              <th>Assignment</th>
+              <th class="text-center" style="min-width: 215px;">Due Date</th>
+              <th class="text-center" style="min-width: 215px;">Late Due Date</th>
+              <th class="text-center" style="width: 80px;">Enable</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% @assignments.each do |assignment| %>
+              <tr>
+                <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
+                <td class="text-break">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span><%= assignment.name %></span>
+                    <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="ms-2">
+                      bCourses <i class="fas fa-up-right-from-square"></i>
+                    </a>
+                  </div>
+                </td>
+                <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+                <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
+                <td class="justify-content-center align-content-center">
+                  <div class="form-check form-switch mx-auto" style="width: 45px;" data-controller="assignment">
+                    <input class="form-check-input assignment-enabled-switch" type="checkbox" 
+                           role="switch" 
+                           id="assignment-<%= assignment.id %>-enabled" 
+                           <%= 'checked' if assignment.enabled %> 
+                           data-assignment-target="checkbox"
+                           data-assignment-id="<%= assignment.id %>" 
+                           data-url="<%= toggle_enabled_assignment_path(assignment) %>">
+                    <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
       <div class="text-center">
-        <a href="/courses" class="btn btn-dark">Back</a>
         <button class="btn btn-info" id="sync-assignments-button" data-course-id="<%= @course.id %>">Sync Assignments</button>
       </div>
     </div>

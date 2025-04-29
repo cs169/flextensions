@@ -10,9 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_22_073255) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  # Custom types defined in this database.
+  # Note that some types may not work with other database engines. Be careful if changing database.
+  create_enum "form_display_status", ["required", "optional", "hidden"]
+  create_enum "request_status", ["pending", "approved", "denied"]
 
   create_table "assignments", force: :cascade do |t|
     t.string "name"
@@ -22,7 +27,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
     t.bigint "course_to_lms_id", null: false
     t.datetime "due_date"
     t.datetime "late_due_date"
-    t.boolean "extensions_enabled"
+    t.boolean "enabled", default: false
+  end
+
+  create_table "course_settings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "enable_extensions", default: false
+    t.integer "auto_approve_days", default: 0
+    t.integer "auto_approve_dsp_days", default: 0
+    t.integer "max_auto_approve", default: 0
+    t.boolean "enable_emails", default: false
+    t.string "reply_email"
+    t.string "email_subject", default: "Extension Request Status: {{status}} - {{course_code}}"
+    t.text "email_template", default: "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff"
+    t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 
   create_table "course_to_lmss", force: :cascade do |t|
@@ -41,16 +61,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
     t.datetime "updated_at", null: false
     t.string "canvas_id"
     t.string "course_code"
-    t.boolean "enable_student_requests"
-    t.integer "auto_approve_days"
-    t.integer "auto_approve_dsp_days"
-    t.integer "max_auto_approve"
-    t.string "reply_email"
-    t.text "custom_question_1"
-    t.text "custom_question_2"
-    t.text "custom_question_3"
-    t.string "email_subject"
-    t.text "email_template"
     t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
   end
 
@@ -65,6 +75,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
     t.string "external_extension_id"
     t.index ["assignment_id"], name: "index_extensions_on_assignment_id"
     t.index ["last_processed_by_id"], name: "index_extensions_on_last_processed_by_id"
+  end
+
+  create_table "form_settings", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.text "reason_desc"
+    t.text "documentation_desc"
+    t.enum "documentation_disp", enum_type: "form_display_status"
+    t.string "custom_q1"
+    t.text "custom_q1_desc"
+    t.enum "custom_q1_disp", enum_type: "form_display_status"
+    t.string "custom_q2"
+    t.text "custom_q2_desc"
+    t.enum "custom_q2_disp", enum_type: "form_display_status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_form_settings_on_course_id"
   end
 
   create_table "lms_credentials", force: :cascade do |t|
@@ -88,6 +114,27 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "requests", force: :cascade do |t|
+    t.datetime "requested_due_date"
+    t.text "reason"
+    t.text "documentation"
+    t.text "custom_q1"
+    t.text "custom_q2"
+    t.string "external_extension_id"
+    t.bigint "course_id", null: false
+    t.bigint "assignment_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "last_processed_by_user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.enum "status", default: "pending", null: false, enum_type: "request_status"
+    t.boolean "auto_approved", default: false
+    t.index ["assignment_id"], name: "index_requests_on_assignment_id"
+    t.index ["course_id"], name: "index_requests_on_course_id"
+    t.index ["last_processed_by_user_id"], name: "index_requests_on_last_processed_by_user_id"
+    t.index ["user_id"], name: "index_requests_on_user_id"
+  end
+
   create_table "user_to_courses", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "course_id"
@@ -103,18 +150,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_10_094022) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "canvas_uid"
-    t.string "canvas_token"
     t.string "name"
+    t.string "student_id"
     t.index ["canvas_uid"], name: "index_users_on_canvas_uid", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "assignments", "course_to_lmss"
+  add_foreign_key "course_settings", "courses"
   add_foreign_key "course_to_lmss", "courses"
   add_foreign_key "course_to_lmss", "lmss"
   add_foreign_key "extensions", "assignments"
   add_foreign_key "extensions", "users", column: "last_processed_by_id"
+  add_foreign_key "form_settings", "courses"
   add_foreign_key "lms_credentials", "users"
+  add_foreign_key "requests", "assignments"
+  add_foreign_key "requests", "courses"
+  add_foreign_key "requests", "users"
+  add_foreign_key "requests", "users", column: "last_processed_by_user_id"
   add_foreign_key "user_to_courses", "courses"
   add_foreign_key "user_to_courses", "users"
 end

@@ -100,4 +100,20 @@ Rails.application.configure do
   ENV['DB_PASSWORD'] ||= Rails.application.credentials.config[:DB_PASSWORD]
   ENV['DB_NAME'] ||= Rails.application.credentials.config[:DB_NAME]
   # --- END PROD DB CRED INITIALIZATION --- #
+
+  # Action Mailer settings
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              ENV.fetch("SMTP_ADDRESS"),
+    port:                 ENV.fetch("SMTP_PORT").to_i,
+    domain:               ENV.fetch("SMTP_DOMAIN"),
+    user_name:            ENV.fetch("SMTP_USERNAME"),
+    password:             ENV.fetch("SMTP_PASSWORD"),
+    authentication:       ENV.fetch("SMTP_AUTH_METHOD", "plain"),
+    enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "true") == "true"
+  }
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("APP_HOST", "localhost"),
+    port: ENV.fetch("APP_PORT", "3000")
+  }
 end
