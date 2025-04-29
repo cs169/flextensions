@@ -5,21 +5,12 @@ module Api
     describe ExtensionsController do
       describe 'POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions' do
         before(:all) do
-          @user = User.find_or_create_by!(name: 'Test User', email: 'test@example.com')
-          @course = Course.find_or_create_by!(course_name: 'Test Course', canvas_id: '12345')
-          @lms = Lms.find_or_create_by!(lms_name: 'Canvas', use_auth_token: true)
-          @course_to_lms = CourseToLms.find_or_create_by!(course: @course, lms: @lms, external_course_id: '67890')
-          @assignment = Assignment.find_or_create_by!(
-            name: 'Test Assignment',
-            course_to_lms: @course_to_lms,
-            external_assignment_id: '11111'
-          )
-          @extension = Extension.find_or_create_by!(
-            assignment: @assignment,
-            last_processed_by_id: @user.id, # Use the correct column
-            new_due_date: '2024-04-16T16:00:00Z'
-          )
-
+          load Rails.root.join('db/seeds.rb').to_s
+          @course = Course.take
+          @assignment = Assignment.take
+          @extension = Extension.take
+          @lms = Lms.take
+          @course_to_lms = CourseToLms.find(@assignment.course_to_lms_id)
           @mock_student_uid = 123
           @mock_new_due_date = '2024-04-16T16:00:00Z'
           @auth_token = 'some_valid_token'
