@@ -30,9 +30,7 @@ jobs:
        with:
          bundler-cache: true
      - name: Set up Database
-       run: |
-         bundle exec rails db:create
-         bundle exec rails db:migrate
+       run: bundle exec rails db:setup
      - name: Create separate Chrome data directories
        run: |
          mkdir -p /tmp/chrome-data-cucumber
