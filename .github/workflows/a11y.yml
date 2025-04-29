@@ -17,7 +17,7 @@ jobs:
          - 5432:5432
     env:
       # Do not install production/staging-only gems in test environment
-      # BUNDLE_WITHOUT: "production staging"
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
