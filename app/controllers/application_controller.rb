@@ -26,8 +26,6 @@ class ApplicationController < ActionController::Base
     return handle_authentication_failure('User has no credentials.') if @current_user.lms_credentials.empty?
 
     token_expiry_time = @current_user.lms_credentials.first.expire_time
-    puts "DEBUG: Token expiry time is #{token_expiry_time}"
-    puts "DEBUG: Current time is #{Time.zone.now}"
     return handle_authentication_failure('User token has expired.') if token_expiry_time < Time.zone.now
 
     return true if token_expiry_time > Time.zone.now
