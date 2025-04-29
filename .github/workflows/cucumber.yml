@@ -38,13 +38,10 @@ jobs:
       uses: browser-actions/setup-chrome@v1
       with:
         chrome-version: stable
-    - name: Install Dependencies
-      run: |
-        gem install bundler
-        bundle install --jobs 4 --retry 3
     - name: Setup Database
       run: |
-        bundle exec rails db:setup
+        bundle exec rails db:create
+        bundle exec rails db:migrate
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-cucumber
     - name: Run Non-JavaScript Cucumber Tests
