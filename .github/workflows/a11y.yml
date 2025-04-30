@@ -4,6 +4,7 @@ name: Accessibility Tests
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   a11y_test:
@@ -16,6 +17,8 @@ jobs:
         ports:
          - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
@@ -30,16 +33,9 @@ jobs:
      - name: Set up Ruby
        uses: ruby/setup-ruby@v1
        with:
-         ruby-version: 3.3.0
          bundler-cache: true
-     - name: Install Dependencies
-       run: |
-         gem install bundler
-         bundle install --jobs 4 --retry 3
      - name: Set up Database
-       run: |
-         bundle exec rails db:create
-         bundle exec rails db:migrate
+       run: bundle exec rails db:setup
      - name: Create separate Chrome data directories
        run: |
          mkdir -p /tmp/chrome-data-cucumber

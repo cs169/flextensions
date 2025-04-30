@@ -3,10 +3,11 @@ name: RSpec Tests
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   rspec:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16
@@ -15,24 +16,22 @@ jobs:
         ports:
           - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      CANVAS_URL: http://bcourses.test.instructure.com/
-      
+      # TODO: This should not be required, but a few specs rely on it by using ENV.fetch.
+      CANVAS_URL: https://ucberkeleysandbox.instructure.com
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.3.0
         bundler-cache: true
-    - name: Install Dependencies
-      run: |
-        gem install bundler
-        bundle install --jobs 4 --retry 3
     - name: Setup Database
       run: |
         bundle exec rails db:create
@@ -43,8 +42,6 @@ jobs:
         chmod +x ./cc-test-reporter
     - name: Run before-build command
       run: ./cc-test-reporter before-build
-      env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-rspec
     - name: Run RSpec Tests
@@ -56,6 +53,7 @@ jobs:
         COVERAGE: "true"
         CI: "true"
     - name: Run after-build command
+      if: env.CC_TEST_REPORTER_ID != ''
       run: |
         if [ -f coverage/.resultset.json ]; then
           ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
@@ -64,5 +62,8 @@ jobs:
           ls -la coverage/
           exit 1
         fi
-      env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }} 
+    - uses: qltysh/qlty-action/coverage@v1
+      if: env.QLTY_COVERAGE_TOKEN != ''
+      with:
+        token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+        files: coverage/.resultset.json
