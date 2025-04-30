@@ -128,8 +128,8 @@ class Request < ApplicationRecord
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
-    to   = user.email
-    from = cs.reply_email.presence || ENV.fetch('DEFAULT_FROM_EMAIL')
+    to = user.email
+    reply_to = cs.reply_email.presence || ENV.fetch('DEFAULT_FROM_EMAIL')
 
     # build the mapping without braces:
     mapping = {
@@ -145,7 +145,8 @@ class Request < ApplicationRecord
 
     EmailService.send_email(
       to: to,
-      from: from,
+      from: ENV.fetch('DEFAULT_FROM_EMAIL'),
+      reply_to: reply_to,
       subject_template: cs.email_subject,
       body_template: cs.email_template,
       mapping: mapping,

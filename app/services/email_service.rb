@@ -22,12 +22,13 @@ class EmailService
     # subject_template: e.g. "Extension for {{student_name}}"
     # body_template:    e.g.  course_settings.email_template
     # mapping:          { "student_name" => "Yaman", ... }
-    def send_email(to:, from:, subject_template:, body_template:, mapping:, deliver_later: false)
+    def send_email(to:, from:, reply_to:, subject_template:, body_template:, mapping:, deliver_later: false)
       rendered = render_templates(subject_template, body_template, mapping)
 
       mail = ActionMailer::Base.mail(
         to: to,
         from: from,
+        reply_to: reply_to,
         subject: rendered[:subject],
         body: rendered[:body].gsub("\n", "<br>\n"),
         content_type: 'text/html'
