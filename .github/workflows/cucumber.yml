@@ -21,12 +21,12 @@ jobs:
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
+      CANVAS_URL: http://bcourses.test.instructure.com/
       CHROME_DATA_DIR: /tmp/chrome-data-cucumber
       COVERAGE: "true"
       SELENIUM_HEADLESS: "true"
       SELENIUM_DRIVER_VERSION: stable
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-      CANVAS_URL: https://ucberkeleysandbox.instructure.com
       
     steps:
     - uses: actions/checkout@v3
