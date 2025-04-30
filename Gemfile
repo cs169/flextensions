@@ -43,6 +43,8 @@ gem 'bootsnap', require: false
 
 gem 'lms-api'
 
+gem 'newrelic_rpm'
+
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
 
@@ -66,6 +68,9 @@ gem 'ostruct'
 # used to authenticate with the LMS
 gem 'omniauth'
 gem 'omniauth-oauth2'
+
+# Font Awesome for icons
+gem 'font-awesome-sass'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -118,3 +123,5 @@ group :development do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
 end
+
+gem 'rails-controller-testing', '~> 1.0'

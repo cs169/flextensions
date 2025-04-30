@@ -1,0 +1,75 @@
+<%= render "layouts/sidebar" %>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <%= render "courses/course_title" %>
+      <% if @requests.any? %>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="requests-table">
+            <thead>
+                <tr class="table-info">
+                <th>Assignment</th>
+				<th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
+                <th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
+                <th class="text-center align-content-center">Status</th>
+                <th class="text-center align-content-center" style="min-width: 125px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @requests.each do |request| %>
+                <tr>
+                    <td class="align-content-center">
+                    <%= request.assignment ? request.assignment.name : "N/A" %>
+                      <% if request.assignment # i don't know why we have this condition here or above %>
+                        <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
+                          <i class="fas fa-up-right-from-square"></i>
+                        </a>
+                      <% end %>
+                    </td>
+					<td class="text-center align-content-center">
+					<%= request.created_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+					</td>
+                    <td class="text-center align-content-center">
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                    </td>
+                    <td class="text-center align-content-center">
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
+                    </td>
+                    <td class="text-center align-content-center">
+                    <% if request.assignment&.due_date && request.requested_due_date.present? %>
+                        <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
+                    <% else %>
+                        N/A
+                    <% end %>
+                    </td>
+                    <td class="text-center align-content-center">
+                      <% case request.status %>
+                      <% when 'pending' %>
+                        <span class="badge text-bg-info">Pending</span>
+                      <% when 'approved' %>
+                        <span class="badge text-bg-success">Approved</span>
+                      <% when 'denied' %>
+                        <span class="badge text-bg-danger">Denied</span>
+                      <% else %>
+                        <span class="badge text-bg-secondary">Unknown</span>
+                      <% end %>
+                    </td>
+                    <td class="text-center align-content-center">
+                    <%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
+                    <% if request&.status == 'pending' %>
+                    <%= link_to 'Edit', edit_course_request_path(@course, request), class: "btn btn-sm btn-secondary ms-1" %>
+                    <% end %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+            </table>
+        </div>
+      <% else %>
+        <div class="alert alert-warning">There are no current requests.</div>
+      <% end %>
+    </div>
+  </div>
+</div>

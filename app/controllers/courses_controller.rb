@@ -1,186 +1,115 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit form requests sync_assignments sync_enrollments]
+  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments]
+  before_action :set_pending_request_count
   before_action :determine_user_role
 
   def index
-    # Temp Code for making an LMS
-    Lms.find_or_create_by(id: 1) do |lms|
-      lms.lms_name = 'Canvas'
-      lms.use_auth_token = true
-    end
-
-    # Fetch UserToCourse records where the user is a teacher or TA
+    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
-    # Fetch UserToCourse records where the user is a student
-    @student_courses = UserToCourse.includes(:course).where(user: @user, role: 'student')
+
+    # Only show courses to students if extensions are enabled at the course level
+    student_courses = UserToCourse.includes(course: :course_settings).where(user: @user, role: 'student')
+    @student_courses = student_courses.select do |utc|
+      course_settings = utc.course.course_settings
+      course_settings.nil? || course_settings.enable_extensions
+    end
   end
 
   def show
     @side_nav = 'show'
+    return redirect_to courses_path, alert: 'Course not found.' unless @course
 
-    return if @course.nil?
-
-    @course.reload
-    # Find the CourseToLms record for the course with lms_id of 1
     course_to_lms = @course.course_to_lms(1)
-    if course_to_lms.nil?
-      flash[:alert] = 'No LMS data found for this course.'
-      Rails.logger.info "No LMS data found for course ID: #{@course.id}"
-      redirect_to courses_path
-      return
+    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+
+    if @role == 'student'
+      course_settings = @course.course_settings
+      return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' if course_settings && !course_settings.enable_extensions
     end
 
-    # Fetch assignments associated with the CourseToLms
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
-
-    # might want to create a convention and factor out this case statement
-    case @role
-    when 'instructor'
-      render 'courses/instructor_view'
-    when 'student'
-      render 'courses/student_view'
-    else
-      flash[:alert] = 'You do not have access to this course.'
-      redirect_to courses_path
-    end
+    @assignments = if @role == 'student'
+                     Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+                   else
+                     Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
+                   end
+    render_role_based_view
   end
 
   def new
-    token = @user.canvas_token
+    token = @user.lms_credentials.first.token
     @courses = Course.fetch_courses(token)
-    if @courses.empty?
-      Rails.logger.info 'No courses found.'
-      flash[:alert] = 'No courses found.'
-    end
+    flash[:alert] = 'No courses found.' if @courses.empty?
 
     teacher_roles = %w[teacher ta]
-    @courses_teacher = @courses.select do |course|
-      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
-    end
-
-    @courses_student = @courses.select do |course|
-      course['enrollments'].any? { |enrollment| enrollment['type'] == 'student' }
-    end
+    existing_canvas_ids = Course.pluck(:canvas_id)
+    @courses_teacher = filter_courses(@courses, teacher_roles, existing_canvas_ids)
+    @courses_student = @courses.select { |c| c['enrollments'].any? { |e| e['type'] == 'student' } }
   end
 
   def edit
     @side_nav = 'edit'
-    unless @role == 'instructor'
-      flash[:alert] = 'You do not have access to this page.'
-      redirect_to course_path(@course.id) and return
-    end
-    nil if @course.nil?
-  end
-
-  def requests
-    @side_nav = 'requests'
-    # might want to create a convention and factor out this case statement
-    case @role
-    when 'instructor'
-      render 'courses/instructor_request_view'
-    when 'student'
-      render 'courses/student_request_view'
-    else
-      flash[:alert] = 'You do not have access to this course.'
-      redirect_to courses_path
-    end
-    nil if @course.nil?
-  end
-
-  # this is for requests/new (might change the name later)
-  def form
-    @side_nav = 'form'
-    unless @role == 'student'
-      flash[:alert] = 'You do not have access to this page.'
-      redirect_to course_path(@course.id) and return
-    end
-    # Find the CourseToLms record for the course with lms_id of 1
-    course_to_lms = @course.course_to_lms(1)
-    if course_to_lms.nil?
-      flash[:alert] = 'No LMS data found for this course.'
-      Rails.logger.info "No LMS data found for course ID: #{@course.id}"
-      redirect_to courses_path
-      return
-    end
-    # Fetch assignments associated with the CourseToLms
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
-    @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
-  end
-
-  def new_request
-    redirect_to course_extension_form_path(params[:course_id], assignment_id: params[:assignment_id])
+    redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
   end
 
   def create
-    token = @user.canvas_token
-    courses = Course.fetch_courses(token)
-
-    teacher_roles = %w[teacher ta]
-    courses_teacher = courses.select do |course|
-      course['enrollments'].any? { |enrollment| teacher_roles.include?(enrollment['type']) }
-    end
-
-    selected_course_ids = params[:courses] || []
-    selected_courses = courses_teacher.select { |course| selected_course_ids.include?(course['id'].to_s) }
-
-    selected_courses.each do |course_data|
-      Course.create_or_update_from_canvas(course_data, token, @user)
-    end
-
+    token = @user.lms_credentials.first.token
+    courses_teacher = filter_courses(Course.fetch_courses(token), %w[teacher ta])
+    selected_courses = courses_teacher.select { |c| params[:courses]&.include?(c['id'].to_s) }
+    selected_courses.each { |course_data| Course.create_or_update_from_canvas(course_data, token, @user) }
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
   def sync_assignments
-    if @course.nil?
-      render json: { error: 'Course not found.' }, status: :not_found
-      return
-    end
+    return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    # Fetch the Canvas token
-    token = @user.canvas_token
-
-    # Use the Course model's create_or_update_from_canvas method
-    course_data = {
-      'id' => @course.canvas_id,
-      'name' => @course.course_name,
-      'course_code' => @course.course_code
-    }
-
-    # Call the model method to sync assignments
-    Course.create_or_update_from_canvas(course_data, token, @user)
-
+    Course.create_or_update_from_canvas(course_data_for_sync, @user.lms_credentials.first.token, @user)
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 
   def sync_enrollments
-    if @course.nil?
-      render json: { error: 'Course not found.' }, status: :not_found
-      return
-    end
+    return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    # Fetch the Canvas token
-    token = @user.canvas_token
-
-    # Call the sync_users_from_canvas method
-    @course.sync_enrollments_from_canvas(token)
-
-    Rails.logger.info "Users synced for course ID: #{@course.id}"
+    @course.sync_enrollments_from_canvas(@user.lms_credentials.first.token)
     render json: { message: 'Users synced successfully.' }, status: :ok
   end
 
-  # ONLY USE THIS FOR TESTING PURPOSES
+  def enrollments
+    @side_nav = 'enrollments'
+    return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
+
+    @enrollments = @course.user_to_courses.includes(:user).sort_by do |enrollment|
+      role_priority = case enrollment.role
+                      when 'teacher' then 0
+                      when 'ta' then 1
+                      when 'student' then 2
+                      else 3
+                      end
+      [role_priority, enrollment.user.name.downcase]
+    end
+  end
+
+  # DELETES ALL COURSES, ASSIGNMENTS, EXTENSIONS, AND USER-TO-COURSE MAPPINGS
+  # This method is intended for use in development or testing environments only.
   def delete_all
-    # Delete all assignments associated with the user's courses
-    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).select(:id)).destroy_all
+    user_courses = Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id })
 
-    # Delete all CourseToLms records associated with the user's courses
-    CourseToLms.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).destroy_all
+    # Find all assignments associated with the user's courses
+    assignments = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: user_courses).select(:id))
 
-    # Delete all UserToCourse records for the user
-    UserToCourse.where(course_id: Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id }).select(:id)).destroy_all
+    # Delete all extensions associated with those assignments
+    Extension.where(assignment_id: assignments.select(:id)).destroy_all
 
-    # Delete orphaned courses (courses with no associated UserToCourse records)
+    # Delete the assignments, course-to-LMS mappings, and user-to-course mappings
+    assignments.destroy_all
+    CourseToLms.where(course_id: user_courses).destroy_all
+    UserToCourse.where(course_id: user_courses).destroy_all
+
+    # Delete course_settings and form_settings associated with the user's courses
+    CourseSettings.where(course_id: user_courses).destroy_all
+    FormSetting.where(course_id: user_courses).destroy_all
+
+    # Delete courses that no longer have any user-to-course associations
     Course.where.missing(:user_to_courses).destroy_all
 
     redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
@@ -190,22 +119,33 @@ class CoursesController < ApplicationController
 
   def authenticate_user
     @user = User.find_by(canvas_uid: session[:user_id])
-    return unless @user.nil?
-
-    redirect_to root_path, alert: 'Please log in to access this page.'
+    redirect_to root_path, alert: 'Please log in to access this page.' unless @user
   end
 
   def set_course
     @course = Course.find_by(id: params[:id])
-    return if @course
-
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path
+    redirect_to courses_path, alert: 'Course not found.' unless @course
   end
 
   def determine_user_role
-    return unless @course && @user
+    @role = @course&.user_role(@user)
+  end
 
-    @role = @course.user_role(@user)
+  def render_role_based_view(instructor_view = 'courses/instructor_view', student_view = 'courses/student_view')
+    case @role
+    when 'instructor' then render instructor_view
+    when 'student' then render student_view
+    else redirect_to courses_path, alert: 'You do not have access to this course.'
+    end
+  end
+
+  def filter_courses(courses, roles, exclude_ids = [])
+    courses.select do |course|
+      course['enrollments'].any? { |e| roles.include?(e['type']) } && exclude_ids.exclude?(course['id'].to_s)
+    end
+  end
+
+  def course_data_for_sync
+    { 'id' => @course.canvas_id, 'name' => @course.course_name, 'course_code' => @course.course_code }
   end
 end

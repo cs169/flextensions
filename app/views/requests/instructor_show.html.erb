@@ -1,0 +1,118 @@
+<%= render "layouts/sidebar" %>
+<div class="container-fluid mt-4">
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<%= render "courses/course_title" %>
+			
+			<%= render "shared/extension_status_warning", course: @course %>
+			
+			<div class="card mb-4 rounded-0">
+				<div class="card-header bg-light d-flex justify-content-between">
+					<h5 class="mb-0 bg-blue">Extension Request Details</h5>
+					<% if @request.status == 'approved' %>
+						<span class="badge fs-6 text-bg-success">Approved</span>
+					<% elsif @request.status == 'denied' %>
+						<span class="badge fs-6 text-bg-danger">Denied</span>
+					<% end %>
+				</div>
+				<div class="card-body">
+					<!-- Display Assignment Information -->
+					<div class="mb-4 border-bottom">
+						<% if @request.assignment.present? %>
+							<p class="mb-2"><strong><%= @request.assignment.name %></strong></p>
+							<div class="row">
+								<div class="col-md-6">
+									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+								</div>
+								<div class="col-md-6">
+									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+								</div>
+							</div>
+						<% else %>
+							<p>N/A</p>
+						<% end %>
+					</div>
+
+					<!-- Display Requested Due Date and Number of Days -->
+					<div class="mb-1">
+						<div class="row">
+							<div class="col-md-6">
+								<p><strong>Requested Due Date: </strong>
+								<% if @request.requested_due_date.present? %>
+									<%= @request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %>
+								<% else %>
+									N/A
+								<% end %>
+								</p>
+							</div>
+							<div class="col-md-6">
+								<p><strong>Number of Days: </strong><%= @number_of_days || '#' %></p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Display Reason for Extension -->
+					<div class="mb-4">
+						<h6 class="mb-2">Reason for Extension</h6>
+						<% if @form_settings.reason_desc.present? %>
+							<p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
+						<% end %>
+						<div class="p-3 bg-light rounded">
+							<%= @request.reason %>
+						</div>
+					</div>
+
+					<!-- Display Additional Documentation if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
+						<div class="mb-4">
+							<h6 class="mb-2">Additional Documentation</h6>
+							<% if @form_settings.documentation_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+								<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.documentation %>
+							</div>
+						</div>
+					<% end %>
+					
+					<!-- Display Custom Question 1 if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
+						<div class="mb-4">
+							<h6 class="mb-2"><%= @form_settings.custom_q1 %></h6>
+							<% if @form_settings.custom_q1_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.custom_q1_desc %></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.custom_q1 %>
+							</div>
+						</div>
+					<% end %>
+					
+					<!-- Display Custom Question 2 if applicable -->
+					<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
+						<div class="mb-4">
+							<h6 class="border-bottom pb-2 mb-3"><%= @form_settings.custom_q2 %></h6>
+							<% if @form_settings.custom_q2_desc.present? %>
+								<p class="text-muted small mb-2"><%= @form_settings.custom_q2_desc %></p>
+							<% end %>
+							<div class="p-3 bg-light">
+								<%= @request.custom_q2 %>
+							</div>
+						</div>
+					<% end %>
+
+			<!-- Display Buttons -->
+			<div class="d-flex justify-content-center mt-4">
+			  <% if @request.status == 'pending' %>
+			    <%= button_to 'Approve', approve_course_request_path(@course, @request), method: :post, class: 'btn btn-success me-3' %>
+			    <%= button_to 'Reject', reject_course_request_path(@course, @request), method: :post, class: 'btn btn-danger me-3' %>
+				<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
+				<%= link_to 'Back', course_requests_path(@course), class: "btn btn-dark" %>
+			  <% else %>
+				<%= link_to 'Back', history_course_requests_path(@course), class: "btn btn-dark" %>
+			  <% end %>
+			</div>
+		</div>
+	</div>
+</div>
