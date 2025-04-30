@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      <h1 class="sr-only">Extension Requests</h1>
       <% if @requests.any? %>
         <div class="table-responsive">
             <table class="table table-bordered table-striped" id="requests-table">
@@ -21,9 +22,9 @@
                 <tr>
                     <td class="align-content-center">
                     <%= request.assignment ? request.assignment.name : "N/A" %>
-                      <% if request.assignment # i don't know why we have this condition here or above %>
-                        <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank">
-                          <i class="fas fa-up-right-from-square"></i>
+                      <% if request.assignment %>
+                        <a class="text-decoration-none" href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{request.assignment.external_assignment_id}" %>" target="_blank" aria-label="View <%= request.assignment.name %> in Canvas">
+                          <i class="fas fa-up-right-from-square"></i> 
                         </a>
                       <% end %>
                     </td>

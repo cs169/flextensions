@@ -2,10 +2,11 @@
   <div class="row justify-content-center">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      <h1 class="sr-only">Edit Extension Request</h1>
 
       <div class="card mb-4 rounded-0">
         <div class="card-header bg-light">
-          <h5 class="mb-0">Edit Extension Request</h5>
+          <h2 class="mb-0 h5">Edit Extension Request</h2>
         </div>
         <div class="card-body">
           <%= form_with(model: [@course, @request], method: :patch, local: true) do |f| %>
@@ -86,25 +87,36 @@
             </div>
 
             <div class="mb-4">
-              <h6 class="mb-2">
+              <h3 class="mb-2 h6" id="reason-heading">
                 Reason for Extension<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
-              </h6>
+              </h3>
               <% if @form_settings.reason_desc.presence %>
-                <p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
+                <p class="text-muted small mb-2" id="reason-desc"><%= @form_settings.reason_desc %></p>
               <% end %>
-              <%= f.text_area :reason, class: "form-control", id: "reason", rows: 3, required: true %>
+              <div class="form-group">
+                <%= f.label :reason, "Reason for Extension", for: "reason", class: "form-label" %>
+                <%= f.text_area :reason, class: "form-control", id: "reason", rows: 3, required: true, 
+                               aria: { describedby: @form_settings.reason_desc.present? ? "reason-desc" : nil, 
+                                      labelledby: "reason-heading" } %>
+              </div>
             </div>
 
             <% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
               <div class="mb-4">
-                <h6 class="mb-2">
+                <h3 class="mb-2 h6" id="documentation-heading">
                   Additional Documentation<% if @form_settings.documentation_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
-                </h6>
+                </h3>
                 <% if @form_settings.documentation_desc.presence %>
-                    <p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+                    <p class="text-muted small mb-2" id="documentation-desc"><%= @form_settings.documentation_desc %></p>
                     <p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
                 <% end %>
-                <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 3, required: (@form_settings.documentation_disp == 'required') %>
+                <div class="form-group">
+                  <%= f.label :documentation, "Additional Documentation", for: "documentation", class: "form-label" %>
+                  <%= f.text_area :documentation, class: "form-control", id: "documentation", rows: 3, 
+                                 required: (@form_settings.documentation_disp == 'required'), 
+                                 aria: { describedby: @form_settings.documentation_desc.present? ? "documentation-desc" : nil, 
+                                        labelledby: "documentation-heading" } %>
+                </div>
               </div>
             <% end %>
             

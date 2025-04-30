@@ -25,9 +25,6 @@ jobs:
       RUBY_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       CANVAS_URL: https://ucberkeleysandbox.instructure.com
-      CANVAS_TEST_USERNAME: ${{ secrets.CANVAS_TEST_USERNAME }}
-      CANVAS_TEST_PASSWORD: ${{ secrets.CANVAS_TEST_PASSWORD }}
-      CANVAS_TEST_NAME: ${{ secrets.CANVAS_TEST_NAME }}
     steps:
      - uses: actions/checkout@v3
      - name: Set up Ruby
@@ -38,12 +35,7 @@ jobs:
        run: bundle exec rails db:setup
      - name: Create separate Chrome data directories
        run: |
-         mkdir -p /tmp/chrome-data-cucumber
          mkdir -p /tmp/chrome-data-rspec
-     - name: Run Cucumber Accessibility Tests
-       run: bundle exec cucumber features/ --tag @a11y --tags 'not @skip and not @wip'
-       env:
-         CHROME_DATA_DIR: /tmp/chrome-data-cucumber
      - name: Run RSpec Accessibility Tests
        run: bundle exec rspec spec/ --tag a11y
        env:

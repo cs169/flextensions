@@ -3,6 +3,7 @@
     <div class="row">
         <div class="col-12">
             <%= render "courses/course_title" %>
+            <h1 class="sr-only">Course Settings</h1>
             <ul class="nav nav-pills mb-4 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link <%= params[:tab] == 'email' ? '' : 'active' %>" 
@@ -39,7 +40,7 @@
                     <div class="tab-pane fade <%= params[:tab] == 'email' ? '' : 'show active' %>" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light">
-                                <h5 class="card-title mb-0">General Settings</h5>
+                                <h2 class="card-title mb-0 h5">General Settings</h2>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
@@ -128,7 +129,7 @@
                     <div class="tab-pane fade <%= params[:tab] == 'email' ? 'show active' : '' %>" id="course-email" role="tabpanel" aria-labelledby="course-email-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Email Template</h5>
+                                <h2 class="card-title mb-0 h5">Email Template</h2>
                                 <%= button_tag "Reset to Default", 
                                               name: "reset_email_template", 
                                               value: "true", 
@@ -156,7 +157,7 @@
                                 
                                 <div class="card bg-light mt-3">
                                     <div class="card-body">
-                                        <h6 class="card-title">Available Variables</h6>
+                                        <h3 class="card-title h5">Available Variables</h3>
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <p class="mb-1 fw-bold">Student Information:</p>
