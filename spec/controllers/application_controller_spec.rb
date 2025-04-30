@@ -25,6 +25,8 @@ RSpec.describe ApplicationController, type: :controller do
 
   before do
     routes.draw { get 'index' => 'anonymous#index' }
+    allow(controller).to receive(:courses_path).and_return('/courses')
+    allow(controller).to receive(:courses_path).and_return('/courses')
   end
 
   describe '#excluded_controller_action?' do
@@ -93,6 +95,68 @@ RSpec.describe ApplicationController, type: :controller do
 
         get :index
         expect(response.body).to eq('OK')
+      end
+    end
+  end
+
+  describe '#render_role_based_view' do
+    before do
+      allow(controller).to receive_messages(controller_name: controller_name_override, action_name: action_name_override)
+    end
+
+    context 'as a student on courses#show' do
+      let(:controller_name_override) { 'courses' }
+      let(:action_name_override)     { 'show' }
+
+      before do
+        controller.instance_variable_set(:@role, 'student')
+      end
+
+      it 'renders courses/student_show' do
+        expect(controller).to receive(:render).with('courses/student_show')
+        controller.send(:render_role_based_view)
+      end
+    end
+
+    context 'as an instructor on requests#index' do
+      let(:controller_name_override) { 'requests' }
+      let(:action_name_override)     { 'index' }
+
+      before do
+        controller.instance_variable_set(:@role, 'instructor')
+      end
+
+      it 'renders requests/instructor_index' do
+        expect(controller).to receive(:render).with('requests/instructor_index')
+        controller.send(:render_role_based_view)
+      end
+    end
+
+    context 'with explicit controller and view overrides' do
+      let(:controller_name_override) { 'courses' }
+      let(:action_name_override)     { 'show' }
+
+      before do
+        controller.instance_variable_set(:@role, 'student')
+      end
+
+      it 'renders the overridden student view under requests' do
+        expect(controller).to receive(:render).with('requests/student_show')
+        controller.send(:render_role_based_view, controller: 'requests', view: 'show')
+      end
+    end
+
+    context 'when @role is nil or unrecognized' do
+      let(:controller_name_override) { 'courses' }
+      let(:action_name_override)     { 'show' }
+
+      before do
+        controller.instance_variable_set(:@role, nil)
+      end
+
+      it 'redirects to courses_path with an alert' do
+        expect(controller).to receive(:redirect_to).with('/courses', alert: 'You do not have access to this view.')
+        controller.send(:render_role_based_view)
       end
     end
   end

@@ -36,9 +36,9 @@ RSpec.describe CoursesController, type: :controller do
         Assignment.create!(name: 'Assignment 1', course_to_lms_id: course.course_to_lmss.first.id, external_assignment_id: 'xyz', enabled: true)
       end
 
-      it 'renders the correct student view' do
+      it 'renders the shared role-based view with student template' do
         get :show, params: { id: course.id }
-        expect(response).to render_template('courses/student_view')
+        expect(response).to render_template('courses/student_show')
       end
     end
 
