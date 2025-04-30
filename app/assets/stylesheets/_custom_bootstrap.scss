@@ -137,12 +137,6 @@ code {
 	display: block !important;
 }
 
-
-// navbars
-.navbar {
-	margin-bottom: 20px;
-}
-
 // navbar accessibility - ensure high contrast for links
 .navbar-dark .nav-link {
 	color: #FFFFFF !important; // High contrast white against dark background
@@ -160,6 +154,8 @@ code {
 .navbar-dark .nav-link.active {
 	font-weight: bold;
 }
+
+// custom
 
 @media (min-width: 992px) {
 	.color-mode-toggler {
@@ -195,97 +191,87 @@ code {
 	}
 }
 
-// Sidebar responsive styles
-.sidebar-container {
-	width: 100%;
-	min-height: auto;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-	position: relative;
+#sidebar {
+	position: sticky;
+	top: calc(56px);
+	min-width: 250px;
+	transition: width 0.3s, left 0.3s;
+}
+#sidebar .nav .nav-link {
+	cursor: pointer !important;
+}
 
-	.nav-back {
-		margin-bottom: 1rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-		
-		.nav-link {
-			color: var(--bs-primary);
-			font-weight: 500;
-			padding: 0.5rem 0.75rem;
-			
-			&:hover {
-				background-color: rgba(var(--bs-primary-rgb), 0.1);
-				color: var(--bs-primary);
-			}
+#sidebar .nav .nav-link:hover {
+	background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
 
-			i {
-				transition: transform 0.2s ease-in-out;
-			}
-
-			&:hover i {
-				transform: translateX(-4px);
-			}
-		}
+@media (max-width: 767.98px) {
+	/* Hide sidebar by default on mobile */
+	#sidebar {
+		display: none;
+		width: 60px;
+		left: 0;
+		transition: width 0.3s, left 0.3s;
 	}
-
-	// Sidebar menu items
-	.nav-pills {
-		.nav-item {
-			margin-bottom: 0.25rem;
-		}
-
-		.nav-link {
-			padding: 0.625rem 0.75rem;
-			display: flex;
-			align-items: center;
-			border-radius: 0.375rem;
-			transition: all 0.2s ease-in-out;
-			line-height: 1.5;
-			gap: 12px;
-
-			&:hover {
-				background-color: rgba(var(--bs-primary-rgb), 0.1);
-			}
-
-			&.active {
-				background-color: var(--bs-secondary);
-				color: var(--bs-dark);
-				font-weight: 500;
-			}
-		}
+	#sidebar.expanded {
+		display: block;
+		width: 250px;
+		background: #f8f9fa;
+		z-index: 1040;
+		position: fixed;
+		top: 56px; /* height of navbar */
+		left: 0;
+		height: calc(100vh - 56px - 56px); /* minus navbar and footer */
+		box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+		overflow-y: auto;
 	}
-
-	.sidebar-icon-container {
-		display: flex;
+	/* Hide the text labels in collapsed mode */
+	#sidebar .nav-text {
+		display: none;
+	}
+	#sidebar.expanded .nav-text {
+		display: inline;
+	}
+	/* When sidebar is expanded, prevent background scrolling */
+	body.sidebar-open {
+		overflow: hidden;
+	}
+	/* The mobile sidebar toggle button (arrow) */
+	#mobileSidebarToggle {
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 20px;
-		flex-shrink: 0;
-
-		i {
-			font-size: 1rem;
-			line-height: 1;
-		}
+		/* position: fixed; */
+		top: 56px;
+		left: 0;
+		z-index: 1050;
+		background: #fff;
+		border-radius: 0;
+		box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+		border: 1px solid #ced4da;
+		width: 32px;
+		height: 32px;
+		padding: 10px;
+		font-size: 16px;
 	}
-
-	.sidebar-text {
-		flex: 1;
-		font-size: 0.9375rem;
-		color: #000000 !important;
-		
-		[data-bs-theme="dark"] & {
-			color: #ffffff;
-		}
+	/* Hide toggle arrow when sidebar is open */
+	body.sidebar-open #mobileSidebarToggle {
+		display: none !important;
+	}
+	/* Show close button when sidebar is open */
+	body.sidebar-open #mobileSidebarClose {
+		display: inline-flex !important;
 	}
 }
 
-@media (min-width: 992px) {
-	.sidebar-container {
-		width: 240px;
-		min-height: 100vh;
-		height: 100%;
-		position: sticky;
-		top: 0;
-		border-bottom: none;
-		border-right: 1px solid rgba(0, 0, 0, 0.1);
+@media (min-width: 768px) {
+	#mobileSidebarToggle {
+		display: none !important;
+	}
+	#sidebar {
+		display: block !important;
+		position: static !important;
+		height: auto !important;
+		box-shadow: none !important;
 	}
 }

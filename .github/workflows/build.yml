@@ -1,6 +1,8 @@
-name: Build
+name: Build (Currently Disabled)
+
 
 on:
+  workflow_dispatch:
   push:
   pull_request:
 
@@ -15,25 +17,31 @@ jobs:
         ports:
           - 5432:5432
     env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging"
       DB_USER: postgres
       DB_PASSWORD: password
       RAILS_ENV: test
       RUBY_ENV: test
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
       CANVAS_URL: http://bcourses.test.instructure.com/
-
+      COVERAGE: "true"
+      CHROME_DATA_DIR: /tmp/chrome-data-cucumber
+      SELENIUM_HEADLESS: "true"
+      SELENIUM_DRIVER_VERSION: stable
     steps:
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.3.0
         bundler-cache: true
-    - name: Install Dependencies
-      run: |
-        gem install bundler
-        bundle install --jobs 4 --retry 3
+    - name: Install Chrome and ChromeDriver
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: stable
     - name: Setup Database
       run: |
-        bundle exec rails db:create
-        bundle exec rails db:migrate 
+        bundle exec rails db:setup
+    - name: Create Chrome data directory
+      run: mkdir -p /tmp/chrome-data-cucumber

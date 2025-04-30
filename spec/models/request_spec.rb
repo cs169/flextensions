@@ -478,84 +478,59 @@ RSpec.describe Request, type: :model do
     end
   end
 
-  describe '#generate_email_response' do
+  describe '#send_email_response' do
+    before do
+      ENV['DEFAULT_FROM_EMAIL'] = 'flextensions@berkeley.edu'
+      course_settings
+      allow(EmailService).to receive(:send_email)
+    end
+
     let(:course_settings) do
       CourseSettings.create!(
         course: course,
         enable_emails: true,
-        email_subject: 'Extension {{status}} for {{assignment_name}}',
+        reply_email: 'instructor@example.com',
+        email_subject: 'Extension for {{student_name}}',
         email_template: <<~TEMPLATE
           Dear {{student_name}},
-
-          Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
-
-          Original due date: {{original_due_date}}
-          New due date:      {{new_due_date}}
-          Extension days:    {{extension_days}}
+          Your extension request has been {{status}}.
         TEMPLATE
       )
     end
 
-    before do
-      course_settings
-      request.update(status: 'approved')
-    end
-
-    it 'generates email response with all placeholders replaced' do
-      email_response = request.generate_email_response
-
-      expect(email_response[:subject]).to eq("Extension Approved for #{assignment.name}")
-      expect(email_response[:template]).to include("Dear #{user.name}")
-      expect(email_response[:template]).to include(assignment.name)
-      expect(email_response[:template]).to include(course.course_name)
-      expect(email_response[:template]).to include(course.course_code)
-      expect(email_response[:template]).to include('Approved')
-      expect(email_response[:template]).to include(assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M %p'))
-      expect(email_response[:template]).to include(request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M %p'))
-      expect(email_response[:template]).to include(request.calculate_days_difference.to_s)
-    end
-
-    it 'returns error message when course settings are not found' do
-      course.course_settings = nil
-      expect(request.generate_email_response).to eq('Course settings not found.')
-    end
-  end
-
-  describe '#send_email_response' do
-    let(:course_settings) do
-      CourseSettings.create!(
-        course: course,
-        enable_emails: true,
-        reply_email: 'instructor@example.com'
+    it 'calls EmailService.send_email with correct parameters' do
+      expect(EmailService).to receive(:send_email).with(
+        to: user.email,
+        from: course_settings.reply_email,
+        subject_template: course_settings.email_subject,
+        body_template: course_settings.email_template,
+        mapping: hash_including(
+          'student_name' => user.name,
+          'assignment_name' => assignment.name,
+          'course_name' => course.course_name,
+          'course_code' => course.course_code,
+          'status' => request.status.capitalize,
+          'original_due_date' => assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M %p'),
+          'new_due_date' => request.requested_due_date.strftime('%a, %b %-d, %Y %-I:%M %p'),
+          'extension_days' => request.calculate_days_difference.to_s
+        ),
+        deliver_later: false
       )
-    end
-
-    before do
-      course_settings
-      allow(Rails.logger).to receive(:info)
-    end
-
-    it 'logs email details when sending email' do
       request.send_email_response
-
-      expect(Rails.logger).to have_received(:info).with("Sending email to: #{user.email}")
-      expect(Rails.logger).to have_received(:info).with("Sending email from: #{course_settings.reply_email}")
-      expect(Rails.logger).to have_received(:info).with(/Request email subject:/)
-      expect(Rails.logger).to have_received(:info).with(/Request email body:/)
     end
 
-    it 'uses default email when reply_email is not set' do
+    it 'uses default from email when reply_email is blank' do
       course_settings.update(reply_email: nil)
+      expect(EmailService).to receive(:send_email).with(
+        hash_including(from: ENV.fetch('DEFAULT_FROM_EMAIL'))
+      )
       request.send_email_response
-
-      expect(Rails.logger).to have_received(:info).with('Sending email from: flextensions@berkeley.edu')
     end
 
-    it 'does not send email when emails are disabled' do
+    it 'does not call EmailService.send_email when emails are disabled' do
       course_settings.update(enable_emails: false)
+      expect(EmailService).not_to receive(:send_email)
       request.send_email_response
-
-      expect(Rails.logger).not_to have_received(:info)
     end
   end
 end
