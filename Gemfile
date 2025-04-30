@@ -76,6 +76,7 @@ group :development, :test do
   gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'rspec-retry'
 end
 
 group :test do

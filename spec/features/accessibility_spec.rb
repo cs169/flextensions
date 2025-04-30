@@ -146,7 +146,7 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
       sleep(0.1) until page.evaluate_script('document.readyState') == 'complete'
     end
   rescue Timeout::Error
-    sleep(0.5)
+    sleep(1)
   end
 
   before do

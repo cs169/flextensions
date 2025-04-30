@@ -368,6 +368,11 @@ code {
 	background-color: rgba(var(--bs-primary-rgb), 0.1);
 }
 
+#sidebar .nav .nav-link.active:hover {
+	background-color: #fdb515 !important;
+	color: #000 !important;
+}
+
 @media (max-width: 767.98px) {
 	/* Hide sidebar by default on mobile */
 	#sidebar {
