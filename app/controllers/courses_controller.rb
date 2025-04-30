@@ -123,14 +123,6 @@ class CoursesController < ApplicationController
     @role = @course&.user_role(@user)
   end
 
-  def render_role_based_view(instructor_view = 'courses/instructor_view', student_view = 'courses/student_view')
-    case @role
-    when 'instructor' then render instructor_view
-    when 'student' then render student_view
-    else redirect_to courses_path, alert: 'You do not have access to this course.'
-    end
-  end
-
   def filter_courses(courses, roles, exclude_ids = [])
     courses.select do |course|
       course['enrollments'].any? { |e| roles.include?(e['type']) } && exclude_ids.exclude?(course['id'].to_s)

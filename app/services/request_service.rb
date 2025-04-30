@@ -46,23 +46,6 @@ class RequestService
     end
   end
 
-  # Helper to determine view based on role
-  def self.render_role_based_view(role, ctrl, act, options = {})
-    view = options[:view] || act
-    instructor_view = "#{ctrl}/instructor_#{view}"
-    student_view = "#{ctrl}/student_#{view}"
-
-    case role
-    when 'instructor'
-      { render: instructor_view }
-    when 'student'
-      { render: student_view }
-    else
-      { redirect_to: Rails.application.routes.url_helpers.courses_path,
-        alert: 'You do not have access to this course.' }
-    end
-  end
-
   # Authenticate a user from session
   def self.authenticate_user(session_user_id)
     user = User.find_by(canvas_uid: session_user_id)

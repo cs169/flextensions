@@ -51,4 +51,28 @@ class ApplicationController < ActionController::Base
 
     @pending_requests_count = @course.requests.where(status: 'pending').count
   end
+
+  # Renders a view based on user role, defaulting to current controller and action.
+  #
+  # You can override the controller or action like so:
+  #   render_role_based_view(controller: 'custom_controller', view: 'custom_action')
+  #
+  # By default, it uses:
+  #   controller = controller_name
+  #   view       = action_name
+  def render_role_based_view(options = {})
+    ctrl  = options[:controller] || controller_name
+    act   = options[:view] || action_name
+    instructor_view = "#{ctrl}/instructor_#{act}"
+    student_view = "#{ctrl}/student_#{act}"
+
+    case @role
+    when 'instructor'
+      render instructor_view
+    when 'student'
+      render student_view
+    else
+      redirect_to courses_path, alert: 'You do not have access to this view.'
+    end
+  end
 end

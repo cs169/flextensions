@@ -150,16 +150,6 @@ class RequestsController < ApplicationController
     @form_settings = result[:form_settings]
   end
 
-  def render_role_based_view(options = {})
-    result = RequestService.render_role_based_view(@role, controller_name, action_name, options)
-
-    if result[:redirect_to]
-      redirect_to result[:redirect_to], alert: result[:alert]
-    else
-      render result[:render]
-    end
-  end
-
   def request_params
     params.require(:request).permit(:assignment_id, :reason, :documentation, :custom_q1, :custom_q2, :requested_due_date)
   end
