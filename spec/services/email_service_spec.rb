@@ -45,6 +45,7 @@ RSpec.describe EmailService, type: :service do
   describe '.send_email' do
     let(:to)        { 'bob@example.com' }
     let(:from)      { 'noreply@acme.com' }
+    let(:reply_to)  { 'reply@acme.com' }
     let(:sub_tmpl)  { 'Order {{order_id}} ready' }
     let(:body_tmpl) { "Hi {{name}}\nYour order is ready." }
     let(:mapping)   { { 'order_id' => '42', 'name' => 'Bob' } }
@@ -59,6 +60,7 @@ RSpec.describe EmailService, type: :service do
         described_class.send_email(
           to: to,
           from: from,
+          reply_to: reply_to,
           subject_template: sub_tmpl,
           body_template: body_tmpl,
           mapping: mapping,
@@ -89,6 +91,7 @@ RSpec.describe EmailService, type: :service do
           described_class.send_email(
             to: to,
             from: from,
+            reply_to: reply_to,
             subject_template: sub_tmpl,
             body_template: body_tmpl,
             mapping: mapping,

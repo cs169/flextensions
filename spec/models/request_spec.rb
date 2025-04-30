@@ -501,7 +501,8 @@ RSpec.describe Request, type: :model do
     it 'calls EmailService.send_email with correct parameters' do
       expect(EmailService).to receive(:send_email).with(
         to: user.email,
-        from: course_settings.reply_email,
+        from: ENV.fetch('DEFAULT_FROM_EMAIL', nil),
+        reply_to: course_settings.reply_email,
         subject_template: course_settings.email_subject,
         body_template: course_settings.email_template,
         mapping: hash_including(

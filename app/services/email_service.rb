@@ -28,7 +28,7 @@ class EmailService
       mail = ActionMailer::Base.mail(
         to: to,
         from: from,
-        reply_to:reply_to,
+        reply_to: reply_to,
         subject: rendered[:subject],
         body: rendered[:body].gsub("\n", "<br>\n"),
         content_type: 'text/html'

@@ -128,7 +128,7 @@ class Request < ApplicationRecord
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
-    to   = user.email
+    to = user.email
     reply_to = cs.reply_email.presence || ENV.fetch('DEFAULT_FROM_EMAIL')
 
     # build the mapping without braces:
