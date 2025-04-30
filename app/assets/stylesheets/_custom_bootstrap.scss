@@ -26,12 +26,7 @@
 }
 
 code {
-    color: #6e0202 !important;
-
-	[data-bs-theme="dark"] & {
-		color: #ffffff !important;
-		font-weight: 500;
-	}
+    color: #be0303 !important;
 }
 
 // Fix for dark theme contrast issues
@@ -44,7 +39,6 @@ code {
     }
   }
   
-  // Override only non-sidebar links or apply special cases
   .sidebar-container .nav-link:not(.active) {
     color: #f3f8fe !important;
 
@@ -60,13 +54,105 @@ code {
     }
   }
   
-  .bg-light, .card-header.bg-light, .bg-light-subtle {
+  // Fix toggle buttons in dark mode
+  .form-check-input {
+    background-color: #495057 !important;
+    border-color: #6c757d !important;
+    
+    &:checked {
+      background-color: #0d6efd !important;
+      border-color: #0d6efd !important;
+    }
+  }
+  
+  // Fix form switch toggle styling in dark mode
+  .form-switch .form-check-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+    
+    &:checked {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+    }
+    
+    &:focus {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+  }
+  
+  // Fix datatable pagination in dark mode
+  .page-link {
+    color: #a0c4ff !important;
+    background-color: #2a2d31 !important;
+    border-color: #495057 !important;
+    
+    &:hover {
+      color: #ccdeff !important;
+      background-color: #343a40 !important;
+    }
+  }
+  
+  .page-item.active .page-link {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #ffffff !important;
+  }
+  
+  .page-item.disabled .page-link {
+    color: #6c757d !important;
+    background-color: #212529 !important;
+    border-color: #495057 !important;
+  }
+  
+  .btn-warning {
+    color: #000000 !important;
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    
+    &:hover {
+      background-color: #ffca2c !important;
+      border-color: #ffc720 !important;
+    }
+  }
+
+  .nav-pills {
+    .nav-link:not(.active) {
+      color: #ffffff !important;
+      
+      &:hover {
+        color: #e6e6e6 !important;
+      }
+    }
+  }
+  
+  // Fix accessibility contrast issues for bg-light-subtle
+  .bg-light-subtle {
+    background-color: #1e2124 !important;
+    
+    p, label, .form-label, strong, li, .small {
+      color: #ffffff !important;
+    }
+    
+    .small strong {
+      color: #ffffff !important;
+    }
+    
+    .form-control, .form-select {
+      background-color: #2a2d31 !important;
+      color: #ffffff !important;
+      border-color: #495057 !important;
+    }
+  }
+  
+  .bg-light, .card-header.bg-light {
     color: #212529 !important;
     
     h2, h3, h4, h5, h6, p, label, .form-label, strong, li {
       color: #212529 !important;
     }
-    
+  }
+
+  #import-courses-button {
+    color: #000000 !important;
   }
 }
 
@@ -189,6 +275,79 @@ code {
 			color: #374772; // Darker hover color for light mode
 		}
 	}
+}
+
+// Accessible text for dark theme
+.accessible-text {
+  [data-bs-theme="dark"] & {
+    color: #ffffff !important; // White text on dark background for better contrast
+  }
+  
+  [data-bs-theme="light"] & {
+    color: #212529 !important; // Dark text on light background
+  }
+}
+
+// Dark form section styling
+.dark-form-section {
+  // Dark theme styles
+  [data-bs-theme="dark"] & {
+    background-color: #1e2124 !important;
+    color: #ffffff !important;
+    
+    .card-header {
+      background-color: #2a2d31 !important;
+      border-bottom: 1px solid #495057 !important;
+      
+      h2, .card-title {
+        color: #ffffff !important;
+      }
+    }
+    
+    .card-body {
+      background-color: #1e2124 !important;
+    }
+    
+    p, label, .form-label, strong, li, .small {
+      color: #ffffff !important;
+    }
+    
+    .form-control, .form-select {
+      background-color: #2a2d31 !important;
+      color: #ffffff !important;
+      border-color: #495057 !important;
+    }
+  }
+  
+  // Light theme styles
+  [data-bs-theme="light"] & {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+    
+    .card-header {
+      background-color: #f8f9fa !important;
+      border-bottom: 1px solid #dee2e6 !important;
+      
+      h2, .card-title {
+        color: #212529 !important;
+      }
+    }
+    
+    .card-body {
+      background-color: #ffffff !important;
+    }
+    
+    p, label, .form-label, strong, li, .small {
+      color: #212529 !important;
+    }
+    
+    .form-control, .form-select {
+      background-color: #ffffff !important;
+      color: #212529 !important;
+      border-color: #ced4da !important;
+    }
+  }
 }
 
 #sidebar {
