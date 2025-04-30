@@ -77,6 +77,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'rspec-retry'
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'factory_bot_rails'
 end
 
 group :test do
