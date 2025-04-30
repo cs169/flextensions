@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :user do
     sequence(:email) { |n| "user#{n}@example.com" }
-    sequence(:canvas_uid) { |n| "#{n}" }
+    sequence(:canvas_uid, &:to_s)
     sequence(:name) { |n| "User #{n}" }
 
     factory :teacher do
