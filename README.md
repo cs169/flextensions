@@ -23,12 +23,12 @@ Flextensions is designed specifically for the UC Berkeley academic environment. 
 
 ## Documentation
 Our documentation provides detailed instructions on how to set up, use, and contribute to Flextensions.
-For the full documentation, visit our **[Flextensions Wiki](https://github.com/cs169/flextensions/wiki)**.
+For the full documentation, visit our **[Flextensions Wiki](https://github.com/berkeley-cdss/flextensions/wiki)**.
 
 Below are the key resources available:
-- **[Developer Resources](https://github.com/cs169/flextensions/wiki/Developer-Resources)**: Information on environment variables, database setup, and deployment.
-- **[Instructor Guide](https://github.com/cs169/flextensions/wiki/Instructor-Resources)**: A comprehensive guide for instructors on how to use Flextensions.
-- **[Student Guide](https://github.com/cs169/flextensions/wiki/Student-Resourcess)**: A comprehensive guide for students on how to use Flextensions.
+- **[Developer Resources](https://github.com/berkeley-cdss/flextensions/wiki/Developer-Resources)**: Information on environment variables, database setup, and deployment.
+- **[Instructor Guide](https://github.com/berkeley-cdss/flextensions/wiki/Instructor-Resources)**: A comprehensive guide for instructors on how to use Flextensions.
+- **[Student Guide](https://github.com/berkeley-cdss/flextensions/wiki/Student-Resourcess)**: A comprehensive guide for students on how to use Flextensions.
 - **[API Documentation](https://github.com/saasbook/esaas-swagger)**: Details on the APIs used for integration with bCourses (Canvas).
 
 ---
