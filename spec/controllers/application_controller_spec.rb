@@ -25,8 +25,7 @@ RSpec.describe ApplicationController, type: :controller do
 
   before do
     routes.draw { get 'index' => 'anonymous#index' }
-    allow(controller).to receive(:courses_path).and_return('/courses')
-    allow(controller).to receive(:root_path).and_return('/')
+    allow(controller).to receive_messages(courses_path: '/courses', root_path: '/')
   end
 
   describe '#excluded_controller_action?' do
