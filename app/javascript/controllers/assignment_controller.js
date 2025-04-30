@@ -14,6 +14,8 @@ export default class extends Controller {
     const assignmentId = checkbox.dataset.assignmentId;
     const url = checkbox.dataset.url;
     const enabled = checkbox.checked;
+    const role = checkbox.dataset.role; // Get the role
+    const userId = checkbox.dataset.userId; // Get the user ID
 
     try {
       const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -24,7 +26,11 @@ export default class extends Controller {
           "Content-Type": "application/json",
           "X-CSRF-Token": token,
         },
-        body: JSON.stringify({ enabled: enabled }),
+        body: JSON.stringify({
+          enabled: enabled,
+          role: role, // Pass the role
+          user_id: userId, // Pass the user ID
+        }),
       });
 
       const data = await response.json();

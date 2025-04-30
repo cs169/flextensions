@@ -38,7 +38,9 @@
                            <%= 'checked' if assignment.enabled %> 
                            data-assignment-target="checkbox"
                            data-assignment-id="<%= assignment.id %>" 
-                           data-url="<%= toggle_enabled_assignment_path(assignment) %>">
+                           data-url="<%= toggle_enabled_assignment_path(assignment) %>" 
+                           data-role="<%= @role %>" 
+                           data-user-id="<%= @user.id %>">
                     <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
                   </div>
                 </td>
