@@ -31,6 +31,10 @@ code {
 
 // Fix for dark theme contrast issues
 [data-bs-theme="dark"] {
+
+	#login-button-index {
+		color: #000000 !important;
+	}
 	
 	a {
     color: #a0c4ff;
