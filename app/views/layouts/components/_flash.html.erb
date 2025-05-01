@@ -1,3 +1,4 @@
+<div data-controller="flash" class="js-flash"></div>
 <% flash.each do |type, message| %>
   <% bootstrap_class = case type.to_sym
      when :notice then 'alert-success'
@@ -5,7 +6,7 @@
      else 'alert-info'
      end %>
     <div class="col-12">
-        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" data-controller="auto-dismiss">
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
             <%= message %>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>

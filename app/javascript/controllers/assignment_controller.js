@@ -68,11 +68,11 @@ export default class extends Controller {
         return response.json();
       })
       .then((data) => {
-        alert(data.message || "Assignments synced successfully.");
+        flash("notice", data.message || "Assignments synced successfully.");
         location.reload();
       })
       .catch((error) => {
-        alert(error.message || "An error occurred while syncing assignments.");
+        flash("alert", error.message || "An error occurred while syncing assignments.");
       });
   }
 }
