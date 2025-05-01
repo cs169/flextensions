@@ -20,7 +20,7 @@
             <% @assignments.each do |assignment| %>
               <tr>
                 <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
-                <td class="text-break">
+                <td class="text-nowrap">
                   <div class="d-flex justify-content-between align-items-center">
                     <span><%= assignment.name %></span>
                     <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="ms-2">

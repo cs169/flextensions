@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
-import DataTable from "datatables.net";
+import DataTable from "datatables.net-bs5";
+import "datatables.net-responsive";
+import "datatables.net-responsive-bs5";
 
 export default class extends Controller {
 	static values = { courseId: Number }
@@ -20,6 +22,7 @@ export default class extends Controller {
 				searching: true,
 				ordering: true,
 				info: true,
+				// responsive: true,
 				columns: [
 					null, // Name
 					null, // Email
