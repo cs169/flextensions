@@ -28,7 +28,7 @@ module TokenRefreshable
     # Create OAuth2 client
     client = OAuth2::Client.new(
       ENV.fetch('CANVAS_CLIENT_ID', nil),
-      ENV.fetch('APP_KEY', nil),
+      ENV.fetch('CANVAS_APP_KEY', nil),
       site: ENV.fetch('CANVAS_URL', nil),
       token_url: '/login/oauth2/token'
     )

@@ -1,5 +1,5 @@
 When(/^I try to authenticate with a missing code$/) do
-  visit canvas_callback_path(error: 'access_denied')
+  visit _path(error: 'access_denied')
 end
 
 When(/^I try to authenticate with an error response from Canvas$/) do
