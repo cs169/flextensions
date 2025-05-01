@@ -1,26 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: Remove this after omniauth updates.
-# This is heavy-handed, but allows :developer to work with a get request.
-class OmniAuth::Form
-  def header(title, header_info)
-    @html << <<-HTML
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-      <title>#{title}</title>
-      #{css}
-      #{header_info}
-    </head>
-    <body>
-    <h1>#{title}</h1>
-    <form method="get" #{"action='#{options[:url]}' " if options[:url]}noValidate='noValidate'>
-    HTML
-    self
-  end
-end
-
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :developer, fields: [:email] if Rails.env.development? || Rails.env.test?
 
