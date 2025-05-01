@@ -2,6 +2,8 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net";
 
 export default class extends Controller {
+	static values = { courseId: Number }
+	
 	connect() {
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
@@ -28,4 +30,29 @@ export default class extends Controller {
 			});
 		}
 	}
+
+	sync() {
+		const courseId = this.courseIdValue;
+		const token = document.querySelector('meta[name="csrf-token"]').content;
+		fetch(`/courses/${courseId}/sync_enrollments`, {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json",
+			"X-CSRF-Token": token,
+		  },
+		})
+		  .then((response) => {
+			if (!response.ok) {
+			  throw new Error("Failed to sync enrollments.");
+			}
+			return response.json();
+		  })
+		  .then((data) => {
+			alert(data.message || "Enrollments synced successfully.");
+			location.reload();
+		  })
+		  .catch((error) => {
+			alert(error.message || "An error occurred while syncing enrollments.");
+		  });
+	  }
 }
