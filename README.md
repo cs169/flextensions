@@ -1,19 +1,28 @@
 # [Flextensions](https://flextensions.eecs.cloud)
+[![Maintainability](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
+[![Code Coverage](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/test_coverage.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
+[![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml)
+[![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml)
+[![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml)
+[![RuboCop](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml)
+
+## [cs169/flextensions](https://github.com/cs169/flextensions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage) 
 [![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml) 
 [![Accessibility Tests](https://github.com/cs169/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/a11y.yml)
 [![RuboCop](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml)
 
-
-**Flextensions** is a web application built for UC Berkeley students and course staff to manage assignment extensions across all their bCourses (Canvas) courses.
-
-To use Flextensions, visit [https://flextensions.eecs.cloud](https://flextensions.eecs.cloud).
+---
+### **Flextensions** is a web application built for UC Berkeley students and course staff to manage assignment extensions across all their bCourses (Canvas) courses.
+#### To use Flextensions, visit [https://flextensions.eecs.cloud](https://flextensions.eecs.cloud).
 
 
 ---
 
-## Made for UC Berkeley
+## Made for UC Berkeley By UC Berkeley
+Flextensions is a project developed by the UC Berkeley Computer Science 169L course (Software Engineering). The goal of Flextensions is to provide a user-friendly interface for managing assignment extensions, making it easier for both students and instructors to keep track of deadlines and extensions.
+The project is open-source and available on GitHub, allowing for contributions and improvements from the community. The Flextensions team consists of students from the course, who have worked together to design, develop, and deploy the application.
 
 Flextensions is designed specifically for the UC Berkeley academic environment. It integrates directly with bCourses and provides a seamless way for instructors and students to manage and track assignment extensions.
 
