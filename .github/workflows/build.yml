@@ -17,12 +17,9 @@ jobs:
     env:
       DB_USER: postgres
       DB_PASSWORD: password
-      RAILS_ENV: production
-      RUBY_ENV: production
-      CANVAS_URL= https://ucberkeleysandbox.instructure.com
-      CANVAS_CLIENT_ID = 265300000000000004
-      CANVAS_APP_KEY = "LYk6KwLDAy2NkP6MaL7PfDDKC3xTPy6ukmDcWxNAryv328CrNGAttVuZh9xRyyNh"
-      CANVAS_REDIRECT_URI = "http://localhost:3000"
+      RAILS_ENV: test
+      RUBY_ENV: test
+
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       CANVAS_URL: http://bcourses.test.instructure.com/
 
