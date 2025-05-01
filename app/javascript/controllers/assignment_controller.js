@@ -51,7 +51,9 @@ export default class extends Controller {
     }
   }
 
-  sync() {
+  sync(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
     const courseId = this.courseIdValue;
     const token = document.querySelector('meta[name="csrf-token"]').content;
     fetch(`/courses/${courseId}/sync_assignments`, {
@@ -73,6 +75,7 @@ export default class extends Controller {
       })
       .catch((error) => {
         flash("alert", error.message || "An error occurred while syncing assignments.");
+        location.reload();
       });
   }
 }
