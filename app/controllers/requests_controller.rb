@@ -10,16 +10,16 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = @role == 'student' ? @course.requests.for_user(@user).order(created_at: :desc) : @course.requests.includes(:assignment).where(status: 'pending').order(created_at: :asc)
+    @requests = if params[:show_all] == 'true'
+                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
+                else
+                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
+                end
+
+    # Pass the search query to the view
+    @search_query = params[:search]
+
     render_role_based_view
-  end
-
-  def history
-    return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'instructor'
-
-    @side_nav = 'requests'
-    @requests = @course.requests.includes(:assignment, :last_processed_by_user).where.not(status: 'pending').order(created_at: :asc)
-    render_role_based_view(view: 'history')
   end
 
   def show
@@ -148,16 +148,6 @@ class RequestsController < ApplicationController
     @course = result[:course]
     @role = result[:role]
     @form_settings = result[:form_settings]
-  end
-
-  def render_role_based_view(options = {})
-    result = RequestService.render_role_based_view(@role, controller_name, action_name, options)
-
-    if result[:redirect_to]
-      redirect_to result[:redirect_to], alert: result[:alert]
-    else
-      render result[:render]
-    end
   end
 
   def request_params

@@ -123,44 +123,35 @@ class Request < ApplicationRecord
     true
   end
 
-  def generate_email_response
-    course_settings = course.course_settings
-    return 'Course settings not found.' unless course_settings
-
-    template = course_settings.email_template
-    subject = course_settings.email_subject
-
-    # Define the placeholders and their corresponding values
-    placeholders = {
-      '{{student_name}}' => user.name,
-      '{{assignment_name}}' => assignment.name,
-      '{{course_name}}' => course.course_name,
-      '{{course_code}}' => course.course_code,
-      '{{status}}' => status.capitalize,
-      '{{original_due_date}}' => assignment.due_date&.strftime('%a, %b %-d, %Y %-I:%M %p'),
-      '{{new_due_date}}' => requested_due_date&.strftime('%a, %b %-d, %Y %-I:%M %p'),
-      '{{extension_days}}' => calculate_days_difference.to_s
-    }
-
-    # Replace placeholders in the template using regex
-    placeholders.each do |placeholder, value|
-      subject = subject.gsub(placeholder, value || 'N/A')
-      template = template.gsub(placeholder, value || 'N/A')
-    end
-
-    { subject: subject, template: template }
-  end
-
+  # app/models/request.rb
   def send_email_response
     return unless course.course_settings&.enable_emails
 
-    course_email = course.course_settings.reply_email.presence || 'flextensions@berkeley.edu'
-    student_email = user.email
-    email_response = generate_email_response
-    Rails.logger.info("Sending email to: #{student_email}")
-    Rails.logger.info("Sending email from: #{course_email}")
-    Rails.logger.info("Request email subject: #{email_response[:subject]}")
-    Rails.logger.info("Request email body: #{email_response[:template]}")
+    cs = course.course_settings
+    to = user.email
+    reply_to = cs.reply_email.presence || ENV.fetch('DEFAULT_FROM_EMAIL')
+
+    # build the mapping without braces:
+    mapping = {
+      'student_name' => user.name,
+      'assignment_name' => assignment.name,
+      'course_name' => course.course_name,
+      'course_code' => course.course_code,
+      'status' => status.capitalize,
+      'original_due_date' => assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M %p'),
+      'new_due_date' => requested_due_date.strftime('%a, %b %-d, %Y %-I:%M %p'),
+      'extension_days' => calculate_days_difference.to_s
+    }
+
+    EmailService.send_email(
+      to: to,
+      from: ENV.fetch('DEFAULT_FROM_EMAIL'),
+      reply_to: reply_to,
+      subject_template: cs.email_subject,
+      body_template: cs.email_template,
+      mapping: mapping,
+      deliver_later: false # or true if you prefer .deliver_later
+    )
   end
 
   private
