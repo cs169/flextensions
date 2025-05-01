@@ -443,3 +443,13 @@ code {
 		box-shadow: none !important;
 	}
 }
+
+/*
+*************************************
+* DataTables BS-type table-responsive
+*************************************
+*/
+.dt-layout-full {
+  overflow-x: auto !important;
+}
+/***********************************/
