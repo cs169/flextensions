@@ -13,6 +13,9 @@ pin "rails-ujs-override", to: "rails-ujs-override.js"
 # Bootstrap and dependencies
 pin "bootstrap", to: "bootstrap.min.js", preload: true
 pin "@popperjs/core", to: "popper.js", preload: true
-pin "jquery", to: "https://ga.jspm.io/npm:jquery@3.7.1/dist/jquery.js", preload: true
+pin "jquery" # @3.7.1
 pin "color-modes"
-pin "datatables.net", to: "https://ga.jspm.io/npm:datatables.net@2.2.2/js/dataTables.mjs"
+pin "datatables.net" # @2.2.2
+pin "datatables.net-bs5" # @2.2.2
+pin "datatables.net-responsive-bs5" # @3.0.4
+pin "datatables.net-responsive" # @3.0.4
