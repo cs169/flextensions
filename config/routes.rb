@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   #Authentication routes
   get '/login/' => 'login#canvas', :as => :login 
   match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
+  get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
   #match '/auth/canvas/callback', to: 'session#create', as: :canvas_callback, via: [:get, :post]
   get '/logout' => 'login#logout', :as => :logout
 

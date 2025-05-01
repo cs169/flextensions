@@ -2,60 +2,59 @@ require 'rails_helper'
 
 RSpec.describe SessionController, type: :controller do
   describe 'GET #omniauth_callback' do
-    let(:user_info) do
-      {
-        'id' => '12345',
-        'name' => 'Test User',
-        'primary_email' => 'test@example.com',
-        'email' => 'test@example.com'
-      }
+    let(:auth_hash) do
+      OmniAuth::AuthHash.new(
+        provider: 'canvas',
+        uid: '12345',
+        info: OpenStruct.new(name: 'Test User', email: 'test@example.com'),
+        credentials: {
+          token: 'fake-token',
+          refresh_token: 'fake-refresh',
+          expires_at: 1.hour.from_now.to_i
+        }
+      )
     end
-
-    let(:mock_token) do
-      instance_double(OAuth2::AccessToken,
-                      token: 'fake-token',
-                      refresh_token: 'fake-refresh',
-                      expires_at: Time.now.to_i + 3600)
-    end
-
-    let(:mock_auth_code) { instance_double(OAuth2::Strategy::AuthCode) }
-    let(:mock_client) { instance_double(OAuth2::Client, auth_code: mock_auth_code) }
 
     before do
-      allow(OAuth2::Client).to receive(:new).and_return(mock_client)
-      allow(mock_auth_code).to receive(:get_token).and_return(mock_token)
-
-      stub_request(:get, "#{ENV.fetch('CANVAS_URL')}/api/v1/users/self?")
-        .with(headers: { 'Authorization' => 'Bearer fake-token' })
-        .to_return(status: 200, body: user_info.to_json, headers: { 'Content-Type' => 'application/json' })
+      # put the fabricated auth hash into the Rack env that the controller sees
+      request.env['omniauth.auth'] = auth_hash
     end
 
-    it 'creates a new user and redirects to courses_path' do
-      get :omniauth_callback, params: { provider: 'canvas', code: 'valid-code' }, session: {}
+    context 'happy path' do
+      it 'creates the user, sets session, and redirects to courses' do
+        get :omniauth_callback, params: { provider: 'canvas' }  # <= add provider
 
-      user = User.find_by(canvas_uid: '12345')
-      expect(user).not_to be_nil
-      expect(user.email).to eq('test@example.com')
-      expect(session[:user_id]).to eq('12345')
-      expect(response).to redirect_to(courses_path)
-      expect(flash[:notice]).to eq('Logged in!')
+        user = User.find_by(canvas_uid: '12345')
+        expect(user).to be_present
+        expect(user.email).to eq('test@example.com')
+
+        expect(session[:user_id]).to eq('12345')
+        expect(response).to redirect_to(courses_path)
+        expect(flash[:notice]).to eq('Logged in!')
+      end
     end
 
-    it 'redirects to root_path if code is missing' do
-      get :omniauth_callback, params: { provider: 'canvas', code: '' }
+    context 'when no auth hash is present' do
+      before { request.env.delete('omniauth.auth') }
 
-      expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to eq('Authentication failed. Please try again.')
+      it 'redirects to root with an error flash' do
+        get :omniauth_callback, params: { provider: 'canvas' }  # <= add provider
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq('Authentication failed. No credentials received.')
+      end
     end
 
-    it 'redirects to root_path if Canvas API call fails' do
-      stub_request(:get, "#{ENV.fetch('CANVAS_URL')}/api/v1/users/self?")
-        .to_return(status: 401)
+    context 'when something inside the callback raises' do
+      it 'rescues and redirects with “Invalid credentials”' do
+        # Force an exception inside the action (e.g., token save blows up)
+        allow_any_instance_of(User).to receive(:save!).and_raise(StandardError)
 
-      get :omniauth_callback, params: { provider: 'canvas', code: 'invalid-code' }
+        get :omniauth_callback, params: { provider: 'canvas' } # <= add provider
 
-      expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to eq('Authentication failed. Invalid token.')
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq('Authentication failed. Invalid credentials.')
+      end
     end
   end
 

@@ -29,31 +29,70 @@ class SessionController < ApplicationController
   #    the logic from "create" to "omniauth_callback".
 
   def omniauth_callback
-    create
-    nil
-  end
-
-  def create
-    if params[:error].present? || params[:code].blank?
+    # Basic error-parameter guard – identical to `create`
+    if params[:error].present?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
       return
     end
-    canvas_code = params[:code]
 
-    token = get_access_token(canvas_code)
-    # Fetch user profile from Canvas API using the token
-    response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?") do |req|
-      req.headers['Authorization'] = "Bearer #{token.token}"
+    # Did OmniAuth actually build an auth hash?
+    auth = request.env['omniauth.auth']
+    unless auth
+      redirect_to root_path, alert: 'Authentication failed. No credentials received.'
+      return
     end
 
-    if response.success?
-      user_data = JSON.parse(response.body)
-      find_or_create_user(user_data, token)
-      redirect_to courses_path, notice: 'Logged in!'
-    else
-      redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-    end
+    # Extract user info and credentials from the auth hash
+    user_data = {
+      'id' => auth.uid,
+      'name' => auth.info.name,
+      'primary_email' => auth.info.email,
+      'email' => auth.info.email
+    }
+
+    creds = auth.credentials # an OmniAuth::AuthHash
+    access_token = OAuth2::AccessToken.new(
+      OAuth2::Client.new('', ''), # client never used – stub
+      creds.token,
+      refresh_token: creds.refresh_token,
+      expires_at: creds.expires_at
+    )
+
+    # Persist / update the user just like `create`
+    find_or_create_user(user_data, access_token)
+
+    redirect_to courses_path, notice: 'Logged in!'
+  rescue StandardError => e
+    Rails.logger.error("OmniAuth callback error: #{e.message}")
+    redirect_to root_path, alert: 'Authentication failed. Invalid credentials.'
   end
+
+  def omniauth_failure
+    Rails.logger.debug(request.env.inspect)
+    redirect_to root_path, alert: 'Authentication failed. Please try again.'
+    nil
+  end
+  # def create
+  #   if params[:error].present? || params[:code].blank?
+  #     redirect_to root_path, alert: 'Authentication failed. Please try again.'
+  #     return
+  #   end
+  #   canvas_code = params[:code]
+
+  #   token = get_access_token(canvas_code)
+  #   # Fetch user profile from Canvas API using the token
+  #   response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?") do |req|
+  #     req.headers['Authorization'] = "Bearer #{token.token}"
+  #   end
+
+  #   if response.success?
+  #     user_data = JSON.parse(response.body)
+  #     find_or_create_user(user_data, token)
+  #     redirect_to courses_path, notice: 'Logged in!'
+  #   else
+  #     redirect_to root_path, alert: 'Authentication failed. Invalid token.'
+  #   end
+  # end
 
   def destroy
     redirect_to :logout, notice: 'Logged out!'
