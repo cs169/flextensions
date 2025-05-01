@@ -2,40 +2,33 @@ name: Swagger
 
 on:
   push:
-    branches:
-      - master
-      - main
-  pull_request: {}
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   swagger:
     runs-on: ubuntu-latest
     name: Validate Spec
     steps:
-      - uses: actions/checkout@v2
-      
+      - uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          
       - name: Install validation tools
         run: |
           npm install --no-save @redocly/cli
-          
       - name: Validate Swagger schema
         run: |
           npx @redocly/cli lint app/assets/swagger/swagger.json --extends=minimal
-          
       - name: Display OpenAPI information
         run: |
           node -e "
           const fs = require('fs');
-          
           try {
             const apiSpec = JSON.parse(fs.readFileSync('app/assets/swagger/swagger.json', 'utf8'));
-            console.log('API name: %s, Version: %s, OpenAPI Version: %s', 
-              apiSpec.info.title, 
+            console.log('API name: %s, Version: %s, OpenAPI Version: %s',
+              apiSpec.info.title,
               apiSpec.info.version,
               apiSpec.openapi);
             console.log('Validation successful');

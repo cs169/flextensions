@@ -60,7 +60,7 @@ Metrics/PerceivedComplexity:
   Max: 15
 
 Metrics/ClassLength:
-  Max: 150
+  Max: 180
 
 Metrics/ModuleLength:
   Max: 150

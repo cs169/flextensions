@@ -33,8 +33,3 @@ Feature: User Authentication and Access Control
     And I log out
     And I navigate to the "Courses page"
     Then I should be redirected to the "Home page"
-
-  
-
-
-

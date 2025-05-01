@@ -1,27 +1,39 @@
-<%= render "layouts/sidebar" %>
-<div class="container mt-4">
+<div class="container-fluid mb-5">
 	<div class="row">
 		<div class="col-12">
 			<%= render "courses/course_title" %>
-			<div class="mb-3">
-				<label for="form-assignment" class="form-label">Assignment <strong>(required by default)</strong></label>
-				<select class="form-control bg-" id="form-assignment" rows="2" disabled>
-					<option>Assignment Name | Due Date: mm-dd-yyyy</option>
-				</select>
-			</div>
-			<div class="col-12 col-lg-5 mb-3">
-				<p>Due Date: <strong>mm-dd-yyyy</strong></p>
-			</div>
-			<div class="col-12 col-lg-5 mb-3">
-				<p>Late Due Date: <strong>mm-dd-yyyy</strong></p>
-			</div>
-			<div class="row justify-content-between align-items-center p-0">
-				<div class="cold-12 col-lg-5 mb-3">
-					<label for="form-new-due-date" class="form-label">Requested Due Date <strong>(required by default)</strong></label>
-					<input type="date" class="form-control bg-body-secondary" id="form-new-due-date" value="" readonly />
+			<h1 class="sr-only">Edit Form Settings</h1>
+			
+			<%= render "shared/extension_status_warning", course: @course %>
+			
+			<div class="card dark-form-section rounded-0 mb-4">
+				<div class="card-header">
+					<h2 class="card-title mb-0 h5">Form Settings</h2>
 				</div>
-				<div class="col-12 col-lg-5 mb-3">
-					<p>Number of Days: <strong>#</strong></p>
+				<div class="card-body">
+					<div class="mb-3">
+						<label for="form-assignment" class="form-label accessible-text"><strong>Assignment</strong> (always required)</label>
+						<select class="form-control" id="form-assignment" rows="2" disabled>
+							<option>Assignment Name | Due Date: mm-dd-yyyy</option>
+						</select>
+					</div>
+					<div class="row mb-3">
+						<div class="col-12 col-lg-6">
+							<p class="accessible-text">Due Date: <strong>mm-dd-yyyy</strong></p>
+						</div>
+						<div class="col-12 col-lg-6">
+							<p class="accessible-text">Late Due Date: <strong>mm-dd-yyyy</strong></p>
+						</div>
+					</div>
+					<div class="row justify-content-between align-items-center">
+						<div class="col-12 col-lg-6 mb-3">
+							<label for="form-new-due-date" class="form-label accessible-text"><strong>Requested Due Date</strong> (always required)</label>
+							<input type="date" class="form-control" id="form-new-due-date" value="" readonly />
+						</div>
+						<div class="col-12 col-lg-6 mb-3">
+							<p class="accessible-text">Number of Days: <strong>#</strong></p>
+						</div>
+					</div>
 				</div>
 			</div>
 						
@@ -37,103 +49,110 @@
 				</div>
 			<% end %>
 
-			<div class="bg-light mb-3 p-4">
-				<p><strong>Why do you need this extension? (required by default)</strong></p>
-				<label for="form_setting_reason_desc" class="form-label">Custom Description</label>
-				<%= f.text_area :reason_desc, class: "form-control", id: "form_setting_reason_desc" %>
+			<div class="card dark-form-section rounded-0 mb-4">
+				<div class="card-header">
+					<h2 class="card-title mb-0 h5">Why do you need this extension?</h2>
+				</div>
+				<div class="card-body">
+					<label for="form_setting_reason_desc" class="form-label accessible-text">Custom Description</label>
+					<%= f.text_area :reason_desc, class: "form-control", id: "form_setting_reason_desc" %>
+				</div>
 			</div>
 			
 			
-			<div class="bg-light-subtle mb-3 p-4">
-				<div class="row justify-content-between">
-					<div class="col-12 col-lg-6">
-						<p><strong>Additional Documentation</strong></p>
-					</div>
-					<div class="col-12 col-lg-4">
-						<div class="row align-items-center p-0">
-							<div class="col-4">
-								<label for="form_setting_documentation_disp" class="form-label">Display</label>
-							</div>
-							<div class="col-8">
-								<%= f.select :documentation_disp, 
-									options_for_select([["Required", "required"], 
-														["Optional", "optional"], 
-														["Hidden", "hidden"]], @form_setting.documentation_disp.presence || 'hidden'), 
-									{}, 
-									class: "form-select", 
-									id: "form_setting_documentation_disp" %>
+			<div class="card dark-form-section rounded-0 mb-4">
+				<div class="card-header">
+					<h2 class="card-title mb-0 h5">Additional Documentation</h2>
+				</div>
+				<div class="card-body">
+					<div class="row justify-content-between mb-3">
+						<div class="col-12 col-lg-4">
+							<div class="row align-items-center p-0">
+								<div class="col-4">
+									<label for="form_setting_documentation_disp" class="form-label accessible-text">Display</label>
+								</div>
+								<div class="col-8">
+									<%= f.select :documentation_disp, 
+										options_for_select([["Required", "required"], 
+															["Optional", "optional"], 
+															["Hidden", "hidden"]], @form_setting.documentation_disp.presence || 'hidden'), 
+										{}, 
+										class: "form-select", 
+										id: "form_setting_documentation_disp" %>
+								</div>
 							</div>
 						</div>
 					</div>
+					<label for="form_setting_documentation_desc" class="form-label accessible-text">Custom Description</label>
+					<%= f.text_area :documentation_desc, class: "form-control mb-2", id: "form_setting_documentation_desc", value: @form_setting.documentation_desc.presence %>
+					<p class="small"><strong class="accessible-text">Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
 				</div>
-				<label for="form_setting_documentation_desc" class="form-label">Custom Description</label>
-				<%= f.text_area :documentation_desc, class: "form-control", id: "form_setting_documentation_desc", value: @form_setting.documentation_desc.presence %>
 			</div>
 
-			<div class="bg-light mb-3 p-4">
-				<div class="row justify-content-between">
-					<div class="col-12 col-lg-6">
-						<p><strong>Additional Question 1</strong></p>
-					</div>
-					<div class="col-12 col-lg-4">
-						<div class="row align-items-center p-0">
-							<div class="col-4">
-								<label for="form_setting_custom_q1_disp" class="form-label">Display</label>
-							</div>
-							<div class="col-8">
-								<%= f.select :custom_q1_disp, 
-									options_for_select([["Required", "required"], 
-														["Optional", "optional"], 
-														["Hidden", "hidden"]], @form_setting.custom_q1_disp.presence || 'hidden'), 
-									{}, 
-									class: "form-select", 
-									id: "form_setting_custom_q1_disp" %>
+			<div class="card dark-form-section rounded-0 mb-4">
+				<div class="card-header">
+					<h2 class="card-title mb-0 h5">Additional Question 1</h2>
+				</div>
+				<div class="card-body">
+					<div class="row justify-content-between mb-3">
+						<div class="col-12 col-lg-4">
+							<div class="row align-items-center p-0">
+								<div class="col-4">
+									<label for="form_setting_custom_q1_disp" class="form-label accessible-text">Display</label>
+								</div>
+								<div class="col-8">
+									<%= f.select :custom_q1_disp, 
+										options_for_select([["Required", "required"], 
+															["Optional", "optional"], 
+															["Hidden", "hidden"]], @form_setting.custom_q1_disp.presence || 'hidden'), 
+										{}, 
+										class: "form-select", 
+										id: "form_setting_custom_q1_disp" %>
+								</div>
 							</div>
 						</div>
 					</div>
+					<label for="form_setting_custom_q1" class="form-label accessible-text">Title</label>
+					<%= f.text_field :custom_q1, class: "form-control", id: "form_setting_custom_q1" %>
+					<label for="form_setting_custom_q1_desc" class="form-label accessible-text mt-2">Description</label>
+					<%= f.text_area :custom_q1_desc, class: "form-control", id: "form_setting_custom_q1_desc" %>
 				</div>
-				<label for="form_setting_custom_q1" class="form-label">Title</label>
-				<%= f.text_field :custom_q1, class: "form-control", id: "form_setting_custom_q1" %>
-				<label for="form_setting_custom_q1_desc" class="form-label">Description</label>
-				<%= f.text_area :custom_q1_desc, class: "form-control", id: "form_setting_custom_q1_desc" %>
 			</div>
 
-			<div class="bg-light-subtle mb-3 p-4">
-				<div class="row justify-content-between">
-					<div class="col-12 col-lg-6">
-						<p><strong>Additional Question 2</strong></p>
-					</div>
-					<div class="col-12 col-lg-4">
-						<div class="row align-items-center p-0">
-							<div class="col-4">
-								<label for="form_setting_custom_q2_disp" class="form-label">Display</label>
-							</div>
-							<div class="col-8">
-								<%= f.select :custom_q2_disp, 
-									options_for_select([["Required", "required"], 
-														["Optional", "optional"], 
-														["Hidden", "hidden"]], @form_setting.custom_q2_disp.presence || 'hidden'), 
-									{}, 
-									class: "form-select", 
-									id: "form_setting_custom_q2_disp" %>
+			<div class="card dark-form-section rounded-0 mb-4">
+				<div class="card-header">
+					<h2 class="card-title mb-0 h5">Additional Question 2</h2>
+				</div>
+				<div class="card-body">
+					<div class="row justify-content-between mb-3">
+						<div class="col-12 col-lg-4">
+							<div class="row align-items-center p-0">
+								<div class="col-4">
+									<label for="form_setting_custom_q2_disp" class="form-label accessible-text">Display</label>
+								</div>
+								<div class="col-8">
+									<%= f.select :custom_q2_disp, 
+										options_for_select([["Required", "required"], 
+															["Optional", "optional"], 
+															["Hidden", "hidden"]], @form_setting.custom_q2_disp.presence || 'hidden'), 
+										{}, 
+										class: "form-select", 
+										id: "form_setting_custom_q2_disp" %>
+								</div>
 							</div>
 						</div>
 					</div>
+					<label for="form_setting_custom_q2" class="form-label accessible-text">Title</label>
+					<%= f.text_field :custom_q2, class: "form-control", id: "form_setting_custom_q2" %>
+					<label for="form_setting_custom_q2_desc" class="form-label accessible-text mt-2">Description</label>
+					<%= f.text_area :custom_q2_desc, class: "form-control", id: "form_setting_custom_q2_desc" %>
 				</div>
-				<label for="form_setting_custom_q2" class="form-label">Title</label>
-				<%= f.text_field :custom_q2, class: "form-control", id: "form_setting_custom_q2" %>
-				<label for="form_setting_custom_q2_desc" class="form-label">Description</label>
-				<%= f.text_area :custom_q2_desc, class: "form-control", id: "form_setting_custom_q2_desc" %>
 			</div>
-			
 			
 			<div class="text-center mb-4">
 				<%= f.submit 'Update', class: "btn btn-success" %>
 			</div>
 		<% end %>
-
-
-
 		</div>
 	</div>
 </div>

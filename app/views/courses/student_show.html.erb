@@ -1,0 +1,55 @@
+<div class="container-fluid mb-5">
+  <div class="row">
+    <div class="col-12">
+        <%= render "courses/course_title" %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped" id="assignments-table">
+            <thead>
+              <tr class="table-info">
+                <th>Assignment</th>
+                <th class="text-center" style="min-width: 215px;">Original Due Date</th>
+                <th class="text-center" style="min-width: 215px;">Extended Due Date</th>
+                <th class="text-center" style="width: 50px;">Request</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @assignments.each do |assignment| %>
+                <tr>
+                  <input type="hidden" class="assignment-id" name="assignment_id" value="<%= assignment.id %>">
+                  <td>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span><%= assignment.name %></span>
+                      <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="ms-2">
+                        View <i class="fas fa-up-right-from-square"></i>
+                      </a>
+                    </div>
+                  </td>
+                  <td class="text-center"><%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %></td>
+                  <td class="text-center">
+                    <% last_approved_request = @course.requests.where(user: @user, assignment_id: assignment.id, status: 'approved').order(:updated_at).last %>
+                    <% if last_approved_request.present? %>
+                      <%= last_approved_request.requested_due_date.strftime("%a, %b %-d at %-I:%M%P") %>
+                    <% else %>
+                      <%= assignment.due_date&.strftime("%a, %b %-d at %-I:%M%P") || 'N/A' %>
+                    <% end %>
+                  </td>
+                  <td class="text-center">
+                    <% existing_request = @course.requests.where(user: @user, assignment_id: assignment.id).order(updated_at: :desc).first %>
+                    <% if existing_request.present? %>
+                      <% if existing_request.status == 'pending' %>
+                        <a href="<%= course_request_path(@course, existing_request) %>" class="btn btn-sm btn-secondary">Edit</a>
+                      <% else %>
+                        <a href="<%= course_request_path(@course, existing_request) %>" class="btn btn-sm btn-primary">View</a>
+                      <% end %>
+                    <% else %>
+                      <a href="<%= new_course_request_path(@course) + '?assignment_id=' + assignment.id.to_s %>" class="btn btn-sm btn-secondary">New</a>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+    </div>
+  </div>
+</div>

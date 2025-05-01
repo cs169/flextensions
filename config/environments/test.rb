@@ -65,4 +65,12 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Set up default encryption keys for the test environment
+  config.active_record.encryption.primary_key = 'test-primary-key-1234567890abcdef'
+  config.active_record.encryption.deterministic_key = 'test-deterministic-key-1234567890abcdef'
+  config.active_record.encryption.key_derivation_salt = 'test-salt-1234567890abcdef'
+
+  # Ensure Rails does not require the master key in the test environment
+  config.require_master_key = false
 end

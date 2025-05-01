@@ -1,6 +1,9 @@
 class FormSettingsController < ApplicationController
+  before_action :authenticated!
   before_action :authenticate_user
   before_action :set_course
+  before_action :ensure_instructor_role
+  before_action :set_pending_request_count
 
   def edit
     @side_nav = 'form_settings'
@@ -35,11 +38,12 @@ class FormSettingsController < ApplicationController
 
   def set_course
     @course = Course.find_by(id: params[:course_id])
+    if @course.nil?
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path
+      return
+    end
     @role = @course.user_role(@user)
-    return if @course
-
-    flash[:alert] = 'Course not found.'
-    redirect_to courses_path
   end
 
   def form_setting_params
@@ -54,6 +58,13 @@ class FormSettingsController < ApplicationController
     @user = User.find_by(canvas_uid: session[:user_id])
     return unless @user.nil?
 
-    redirect_to root_path, alert: 'Please log in to access this page.'
+    redirect_to root_path, alert: 'User not found in the database.'
+  end
+
+  def ensure_instructor_role
+    return if @role == 'instructor'
+
+    flash[:alert] = 'You do not have access to this page.'
+    redirect_to courses_path
   end
 end

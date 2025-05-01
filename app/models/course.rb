@@ -5,6 +5,7 @@ class Course < ApplicationRecord
   has_many :user_to_courses
   has_many :users, through: :user_to_courses
   has_one :form_setting, dependent: :destroy
+  has_one :course_settings, dependent: :destroy
   has_many :requests, dependent: :destroy
 
   # Validations
@@ -41,14 +42,14 @@ class Course < ApplicationRecord
 
   # Create or find a course and its associated CourseToLms and assignments
   def self.create_or_update_from_canvas(course_data, token, _user)
-    course = find_or_create_course(course_data)
+    course = find_or_create_course(course_data, token)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
 
     # Creating a 1 to 1 form_settings record to course since the instructor is only meant to update form_settings
     unless course.form_setting
       form_setting = course.build_form_setting(
         documentation_desc: <<~DESC,
-          Please provide links to any additional details if relevant. Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.
+          Please provide links to any additional details if relevant.
         DESC
         documentation_disp: 'hidden',
         custom_q1_disp: 'hidden',
@@ -57,17 +58,53 @@ class Course < ApplicationRecord
       form_setting.save!
     end
 
+    # Create a 1-to-1 course_settings record if it doesn't exist
+    unless course.course_settings
+      course_settings = course.build_course_settings(
+        enable_extensions: false,
+        auto_approve_days: 0,
+        auto_approve_dsp_days: 0,
+        max_auto_approve: 0,
+        enable_emails: false,
+        reply_email: nil,
+        email_subject: 'Extension Request Status: {{status}} - {{course_code}}',
+        email_template: <<~TEMPLATE
+          Dear {{student_name}},
+
+          Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+
+          Extension Details:
+          - Original Due Date: {{original_due_date}}
+          - New Due Date: {{new_due_date}}
+          - Extension Days: {{extension_days}}
+
+          If you have any questions, please contact the course staff.
+
+          Best regards,
+          {{course_name}} Staff
+        TEMPLATE
+      )
+      course_settings.save!
+    end
+
     sync_assignments(course_to_lms, token)
     course.sync_enrollments_from_canvas(token)
     course
   end
 
   # Find or create the course
-  def self.find_or_create_course(course_data)
-    find_or_create_by(canvas_id: course_data['id']) do |c|
-      c.course_name = course_data['name']
-      c.course_code = course_data['course_code']
+  def self.find_or_create_course(course_data, token)
+    canvas_facade = CanvasFacade.new(token)
+    response = canvas_facade.get_course(course_data['id'])
+
+    if response.success?
+      course = find_or_initialize_by(canvas_id: course_data['id'])
+      response_data = JSON.parse(response.body)
+      course.course_name = response_data['name']
+      course.course_code = response_data['course_code']
+      course.save!
     end
+    course
   end
 
   # Find or create the CourseToLms record
@@ -101,8 +138,21 @@ class Course < ApplicationRecord
   def self.sync_assignment(course_to_lms, assignment_data)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
-    assignment.due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present?
-    assignment.late_due_date = DateTime.parse(assignment_data['due_at']) if assignment_data['due_at'].present? && (assignment.late_due_date.nil? || assignment.late_due_date < DateTime.parse(assignment_data['due_at']))
+
+    # Extract due_at from base_date if present
+    if assignment_data['base_date'] && assignment_data['base_date']['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['base_date']['due_at'])
+    elsif assignment_data['due_at'].present?
+      assignment.due_date = DateTime.parse(assignment_data['due_at'])
+    end
+
+    # Extract lock_at for late_due_date
+    if assignment_data['base_date'] && assignment_data['base_date']['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['base_date']['lock_at'])
+    elsif assignment_data['lock_at'].present?
+      assignment.late_due_date = DateTime.parse(assignment_data['lock_at'])
+    end
+
     assignment.save!
   end
 
