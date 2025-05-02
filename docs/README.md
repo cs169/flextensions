@@ -1,0 +1,58 @@
+---
+title: Flextensions - Assignment Extension Management for UC Berkeley
+permalink: /
+---
+<!-- NOTE to Authors: all absolute URLs should start with /flextensions/
+-->
+
+# Welcome to [Flextensions][flextensions] 👋
+
+[**Flextensions**][flextensions] is your one-stop solution to manage and access assignment extensions across all your UC Berkeley courses. Whether you're course staff or a student, Flextensions streamlines extension workflows and makes extension data easy to access and manage.
+
+[flextensions]: https://flextensions.eecs.cloud
+
+---
+
+## 🚀 What Does Flextensions Do?
+
+### [🧑‍🏫 For Course Staff](/flextensions/instructors/):
+- View and manage extensions requests for all assignments in your course.
+- Grant extensions to students with a few clicks.
+- Monitor extension usage across your course.
+- Automate approving extension requests and email sending
+
+### [🎓 For Students](/flextensions/students/):
+- View all your granted extensions in one place.
+- See how long your extension lasts and when the new due date is.
+- Stay informed and organized without checking multiple systems.
+
+---
+
+## 🔧 How It Works
+
+Flextensions connects directly with bCourses (Canvas) and imports your assignments. The interface is intuitive and role-based—course staff can grant and manage, while students can view.
+
+---
+
+Are you a developer? Check out the [Developer Documentation](/flextensions/developers/) documention to contribute to Flextensions and the [API Reference](/flextensions/api/) to learn how to integrate Flextensions with your own applications.
+
+---
+
+## Credits
+
+Flextensions was originally developed by students in [CS169L](https://saasbook.info), during the Spring 2024 and Spring 2025 semesters, as part of the [Software as a Service](https://saasbook.info) course at UC Berkeley.
+
+Student developers (in alphabetical order):
+
+* Connor Bernard, Spring 2024
+* Cynthia Lixinyi, Spring 2024
+* Diandian Liu, Spring 2025
+* Eric Huang, Spring 2025
+* Evan Kandell, Spring 2024
+* Sepehr Behmanesh Fard, Spring 2024
+* Tashrique Ahmed, Spring 2025
+* Tianye Meng, Spring 2025
+* Yaman Tarakji, Spring 2025
+* Zee Babar, Spring 2024
+
+Michael Ball, Armando Fox, and Lisa Yan are the faculty members who have overseen the development of Flextensions.
