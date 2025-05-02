@@ -83,7 +83,7 @@ class CoursesController < ApplicationController
 
   def delete
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
-    return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' unless @course.course_settomgs&.enable_extensions
+    return redirect_to courses_path, alert: 'Extensions are enabled for this course.' if @course.course_settomgs&.enable_extensions
 
     assignments = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
     Extension.where(assignment_id: assignments.select(:id)).destroy_all
