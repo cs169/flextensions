@@ -27,8 +27,6 @@ Rails.application.routes.draw do
       post :sync_assignments
       post :sync_enrollments
       get :enrollments
-    end
-    collection do
       delete :delete
     end
     resources :extensions, only: [:create]
