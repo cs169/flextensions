@@ -72,10 +72,3 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 - OAuth2 integration with bCourses (Canvas)
 
 ---
-
-## SP25 Flextensions Team
-- [Eric Huang](https://huanger2.github.io)
-- [Yaman Tarakji](https://www.linkedin.com/in/yaman-tarakji-602530196)
-- [Tashrique Ahmed](https://tashrique.com)
-- [Tianye Meng](https://www.linkedin.com/in/tianye-meng-611b22253/)
-- [Diandian Liu](https://www.linkedin.com/in/diandian-liu/)
