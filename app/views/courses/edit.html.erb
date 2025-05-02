@@ -196,6 +196,10 @@
                     <%= form.submit 'Save Settings', class: 'btn btn-success px-4' %>
                 </div>
             <% end %>
+
+            <div class="text-center">
+                <%= button_to 'Delete Course', delete_course_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
+            </div>
         </div>
     </div>
 </div>
