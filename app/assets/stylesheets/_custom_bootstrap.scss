@@ -354,6 +354,20 @@ code {
   }
 }
 
+// disabled hover on disabled danger-outline-btn
+a.btn-outline-danger.disable:hover {
+  background-color: transparent !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  pointer-events: none; /* optional: makes it unclickable */
+}
+
+/*
+*****************
+* Sidebar
+*****************
+*/
+
 #sidebar {
 	position: sticky;
 	top: calc(56px);

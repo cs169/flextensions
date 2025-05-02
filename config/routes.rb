@@ -22,15 +22,12 @@ Rails.application.routes.draw do
   get '/courses/:id', to: 'courses#show', as: :course
   get '/courses/:id/edit', to: 'courses#edit', as: :course_settings
   
-  # Add the delete_all route for courses
   resources :courses do
     member do
       post :sync_assignments
       post :sync_enrollments
       get :enrollments
-    end
-    collection do
-      delete :delete_all
+      delete :delete
     end
     resources :extensions, only: [:create]
     resources :requests do
