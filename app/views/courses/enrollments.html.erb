@@ -1,62 +1,47 @@
-<%= render "layouts/sidebar" %>
-<div class="container-fluid mt-4">
+<div class="container-fluid mb-5">
   <div class="row">
     <div class="col-12">
       <%= render "courses/course_title" %>
+      <h1 class="sr-only">Course Enrollments</h1>
       
       <%= render "shared/extension_status_warning", course: @course %>
       
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="enrollments-table">
-          <thead>
-            <tr class="table-info">
-              <th>Name</th>
-              <th class="text-center">Student ID</th>
-              <th class="text-center">Email</th>
-              <th class="text-center">Role</th>
+      <table class="table table-bordered table-striped datatable" id="enrollments-table" data-controller="enrollments">
+        <thead>
+          <tr class="table-info">
+            <th style="min-width: 200px;">Name</th>
+            <th class="text-center">Student ID</th>
+            <th class="text-center">Email</th>
+            <th class="text-center">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @enrollments.each do |enrollment| %>
+            <tr>
+              <td>
+                <%= link_to(
+                  enrollment.user.student_id.present? ? course_requests_path(@course, search: enrollment.user.student_id, show_all: 'true') : course_requests_path(@course, search: enrollment.user.name, show_all: 'true'),
+                  class: "text-decoration-none"
+                ) do %>
+                  <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
+                <% end %>
+              </td>
+              <td class="text-center"><%= enrollment.user.student_id %></td>
+              <td class="text-center"><%= enrollment.user.email %></td>
+              <td class="text-center"><%= enrollment.role.downcase.capitalize %></td>
             </tr>
-          </thead>
-          <tbody>
-            <% @enrollments.each do |enrollment| %>
-              <tr>
-                <td><%= enrollment.user.name %></td>
-                <td class="text-center"><%= enrollment.user.student_id %></td>
-                <td class="text-center"><%= enrollment.user.email %></td>
-                <td class="text-center"><%= enrollment.role.capitalize %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+          <% end %>
+        </tbody>
+      </table>
+
       <div class="text-center mt-4">
-        <button class="btn btn-info" id="sync-enrollments-button" data-course-id="<%= @course.id %>">Sync Enrollments</button>
+        <button class="btn btn-info"
+                data-controller="enrollments"
+                data-action="click->enrollments#sync"
+                data-enrollments-course-id-value="<%= @course.id %>">
+          Sync Enrollments
+        </button>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-document.getElementById("sync-enrollments-button").addEventListener("click", function () {
-  const courseId = this.getAttribute("data-course-id");
-  fetch(`/courses/${courseId}/sync_enrollments`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to sync enrollments.");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      alert(data.message || "Enrollments synced successfully.");
-      location.reload(); // Reload the page to reflect updated enrollments
-    })
-    .catch((error) => {
-      alert(error.message || "An error occurred while syncing enrollments.");
-    });
-});
-</script>

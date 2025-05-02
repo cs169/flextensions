@@ -42,7 +42,7 @@ class Course < ApplicationRecord
 
   # Create or find a course and its associated CourseToLms and assignments
   def self.create_or_update_from_canvas(course_data, token, _user)
-    course = find_or_create_course(course_data)
+    course = find_or_create_course(course_data, token)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
 
     # Creating a 1 to 1 form_settings record to course since the instructor is only meant to update form_settings
@@ -93,11 +93,18 @@ class Course < ApplicationRecord
   end
 
   # Find or create the course
-  def self.find_or_create_course(course_data)
-    find_or_create_by(canvas_id: course_data['id']) do |c|
-      c.course_name = course_data['name']
-      c.course_code = course_data['course_code']
+  def self.find_or_create_course(course_data, token)
+    canvas_facade = CanvasFacade.new(token)
+    response = canvas_facade.get_course(course_data['id'])
+
+    if response.success?
+      course = find_or_initialize_by(canvas_id: course_data['id'])
+      response_data = JSON.parse(response.body)
+      course.course_name = response_data['name']
+      course.course_code = response_data['course_code']
+      course.save!
     end
+    course
   end
 
   # Find or create the CourseToLms record

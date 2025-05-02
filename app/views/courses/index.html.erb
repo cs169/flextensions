@@ -3,19 +3,7 @@
         <div class="col-12">
             
             <div class="row">
-			<% flash.each do |type, message| %>
-            <% bootstrap_class = case type.to_sym
-                when :notice then 'alert-success'
-                when :alert then 'alert-danger'
-                else 'alert-info'
-                end %>
-                <div class="col-12">
-                    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert" data-controller="auto-dismiss">
-                        <%= message %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-            <% end %>
+                <%= render "layouts/components/flash" %>
 				<div class="col-12">
 					<h1 class="mb-4">Courses Dashboard</h1>
 				</div>
@@ -49,10 +37,7 @@
             </table>
 
             <div class="text-center my-3">
-                <a href="/courses/new" class="btn btn-secondary">Import courses from Canvas</a>
-            </div>
-            <div class="text-center">
-                <%= button_to 'Delete All Courses', delete_all_courses_path, method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure you want to delete all your courses and associations?' } %>
+                <a href="/courses/new" id="import-courses-button" class="btn btn-secondary ">Import courses from Canvas</a>
             </div>
         </div>
         <% end %>
@@ -94,5 +79,11 @@
                 <div class="alert alert-warning">You are not a student in any courses with flextensions set up.</div>
             <% end %>
         </div>
+
+        <% if @teacher_courses.empty? %>
+        <div class="text-center mt-5">
+          <p>If you are an instructor, you can <a href="<%= new_course_path %>">import a course</a>.</p>
+        </div>
+        <% end %>
     </div>
 </div>

@@ -1,5 +1,4 @@
-<%= render "layouts/sidebar" %>
-<div class="container-fluid mt-4" data-controller="extension-form">
+<div class="container-fluid mb-5" data-controller="extension-form">
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<%= render "courses/course_title" %>
@@ -26,6 +25,13 @@
 							<%= f.label :assignment_id, class: "form-label", for: "new-request-assignment-id" do %>
 								Select Assignment<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
 							<% end %>
+							
+							<% if @has_pending %>
+								<div class="alert alert-info mb-3">
+									<small>Some assignments are not shown because you already have pending requests for them. Please check your <a href="<%= course_requests_path(@course) %>">requests</a> to view or edit them.</small>
+								</div>
+							<% end %>
+							
 							<%= f.select :assignment_id,
 							options_for_select(
 								@assignments.map do |assignment|
@@ -34,7 +40,7 @@
 									assignment.id,
 									{
 									"data-original-due-date" => assignment.due_date.strftime('%a, %b %-d, %Y at %-I:%M %p'),
-									"data-original-late-due-date" => assignment.late_due_date.strftime('%a, %b %-d, %Y at %-I:%M %p')
+									"data-original-late-due-date" => assignment.late_due_date&.strftime('%a, %b %-d, %Y at %-I:%M %p')
 									}
 								]
 								end,
@@ -57,7 +63,7 @@
 								<p><strong>Original Due Date: </strong><span id="due-date"><%= @selected_assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') if @selected_assignment %></span></p>
 							</div>
 							<div class="col-md-6 mb-2">
-								<p><strong>Original Late Due Date: </strong><span id="late-due-date"><%= @selected_assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') if @selected_assignment %></span></p>
+								<p><strong>Original Late Due Date: </strong><span id="late-due-date"><%= @selected_assignment&.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' if @selected_assignment %></span></p>
 							</div>
 						</div>
 					</div>
