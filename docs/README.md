@@ -13,13 +13,13 @@ permalink: /
 
 ## 🚀 What Does Flextensions Do?
 
-### [🧑‍🏫 For Course Staff](/instructors/):
+### [🧑‍🏫 For Course Staff](/flextensions/instructors/):
 - View and manage extensions requests for all assignments in your course.
 - Grant extensions to students with a few clicks.
 - Monitor extension usage across your course.
 - Automate approving extension requests and email sending
 
-### [🎓 For Students](/students):
+### [🎓 For Students](/flextensions/students):
 - View all your granted extensions in one place.
 - See how long your extension lasts and when the new due date is.
 - Stay informed and organized without checking multiple systems.
@@ -32,7 +32,7 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 
 ---
 
-Are you a developer? Check out the [Developer Documentation](/developers/) documention to contribute to Flextensions and the [API Reference](/api/) to learn how to integrate Flextensions with your own applications.
+Are you a developer? Check out the [Developer Documentation](/flextensions/developers/) documention to contribute to Flextensions and the [API Reference](/flextensions/api/) to learn how to integrate Flextensions with your own applications.
 
 ---
 
