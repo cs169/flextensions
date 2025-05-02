@@ -126,6 +126,7 @@ group :development do
   gem 'rubocop-rspec', require: false
 
   gem 'letter_opener'
+  gem 'letter_opener_web', '~> 3.0'
 end
 
 gem 'rails-controller-testing', '~> 1.0'

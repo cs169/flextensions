@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
   post 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
