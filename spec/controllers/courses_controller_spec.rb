@@ -186,4 +186,39 @@ RSpec.describe CoursesController, type: :controller do
       end
     end
   end
+
+  describe 'DELETE #delete' do
+    let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
+    let!(:assignment) { Assignment.create!(name: 'Assignment to Delete', course_to_lms_id: course_to_lms.id, external_assignment_id: 'del123', enabled: true) }
+
+    before do
+      Extension.create!(assignment: assignment, student_email: user.email)
+      UserToCourse.create!(user: user, course: course, role: 'teacher')
+      Request.create!(course: course, assignment: assignment, user: user, requested_due_date: Time.current, reason: 'Reason')
+      CourseSettings.create!(course: course)
+      FormSetting.create!(
+        course: course,
+        documentation_disp: 'required',
+        custom_q1_disp: 'required',
+        custom_q2_disp: 'required'
+      )
+    end
+
+    it 'deletes all associated records and redirects with a notice' do
+      expect do
+        delete :delete, params: { id: course.id }
+      end.to change(Course, :count).by(-1)
+                                   .and change(Assignment, :count).by(-1)
+                                                                  .and change(Extension, :count).by(-1)
+                                                                                                .and change(CourseToLms, :count).by(-1)
+                                                                                                                                .and change(UserToCourse, :count).by(-2)
+                                                                                                                                                                 .and change(Request, :count).by(-1)
+                                                                                                                                                                                             .and change(CourseSettings, :count).by(-1)
+                                                                                                                                                                                                                                .and change(FormSetting,
+                                                                                                                                                                                                                                            :count).by(-1)
+
+      expect(response).to redirect_to(courses_path)
+      expect(flash[:notice]).to eq('Course deleted successfully.')
+    end
+  end
 end
