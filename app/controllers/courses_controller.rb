@@ -81,27 +81,15 @@ class CoursesController < ApplicationController
     @enrollments = @course.user_to_courses.includes(:user)
   end
 
-  # DELETES ALL COURSES, ASSIGNMENTS, EXTENSIONS, AND USER-TO-COURSE MAPPINGS
-  # This method is intended for use in development or testing environments only.
   def delete
-    # user_courses = Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id })
-
-    # Find all assignments associated with the user's courses
     assignments = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
-
-    # Delete all extensions associated with those assignments
     Extension.where(assignment_id: assignments.select(:id)).destroy_all
-
-    # Delete the assignments, course-to-LMS mappings, and user-to-course mappings
     assignments.destroy_all
     CourseToLms.where(course_id: @course.id).destroy_all
     UserToCourse.where(course_id: @course.id).destroy_all
-
-    # Delete course_settings and form_settings associated with the user's courses
+    Request.where(course_id: @course.id).destroy_all
     CourseSettings.where(course_id: @course.id).destroy_all
     FormSetting.where(course_id: @course.id).destroy_all
-
-    # Delete courses that no longer have any user-to-course associations
     Course.where.missing(:user_to_courses).destroy_all
 
     redirect_to courses_path, notice: 'Course deleted successfully.'

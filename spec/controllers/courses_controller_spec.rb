@@ -112,14 +112,6 @@ RSpec.describe CoursesController, type: :controller do
     end
   end
 
-  describe 'POST #delete_all' do
-    it 'deletes user courses and redirects' do
-      delete :delete_all
-      expect(response).to redirect_to(courses_path)
-      expect(flash[:notice]).to eq('All your courses and associations have been deleted successfully.')
-    end
-  end
-
   describe 'GET #new' do
     before do
       # Create a fake LMS credential with a token
