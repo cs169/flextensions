@@ -2,6 +2,8 @@
 title: Flextensions - Assignment Extension Management for UC Berkeley
 permalink: /
 ---
+<!-- NOTE to Authors: all absolute URLs should start with /flextensions/
+-->
 
 # Welcome to [Flextensions][flextensions] 👋
 
@@ -19,7 +21,7 @@ permalink: /
 - Monitor extension usage across your course.
 - Automate approving extension requests and email sending
 
-### [🎓 For Students](/flextensions/students):
+### [🎓 For Students](/flextensions/students/):
 - View all your granted extensions in one place.
 - See how long your extension lasts and when the new due date is.
 - Stay informed and organized without checking multiple systems.

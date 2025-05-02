@@ -1,6 +1,6 @@
 ---
 title: Flextensions for Students
-permalink: /Students/
+permalink: /students/
 ---
 
 ## Accessing a Course
