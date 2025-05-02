@@ -1,3 +1,8 @@
+---
+title: Developing Flextensions
+permalink: /developers/
+---
+
 # Standing Up the Application
 This guide walks you through setting up the Flextensions app on your local machine and on your Heroku server and preparing it for development and deployment.
 
@@ -44,20 +49,20 @@ sudo apt install postgresql
 sudo su-postgres #(to get into postgres shell)
 createuser --interactive --pwprompt #(in postgres shell)0
 # Save DB_USER and DB_PASSWORD fields in the .env file.
-#Start postgres if necessary. 
-pg ctlcluster 12 main start 
-#Note: if you are using WSl2 on windows, the command to start postares is 
+#Start postgres if necessary.
+pg ctlcluster 12 main start
+#Note: if you are using WSl2 on windows, the command to start postares is
 sudo seryice posteresal start
 ```
 
 ### Environment Variables
 - Create a new file named .env under the root directory of Flextensions app.
-- Get client secrets from your Instructure sandbox account. Flextensions uses bcourses (Canvas) third-party authentication. For developers, you need a sandbox admin account to generate client ID and secrets for your app when using Canvas authentication APIs. 
+- Get client secrets from your Instructure sandbox account. Flextensions uses bcourses (Canvas) third-party authentication. For developers, you need a sandbox admin account to generate client ID and secrets for your app when using Canvas authentication APIs.
 1. Log into your sandbox admin account. Contact your instructor if you do not have one.
 2. Click `admin` on the sidebar on the left, then Click `UC Berkeley Sandbox`
 3. Go to the `Developer Keys` section on the left sidebar, add an API key.
 4. Fill in each field with your own information. `Redirect_URI` should be the same as your `CANVAS_REDIRECT_URI` in `.env` (See the code block below)
-5. For your environment variables, the `CANVAS_CLIENT_ID` should be something like `2653xxxxxxxxx`; the `APP_KEY` should be the secret corresponding to it. 
+5. For your environment variables, the `CANVAS_CLIENT_ID` should be something like `2653xxxxxxxxx`; the `APP_KEY` should be the secret corresponding to it.
 - Setup the following ENV variables in your .env file:
 ```
 DB_PORT (default: 5432)
@@ -152,10 +157,10 @@ git push golden main
 
 ## Conventions
 
-1. Testing convention css selector - 
-```<a class="nav-link testid-username" href="#"> Tashrique </a>``` 
+1. Testing convention css selector -
+```<a class="nav-link testid-username" href="#"> Tashrique </a>```
 
-Notice the ```testid-username```We will be using this style in **class** to grab elements from DOM to test. 
+Notice the ```testid-username```We will be using this style in **class** to grab elements from DOM to test.
 
 Please don't remove any class that starts with ```testid-```
 
@@ -168,4 +173,3 @@ We recommend developing in this order:
 1. [ucberkeleysandbox.instructure.com](ucberkeleysandbox.instructure.com) (no risk) - this is the one for which this repo currently has oauth2 keys (secrets)
 2. [bcourses.test.instructure.com](bcourses.test.instructure.com) (no risk of impacting courses, but contains real data)
 3. [bcourses.berkeley.edu](bcourses.berkeley.edu)
-
