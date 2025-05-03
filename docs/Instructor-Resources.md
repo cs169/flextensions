@@ -3,121 +3,170 @@ title: Flextensions for Instructors
 permalink: /instructors/
 ---
 
-## Importing a Course
-After login to the Flextensions, in courses page:
+# Importing a Course
 
-1. Click **Import courses from canvas**.
-![image](https://github.com/user-attachments/assets/064c49d0-b746-4bc5-86de-805c8dc5b71d)
-> If you are not already an instructor in a Course and need to import a Course, click the blue text in "If you are an instructor, import a course" to be redirected to the Import Courses page.
+After logging into Flextensions, navigate to the **Courses** page.
 
+1. Click **Import courses from Canvas** to view the list of Canvas courses you’re associated with.
+   > If you are not already listed as an instructor and need to import a course, click the blue link text under "If you are an instructor, import a course" to access the import interface.
 
-2. On the new page, toggle the switch on the left of any Canvas course you'd like to import.
-![image](https://github.com/user-attachments/assets/ea821e4d-cde3-40e3-badb-744874774d46)
+2. On the **Import Courses** page, toggle the switch on the left for each course you'd like to import.
 
-3. Click **Import Selected Courses** to complete the import.
-  >⚠️ Courses you are enrolled in but cannot set up extensions for will be listed at the
-  >bottom of the page for reference.
-## Course Assignments
-On the course page, Click on the blue course name links (e.g., CS 161, CS 168) to access the management page for each course.
+3. Click **Import Selected Courses** to finalize the process.
+   > Courses you are enrolled in but do not have permissions to manage will appear at the bottom for reference only.
 
-![image](https://github.com/user-attachments/assets/3b0c10c8-1fdb-4188-a5b8-b1e215eb7efc)
+# Course Assignments
 
-### Syncing Assignments
-Click "**Sync Assignments**" to sync all assignments from bourses
-### Enabling Assignments
-To make an assignment visible to students for extension requests, toggle the **Enable switch** on the right side of the assignment row.
-  >📝 If the course is still disabled, you will see a warning banner. You must first
-  >enable the course in **Course Settings** to allow students access.
-## Course Extension Requests
-Navigate to **Requests** tab in the left sidebar to manage or review your extension requests.
-### Viewing Extension Requests
-Click **View** next to a request to open the Extension Request Details page.
-### Editing Extension Requests
-1. Click **View** on the Requests page;
-2. On the Extension Request Details page, click **Edit Request**.
-3. In the Requested Due Date field, enter the new due date or select it from the date picker.
-4. Update the Reason for Extension by editing the text in the corresponding text box.
-5. Review the Number of Days field (calculated automatically based on the new due date).
-6. Click **Update Request** to save your changes, or **Cancel** to discard them.
-### Approving/Denying Extension Requests
-As an instructor, you can approve or deny extension requests through either of the following methods:
-**Method 1: From the Requests Overview Page**
-1. Navigate to the Requests tab in the left sidebar.
-2. Locate the request in the table.
-3. In the Actions column, click Approve (green button) or Reject (red button) to respond immediately.
+On the **Courses** page, click a blue course name (e.g., **CS 161**, **CS 168**) to access that course’s management dashboard.
 
-**Method 2: From the Request Details Page**
-1.On the Requests overview page, click the View button next to the request.
-2. On the Extension Request Details page, review the assignment information, requested due date, and reason.
-3. Click Approve or Reject at the bottom of the page.
-4. Once a decision is made, the status of the request will update accordingly.
+## Syncing Assignments
 
-## Course Enrollments
-The Enrollments tab displays the list of all students and instructors currently associated with the course, including their names, student IDs, email addresses, and roles.
-### Syncing Enrollments
-To sync the enrollment list with the official course roster:
+If you have added new assignments in Canvas, you can click **Sync Assignments** to import the latest assignments from Canvas into Flextensions.
 
-1. Navigate to the Enrollments tab in the left sidebar.
+## Enabling Assignments
 
-2. Click the Sync Enrollments button located at the bottom of the page.
+To allow students to request extensions for an assignment, toggle the **Enable** switch on the right side of that assignment’s row.
 
-The system will fetch the most up-to-date enrollment data and update the list accordingly.
-This feature ensures that any newly added students or instructors are reflected in the course, and any removed users are no longer shown.
-## Course General Settings
-The Settings tab allows instructors to configure course-wide policies for extension requests, including enabling requests, setting auto-approval conditions, and managing notification preferences.
-### Auto-approval Settings
-Instructors can control how and when extension requests are automatically approved using the following options:
-- **Auto approve within days**
-  &nbsp;&nbsp;Automatically approves requests made within the specified number of days before the original due date. Leave blank to disable auto-approval.
-  >Note:
-- **Auto approve within days (DSP)**
-  &nbsp;&nbsp;(For students with a DSP accommodation.) Similar to the setting above, but applied specifically to DSP-tagged students.
-  >Note:
-- **Maximum requests to auto approve**
-  &nbsp;&nbsp;Sets a per-student limit on how many extension requests can be auto-approved for the course.
-Enter ``0`` to allow unlimited auto-approved requests.
-## Course Email Settings
-   The **Email Settings** tab in **Settings** page allows instructors to configure how Flextensions sends email notifications related to extension requests. This includes specifying a reply-to address and customizing the content of email templates.
+> 📝 If the course itself is not yet enabled, a warning banner will appear. You must first enable the course under **Course Settings** before students can access it.
 
-![image](https://github.com/user-attachments/assets/ce960eae-b893-48b6-abbd-d47a9f551f70)
+# Course Extension Requests
 
-### Course Email Setup
-Instructors can choose to enable or disable email notifications.
-When enabled, Flextensions will automatically send an email to students when their extension request is approved or denied.
+Navigate to the **Requests** tab in the left sidebar to review and manage all extension requests.
 
-You can also enter a Course Reply Email Address, which will be used as the "reply-to" address in outgoing emails. Students can respond to this address if they have questions about their request.
+## Viewing Extension Requests
 
-💡 Make sure the email address you provide is valid and monitored by your course staff.
-### Email template Setup
-Click **Email Settings** tab and you can customize both the subject line and email body of the messages sent to students. Use the dynamic variables provided to include personalized content such as student names, assignment titles, and status.
+Click **View** next to any request to access its full details.
 
-![image](https://github.com/user-attachments/assets/c9f71461-946a-4971-9263-c0e6adc7c0dc)
+## Editing Extension Requests
 
-Available variables include:
-- **Student Information**
-```{{student_name}}, {{student_email}}, {{student_id}}```
-- **Course Information**
-```{{course_name}}, {{course_code}}, {{assignment_name}}```
-- **Extension Information**
-```{{original_due_date}}, {{new_due_date}}, {{extension_days}}, {{status}}```
-Click **Reset to Default** to restore the original system template if needed.
-## Course Extension Request Form
-The **Form** tab allows instructors to customize the extension request form that students will use. You can add clarifying descriptions, request additional documentation, or define your own questions.
-### Writing Custom Descriptions
-You can also provide a **Custom Description** for the following sections:
+1. Click **View** on the Requests page.
+2. In the Extension Request Details page, click **Edit Request**.
+3. Update the **Requested Due Date** or select a new date from the date picker.
+4. Optionally revise the **Reason for Extension** field.
+5. The system will auto-calculate the number of extension days.
+6. Click **Update Request** to save changes.
+
+## Approving or Denying Requests
+
+You can respond to requests in two ways:
+
+**Method 1: Requests Overview Page**
+1. Go to the **Requests** tab.
+2. Locate a pending request.
+3. Click the green **Approve** or red **Reject** button in the Actions column.
+
+**Method 2: Extension Request Details Page**
+1. Click **View** next to a request.
+2. Review assignment details and student’s explanation.
+3. Click **Approve** or **Reject** at the bottom.
+4. The request status will update in real time.
+
+## Viewing Request History
+To view all requests made in the course, click the **View all Requests** button at the top left.
+
+# Course Enrollments
+
+The **Enrollments** tab shows all instructors and students currently associated with the course, including their names, student IDs, email addresses, and roles.
+
+## Syncing Enrollments
+
+1. Navigate to the **Enrollments** tab.
+2. Click **Sync Enrollments** to pull the latest enrollment data from Canvas.
+
+The list will refresh with updated data, including new students and instructors, and will remove users no longer in the course.
+
+> ⚠️ If if a student is added to the course after you have already imported a course, you will need to sync the course enrollments to ensure they are able to access the Flextensions course.
+
+## Filtering Student Requests
+By clicking the name of a student in the **Enrollments** tab, you can filter the requests to only show those made by that student. This is useful for quickly reviewing all requests from a specific student.
+
+# Course General Settings
+
+The **Settings** tab lets you define how your course handles extension requests.
+
+## Auto-approval Settings
+
+Control when and how requests are automatically approved:
+
+- **Auto-approve within days**  
+  Automatically approves requests made within the specified number of days before the assignment due date. Leave blank to disable.
+
+- **Auto-approve within days (DSP)**  
+  Applies a similar rule specifically to students with a DSP accommodation flag.
+
+- **Maximum requests to auto-approve**  
+  Sets a per-student limit on auto-approved requests. Use `0` for no limit.
+
+After setting these options, click **Save Settings** to save.
+
+# Course Email Settings
+
+The **Email Settings** section (under Settings) controls how students receive notifications about their extension requests.
+
+## Course Email Setup
+
+Enable or disable email notifications as needed. When enabled, Flextensions sends students an email when their request is approved or denied.
+
+You can specify a **Course Reply Email Address** for outgoing emails. This will be used as the "reply-to" address if students respond to notification emails.
+
+💡 Ensure this address is monitored regularly by course staff.
+
+After setting these options, click **Save Settings** to save.
+
+## Email Template Customization
+
+In the **Email Settings** tab, you can customize:
+
+- Subject line
+- Email body
+
+Use provided dynamic variables to personalize each email.
+
+**Available Variables**:
+
+- **Student Information**  
+  `{{student_name}}, {{student_email}}, {{student_id}}`
+
+- **Course Information**  
+  `{{course_name}}, {{course_code}}, {{assignment_name}}`
+
+- **Extension Information**  
+  `{{original_due_date}}, {{new_due_date}}, {{extension_days}}, {{status}}`
+
+Click **Reset to Default** to restore the system default template.
+
+# Course Extension Request Form
+
+Use the **Form** tab to customize the student request form.
+> The following options are required fields and cannot be removed: 
+> Assignment Name, Requested Due Date, Reason for Extension.
+
+## Writing Custom Descriptions
+
+You can provide custom description text for:
+
 - **Why do you need this extension?**
 - **Additional Documentation**
-The custom descriptions are shown directly on the form and help clarify what kind of response is expected. For example, you may want to include a note like:
->“Please do not include any personal health or disability related details. If you have >questions, contact the course staff before submitting.”
-This helps ensure students provide appropriate and relevant information while maintaining privacy.
-### Creating Custom Questions
-Instructors may define up to two additional custom questions (labeled Additional Question 1 and Additional Question 2). Each question includes:
-- A **Title** field, which acts as the prompt shown to students.
-- A **Description** field, which provides more context or instructions for the question.
-These fields are optional and allow for flexibility in gathering course-specific information (e.g., "What steps have you already taken to complete the assignment?" or "Have you communicated with your TA?").
-### Setting Question Display
-Each section (including the custom questions and additional documentation) can be shown or hidden using the Display dropdown. The available options are:
-- *Hidden*- The section will not appear on the student form.
-- *(Other options like "Required" or "Optional" may be available depending on the implementation.)*
 
-After configuring your custom questions and visibility settings, click the **Update** button at the bottom of the page to save your changes.
+These appear directly on the form and help guide student responses.
+
+## Creating Custom Questions
+
+You can add up to **two additional questions** to gather more context:
+
+- **Title**: The main question shown to students.
+- **Description**: Additional clarification or instructions.
+
+## Setting Question Display
+
+Each custom question as well as the **Additional Documentation** question can be configured to be:
+
+- **Hidden**: Not shown on the form  
+- **Optional**: Shown but not required
+- **Required**: Must be answered to submit the form
+
+Once configured, click **Update** at the bottom of the page to save your settings.
+
+# Deleting a Course
+To delete a course, navigate to the **Settings** tab and scroll to the bottom of the page. Click **Delete Course**. This option is only available when student extension requests are not enabled for the course.  
+> ⚠️ Deleting a course is permanent and cannot be undone. All data associated with the course will be lost.
