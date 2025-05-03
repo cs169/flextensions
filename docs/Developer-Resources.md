@@ -1,3 +1,8 @@
+---
+title: Developing Flextensions
+permalink: /developers/
+---
+
 # Standing Up the Application
 This guide walks you through setting up the Flextensions app on your local machine and on your Heroku server and preparing it for development and deployment.
 

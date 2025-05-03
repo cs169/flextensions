@@ -3,7 +3,7 @@ title: Flextensions for Students
 permalink: /students/
 ---
 
-## Accessing a Course
+# Accessing a Course
 
 After logging into your account, you will be directed to the **Courses Dashboard**.  
 This page lists all courses you are enrolled in:
@@ -18,7 +18,7 @@ If you expect to see a course but it is not listed, please contact your instruct
 
 ---
 
-## Course Assignments
+# Course Assignments
 
 Within each course, click the **Assignments** tab to view a list of all course assignments.  
 Each row shows:
@@ -28,7 +28,7 @@ Each row shows:
 - Your extended due date if a request has been approved
 - A button to submit or edit a request
 
-### Extension Request Buttons
+## Extension Request Buttons
 
 - **"New"**: Appears if you have not submitted a request for the assignment. Click to open the *Request Extension* form.
 - **"Edit"**: Appears if you’ve already submitted a request. Click to update your existing request.
@@ -38,9 +38,9 @@ Each row shows:
 
 ---
 
-## Course Extension Requests
+# Course Extension Requests
 
-### Submitting a New Extension Request
+## Submitting a New Extension Request
 
 To request an extension:
 
@@ -58,7 +58,7 @@ To request an extension:
 
 ---
 
-### Viewing Existing Extension Requests
+## Viewing Existing Extension Requests
 
 1. Click the **Requests** tab in the left-hand sidebar.
 2. A table will list all your submitted extension requests for the course.
@@ -78,7 +78,7 @@ Each row displays:
 
 ---
 
-### Updating or Canceling a Request
+## Updating or Canceling a Request
 
 On the **Extension Request Details** page:
 
