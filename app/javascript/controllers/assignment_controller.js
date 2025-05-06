@@ -3,6 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="assignment"
 export default class extends Controller {
   static targets = ["checkbox"]
+  static values = { courseId: Number }
 
   connect() {
     this.checkboxTargets.forEach((checkbox) => {
@@ -48,5 +49,33 @@ export default class extends Controller {
       console.error("Error updating assignment:", error);
       checkbox.checked = !enabled; // rollback checkbox if error
     }
+  }
+
+  sync(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
+    const courseId = this.courseIdValue;
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    fetch(`/courses/${courseId}/sync_assignments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to sync assignments.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        flash("notice", data.message || "Assignments synced successfully.");
+        location.reload();
+      })
+      .catch((error) => {
+        flash("alert", error.message || "An error occurred while syncing assignments.");
+        location.reload();
+      });
   }
 }

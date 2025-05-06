@@ -109,7 +109,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3 row">
+                                <div class="mb-3 row border-bottom pb-3">
                                     <label for="reply-email" class="col-sm-4 col-form-label">Course Reply Email Address</label>
                                     <div class="col-sm-8">
                                         <%= email_field_tag 'course_settings[reply_email]', 
@@ -119,6 +119,22 @@
                                                           placeholder: 'example@example.com',
                                                           data: { course_settings_target: "emailField" },
                                                           disabled: !@course.course_settings&.enable_emails %>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="text-start">
+                                        <% if @course.course_settings&.enable_extensions %>
+                                            <%= link_to 'Delete Course (must have student extension requests disabled)', '#', class: 'btn btn-outline-danger disable me-3', aria_disabled: 'true' %>
+                                        <% else %>
+                                            <%= link_to 'Delete Course',
+                                                        delete_course_path,
+                                                        method: :delete,
+                                                        class: 'btn btn-danger me-3',
+                                                        data: {
+                                                            confirm: 'Are you sure you want to delete this course? This action cannot be undone.'
+                                                        } %>
+                                        <% end %>
                                     </div>
                                 </div>
                             </div>

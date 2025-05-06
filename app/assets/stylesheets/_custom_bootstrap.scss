@@ -354,6 +354,20 @@ code {
   }
 }
 
+// disabled hover on disabled danger-outline-btn
+a.btn-outline-danger.disable:hover {
+  background-color: transparent !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  pointer-events: none; /* optional: makes it unclickable */
+}
+
+/*
+*****************
+* Sidebar
+*****************
+*/
+
 #sidebar {
 	position: sticky;
 	top: calc(56px);
@@ -445,11 +459,28 @@ code {
 }
 
 /*
-*************************************
-* DataTables BS-type table-responsive
-*************************************
+***********************
+* DataTables
+***********************
 */
+//  BS-type table-responsive
 .dt-layout-full {
   overflow-x: auto !important;
 }
-/***********************************/
+//  BS-type table-responsive
+
+
+// Request Table desktop
+@media (min-width: 768px) {
+  #requests-table #assignment {
+    min-width: 200px;
+  }
+  #requests-table #name {
+    min-width: 150px;
+  }
+}
+// Request Table desktop
+
+
+
+/*********************/

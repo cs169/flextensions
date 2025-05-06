@@ -6,11 +6,15 @@
     "lib": "lib"
   },
   "scripts": {
-    "dev": "overmind s -f Procfile.dev"
+    "dev": "overmind s -f Procfile.dev",
+    "api": "npx swagger-cli bundle app/assets/swagger/swagger.json -o docs/api/swagger-bundle.json && npx @redocly/cli build-docs docs/api/swagger-bundle.json -o docs/api/index.html"
   },
   "author": "CS169l flextensions development team",
   "license": "BSD-2-Clause",
-  "dependencies": {
+
+  "devDependencies": {
+    "@redocly/cli": "^1.34.2",
+    "swagger-cli": "^4.0.4",
     "datatables.net": "^2.2.2",
     "datatables.net-bs5": "^2.2.2"
   }

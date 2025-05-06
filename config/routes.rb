@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  if Rails.env.development? || !ActiveModel::Type::Boolean.new.cast(ENV["ENABLE_EMAIL_SENDING"])
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
   post 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
@@ -22,15 +25,12 @@ Rails.application.routes.draw do
   get '/courses/:id', to: 'courses#show', as: :course
   get '/courses/:id/edit', to: 'courses#edit', as: :course_settings
   
-  # Add the delete_all route for courses
   resources :courses do
     member do
       post :sync_assignments
       post :sync_enrollments
       get :enrollments
-    end
-    collection do
-      delete :delete_all
+      delete :delete
     end
     resources :extensions, only: [:create]
     resources :requests do

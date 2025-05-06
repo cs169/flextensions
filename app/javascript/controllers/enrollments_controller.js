@@ -4,6 +4,8 @@ import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
 
 export default class extends Controller {
+	static values = { courseId: Number }
+	
 	connect() {
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
@@ -20,7 +22,7 @@ export default class extends Controller {
 				searching: true,
 				ordering: true,
 				info: true,
-				// responsive: true,
+				responsive: true,
 				columns: [
 					null, // Name
 					null, // Email
@@ -31,4 +33,32 @@ export default class extends Controller {
 			});
 		}
 	}
+
+	sync() {
+		const button = event.currentTarget;
+		button.disabled = true;
+		const courseId = this.courseIdValue;
+		const token = document.querySelector('meta[name="csrf-token"]').content;
+		fetch(`/courses/${courseId}/sync_enrollments`, {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json",
+			"X-CSRF-Token": token,
+		  },
+		})
+		  .then((response) => {
+			if (!response.ok) {
+			  throw new Error("Failed to sync enrollments.");
+			}
+			return response.json();
+		  })
+		  .then((data) => {
+			flash("notice", data.message || "Enrollments synced successfully.");
+			location.reload();
+		  })
+		  .catch((error) => {
+			flash("alert", error.message || "An error occurred while syncing enrollments.");
+			location.reload();
+		});
+	  }
 }

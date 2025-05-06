@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments]
+  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments delete]
   before_action :set_pending_request_count
   before_action :determine_user_role
 
@@ -81,30 +81,21 @@ class CoursesController < ApplicationController
     @enrollments = @course.user_to_courses.includes(:user)
   end
 
-  # DELETES ALL COURSES, ASSIGNMENTS, EXTENSIONS, AND USER-TO-COURSE MAPPINGS
-  # This method is intended for use in development or testing environments only.
-  def delete_all
-    user_courses = Course.joins(:user_to_courses).where(user_to_courses: { user_id: @user.id })
+  def delete
+    return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
+    return redirect_to courses_path, alert: 'Extensions are enabled for this course.' if @course.course_settings&.enable_extensions
 
-    # Find all assignments associated with the user's courses
-    assignments = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: user_courses).select(:id))
-
-    # Delete all extensions associated with those assignments
+    assignments = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
     Extension.where(assignment_id: assignments.select(:id)).destroy_all
-
-    # Delete the assignments, course-to-LMS mappings, and user-to-course mappings
     assignments.destroy_all
-    CourseToLms.where(course_id: user_courses).destroy_all
-    UserToCourse.where(course_id: user_courses).destroy_all
-
-    # Delete course_settings and form_settings associated with the user's courses
-    CourseSettings.where(course_id: user_courses).destroy_all
-    FormSetting.where(course_id: user_courses).destroy_all
-
-    # Delete courses that no longer have any user-to-course associations
+    CourseToLms.where(course_id: @course.id).destroy_all
+    UserToCourse.where(course_id: @course.id).destroy_all
+    Request.where(course_id: @course.id).destroy_all
+    CourseSettings.where(course_id: @course.id).destroy_all
+    FormSetting.where(course_id: @course.id).destroy_all
     Course.where.missing(:user_to_courses).destroy_all
 
-    redirect_to courses_path, notice: 'All your courses and associations have been deleted successfully.'
+    redirect_to courses_path, notice: 'Course deleted successfully.'
   end
 
   private
