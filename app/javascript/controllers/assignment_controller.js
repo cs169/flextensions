@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { syncResource } from "../helpers/api_helpers";
+import { syncResource, getCsrfToken } from "../helpers/api_helpers";
 
 // Connects to data-controller="assignment"
 export default class extends Controller {
@@ -20,7 +20,7 @@ export default class extends Controller {
     const userId = checkbox.dataset.userId; // Get the user ID
 
     try {
-      const token = document.querySelector('meta[name="csrf-token"]').content;
+      const token = getCsrfToken();
 
       const response = await fetch(url, {
         method: "PATCH",

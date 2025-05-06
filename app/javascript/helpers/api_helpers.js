@@ -19,11 +19,11 @@ export function syncResource(courseId, endpoint, successMessage, errorMessage) {
       return response.json();
     })
     .then((data) => {
-      flash("notice", data.message || successMessage || `${endpoint} synced successfully.`);
+      window.flash("notice", data.message || successMessage || `${endpoint} synced successfully.`);
       location.reload();
     })
     .catch((error) => {
-      flash("alert", error.message || `An error occurred while syncing ${endpoint}.`);
+      window.flash("alert", error.message || `An error occurred while syncing ${endpoint}.`);
       location.reload();
     });
 } 
