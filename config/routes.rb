@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  if Rails.env.development? || !ActiveModel::Type::Boolean.new.cast(ENV["ENABLE_EMAIL_SENDING"])
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
   post 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
