@@ -1,4 +1,7 @@
 # app/services/email_service.rb
+##########################################################################################
+# if you want to use Letter Opener Web make sure to set ENV[ENABLE_EMAIL_SENDING] to false 
+##########################################################################################
 class EmailService
   class << self
     # Given a subject_template and body_template (both strings
