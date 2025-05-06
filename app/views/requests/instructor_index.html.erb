@@ -22,14 +22,14 @@
         <table class="table table-bordered table-striped datatable" id="requests-table" data-controller="requests" data-search-query="<%= @search_query %>">
           <thead>
             <tr class="table-info">
-              <th style="min-width: 300px;">Assignment</th>
-              <th class="text-center align-content-center" style="min-width: 160px;">User Name</th>
-              <th class="text-center align-content-center" style="min-width: 110px;">Student ID</th>
+              <th id="assignment">Assignment</th>
+              <th class="text-center align-content-center" id="name">Name</th>
+              <th class="text-center align-content-center" id="student-id">Student ID</th>
               <th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
               <th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
-              <th class="text-center align-content-center" style="min-width: 175px;">Requested Due Date</th>
+              <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
               <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
-              <th class="text-center align-content-center">Status</th>
+              <th class="text-center align-content-center" style="min-width: 240px;">Status</th>
               <th class="text-center align-content-center no-sort" style="min-width: 220px;">Actions</th>
             </tr>
           </thead>
