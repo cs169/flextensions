@@ -445,11 +445,28 @@ code {
 }
 
 /*
-*************************************
-* DataTables BS-type table-responsive
-*************************************
+***********************
+* DataTables
+***********************
 */
+//  BS-type table-responsive
 .dt-layout-full {
   overflow-x: auto !important;
 }
-/***********************************/
+//  BS-type table-responsive
+
+
+// Request Table desktop
+@media (min-width: 768px) {
+  #requests-table #assignment {
+    min-width: 250px;
+  }
+  #requests-table #name {
+    min-width: 150px;
+  }
+}
+// Request Table desktop
+
+
+
+/*********************/
