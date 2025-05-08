@@ -75,4 +75,30 @@ class ApplicationController < ActionController::Base
       redirect_to courses_path, alert: 'You do not have access to this view.'
     end
   end
+
+  protected
+
+  def set_course
+    @course = Course.find_by(id: params[:course_id])
+    if @course.nil?
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path
+      return
+    end
+    @role = @course.user_role(@user) if @user
+  end
+
+  def ensure_instructor_role
+    return if @role == 'instructor'
+
+    flash[:alert] = 'You do not have access to this page.'
+    redirect_to courses_path
+  end
+
+  def authenticate_user
+    @user = User.find_by(canvas_uid: session[:user_id])
+    return unless @user.nil?
+
+    redirect_to root_path, alert: 'User not found in the database.'
+  end
 end
