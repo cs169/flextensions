@@ -189,12 +189,6 @@ end
 
 # Set up hooks
 Before do
-  # Reset sequences if PostgreSQL
-  if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
-    ActiveRecord::Base.connection.tables.each do |table|
-      ActiveRecord::Base.connection.reset_pk_sequence!(table)
-    end
-  end
   # Use rack_test by default
   Capybara.current_driver = :rack_test
 end

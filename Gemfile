@@ -103,6 +103,8 @@ group :test do
   gem 'selenium-webdriver'
   gem 'simplecov_json_formatter'
 
+  gem 'database_cleaner-active_record'
+
   # gem 'simplecov_json_formatter'
   # gem 'simplecov'#, '~> 0.21.2'
   # gem 'simplecov_json_formatter', '~> 0.1.4'

@@ -3,7 +3,7 @@ Feature: Course Enrollments
 	Background:
 		Given a course exists
 
-	Scenario: display form settings
+	Scenario: display Enrollments
 		Given I'm logged in as a teacher
 		When I go to the Course Enrollments page
 		Then I should see "User 1"
