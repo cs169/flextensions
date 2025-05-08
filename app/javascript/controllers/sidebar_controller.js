@@ -26,7 +26,7 @@ export default class extends Controller {
   toggleSidebar() {
     const sidebar = document.getElementById("sidebar")
     const sidebarCloseBtn = document.getElementById("mobileSidebarClose")
-    const mobileSidebarToggle = document.getElementById("mobileSidebarToggle")
+    const sidebarToggleBtn = document.getElementById("mobileSidebarToggle")
     sidebar.classList.toggle('expanded')
     if (sidebar.classList.contains('expanded')) {
       document.body.classList.add('sidebar-open')

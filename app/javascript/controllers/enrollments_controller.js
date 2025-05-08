@@ -22,7 +22,7 @@ export default class extends Controller {
 				searching: true,
 				ordering: true,
 				info: true,
-				// responsive: true,
+				responsive: true,
 				columns: [
 					null, // Name
 					null, // Email
@@ -60,5 +60,5 @@ export default class extends Controller {
 			flash("alert", error.message || "An error occurred while syncing enrollments.");
 			location.reload();
 		});
-	}
+	  }
 }
