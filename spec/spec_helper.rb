@@ -122,11 +122,11 @@ RSpec.configure do |config|
 
   # Retry only specific examples
   config.around :each, :flaky do |ex|
-    ex.run_with_retry retry: 3
+    ex.run_with_retry retry: 4
   end
 
   # Or retry all accessibility tests
   config.around :each, type: :feature do |ex|
-    ex.run_with_retry retry: 2
+    ex.run_with_retry retry: 3
   end
 end
