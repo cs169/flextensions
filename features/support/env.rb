@@ -187,6 +187,8 @@ else
   Capybara.default_max_wait_time = 10
 end
 
+Capybara::Screenshot.autosave_on_failure = false unless Capybara.current_driver == :selenium_chrome_headless
+
 # Set up hooks
 Before do
   # Reset sequences if PostgreSQL
