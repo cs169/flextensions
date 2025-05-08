@@ -3,6 +3,7 @@ require 'rails_helper'
 require 'rack_session_access/capybara'
 
 RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
+
   let(:chrome_data_dir) { ENV['CHROME_DATA_DIR'] || Dir.mktmpdir }
 
   let!(:teacher1) { create(:user, email: 'teacher1@example.com', canvas_uid: '101', name: 'Teacher One') }
