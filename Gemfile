@@ -99,6 +99,7 @@ group :test do
   gem 'axe-core-cucumber'
   gem 'axe-core-rspec'
   gem 'capybara-screenshot'
+  gem 'database_cleaner-active_record'
   gem 'rack_session_access'
   gem 'selenium-webdriver'
   gem 'simplecov_json_formatter'
