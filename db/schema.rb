@@ -130,6 +130,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_22_073255) do
     t.enum "status", default: "pending", null: false, enum_type: "request_status"
     t.boolean "auto_approved", default: false, null: false
     t.index ["assignment_id"], name: "index_requests_on_assignment_id"
+    t.index ["auto_approved"], name: "index_requests_on_auto_approved"
     t.index ["course_id"], name: "index_requests_on_course_id"
     t.index ["last_processed_by_user_id"], name: "index_requests_on_last_processed_by_user_id"
     t.index ["user_id"], name: "index_requests_on_user_id"
