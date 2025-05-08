@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
-import { syncResource } from "../helpers/api_helpers";
 
 export default class extends Controller {
 	static values = { courseId: Number }
@@ -35,16 +34,31 @@ export default class extends Controller {
 		}
 	}
 
-	sync(event) {
+	sync() {
 		const button = event.currentTarget;
 		button.disabled = true;
 		const courseId = this.courseIdValue;
-		
-		syncResource(
-			courseId, 
-			'sync_enrollments', 
-			'Enrollments synced successfully.', 
-			'Failed to sync enrollments.'
-		);
+		const token = document.querySelector('meta[name="csrf-token"]').content;
+		fetch(`/courses/${courseId}/sync_enrollments`, {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json",
+			"X-CSRF-Token": token,
+		  },
+		})
+		  .then((response) => {
+			if (!response.ok) {
+			  throw new Error("Failed to sync enrollments.");
+			}
+			return response.json();
+		  })
+		  .then((data) => {
+			flash("notice", data.message || "Enrollments synced successfully.");
+			location.reload();
+		  })
+		  .catch((error) => {
+			flash("alert", error.message || "An error occurred while syncing enrollments.");
+			location.reload();
+		});
 	}
 }

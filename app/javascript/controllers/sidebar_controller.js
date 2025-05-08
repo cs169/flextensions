@@ -25,20 +25,9 @@ export default class extends Controller {
 
   toggleSidebar() {
     const sidebar = document.getElementById("sidebar")
-    sidebar.classList.toggle('expanded')
-    this.updateSidebarState(sidebar)
-  }
-
-  closeSidebar() {
-    const sidebar = document.getElementById("sidebar")
-    sidebar.classList.remove('expanded')
-    this.updateSidebarState(sidebar)
-  }
-
-  updateSidebarState(sidebar) {
     const sidebarCloseBtn = document.getElementById("mobileSidebarClose")
     const mobileSidebarToggle = document.getElementById("mobileSidebarToggle")
-    
+    sidebar.classList.toggle('expanded')
     if (sidebar.classList.contains('expanded')) {
       document.body.classList.add('sidebar-open')
       mobileSidebarToggle.style.display = 'none'
@@ -48,6 +37,16 @@ export default class extends Controller {
       sidebarCloseBtn.style.display = 'none'
       mobileSidebarToggle.style.display = 'inline-flex'
     }
+  }
+
+  closeSidebar() {
+    const sidebar = document.getElementById("sidebar")
+    const sidebarCloseBtn = document.getElementById("mobileSidebarClose")
+    const sidebarToggleBtn = document.getElementById("mobileSidebarToggle")
+    sidebar.classList.remove('expanded')
+    document.body.classList.remove('sidebar-open')
+    sidebarCloseBtn.style.display = 'none'
+    sidebarToggleBtn.style.display = 'inline-flex'
   }
 
   handleOutsideClick(e) {

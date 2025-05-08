@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { syncResource, getCsrfToken } from "../helpers/api_helpers";
 
 // Connects to data-controller="assignment"
 export default class extends Controller {
@@ -20,7 +19,7 @@ export default class extends Controller {
     const userId = checkbox.dataset.userId; // Get the user ID
 
     try {
-      const token = getCsrfToken();
+      const token = document.querySelector('meta[name="csrf-token"]').content;
 
       const response = await fetch(url, {
         method: "PATCH",
@@ -56,12 +55,27 @@ export default class extends Controller {
     const button = event.currentTarget;
     button.disabled = true;
     const courseId = this.courseIdValue;
-    
-    syncResource(
-      courseId, 
-      'sync_assignments', 
-      'Assignments synced successfully.', 
-      'Failed to sync assignments.'
-    );
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    fetch(`/courses/${courseId}/sync_assignments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to sync assignments.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        flash("notice", data.message || "Assignments synced successfully.");
+        location.reload();
+      })
+      .catch((error) => {
+        flash("alert", error.message || "An error occurred while syncing assignments.");
+        location.reload();
+      });
   }
 }
