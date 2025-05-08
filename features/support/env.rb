@@ -188,6 +188,7 @@ else
 end
 
 Capybara::Screenshot.autosave_on_failure = false unless Capybara.current_driver == :selenium_chrome_headless
+Capybara::Screenshot.autosave_on_failure = false if Capybara.current_driver == :rack_test
 
 # Set up hooks
 Before do
