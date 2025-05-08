@@ -5,7 +5,9 @@ class CoursesController < ApplicationController
   before_action :determine_user_role
 
   def index
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
+    # To-Do remove this line in the next iteration
+    # the line below is not necessary and causes cucumber tests to fail
+    # Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
 
     # Only show courses to students if extensions are enabled at the course level
