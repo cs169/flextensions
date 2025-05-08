@@ -3,7 +3,6 @@ require 'rails_helper'
 require 'rack_session_access/capybara'
 
 RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
-
   let(:chrome_data_dir) { ENV['CHROME_DATA_DIR'] || Dir.mktmpdir }
 
   let!(:teacher1) { create(:user, email: 'teacher1@example.com', canvas_uid: '101', name: 'Teacher One') }
@@ -18,7 +17,7 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
   let!(:course2) { create(:course, course_name: 'English 201', canvas_id: '302', course_code: 'ENG201') }
   let!(:course3) { create(:course, course_name: 'Computer Science 301', canvas_id: '303', course_code: 'CS301') }
 
-  let(:lms) { Lms.find(1) }
+  let!(:lms) { create(:lms) }
 
   let!(:course_to_lms1) { create(:course_to_lms, course: course1, lms: lms, external_course_id: '301') }
   let!(:course_to_lms2) { create(:course_to_lms, course: course2, lms: lms, external_course_id: '302') }
@@ -142,10 +141,6 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     end
   rescue Timeout::Error
     sleep(1)
-  end
-
-  before(:all) do
-    Lms.find_or_create_by!(id: 1, lms_name: 'canvas', use_auth_token: true)
   end
 
   before do
