@@ -15,11 +15,11 @@ Feature: Extension Requests
 	Scenario: Assignment auto selected when student creates a request from the course page
 		Given I'm logged in as a student
 		And I go to the Course page
-		And I click New for "Homework 2" in the "assignments-table"
-        Then I should be redirected to the "Request Extension page" with param assignment_id=2
-        And the "Select Assignment" select should have "Homework 2" selected
-        And I should see "Original Due Date" formatted as 2 days from now
-        And I should see "Original Late Due Date" formatted as 20 days from now
+		And I click New for "Homework 3" in the "assignments-table"
+        Then I should be redirected to the "Request Extension page" with param assignment_id=3
+        And the "Select Assignment" select should have "Homework 3" selected
+        And I should see "Original Due Date" formatted as 3 days from now
+        And I should see "Original Late Due Date" formatted as 30 days from now
 
     @javascript
     Scenario: Changing Assignment changes due date (JS)

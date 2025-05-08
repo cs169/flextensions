@@ -29,7 +29,7 @@ end
 # And I click New for "Homework 1"
 # And I click Approve for "Homework 2"
 When(/^I click ([^"]*) for "(.*?)"(?: in the "(.*)")?$/) do |button_text, row_text, table_id|
-  table_selector = table_id ? "##{table_id}" : "#assignments-table"
+  table_selector = "##{table_id}"
   within(table_selector) do
     within(:xpath, ".//tr[td[contains(normalize-space(.), '#{row_text}')]]") do
       click_on button_text
