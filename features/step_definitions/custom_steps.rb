@@ -29,12 +29,12 @@ end
 # And I click New for "Homework 1"
 # And I click Approve for "Homework 2"
 When(/^I click ([^"]*) for "(.*?)"(?: in the "(.*)")?$/) do |button_text, row_text, table_id|
-  container = table_id ? find("table##{table_id}") : find('table#assignments-table')
-  row = container.find('tr', text: /#{Regexp.escape(row_text)}/i)
-
-  # Try to find button or link matching the text, case-insensitively
-  link = row.find(:link_or_button, text: /#{Regexp.escape(button_text)}/i, match: :prefer_exact)
-  link.click
+  table_selector = table_id ? "##{table_id}" : "#assignments-table"
+  within(table_selector) do
+    within(:xpath, ".//tr[td[contains(normalize-space(.), '#{row_text}')]]") do
+      click_on button_text
+    end
+  end
 end
 
 # Redirection step that uses paths from paths.rb
