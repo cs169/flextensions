@@ -1,5 +1,6 @@
 Given(/^a course exists$/) do
   FactoryBot.rewind_sequences
+  FactoryBot.create(:lms, id: 1, lms_name: 'canvas')
   @course = create(:course, course_name: 'Physics 110A', canvas_id: 'Phys110A', course_code: 'PHYS110A')
 
   teacher = create(:teacher, email: 'user1@berkeley.edu', canvas_uid: 'canvas_uid_1')
