@@ -5,7 +5,7 @@ FactoryBot.define do
     sequence(:course_code) { |n| "COURSE#{n}" }
 
     after(:create) do |course|
-      lms = Lms.find_by(id: 1) || create(:lms, id: 1, lms_name: 'Canvas OAUTH')
+      lms = Lms.find_by(id: 1) || create(:lms, id: 1, lms_name: 'Canvas')
 
       create(:course_settings, course: course)
       create(:form_setting, course: course)
