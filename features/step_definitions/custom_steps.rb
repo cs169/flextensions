@@ -91,14 +91,14 @@ When(/^I fill in (.+) with date formatted as (\d+) days from now$/i) do |field_l
   fill_in(field_label, with: date)
 end
 
+###################
+#      STUBS      #
+###################
+
 # Stubbing flash for when you can't use the controller
 Given(/^I set flash message "(.*)"$/) do |message|
   page.set_rack_session('flash' => { 'notice' => message })
 end
-
-##################
-#      STUBS     #
-##################
 
 # this step is necessary to workaround ajax call to enable assignments
 # And I enable "Homework 1"
