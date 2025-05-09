@@ -138,6 +138,12 @@ Capybara.register_driver :selenium_chrome do |app|
   )
 end
 
+Capybara.register_driver :selenium_chrome_visible do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument('--window-size=1400,1400')
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+end
+
 # Register Chrome headless driver
 Capybara.register_driver :selenium_chrome_headless do |app|
   options = Selenium::WebDriver::Chrome::Options.new
@@ -202,6 +208,10 @@ Before('@javascript') do
                                                                 credentials: { token: 'mock_token' }
                                                                 # Add other fields as needed
                                                               })
+end
+
+Before('@visible_browser') do
+  Capybara.current_driver = :selenium_chrome_visible
 end
 
 After do

@@ -1,10 +1,18 @@
 FactoryBot.define do
+  sequence :assignment_seq do |n|
+    n
+  end
+
   factory :assignment do
-    sequence(:name) { |n| "Assignment #{n}" }
+    transient do
+      seq_num { generate(:assignment_seq) }
+    end
+
+    name { "Homework #{seq_num}" }
     association :course_to_lms
-    sequence(:external_assignment_id) { |n| "assignment_#{n}" }
-    enabled { true }
-    due_date { 7.days.from_now }
-    late_due_date { 10.days.from_now }
+    external_assignment_id { "ext-assignment-#{seq_num}" }
+    due_date { seq_num.days.from_now }
+    late_due_date { (seq_num * 10).days.from_now }
+    enabled { false }
   end
 end

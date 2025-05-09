@@ -41,7 +41,9 @@
                            data-url="<%= toggle_enabled_assignment_path(assignment) %>" 
                            data-role="<%= @role %>" 
                            data-user-id="<%= @user.id %>">
-                    <label class="form-check-label" for="assignment-<%= assignment.id %>-enabled"></label>
+                    <label class="visually-hidden" for="assignment-<%= assignment.id %>-enabled">
+                      Enable <%= assignment.name %> assignment
+                    </label>
                   </div>
                 </td>
               </tr>

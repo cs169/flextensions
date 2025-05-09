@@ -17,7 +17,7 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
   let!(:course2) { create(:course, course_name: 'English 201', canvas_id: '302', course_code: 'ENG201') }
   let!(:course3) { create(:course, course_name: 'Computer Science 301', canvas_id: '303', course_code: 'CS301') }
 
-  let!(:lms) { create(:lms) }
+  let!(:lms) { Lms.find_or_create_by(lms_name: 'Canvas') }
 
   let!(:course_to_lms1) { create(:course_to_lms, course: course1, lms: lms, external_course_id: '301') }
   let!(:course_to_lms2) { create(:course_to_lms, course: course2, lms: lms, external_course_id: '302') }

@@ -5,11 +5,15 @@ FactoryBot.define do
     sequence(:name) { |n| "User #{n}" }
 
     factory :teacher do
-      # Add teacher-specific attributes if needed
+      after(:create) { |user| create(:user_to_course, user: user, role: 'teacher') }
+    end
+
+    factory :ta do
+      after(:create) { |user| create(:user_to_course, user: user, role: 'ta') }
     end
 
     factory :student do
-      # Add student-specific attributes if needed
+      after(:create) { |user| create(:user_to_course, user: user, role: 'student') }
     end
   end
 end

@@ -573,6 +573,7 @@ DEPENDENCIES
   cucumber-rails
   cucumber-rails-training-wheels
   database_cleaner
+  database_cleaner-active_record
   debug
   dotenv-rails
   factory_bot_rails
