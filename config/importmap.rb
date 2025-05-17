@@ -16,7 +16,8 @@ pin "@popperjs/core", to: "popper.js", preload: true
 pin "jquery" # @3.7.1
 pin "color-modes"
 pin "datatables.net" # @2.3.1
-pin "datatables.net-bs5" # @2.2.2
+pin "datatables.net-bs5" # @2.3.1
 pin "datatables.net-responsive-bs5" # @3.0.4
 pin "datatables.net-responsive" # @3.0.4
 pin "datatables.net-buttons" # @3.2.3
+pin "datatables.net-buttons-bs5" # @3.2.3
