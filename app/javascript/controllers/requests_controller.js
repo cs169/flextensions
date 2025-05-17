@@ -10,7 +10,7 @@ export default class extends Controller {
     connect() {
         if (!DataTable.isDataTable('#requests-table')) {
             const searchQuery = this.element.dataset.searchQuery;
-        
+
             this.table = new DataTable('#requests-table', {
                 paging: true,
                 searching: true,
@@ -18,14 +18,28 @@ export default class extends Controller {
                 info: true,
                 responsive: true,
                 columnDefs: [
-                    { orderable: false, targets: 'no-sort' }, // Disable sorting for columns with the "no-sort" class
-                    { type: "date", targets: [3, 4, 5] } // Ensure "Requested At", "Original Due Date", and "Requested Due Date" are sorted by date
+                    { orderable: false, targets: 'no-sort' },
+                    { type: "date", targets: [3, 4, 5] }
                 ],
-                order: [[3, "asc"]], // Default sort by the "Requested At" column in ascending order
-                dom: 'Bfrtip', // ensures buttons are above the table
-                buttons: ['copy', 'csv', 'colvis']
+                order: [[3, "asc"]],
+                layout: {
+                    topStart: {
+                        buttons: [
+                            {
+                                extend: 'copy',
+                                title: null,
+                                messageTop: null,
+                                messageBottom: null,
+                                info: false // disables the notification
+                            },
+                            'csv',
+                            'colvis'
+                        ],
+                        search: {}
+                    }
+                }
             });
-        
+
             if (searchQuery) {
                 this.table.search(searchQuery).draw();
             }
