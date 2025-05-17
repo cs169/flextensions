@@ -21,3 +21,4 @@ pin "datatables.net-responsive-bs5" # @3.0.4
 pin "datatables.net-responsive" # @3.0.4
 pin "datatables.net-buttons" # @3.2.3
 pin "datatables.net-buttons-bs5" # @3.2.3
+pin "datatables.net-buttons/js/buttons.html5.min.js", to: "datatables.net-buttons--js--buttons.html5.min.js.js" # @3.2.3

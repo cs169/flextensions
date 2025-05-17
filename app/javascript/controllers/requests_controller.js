@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-buttons";
 import "datatables.net-buttons-bs5";
+import "datatables.net-buttons/js/buttons.html5.min.js";
 
 
 export default class extends Controller {
@@ -20,11 +21,8 @@ export default class extends Controller {
                     { type: "date", targets: [3, 4, 5] } // Ensure "Requested At", "Original Due Date", and "Requested Due Date" are sorted by date
                 ],
                 order: [[3, "asc"]], // Default sort by the "Requested At" column in ascending order
-                layout: {
-                    topStart: {
-                        buttons: ['copy', 'csv', 'colvis']
-                    }
-                }
+                dom: 'Bfrtip', // ensures buttons are above the table
+                buttons: ['csv']
             });
         
             if (searchQuery) {
