@@ -2,13 +2,14 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
+import "datatables.net-buttons";
 import "datatables.net-buttons-bs5";
 
 export default class extends Controller {
     connect() {
         if (!DataTable.isDataTable('#requests-table')) {
             const searchQuery = this.element.dataset.searchQuery;
-        
+
             this.table = new DataTable('#requests-table', {
                 paging: true,
                 searching: true,
@@ -16,18 +17,32 @@ export default class extends Controller {
                 info: true,
                 responsive: true,
                 columnDefs: [
-                    { orderable: false, targets: 'no-sort' }, // Disable sorting for columns with the "no-sort" class
-                    { type: "date", targets: [3, 4, 5] } // Ensure "Requested At", "Original Due Date", and "Requested Due Date" are sorted by date
+                    { orderable: false, targets: 'no-sort' },
+                    { type: "date", targets: [3, 4, 5] }
                 ],
-                order: [[3, "asc"]], // Default sort by the "Requested At" column in ascending order,
-                layout: {
-                    topStart: {
-                        buttons: ['copy', 'excel', 'pdf', 'csv', 'colvis']
-                    }
-                }
-                
+                order: [[3, "asc"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        exportOptions: { columns: ':not(.no-export)' }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: { columns: ':not(.no-export)' }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: { columns: ':not(.no-export)' }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: { columns: ':not(.no-export)' }
+                    },
+                    'colvis'
+                ]
             });
-        
+
             if (searchQuery) {
                 this.table.search(searchQuery).draw();
             }
