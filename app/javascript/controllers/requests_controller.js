@@ -37,7 +37,19 @@ export default class extends Controller {
                                 extend: 'csv',
                                 text: 'Export as CSV',
                                 filename: 'extension-requests',
-                            },                            
+                                exportOptions: {
+                                    columns: ':visible',
+                                    format: {
+                                        body: function (data, row, column, node) {
+                                            // For the Status column, use data-export attribute if present
+                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
+                                                return node.getAttribute('data-export');
+                                            }
+                                            return data;
+                                        }
+                                    }
+                                }
+                            },
                             'colvis'
                         ],
                     }
