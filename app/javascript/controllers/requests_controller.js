@@ -36,6 +36,7 @@ export default class extends Controller {
                             {
                                 extend: 'csv',
                                 text: 'Export as CSV',
+                                filename: 'extension-requests',
                             },                            
                             'colvis'
                         ],
