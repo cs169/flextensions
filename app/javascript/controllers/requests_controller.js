@@ -2,8 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-buttons";
 import "datatables.net-buttons-bs5";
-import "datatables.net-buttons/js/buttons.html5.min.js";
-import "datatables.net-buttons/js/buttons.print.min.js";
+
 
 export default class extends Controller {
     connect() {
@@ -23,7 +22,7 @@ export default class extends Controller {
                 order: [[3, "asc"]], // Default sort by the "Requested At" column in ascending order
                 layout: {
                     topStart: {
-                        buttons: ['copy', 'excel', 'pdf', 'colvis']
+                        buttons: ['copy', 'csv', 'colvis']
                     }
                 }
             });
