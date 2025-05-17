@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
 import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
+import "datatables.net-buttons-bs5";
 
 export default class extends Controller {
     connect() {
@@ -18,7 +19,13 @@ export default class extends Controller {
                     { orderable: false, targets: 'no-sort' }, // Disable sorting for columns with the "no-sort" class
                     { type: "date", targets: [3, 4, 5] } // Ensure "Requested At", "Original Due Date", and "Requested Due Date" are sorted by date
                 ],
-                order: [[3, "asc"]] // Default sort by the "Requested At" column in ascending order
+                order: [[3, "asc"]], // Default sort by the "Requested At" column in ascending order,
+                layout: {
+                    topStart: {
+                        buttons: ['copy', 'excel', 'pdf', 'csv', 'colvis']
+                    }
+                }
+                
             });
         
             if (searchQuery) {
