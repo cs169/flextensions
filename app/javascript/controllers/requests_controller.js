@@ -31,14 +31,26 @@ export default class extends Controller {
                                 title: null,
                                 messageTop: null,
                                 messageBottom: null,
-                                info: false // disables the notification
+                                info: false, // disables the notification
+                                exportOptions: {
+                                    columns: ':visible:not(.no-sort)',
+                                    format: {
+                                        body: function (data, row, column, node) {
+                                            // For the Status column, use data-export attribute if present
+                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
+                                                return node.getAttribute('data-export');
+                                            }
+                                            return data;
+                                        }
+                                    }
+                                }
                             },
                             {
                                 extend: 'csv',
                                 text: 'Export as CSV',
                                 filename: 'extension-requests',
                                 exportOptions: {
-                                    columns: ':visible',
+                                    columns: ':visible:not(.no-sort)',
                                     format: {
                                         body: function (data, row, column, node) {
                                             // For the Status column, use data-export attribute if present
