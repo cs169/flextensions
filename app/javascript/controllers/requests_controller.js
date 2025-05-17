@@ -27,15 +27,18 @@ export default class extends Controller {
                         buttons: [
                             {
                                 extend: 'copy',
+                                text: 'Copy Table to Clipboard',
                                 title: null,
                                 messageTop: null,
                                 messageBottom: null,
                                 info: false // disables the notification
                             },
-                            'csv',
+                            {
+                                extend: 'csv',
+                                text: 'Export as CSV',
+                            },                            
                             'colvis'
                         ],
-                        search: {}
                     }
                 }
             });
