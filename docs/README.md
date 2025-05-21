@@ -46,13 +46,13 @@ Student developers (in alphabetical order):
 
 * Connor Bernard, Spring 2024
 * Cynthia Lixinyi, Spring 2024
-* Diandian Liu, Spring 2025
-* Eric Huang, Spring 2025
+* [Diandian Liu](https://www.linkedin.com/in/diandian-liu/), Spring 2025
+* [Eric Huang](https://huanger2.github.io), Spring 2025
 * Evan Kandell, Spring 2024
 * Sepehr Behmanesh Fard, Spring 2024
-* Tashrique Ahmed, Spring 2025
-* Tianye Meng, Spring 2025
-* Yaman Tarakji, Spring 2025
+* [Tashrique Ahmed](https://tashrique.com), Spring 2025
+* [Tianye Meng](https://www.linkedin.com/in/tianye-meng-611b22253/), Spring 2025
+* [Yaman Tarakji](https://www.linkedin.com/in/yaman-tarakji-602530196), Spring 2025
 * Zee Babar, Spring 2024
 
 Michael Ball, Armando Fox, and Lisa Yan are the faculty members who have overseen the development of Flextensions.

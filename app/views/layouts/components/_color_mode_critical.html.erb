@@ -1,0 +1,12 @@
+<!-- CRITICAL THEME SWITCHER: runs immediately, before CSS loads -->
+<!-- Without this script there's a small delay before selecting dark mode with each reload -->
+<script>
+    (function() {
+    const stored   = localStorage.getItem('theme');
+    const theme    = stored || 'light';
+    const finalTheme = theme === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+    document.documentElement.setAttribute('data-bs-theme', finalTheme);
+    })();
+</script>

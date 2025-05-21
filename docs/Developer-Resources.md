@@ -16,7 +16,7 @@ cd flextensions
 ```
 ---
 ### Set Up Ruby Environment
-
+#### Linux / WSL (If you are on Windows, please use WSL instead).
 Make sure you are using Ruby 3.3.0:
 
 ```
@@ -26,14 +26,15 @@ rvm use 3.3.0
 ```
 rvm install 3.3.0
 ```
+#### Macs
+Similar to rvm for Linux, use `asdf` instead of `RVM` to make sure you are using the right version of Ruby on Rails（3.3.0). If you are unsure how to do this, please follow Athe ssignment [Cue-to-Cue Dry Run of the Tool-Rich Agile Workflow] on bcourses.
 
-Then install dependencies:
+### Install dependencies:
 
 ```
 bundle install --without production
 ```
 ### Install PostgreSQL
-Consult README.md if you need help in this step.
 #### On macOS:
 
 ```bash
@@ -48,21 +49,27 @@ sudo apt install postgresql
 # Create a postgres user.
 sudo su-postgres #(to get into postgres shell)
 createuser --interactive --pwprompt #(in postgres shell)0
-# Save DB_USER and DB_PASSWORD fields in the .env file.
-#Start postgres if necessary.
-pg ctlcluster 12 main start
-#Note: if you are using WSl2 on windows, the command to start postares is
+Save DB_USER and DB_PASSWORD fields in the .env file.
+#Start postgres if necessary. 
+pg ctlcluster 12 main start 
+#Note: if you are using WSL2 on windows, the command to start postares is 
 sudo seryice posteresal start
 ```
+### Install Overmind
+
+In order to stand up the server you must first install [Overmind](https://github.com/DarthSim/overmind).
+  Development has been tested with overmind 2.4.0
+
+With Overmind, you can run `$make dev` or `$make`
 
 ### Environment Variables
 - Create a new file named .env under the root directory of Flextensions app.
-- Get client secrets from your Instructure sandbox account. Flextensions uses bcourses (Canvas) third-party authentication. For developers, you need a sandbox admin account to generate client ID and secrets for your app when using Canvas authentication APIs.
+- Get client secrets from your Instructure sandbox account. Flextensions uses bcourses (Canvas) third-party authentication. For developers, you need a sandbox admin account to generate client ID and secrets for your app when using Canvas authentication APIs. 
 1. Log into your sandbox admin account. Contact your instructor if you do not have one.
 2. Click `admin` on the sidebar on the left, then Click `UC Berkeley Sandbox`
 3. Go to the `Developer Keys` section on the left sidebar, add an API key.
 4. Fill in each field with your own information. `Redirect_URI` should be the same as your `CANVAS_REDIRECT_URI` in `.env` (See the code block below)
-5. For your environment variables, the `CANVAS_CLIENT_ID` should be something like `2653xxxxxxxxx`; the `APP_KEY` should be the secret corresponding to it.
+5. For your environment variables, the `CANVAS_CLIENT_ID` should be something like `2653xxxxxxxxx`; the `APP_KEY` should be the secret corresponding to it. 
 - Setup the following ENV variables in your .env file:
 ```
 DB_PORT (default: 5432)
@@ -157,10 +164,10 @@ git push golden main
 
 ## Conventions
 
-1. Testing convention css selector -
-```<a class="nav-link testid-username" href="#"> Tashrique </a>```
+1. Testing convention css selector - 
+```<a class="nav-link testid-username" href="#"> Tashrique </a>``` 
 
-Notice the ```testid-username```We will be using this style in **class** to grab elements from DOM to test.
+Notice the ```testid-username```We will be using this style in **class** to grab elements from DOM to test. 
 
 Please don't remove any class that starts with ```testid-```
 
@@ -173,3 +180,4 @@ We recommend developing in this order:
 1. [ucberkeleysandbox.instructure.com](ucberkeleysandbox.instructure.com) (no risk) - this is the one for which this repo currently has oauth2 keys (secrets)
 2. [bcourses.test.instructure.com](bcourses.test.instructure.com) (no risk of impacting courses, but contains real data)
 3. [bcourses.berkeley.edu](bcourses.berkeley.edu)
+

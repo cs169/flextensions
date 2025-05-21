@@ -11,8 +11,11 @@
   },
   "author": "CS169l flextensions development team",
   "license": "BSD-2-Clause",
+
   "devDependencies": {
     "@redocly/cli": "^1.34.2",
-    "swagger-cli": "^4.0.4"
+    "swagger-cli": "^4.0.4",
+    "datatables.net": "^2.2.2",
+    "datatables.net-bs5": "^2.2.2"
   }
 }

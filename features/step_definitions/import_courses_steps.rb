@@ -25,9 +25,9 @@ When('I click {string}') do |button_text|
   click_button button_text
 end
 
-Then('I should see {string}') do |message|
-  expect(page).to have_content(message)
-end
+# Then('I should see {string}') do |message|
+#   expect(page).to have_content(message)
+# end
 
 Then('I should see {string} in the teacher courses list') do |course_name|
   within('#teacher-courses') do

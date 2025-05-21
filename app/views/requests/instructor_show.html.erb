@@ -1,14 +1,14 @@
-<%= render "layouts/sidebar" %>
-<div class="container-fluid mt-4">
+<div class="container-fluid mb-5">
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<%= render "courses/course_title" %>
+			<h1 class="sr-only">Extension Request Details</h1>
 			
 			<%= render "shared/extension_status_warning", course: @course %>
 			
 			<div class="card mb-4 rounded-0">
 				<div class="card-header bg-light d-flex justify-content-between">
-					<h5 class="mb-0 bg-blue">Extension Request Details</h5>
+					<h2 class="mb-0 bg-blue h5">Extension Request Details</h2>
 					<% if @request.status == 'approved' %>
 						<span class="badge fs-6 text-bg-success">Approved</span>
 					<% elsif @request.status == 'denied' %>
@@ -25,7 +25,7 @@
 									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
 								</div>
 								<div class="col-md-6">
-									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
+									<p><strong>Original Late Due Date: </strong><%= @request.assignment.late_due_date&.strftime('%a, %b %-d, %Y %-I:%M%P') || 'N/A' %></p>
 								</div>
 							</div>
 						<% else %>
@@ -53,7 +53,7 @@
 
 					<!-- Display Reason for Extension -->
 					<div class="mb-4">
-						<h6 class="mb-2">Reason for Extension</h6>
+						<h3 class="mb-2 h6">Reason for Extension</h3>
 						<% if @form_settings.reason_desc.present? %>
 							<p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
 						<% end %>
@@ -65,7 +65,7 @@
 					<!-- Display Additional Documentation if applicable -->
 					<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
 						<div class="mb-4">
-							<h6 class="mb-2">Additional Documentation</h6>
+							<h3 class="mb-2 h6">Additional Documentation</h3>
 							<% if @form_settings.documentation_desc.present? %>
 								<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
 								<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
@@ -79,7 +79,7 @@
 					<!-- Display Custom Question 1 if applicable -->
 					<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
 						<div class="mb-4">
-							<h6 class="mb-2"><%= @form_settings.custom_q1 %></h6>
+							<h3 class="mb-2 h6"><%= @form_settings.custom_q1 %></h3>
 							<% if @form_settings.custom_q1_desc.present? %>
 								<p class="text-muted small mb-2"><%= @form_settings.custom_q1_desc %></p>
 							<% end %>
@@ -92,7 +92,7 @@
 					<!-- Display Custom Question 2 if applicable -->
 					<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
 						<div class="mb-4">
-							<h6 class="border-bottom pb-2 mb-3"><%= @form_settings.custom_q2 %></h6>
+							<h3 class="mb-2 h6"><%= @form_settings.custom_q2 %></h3>
 							<% if @form_settings.custom_q2_desc.present? %>
 								<p class="text-muted small mb-2"><%= @form_settings.custom_q2_desc %></p>
 							<% end %>
@@ -110,7 +110,7 @@
 				<%= link_to 'Edit Request', edit_course_request_path(@course, @request), class: "btn btn-secondary me-3" %>
 				<%= link_to 'Back', course_requests_path(@course), class: "btn btn-dark" %>
 			  <% else %>
-				<%= link_to 'Back', history_course_requests_path(@course), class: "btn btn-dark" %>
+				<%= link_to 'Back', course_requests_path(@course), class: "btn btn-dark" %>
 			  <% end %>
 			</div>
 		</div>

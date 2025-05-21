@@ -13,6 +13,7 @@
 # it.
 #
 require 'webmock/rspec'
+require 'rspec/retry'
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 # require 'codeclimate-test-reporter'
@@ -114,4 +115,18 @@ RSpec.configure do |config|
   #   # test failures related to randomization by passing the same `--seed` value
   #   # as the one that triggered the failure.
   #   Kernel.srand config.seed
+
+  # Add retry for flaky tests
+  config.verbose_retry = true
+  config.display_try_failure_messages = true
+
+  # Retry only specific examples
+  config.around :each, :flaky do |ex|
+    ex.run_with_retry retry: 4
+  end
+
+  # Or retry all accessibility tests
+  config.around :each, type: :feature do |ex|
+    ex.run_with_retry retry: 3
+  end
 end

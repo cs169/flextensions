@@ -17,6 +17,24 @@ module NavigationHelpers
     when /^Courses page$/
       '/courses'
 
+    when /^Course page$/
+      "/courses/#{@course.id}"
+
+    when /^Course Enrollments page$/
+      "courses/#{@course.id}/enrollments"
+
+    when /^Course Settings page$/
+      "/courses/#{@course.id}/edit"
+
+    when /^Form Settings page$/
+      "/courses/#{@course.id}/form_setting/edit"
+
+    when /^Requests page$/
+      "/courses/#{@course.id}/requests"
+
+    when /^Request Extension page$/
+      "/courses/#{@course.id}/requests/new"
+
     else
       begin
         page_name =~ /^the (.*) page$/

@@ -3,63 +3,99 @@ title: Flextensions for Students
 permalink: /students/
 ---
 
-## Accessing a Course
+# Accessing a Course
 
-- After logging into your account, you will be directed to the Courses Dashboard. On this page, any courses you are enrolled in—either as an instructor or a student—will be automatically listed.
-- To access a specific course, simply click on its **blue course name link**. This will take you to the course’s management or extension request page, depending on your role.
+After logging into your account, you will be directed to the **Courses Dashboard**.  
+This page lists all courses you are enrolled in:
 
-## Course Assignments
+To access a specific course:
+1. Locate the course in your dashboard.
+2. Click the **blue course name link** to open the course’s page.
 
-Under the Assignments tab, students can view a list of all assignments for the course, along with their original due dates and late due dates.
-Each row in the table includes a Request button:
-- If no extension has been requested yet, the button will say "New", allowing the student to start a new extension request.The button will guide you to the corresponding homework's *Request Extension* page.
-- If an extension has already been requested, the button will say "Edit", allowing the student to update the existing request.
-Clicking on an assignment name button will guide you to the corresponding bcourse page.
+If you expect to see a course but it is not listed, please contact your instructor:
+> Make sure you are enrolled in the course on bCourses and that your instructor has imported it into Flextensions. 
+> Ensure that the course is enabled for student access and that the instructor has synced the course enrollments.
 
-## Course Extension Requests
+---
 
-### Make Extension Request
-To submit a new extension request:
+# Course Assignments
 
-1. Click on the Request Extension tab from the left sidebar.
+Within each course, click the **Assignments** tab to view a list of all course assignments.  
+Each row shows:
 
-2. Select an assignment from the dropdown menu (only assignments without existing requests will be shown).
+- Assignment name
+- Original due date
+- Your extended due date if a request has been approved
+- A button to submit or edit a request
 
-3. The original and late due dates will appear automatically.
+## Extension Request Buttons
 
-4. Enter your Requested Due Date.
+- **"New"**: Appears if you have not submitted a request for the assignment. Click to open the *Request Extension* form.
+- **"Edit"**: Appears if you’ve already submitted a request. Click to update your existing request.
+- Clicking the assignment name itself will open the corresponding bCourses assignment page in a new tab.
 
-5. Provide a Reason for Extension.
+> If the assignment is not listed, it may not be enabled for extension requests. Contact your instructor for assistance.
 
-6. Click Submit Request to complete the process.
+---
 
-  >🔵 Note: If an assignment is not listed, it means you've already submitted a request for it. Visit the Requests tab to view or edit it.
-### View Request Details
-To view the details of an extension request:
+# Course Extension Requests
 
-1. Go to the **Requests** tab from the left-hand sidebar.
+## Submitting a New Extension Request
 
-2. You will see a table listing all your submitted requests for the course.
+To request an extension:
 
-3. Each row shows the following information:
+1. Click the **Request Extension** tab in the left-hand sidebar, or **New** on the assignments page.
+2. Use the dropdown menu to select an assignment.
+   - Only assignments that do not already have a submitted request will appear.
+3. The assignment’s **Original Due Date** and **Late Due Date** will display automatically.
+4. Enter your **Requested Due Date**.
+5. Fill out the **Reason for Extension** field.
+6. Fill out additional fields as needed.
+7. Click **Submit Request** to finalize your request.
 
-  - **Assignment name**
+> Note: If an assignment is not available in the dropdown, you have likely already submitted a request. You can view or edit it under the **Requests** tab.
+> You may submit more than one request per assignment after your request gets approved or denied by using the **Request Extension** page.
 
-  - **Requested At**: when the request was submitted
+---
 
-  - **Original Due Date** and Requested Due Date
+## Viewing Existing Extension Requests
 
-  - **# of Days**: the number of additional days requested
+1. Click the **Requests** tab in the left-hand sidebar.
+2. A table will list all your submitted extension requests for the course.
 
-  - **Status**: the current state of the request
-    - 🔵Pending
-    - 🟢Approved
-    - 🔴Rejected
-4. Click the **View** button under the **Actions** column to see the full details of the request.
-### Update Request Details
-On **Extension Request Details** page:
-- If your extension request is still 🔵pending, you will see three buttons:
-  - **Edit Request** - Click to modify the requested due date or the reason for the extension.
-  - **Cancel Request** – Click to withdraw your pending request entirely.
-  - **Back** – Return to the request list without making changes.
-- Once a request has been approved 🟢 or rejected 🔴, the Edit Request and Cancel Request buttons may no longer be available.
+Each row displays:
+
+- Assignment name
+- Date the request was submitted ("Requested At")
+- Original and requested due dates
+- Number of additional days requested
+- Status of the request:
+  - **Pending**
+  - **Approved**
+  - **Rejected**
+
+3. Click the **View** button in the Actions column to open the full request details, or **Edit** to update your request.
+
+---
+
+## Updating or Canceling a Request
+
+On the **Extension Request Details** page:
+
+If your request is still in **Pending** status:
+
+- Click **Edit Request** to:
+  - Update the requested due date
+  - Revise your reason for the extension
+
+- Click **Cancel Request** to:
+  - Permanently withdraw your request
+
+- Click **Back** to return to the list of requests without making changes
+
+> If your request has been **Approved** or **Rejected**, the **Edit** and **Cancel** buttons will no longer appear.
+
+---
+
+
+

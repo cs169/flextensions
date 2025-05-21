@@ -81,7 +81,7 @@ When(/^I navigate to\s*"?([^"]+)"?\s*$/) do |page_name|
   visit path_to(page_name.strip)
 end
 
-When(/^(?:|I )go to (.+)$/) do |page_name|
+When(/^(?:|I )go to (?:the )?(.+)$/) do |page_name|
   visit path_to(page_name)
 end
 
