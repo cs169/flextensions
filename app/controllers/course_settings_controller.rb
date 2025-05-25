@@ -50,7 +50,9 @@ class CourseSettingsController < ApplicationController
       :enable_emails,
       :reply_email,
       :email_subject,
-      :email_template
+      :email_template,
+      :enable_slack_webhook_url,
+      :slack_webhook_url  
     )
   end
 
