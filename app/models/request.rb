@@ -25,15 +25,14 @@ class Request < ApplicationRecord
 
   # Process a newly created request, including auto-approval check
   def process_created_request(current_user)
-    notify_slack = false
     slack_message = nil
 
     # Build the link using ENV and Rails routes
-    link = "#{ENV['CANVAS_REDIRECT_URI']}/courses/#{course.id}/requests/#{id}"
+    link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
 
+    notify_slack = true
     if try_auto_approval(current_user)
       # Auto-approved
-      notify_slack = true
       slack_message = "A request was *auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
       result = {
         redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
@@ -41,7 +40,6 @@ class Request < ApplicationRecord
       }
     else
       # Pending
-      notify_slack = true
       slack_message = "A new extension request is *pending* for review: '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
       result = {
         redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
@@ -49,36 +47,25 @@ class Request < ApplicationRecord
       }
     end
 
-    if notify_slack && course&.course_settings&.slack_webhook_url.present?
-      SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url)
-    end
+    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
 
     result
   end
 
   # Handle request update and check for auto-approval
   def process_update(current_user)
-    notify_slack = false
-    slack_message = nil
+    link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
+    notify_slack = true
 
     if status == 'pending' && try_auto_approval(current_user)
-      # Updated and auto-approved
-      notify_slack = true
-      slack_message = "A pending request was *updated and auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'."
-      result = {
-        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
-        notice: 'Your request was updated and has been approved.'
-      }
+      slack_message = build_slack_message(:auto_approved, link)
+      result = build_result_hash('Your request was updated and has been approved.')
     else
-      result = {
-        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
-        notice: 'Request was successfully updated.'
-      }
+      slack_message = build_slack_message(:updated, link)
+      result = build_result_hash('Request was successfully updated.')
     end
 
-    if notify_slack && course&.course_settings&.slack_webhook_url.present?
-      SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url)
-    end
+    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
 
     result
   end
@@ -203,5 +190,21 @@ class Request < ApplicationRecord
       course.canvas_id, assignment.external_assignment_id, [user.canvas_uid], "Extension for #{user.name}",
       requested_due_date.iso8601, nil, nil
     )
+  end
+
+  def build_slack_message(type, link)
+    case type
+    when :auto_approved
+      "A pending request was *updated and auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
+    when :updated
+      "A pending request was *updated* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
+    end
+  end
+
+  def build_result_hash(notice)
+    {
+      redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+      notice: notice
+    }
   end
 end

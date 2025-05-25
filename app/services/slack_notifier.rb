@@ -4,7 +4,7 @@ require 'json'
 
 class SlackNotifier
   def self.notify(text, webhook_url)
-    return unless webhook_url.present?
+    return if webhook_url.blank?
 
     uri = URI.parse(webhook_url)
     header = { 'Content-Type': 'application/json' }
