@@ -28,10 +28,13 @@ class Request < ApplicationRecord
     notify_slack = false
     slack_message = nil
 
+    # Build the link using ENV and Rails routes
+    link = "#{ENV['CANVAS_REDIRECT_URI']}/courses/#{course.id}/requests/#{id}"
+
     if try_auto_approval(current_user)
       # Auto-approved
       notify_slack = true
-      slack_message = "A request was *auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'."
+      slack_message = "A request was *auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
       result = {
         redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
         notice: 'Your extension request has been approved.'
@@ -39,7 +42,7 @@ class Request < ApplicationRecord
     else
       # Pending
       notify_slack = true
-      slack_message = "A new extension request is *pending* for review: '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'."
+      slack_message = "A new extension request is *pending* for review: '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
       result = {
         redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
         notice: 'Your extension request has been submitted.'
