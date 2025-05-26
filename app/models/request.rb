@@ -49,7 +49,7 @@ class Request < ApplicationRecord
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
     if !success
-      result[:notice] ||= 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
+      result[:notice] = 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
     end
     result
   end
@@ -69,7 +69,7 @@ class Request < ApplicationRecord
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
     if !success
-      result[:notice] ||= 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
+      result[:notice] = 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
     end
     result
   end
