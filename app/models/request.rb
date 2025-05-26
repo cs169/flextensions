@@ -47,8 +47,10 @@ class Request < ApplicationRecord
       }
     end
 
-    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-
+    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
+    if !success
+      result[:alert] = 'Failed to notify Slack. Please check your webhook URL.'
+    end
     result
   end
 
@@ -65,8 +67,10 @@ class Request < ApplicationRecord
       result = build_result_hash('Request was successfully updated.')
     end
 
-    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-
+    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
+    if !success
+      result[:alert] = 'Failed to notify Slack. Please check your webhook URL.'
+    end
     result
   end
 
