@@ -22,7 +22,7 @@ class SlackNotifier
     end
 
     true
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error("SlackNotifier exception: #{e.class} - #{e.message}")
     false
   end

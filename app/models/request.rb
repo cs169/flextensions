@@ -25,32 +25,16 @@ class Request < ApplicationRecord
 
   # Process a newly created request, including auto-approval check
   def process_created_request(current_user)
-    slack_message = nil
-
-    # Build the link using ENV and Rails routes
     link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
 
-    notify_slack = true
     if try_auto_approval(current_user)
-      # Auto-approved
-      slack_message = "A request was *auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
-      result = {
-        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
-        notice: 'Your extension request has been approved.'
-      }
+      slack_message, result = build_created_slack_and_result(:auto_approved, link)
     else
-      # Pending
-      slack_message = "A new extension request is *pending* for review: '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}"
-      result = {
-        redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
-        notice: 'Your extension request has been submitted.'
-      }
+      slack_message, result = build_created_slack_and_result(:pending, link)
     end
 
-    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-    if !success
-      result[:notice] = 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
-    end
+    notify_slack(slack_message)
+
     result
   end
 
@@ -68,9 +52,7 @@ class Request < ApplicationRecord
     end
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-    if !success
-      result[:notice] = 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
-    end
+    Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}. Please check your webhook URL." unless success
     result
   end
 
@@ -211,5 +193,33 @@ class Request < ApplicationRecord
       redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
       notice: notice
     }
+  end
+
+  def build_created_slack_and_result(type, link)
+    case type
+    when :auto_approved
+      [
+        "A request was *auto-approved* for '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}",
+        {
+          redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+          notice: 'Your extension request has been approved.'
+        }
+      ]
+    when :pending
+      [
+        "A new extension request is *pending* for review: '#{assignment&.name}' (#{user&.name}) in course '#{course&.course_name}'.\nView: #{link}",
+        {
+          redirect_to: Rails.application.routes.url_helpers.course_request_path(course, id),
+          notice: 'Your extension request has been submitted.'
+        }
+      ]
+    end
+  end
+
+  def notify_slack(slack_message)
+    return if course&.course_settings&.slack_webhook_url.blank?
+
+    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url)
+    Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}. Please check your webhook URL." unless success
   end
 end
