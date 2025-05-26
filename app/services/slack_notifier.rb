@@ -14,6 +14,16 @@ class SlackNotifier
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.request_uri, header)
     request.body = payload.to_json
-    http.request(request)
+    response = http.request(request)
+
+    unless response.is_a?(Net::HTTPSuccess)
+      Rails.logger.error("SlackNotifier failed: #{response.code} #{response.message} - #{response.body}")
+      return false
+    end
+
+    true
+  rescue => e
+    Rails.logger.error("SlackNotifier exception: #{e.class} - #{e.message}")
+    false
   end
 end

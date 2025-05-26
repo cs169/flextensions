@@ -47,8 +47,11 @@ class Request < ApplicationRecord
       }
     end
 
-    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-
+    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
+    if !success:
+      Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}"
+      result[:alert] = 'Your request was created, but there was an issue sending the Slack notification.'
+    end
     result
   end
 
@@ -65,8 +68,11 @@ class Request < ApplicationRecord
       result = build_result_hash('Request was successfully updated.')
     end
 
-    SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
-
+    success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
+    if !success:
+      Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}"
+      result[:alert] = 'Your request was created, but there was an issue sending the Slack notification.'
+    end
     result
   end
 
