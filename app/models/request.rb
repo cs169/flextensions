@@ -49,7 +49,7 @@ class Request < ApplicationRecord
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
     if !success
-      result[:alert] = 'Failed to notify Slack. Please check your webhook URL.'
+      result[:notice] ||= 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
     end
     result
   end
@@ -69,7 +69,7 @@ class Request < ApplicationRecord
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url) if notify_slack && course&.course_settings&.slack_webhook_url.present?
     if !success
-      result[:alert] = 'Failed to notify Slack. Please check your webhook URL.'
+      result[:notice] ||= 'Your request was submitted, but we could not notify Slack. Please check your webhook URL.'
     end
     result
   end
@@ -140,7 +140,8 @@ class Request < ApplicationRecord
 
   def reject(processed_user_id)
     update(status: 'denied', last_processed_by_user_id: processed_user_id.id)
-    send_email_response if course.course_settings&.enable_emails
+    # Only send email if the person processing is the same as the request's user
+    send_email_response if course.course_settings&.enable_emails && processed_user_id.id != user_id
     true
   end
 
