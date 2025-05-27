@@ -25,8 +25,10 @@ class CourseSettingsController < ApplicationController
       reset_email_templates
       redirect_to course_settings_path(@course, tab: 'email'), notice: 'Email templates reset to defaults.'
     elsif @course_settings.update(course_settings_params)
-      # Use the tab from params to determine which tab to show
-      if @course_settings.enable_slack_webhook_url && @course_settings.slack_webhook_url.present?
+      if @course_settings.enable_slack_webhook_url &&
+         @course_settings.slack_webhook_url.present? &&
+         @course_settings.saved_change_to_slack_webhook_url?
+
         success = SlackNotifier.notify(
           ":wave: Slack notifications have been enabled for *#{@course.course_name}* (#{@course.course_code}). You will now receive updates here!",
           @course_settings.slack_webhook_url
