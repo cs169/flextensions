@@ -1,5 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import DataTable from "datatables.net-bs5";
+import "datatables.net-responsive";
+import "datatables.net-responsive-bs5";
 import "datatables.net-buttons";
 import "datatables.net-buttons-bs5";
 import "datatables.net-buttons/js/buttons.html5.min.js";
