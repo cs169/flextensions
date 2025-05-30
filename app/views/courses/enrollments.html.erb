@@ -18,17 +18,21 @@
         <tbody>
           <% @enrollments.each do |enrollment| %>
             <tr>
-              <td>
-                <%= link_to(
-                      enrollment.user.student_id.present? ? course_requests_path(@course, search: enrollment.user.student_id, show_all: 'true') : course_requests_path(@course, search: enrollment.user.name, show_all: 'true'),
-                      class: "text-decoration-none"
-                    ) do %>
-                  <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
-                <% end %>
-                <% if enrollment.role.downcase == 'student' %>
-                  <%= link_to new_course_request_path(@course, "request[user_id]": enrollment.user.id), class: "ms-2", title: "Create request for this student" do %>
-                    <i class="fas fa-plus-circle"></i>
+              <td class="d-flex justify-content-between align-items-center">
+                <span>
+                  <%= link_to(
+                        enrollment.user.student_id.present? ? course_requests_path(@course, search: enrollment.user.student_id, show_all: 'true') : course_requests_path(@course, search: enrollment.user.name, show_all: 'true'),
+                        class: "text-decoration-none"
+                      ) do %>
+                    <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
                   <% end %>
+                </span>
+                <% if enrollment.role.downcase == 'student' %>
+                  <span>
+                    <%= link_to new_course_request_path(@course, "request[user_id]": enrollment.user.id), title: "Create request for this student" do %>
+                      <i class="fas fa-plus-circle"></i>
+                    <% end %>
+                  </span>
                 <% end %>
               </td>
               <td class="text-center"><%= enrollment.user.student_id %></td>
