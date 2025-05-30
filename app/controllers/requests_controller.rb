@@ -34,20 +34,10 @@ class RequestsController < ApplicationController
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
     if @role == 'instructor'
-      @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
-      @request = @course.requests.new
-      @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+      prepare_instructor_new_request(course_to_lms)
       render :new_for_student and return
     elsif @role == 'student'
-      all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
-      @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
-      @has_pending = all_assignments.size != @assignments.size
-      @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
-      if @selected_assignment&.has_pending_request_for_user?(@user, @course)
-        pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
-        redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.' and return
-      end
-      @request = @course.requests.new
+      prepare_student_new_request(course_to_lms)
       render :new and return
     else
       redirect_to course_path(@course.id), alert: 'You do not have access to this page.'
@@ -57,9 +47,7 @@ class RequestsController < ApplicationController
   def new_for_student
     @side_nav = 'form'
     # Only instructors allowed
-    unless @role == 'instructor'
-      return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.'
-    end
+    return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.' unless @role == 'instructor'
 
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
@@ -68,6 +56,11 @@ class RequestsController < ApplicationController
     @assignments = all_assignments
     @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
     @request = @course.requests.new
+  end
+
+  def edit
+    @selected_assignment = @request.assignment
+    @assignments = [@selected_assignment]
   end
 
   def create
@@ -90,33 +83,23 @@ class RequestsController < ApplicationController
   end
 
   def create_for_student
-    unless @role == 'instructor'
-      return redirect_to course_requests_path(@course), alert: 'You do not have permission to perform this action.'
-    end
+    return redirect_to course_requests_path(@course), alert: 'You do not have permission to perform this action.' unless @role == 'instructor'
 
     student = User.find_by(id: params[:request][:user_id])
-    unless student
-      return redirect_to new_for_student_course_requests_path(@course), alert: 'Student not found.'
-    end
+    return redirect_to new_course_request_path(@course), alert: 'Student not found.' unless student
+
+    assignment_id = params[:request][:assignment_id]
+    reject_other_student_requests(student, assignment_id) if assignment_id.present?
 
     Request.merge_date_and_time!(params[:request])
     @request = @course.requests.new(request_params.merge(user: student))
-
-    Rails.logger.info "Creating request for student: #{student.name}, assignment_id: #{params[:request][:assignment_id]}"
     if @request.save
-      result = @request.process_created_request(@user)
-      redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
+      handle_successful_student_request(student)
     else
-      @assignments = Assignment.enabled_for_course(@course.course_to_lms(1).id).order(:name)
-      @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
+      prepare_instructor_new_request(@course.course_to_lms(1))
       flash.now[:alert] = 'There was a problem submitting the request.'
       render :new_for_student
     end
-  end
-
-  def edit
-    @selected_assignment = @request.assignment
-    @assignments = [@selected_assignment]
   end
 
   def update
@@ -221,5 +204,36 @@ class RequestsController < ApplicationController
   def check_extensions_enabled_for_students
     result = RequestService.check_extensions_enabled_for_students(@role, @course, courses_path)
     redirect_to result[:redirect_to], alert: result[:alert] if result != true
+  end
+
+  def prepare_instructor_new_request(course_to_lms)
+    @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
+    @request = @course.requests.new
+    @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+  end
+
+  def prepare_student_new_request(course_to_lms)
+    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+    @has_pending = all_assignments.size != @assignments.size
+    @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
+    if @selected_assignment&.has_pending_request_for_user?(@user, @course)
+      pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
+      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.' and return
+    end
+    @request = @course.requests.new
+  end
+
+  def reject_other_student_requests(student, assignment_id)
+    @course.requests.where(user_id: student.id, assignment_id: assignment_id)
+           .where.not(status: 'denied')
+           .find_each do |req|
+      req.update(status: 'denied', last_processed_by_user_id: @user.id)
+    end
+  end
+
+  def handle_successful_student_request(student)
+    result = @request.process_created_request(@user)
+    redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
   end
 end
