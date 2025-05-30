@@ -1,0 +1,165 @@
+<div class="container-fluid mb-5" data-controller="extension-form">
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<%= render "courses/course_title" %>
+
+			<div class="card mb-4 rounded-0">
+				<div class="card-header bg-light">
+					<h1 class="h5 mb-0">New Extension Request</h1>
+				</div>
+				<div class="card-body">
+					<%= form_with(model: [@course, @request], method: :post, local: true) do |f| %>
+					<% if @request.errors.any? %>
+						<div id="error_explanation" class="alert alert-danger">
+							<h2><%= pluralize(@request.errors.count, "error") %> prohibited this request from being saved:</h2>
+							<ul>
+								<% @request.errors.full_messages.each do |msg| %>
+									<li><%= msg %></li>
+								<% end %>
+							</ul>
+						</div>
+					<% end %>
+
+                    <div class="mb-3">
+                        <%= label_tag :student_id, "Select Student", class: "form-label" %>
+                        <%= select_tag 'request[student_id]',
+                            options_from_collection_for_select(@students, :id, :name, params.dig(:request, :student_id) || @request.user_id),
+                            class: "form-select",
+                            required: true,
+                            id: "student-select" %>
+                    </div>
+
+					<div class="mb-4">
+						<div class="mb-3">
+							<%= f.label :assignment_id, class: "form-label", for: "new-request-assignment-id" do %>
+								Select Assignment<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+							<% end %>
+							
+							<% if @has_pending %>
+								<div class="alert alert-info mb-3">
+									<small>Some assignments are not shown because the selected student already has pending requests for them. Please check <a href="<%= course_requests_path(@course) %>">requests</a> to view or edit them.</small>
+								</div>
+							<% end %>
+							
+							<%= f.select :assignment_id,
+							options_for_select(
+								@assignments.map do |assignment|
+								[
+									"#{assignment.name}",
+									assignment.id,
+									{
+									"data-original-due-date" => assignment.due_date.strftime('%a, %b %-d, %Y at %-I:%M%P'),
+									"data-original-late-due-date" => assignment.late_due_date&.strftime('%a, %b %-d, %Y at %-I:%M%P')
+									}
+								]
+								end,
+								params.dig(:request, :assignment_id) || @request.assignment_id
+							),
+							{ prompt: '---', required: true },
+							{
+								class: "form-select",
+								id: "new-request-assignment-id",
+								data: {
+								extension_form_target: "assignmentSelect",
+								action: "change->extension-form#updateAssignment"
+								}
+							}
+							%>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6 mb-2">
+								<p><strong>Original Due Date: </strong><span id="due-date"><%= @selected_assignment.due_date.strftime('%a, %b %-d, %Y at %-I:%M%P') if @selected_assignment %></span></p>
+							</div>
+							<div class="col-md-6 mb-2">
+								<p><strong>Original Late Due Date: </strong><span id="late-due-date"><%= @selected_assignment&.late_due_date&.strftime('%a, %b %-d, %Y at %-I:%M%P') || 'N/A' if @selected_assignment %></span></p>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<%= f.hidden_field :due_time, value: (@selected_assignment.due_date.strftime('%H:%M') if @selected_assignment) %>
+								<%= f.label :requested_due_date, class: "form-label", for: "new-request-requested-due-date" do %>
+									Requested Due Date<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+								<% end %>
+								<%= f.date_field :requested_due_date,
+									class: "form-control",
+									id: "new-request-requested-due-date",
+									value: (@selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment),
+									required: true,
+									data: { 
+										extension_form_target: "dueDateInput",
+										"original-due-date" => (@selected_assignment.due_date.strftime('%Y-%m-%d') if @selected_assignment),
+										action: "input->extension-form#updateDays"
+									} %>
+							</div>
+
+							<div class="col-md-6 mb-3 d-flex align-items-end">
+								<p class="mb-0"><strong>Number of Days: </strong><span id="days" data-extension-form-target="daysDisplay">#</span></p>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<p class="h6 mb-2">
+							Reason for Extension<span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span>
+						</p>
+						<% if @form_settings.reason_desc.presence %>
+							<p class="text-muted small mb-2"><%= @form_settings.reason_desc %></p>
+						<% end %>
+						<label class="visually-hidden" for="reason">Reason for Extension</label>
+						<%= f.text_area :reason, class: "form-control", id: "reason", rows: 3, required: true %>
+					</div>
+
+					<% if ['required', 'optional'].include?(@form_settings.documentation_disp) %>
+					<div class="mb-4">
+						<p class="h6 mb-2">
+							Additional Documentation<% if @form_settings.documentation_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+						</p>
+						<% if @form_settings.documentation_desc.presence %>
+							<p class="text-muted small mb-2"><%= @form_settings.documentation_desc %></p>
+						<% end %>
+						<p class="small"><strong>Please do not include any personal health or disability related details in your documentation. If you have questions please reach out to the course staff before submitting this form.</strong></p>
+						<label class="visually-hidden" for="documentation">Additional Documentation</label>
+						<%= f.text_area :documentation, class: "form-control mb-2", id: "documentation", rows: 3, required: @form_settings.documentation_disp == 'required'? true : false %>
+					</div>
+					<% end %>
+					
+					<% if ['required', 'optional'].include?(@form_settings.custom_q1_disp) && @form_settings.custom_q1.present? %>
+					<div class="mb-4">
+						<p class="h6 mb-2">
+							<%= @form_settings.custom_q1 %><% if @form_settings.custom_q1_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+						</p>
+						<% if @form_settings.custom_q1_desc.presence %>	
+							<p class="text-muted small mb-2"><%= @form_settings.custom_q1_desc %></p>
+						<% end %>
+						<label class="visually-hidden" for="custom-q1"><%= @form_settings.custom_q1 %></label>
+						<%= f.text_area :custom_q1, class: "form-control", id: "custom-q1", rows: 3, required: @form_settings.custom_q1_disp == 'required'? true : false %>
+					</div>
+					<% end %>
+
+					<% if ['required', 'optional'].include?(@form_settings.custom_q2_disp) && @form_settings.custom_q2.present? %>
+					<div class="mb-4">
+						<p class="h6 mb-2">
+							<%= @form_settings.custom_q2 %><% if @form_settings.custom_q2_disp == 'required' %><span class="text-danger ms-1" aria-hidden="true"><strong>*</strong></span><span class="visually-hidden"> (required)</span><% end %>
+						</p>
+						<% if @form_settings.custom_q2_desc.presence %>
+							<p class="text-muted small mb-2"><%= @form_settings.custom_q2_desc %></p>
+						<% end %>
+						<label class="visually-hidden" for="custom-q2"><%= @form_settings.custom_q2 %></label>
+						<%= f.text_area :custom_q2, class: "form-control", id: "custom-q2", rows: 3, required: @form_settings.custom_q2_disp == 'required'? true : false %>
+					</div>
+					<% end %>
+
+					<div class="text-center mt-4">
+						<%= f.submit "Submit Request", class: "btn btn-success" %>
+						<%= link_to "Cancel", course_path(@course), class: "btn btn-secondary ms-2" %>
+					</div>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

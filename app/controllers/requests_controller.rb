@@ -53,9 +53,20 @@ class RequestsController < ApplicationController
     @request = @course.requests.new
   end
 
-  def edit
-    @selected_assignment = @request.assignment
-    @assignments = [@selected_assignment]
+  def new_for_student
+    @side_nav = 'form'
+    # Only instructors allowed
+    unless @role == 'instructor'
+      return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.'
+    end
+
+    course_to_lms = @course.course_to_lms(1)
+    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+
+    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    @assignments = all_assignments
+    @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
+    @request = @course.requests.new
   end
 
   def create
@@ -75,6 +86,35 @@ class RequestsController < ApplicationController
     else
       handle_request_error
     end
+  end
+
+  def create_for_student
+    unless @role == 'instructor'
+      return redirect_to course_requests_path(@course), alert: 'You do not have permission to perform this action.'
+    end
+
+    student = User.find_by(id: params[:request][:student_id])
+    unless student
+      return redirect_to new_for_student_course_requests_path(@course), alert: 'Student not found.'
+    end
+
+    Request.merge_date_and_time!(params[:request])
+    @request = @course.requests.new(request_params.merge(user: student))
+
+    if @request.save
+      result = @request.process_created_request(@user)
+      redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
+    else
+      @assignments = Assignment.enabled_for_course(@course.course_to_lms(1).id).order(:name)
+      @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
+      flash.now[:alert] = 'There was a problem submitting the request.'
+      render :new_for_student
+    end
+  end
+
+  def edit
+    @selected_assignment = @request.assignment
+    @assignments = [@selected_assignment]
   end
 
   def update
@@ -151,7 +191,7 @@ class RequestsController < ApplicationController
   end
 
   def request_params
-    params.require(:request).permit(:assignment_id, :reason, :documentation, :custom_q1, :custom_q2, :requested_due_date)
+    params.require(:request).permit(:assignment_id, :reason, :documentation, :custom_q1, :custom_q2, :requested_due_date, :student_id)
   end
 
   def authenticate_user

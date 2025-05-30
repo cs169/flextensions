@@ -45,6 +45,12 @@
 				icon: 'fas fa-file-alt',
 				text: 'Form',
 				active: @side_nav == 'form_settings' %>
+
+			<%= render 'layouts/components/sidebar_menu_item',
+				path: new_for_student_course_requests_path(@course.id),
+				icon: 'fas fa-user-plus',
+				text: 'Request for Student',
+				active: @side_nav == 'new_for_student' %>
 		<% end %>
 
 		<% if @role == 'student' %>
