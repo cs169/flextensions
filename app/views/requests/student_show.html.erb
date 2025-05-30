@@ -18,8 +18,21 @@
 				<div class="card-body">
 					<!-- Display Assignment Information -->
 					<div class="mb-4 border-bottom">
+						<!-- Student Info -->
+						<div class="mb-2">
+							<strong class="fs-5">Student:</strong>
+							<span class="fs-5">
+								<%= @request.user.name %>
+								<% if @request.user.student_id.present? %>
+									(<%= @request.user.student_id %>)
+								<% end %>
+							</span>
+						</div>
 						<% if @request.assignment.present? %>
-							<p class="mb-2"><strong><%= @request.assignment.name %></strong></p>
+							<p class="mb-2">
+								<strong class="fs-5">Assignment:</strong>
+								<span class="fs-5"><%= @request.assignment.name %></span>
+							</p>
 							<div class="row">
 								<div class="col-md-6">
 									<p><strong>Original Due Date: </strong><%= @request.assignment.due_date.strftime('%a, %b %-d, %Y %-I:%M%P') %></p>
