@@ -38,7 +38,10 @@ Rails.application.routes.draw do
         post :approve
         post :reject
         post :cancel
-      end  
+      end
+    collection do
+      post :create_for_student
+    end      
     end
     resource :form_setting, only: [:edit, :update]
   end
