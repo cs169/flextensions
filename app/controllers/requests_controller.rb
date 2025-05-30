@@ -30,27 +30,28 @@ class RequestsController < ApplicationController
 
   def new
     @side_nav = 'form'
-    return redirect_to course_path(@course.id), alert: 'You do not have access to this page.' unless @role == 'student'
-
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    # Get all enabled assignments for this course
-    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
-
-    # Filter out assignments that already have pending requests from this user
-    @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
-
-    @has_pending = all_assignments.size != @assignments.size
-
-    @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
-
-    if @selected_assignment&.has_pending_request_for_user?(@user, @course)
-      pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
-      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.'
+    if @role == 'instructor'
+      @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
+      @request = @course.requests.new
+      @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+      render :new_for_student and return
+    elsif @role == 'student'
+      all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+      @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
+      @has_pending = all_assignments.size != @assignments.size
+      @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
+      if @selected_assignment&.has_pending_request_for_user?(@user, @course)
+        pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
+        redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.' and return
+      end
+      @request = @course.requests.new
+      render :new and return
+    else
+      redirect_to course_path(@course.id), alert: 'You do not have access to this page.'
     end
-
-    @request = @course.requests.new
   end
 
   def new_for_student
