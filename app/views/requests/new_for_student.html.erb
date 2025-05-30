@@ -8,7 +8,12 @@
 					<h1 class="h5 mb-0">New Extension Request</h1>
 				</div>
 				<div class="card-body">
-					<%= form_with(model: [@course, @request], method: :post, local: true) do |f| %>
+					<%= form_with(
+                        model: [@course, @request],
+                        url: create_for_student_course_requests_path(@course),
+                        method: :post,
+                        local: true
+                    ) do |f| %>
 					<% if @request.errors.any? %>
 						<div id="error_explanation" class="alert alert-danger">
 							<h2><%= pluralize(@request.errors.count, "error") %> prohibited this request from being saved:</h2>
