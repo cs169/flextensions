@@ -20,14 +20,14 @@
 						</div>
 					<% end %>
 
-                    <div class="mb-3">
-                        <%= label_tag :student_id, "Select Student", class: "form-label" %>
-                        <%= select_tag 'request[student_id]',
-                            options_from_collection_for_select(@students, :id, :name, params.dig(:request, :student_id) || @request.user_id),
-                            class: "form-select",
-                            required: true,
-                            id: "student-select" %>
-                    </div>
+					<div class="mb-3">
+						<%= label_tag :user_id, "Select Student", class: "form-label" %>
+						<%= select_tag 'request[user_id]',
+							options_from_collection_for_select(@students, :id, :name, params.dig(:request, :user_id) || @request.user_id),
+							class: "form-select",
+							required: true,
+							id: "student-select" %>
+					</div>
 
 					<div class="mb-4">
 						<div class="mb-3">
