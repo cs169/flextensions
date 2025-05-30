@@ -37,7 +37,9 @@ class RequestsController < ApplicationController
       prepare_instructor_new_request(course_to_lms)
       render :new_for_student and return
     elsif @role == 'student'
-      prepare_student_new_request(course_to_lms)
+      redirected = prepare_student_new_request(course_to_lms)
+      return if redirected
+
       render :new and return
     else
       redirect_to course_path(@course.id), alert: 'You do not have access to this page.'
@@ -219,9 +221,11 @@ class RequestsController < ApplicationController
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     if @selected_assignment&.has_pending_request_for_user?(@user, @course)
       pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
-      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.' and return
+      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.'
+      return true
     end
     @request = @course.requests.new
+    false
   end
 
   def reject_other_student_requests(student, assignment_id)
