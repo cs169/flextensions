@@ -101,6 +101,7 @@ class RequestsController < ApplicationController
     Request.merge_date_and_time!(params[:request])
     @request = @course.requests.new(request_params.merge(user: student))
 
+    Rails.logger.info "Creating request for student: #{student.name}, assignment_id: #{params[:request][:assignment_id]}"
     if @request.save
       result = @request.process_created_request(@user)
       redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
