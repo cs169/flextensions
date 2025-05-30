@@ -93,7 +93,7 @@ class RequestsController < ApplicationController
       return redirect_to course_requests_path(@course), alert: 'You do not have permission to perform this action.'
     end
 
-    student = User.find_by(id: params[:request][:student_id])
+    student = User.find_by(id: params[:request][:user_id])
     unless student
       return redirect_to new_for_student_course_requests_path(@course), alert: 'Student not found.'
     end
@@ -191,7 +191,7 @@ class RequestsController < ApplicationController
   end
 
   def request_params
-    params.require(:request).permit(:assignment_id, :reason, :documentation, :custom_q1, :custom_q2, :requested_due_date, :student_id)
+    params.require(:request).permit(:assignment_id, :reason, :documentation, :custom_q1, :custom_q2, :requested_due_date, :user_id)
   end
 
   def authenticate_user
