@@ -1,14 +1,30 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["emailField", "tab"]
+  static targets = ["emailField", "gradescopeField", "tab"]
   
   connect() {
     this.toggleEmailFields();
+    this.toggleGradescopeFields();
+
+    const gradescopeToggle = document.getElementById('enable-gradescope');
+    if (gradescopeToggle) {
+      gradescopeToggle.addEventListener('change', this.toggleGradescopeFields.bind(this));
+    }
     
     const emailToggle = document.getElementById('enable-email');
     if (emailToggle) {
       emailToggle.addEventListener('change', this.toggleEmailFields.bind(this));
+    }
+  }
+
+  toggleGradescopeFields() {
+    const gradescopeToggle = document.getElementById('enable-gradescope');
+    const gradescopeCourseUrlField = document.getElementById('gradescope-course-url');
+    
+    if (gradescopeToggle && gradescopeCourseUrlField) {
+      const isEnabled = gradescopeToggle.checked;
+      gradescopeCourseUrlField.disabled = !isEnabled;
     }
   }
   

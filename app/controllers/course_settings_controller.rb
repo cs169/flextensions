@@ -47,6 +47,8 @@ class CourseSettingsController < ApplicationController
       :auto_approve_days,
       :auto_approve_dsp_days,
       :max_auto_approve,
+      :enable_gradescope,
+      :gradescope_course_url,
       :enable_emails,
       :reply_email,
       :email_subject,

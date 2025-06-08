@@ -65,6 +65,8 @@ class Course < ApplicationRecord
         auto_approve_days: 0,
         auto_approve_dsp_days: 0,
         max_auto_approve: 0,
+        enable_gradescope: false,
+        gradescope_course_url: nil,
         enable_emails: false,
         reply_email: nil,
         email_subject: 'Extension Request Status: {{status}} - {{course_code}}',
