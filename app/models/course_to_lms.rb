@@ -4,7 +4,7 @@ class CourseToLms < ApplicationRecord
   belongs_to :lms
 
   # Fetch assignments from Canvas API
-  def fetch_assignments(token)
+  def fetch_canvas_assignments(token)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{external_course_id}/assignments"
     response = Faraday.get(url) do |req|
       req.headers['Authorization'] = "Bearer #{token}"
@@ -26,6 +26,26 @@ class CourseToLms < ApplicationRecord
       assignments
     else
       Rails.logger.error "Failed to fetch assignments: #{response.status} - #{response.body}"
+      []
+    end
+  end
+
+  def fetch_gradescope_assignments
+    # course_id = course.course_settings.gradescope_course_id
+
+    client = Gradescope::Client.new
+    client.login(
+      ENV.fetch('GRADESCOPE_EMAIL'),
+      ENV.fetch('GRADESCOPE_PASSWORD')
+    )
+
+    course = Gradescope::Course.new(external_course_id, client)
+    assignments = course.assignments
+
+    if assignments.any?
+      assignments
+    else
+      Rails.logger.error 'Failed to fetch Gradescope assignments'
       []
     end
   end

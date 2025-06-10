@@ -35,12 +35,54 @@ module Gradescope
 
       # Confirm Gradescope log in
       res = @conn.get('/account')
-      raise 'Failed to log in Gradescope' if res.status != 200
+      raise AuthenticationError, 'Login failed' if res.status != 200
     end
 
     def extract_csrf_token(html)
       doc = Nokogiri::HTML(html)
       doc.at('meta[name="csrf-token"]')&.[]('content')
+    end
+
+    def get(path)
+      response = @conn.get(path)
+      handle_response(response)
+    end
+
+    def post(path, data)
+      response = @conn.post(
+        path, {
+          body: data.to_json
+        }
+      )
+      handle_response(response)
+    end
+
+    def extract_react_props(html, data_react_class)
+      doc = Nokogiri::HTML(html)
+      element = doc.css("[data-react-class='#{data_react_class}']").first
+      return nil unless element
+
+      props_attr = element.attr('data-react-props')
+      return nil unless props_attr
+
+      JSON.parse(props_attr)
+    rescue JSON::ParserError
+      nil
+    end
+
+    private
+
+    def handle_response(response)
+      case response.status
+      when 200..299
+        response
+        # when 401, 403
+        #   raise AuthenticationError, 'Authentication required'
+        # when 404
+        #   raise NotFoundError, 'Resource not found'
+        # else
+        #   raise RequestError, "Request failed: #{response.code}"
+      end
     end
   end
 end

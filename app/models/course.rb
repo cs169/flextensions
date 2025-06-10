@@ -89,7 +89,15 @@ class Course < ApplicationRecord
       course_settings.save!
     end
 
+    # Sync assignments from Canvas
     sync_assignments(course_to_lms, token)
+    # Sync assignments from Gradescope if enabled
+    # To-do: if disabled should unsync Gradescope assignments
+    if course.course_settings.enable_gradescope
+      course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => '' }, 2)
+      sync_assignments(course_to_gradescope)
+    end
+
     course.sync_enrollments_from_canvas(token)
     course
   end
@@ -110,20 +118,27 @@ class Course < ApplicationRecord
   end
 
   # Find or create the CourseToLms record
-  def self.find_or_create_course_to_lms(course, course_data)
-    CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: 1).tap do |course_to_lms|
+  def self.find_or_create_course_to_lms(course, course_data, lms_id = 1)
+    CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: lms_id).tap do |course_to_lms|
       course_to_lms.external_course_id = course_data['id']
       course_to_lms.save!
     end
   end
 
   # Sync assignments for the course
-  def self.sync_assignments(course_to_lms, token)
-    # Fetch assignments from Canvas
-    assignments = course_to_lms.fetch_assignments(token)
-
-    # Keep track of external assignment IDs from Canvas
-    external_assignment_ids = assignments.pluck('id')
+  def self.sync_assignments(course_to_lms, token = nil)
+    case course_to_lms.id
+    when 1
+      # Fetch assignments from Canvas
+      assignments = course_to_lms.fetch_canvas_assignments(token)
+      # Keep track of external assignments IDs from Canvas
+      external_assignment_ids = assignments.pluck('id')
+    when 2
+      # Fetch assignments from Gradescope
+      assignments = course_to_lms.fetch_gradescope_assignments
+      # Keep track of external assignments IDs from Gradescope
+      external_assignment_ids = assignments.map(&:id)
+    end
 
     # Sync or update assignments
     assignments.each do |assignment_data|
@@ -138,12 +153,21 @@ class Course < ApplicationRecord
 
   # Sync a single assignment
   def self.sync_assignment(course_to_lms, assignment_data)
-    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-    assignment.name = assignment_data['name']
+    # assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
+    if course_to_lms.id == 1
+      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
+      assignment.name = assignment_data['name']
 
-    # Extract due_at and lock_at dates
-    assignment.due_date = extract_date_field(assignment_data, 'due_at')
-    assignment.late_due_date = extract_date_field(assignment_data, 'lock_at')
+      # Extract due_at and lock_at dates
+      assignment.due_date = extract_date_field(assignment_data, 'due_at')
+      assignment.late_due_date = extract_date_field(assignment_data, 'lock_at')
+    elsif course_to_lms.id == 2
+      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data.id)
+      assignment.name = assignment_data.title
+      assignment.due_date = assignment_data.due_date
+      assignment.late_due_date = assignment_data.late_due_date
+      assignment.enabled = true
+    end
 
     assignment.save!
   end
