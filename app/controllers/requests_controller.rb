@@ -1,3 +1,5 @@
+require 'csv'
+
 class RequestsController < ApplicationController
   before_action :authenticate_user, except: [:export]
   before_action :set_course_role_from_settings, except: [:export]
