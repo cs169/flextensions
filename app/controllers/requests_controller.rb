@@ -1,9 +1,9 @@
 class RequestsController < ApplicationController
   before_action :authenticate_user, except: [:export]
-  before_action :set_course_role_from_settings
+  before_action :set_course_role_from_settings, except: [:export]
   before_action :authenticate_course
-  before_action :set_pending_request_count
-  before_action :check_extensions_enabled_for_students
+  before_action :set_pending_request_count, except: [:export]
+  before_action :check_extensions_enabled_for_students, except: [:export]
   before_action :ensure_request_is_pending, only: %i[update approve reject]
   before_action :set_request, only: %i[show edit cancel]
   before_action :check_instructor_permission, only: %i[approve reject]
