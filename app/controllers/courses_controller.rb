@@ -21,6 +21,8 @@ class CoursesController < ApplicationController
     @side_nav = 'show'
     return redirect_to courses_path, alert: 'Course not found.' unless @course
 
+    @course.regenerate_readonly_api_token_if_blank
+
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
@@ -78,7 +80,6 @@ class CoursesController < ApplicationController
   def enrollments
     @side_nav = 'enrollments'
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
-
     @enrollments = @course.user_to_courses.includes(:user)
   end
 

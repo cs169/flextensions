@@ -1,5 +1,7 @@
+require 'csv'
+
 class RequestsController < ApplicationController
-  before_action :authenticate_user
+  skip_before_action :authenticate_user, only: [:export]
   before_action :set_course_role_from_settings
   before_action :authenticate_course
   before_action :set_pending_request_count
@@ -141,6 +143,37 @@ class RequestsController < ApplicationController
     else
       redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
     end
+  end
+
+  def export
+    course = Course.find_by(id: params[:course_id])
+    token = params[:readonly_api_token]
+
+    unless course && ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, token.to_s)
+      return render plain: "Invalid or missing API token", status: :unauthorized
+    end
+
+    requests = course.requests.includes(:assignment, :user)
+    if params[:status].present?
+      requests = requests.where(status: params[:status])
+    end
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << ["Assignment", "Student Name", "Student ID", "Requested At", "Original Due Date", "Requested Due Date", "Status"]
+      requests.find_each do |request|
+        csv << [
+          request.assignment&.name,
+          request.user&.name,
+          request.user&.student_id,
+          request.created_at,
+          request.assignment&.due_date,
+          request.requested_due_date,
+          request.status
+        ]
+      end
+    end
+
+    send_data csv_data, filename: "requests.csv", type: "text/csv"
   end
 
   private
