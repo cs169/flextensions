@@ -1,5 +1,5 @@
 class RequestsController < ApplicationController
-  skip_before_action :authenticate_user, only: [:export]
+  before_action :authenticate_user, except: [:export]
   before_action :set_course_role_from_settings
   before_action :authenticate_course
   before_action :set_pending_request_count
