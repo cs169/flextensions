@@ -158,6 +158,24 @@ class Request < ApplicationRecord
     )
   end
 
+  def self.to_csv(requests)
+    headers = ['Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status']
+    CSV.generate(headers: true) do |csv|
+      csv << headers
+      requests.find_each do |request|
+        csv << [
+          request.assignment&.name,
+          request.user&.name,
+          request.user&.student_id,
+          request.created_at,
+          request.assignment&.due_date,
+          request.requested_due_date,
+          request.status
+        ]
+      end
+    end
+  end
+
   private
 
   def existing_override(canvas_facade)

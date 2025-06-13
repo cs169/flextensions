@@ -30,14 +30,6 @@ export default class extends Controller {
                     topStart: {
                         buttons: [
                             {
-                                text: 'Get ReadOnly Token',
-                                action: function () {
-                                    if (readonlyToken) {
-                                        navigator.clipboard.writeText(readonlyToken);
-                                    }
-                                }
-                            },
-                            {
                                 extend: 'collection',
                                 text: 'Copy Google Sheets Import',
                                 buttons: [
