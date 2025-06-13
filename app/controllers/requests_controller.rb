@@ -149,17 +149,13 @@ class RequestsController < ApplicationController
     course = Course.find_by(id: params[:course_id])
     token = params[:readonly_api_token]
 
-    unless course && ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, token.to_s)
-      return render plain: "Invalid or missing API token", status: :unauthorized
-    end
+    return render plain: 'Invalid or missing API token', status: :unauthorized unless course && ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, token.to_s)
 
     requests = course.requests.includes(:assignment, :user)
-    if params[:status].present?
-      requests = requests.where(status: params[:status])
-    end
+    requests = requests.where(status: params[:status]) if params[:status].present?
 
     csv_data = CSV.generate(headers: true) do |csv|
-      csv << ["Assignment", "Student Name", "Student ID", "Requested At", "Original Due Date", "Requested Due Date", "Status"]
+      csv << ['Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status']
       requests.find_each do |request|
         csv << [
           request.assignment&.name,
@@ -173,7 +169,7 @@ class RequestsController < ApplicationController
       end
     end
 
-    send_data csv_data, filename: "requests.csv", type: "text/csv"
+    send_data csv_data, filename: 'requests.csv', type: 'text/csv'
   end
 
   private

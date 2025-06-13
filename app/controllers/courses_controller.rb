@@ -80,6 +80,7 @@ class CoursesController < ApplicationController
   def enrollments
     @side_nav = 'enrollments'
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
+
     @enrollments = @course.user_to_courses.includes(:user)
   end
 

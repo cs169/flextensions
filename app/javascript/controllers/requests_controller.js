@@ -31,7 +31,6 @@ export default class extends Controller {
                         buttons: [
                             {
                                 text: 'Get ReadOnly Token',
-                                className: 'btn btn-outline-primary me-2',
                                 action: function () {
                                     if (readonlyToken) {
                                         navigator.clipboard.writeText(readonlyToken);
@@ -40,7 +39,6 @@ export default class extends Controller {
                             },
                             {
                                 text: 'Copy Google Sheets Import (All)',
-                                className: 'btn btn-outline-primary me-2',
                                 action: function () {
                                     const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
                                     const formula = `=IMPORTDATA("${url}")`;
@@ -49,7 +47,6 @@ export default class extends Controller {
                             },
                             {
                                 text: 'Copy Google Sheets Import (Pending)',
-                                className: 'btn btn-outline-primary me-2',
                                 action: function () {
                                     const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}&status=pending`;
                                     const formula = `=IMPORTDATA("${url}")`;
