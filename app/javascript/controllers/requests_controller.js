@@ -38,20 +38,28 @@ export default class extends Controller {
                                 }
                             },
                             {
-                                text: 'Copy Google Sheets Import (All)',
-                                action: function () {
-                                    const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
-                                    const formula = `=IMPORTDATA("${url}")`;
-                                    navigator.clipboard.writeText(formula);
-                                }
-                            },
-                            {
-                                text: 'Copy Google Sheets Import (Pending)',
-                                action: function () {
-                                    const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}&status=pending`;
-                                    const formula = `=IMPORTDATA("${url}")`;
-                                    navigator.clipboard.writeText(formula);
-                                }
+                                extend: 'collection',
+                                text: 'Copy Google Sheets Import',
+                                buttons: [
+                                    {
+                                        text: 'All Requests',
+                                        className: 'dropdown-item',
+                                        action: function () {
+                                            const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
+                                            const formula = `=IMPORTDATA("${url}")`;
+                                            navigator.clipboard.writeText(formula);
+                                        }
+                                    },
+                                    {
+                                        text: 'Pending Requests',
+                                        className: 'dropdown-item',
+                                        action: function () {
+                                            const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}&status=pending`;
+                                            const formula = `=IMPORTDATA("${url}")`;
+                                            navigator.clipboard.writeText(formula);
+                                        }
+                                    }
+                                ]
                             },
                             {
                                 extend: 'copy',

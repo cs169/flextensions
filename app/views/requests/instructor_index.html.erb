@@ -8,7 +8,6 @@
       <div class="row justify-content-between mb-2">
         <div class="col-6 align-content-center">
           <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger"><%= @requests.select { |request| request.status == 'pending' }.count %></span> pending requests</p>
-          <p class="mb-0">Course Token: <span class="badge rounded-pill text-bg-secondary"><%= @course.readonly_api_token %></span></p>
         </div>
         <div class="col-6 text-end">
           <% if params[:show_all] == "true" %>
