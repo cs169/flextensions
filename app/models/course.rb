@@ -94,7 +94,8 @@ class Course < ApplicationRecord
     # Sync assignments from Gradescope if enabled
     # To-do: if disabled should unsync Gradescope assignments
     if course.course_settings.enable_gradescope
-      course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => '' }, 2)
+      gradescope_course_id = extract_gradescope_course_id(course.course_settings.gradescope_course_url)
+      course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => gradescope_course_id }, 2)
       sync_assignments(course_to_gradescope)
     end
 
@@ -127,18 +128,16 @@ class Course < ApplicationRecord
 
   # Sync assignments for the course
   def self.sync_assignments(course_to_lms, token = nil)
-    case course_to_lms.id
+    case course_to_lms.lms_id
     when 1
       # Fetch assignments from Canvas
       assignments = course_to_lms.fetch_canvas_assignments(token)
-      # Keep track of external assignments IDs from Canvas
-      external_assignment_ids = assignments.pluck('id')
     when 2
       # Fetch assignments from Gradescope
       assignments = course_to_lms.fetch_gradescope_assignments
-      # Keep track of external assignments IDs from Gradescope
-      external_assignment_ids = assignments.map(&:id)
     end
+    # Keep track of external assignments IDs
+    external_assignment_ids = assignments.map(&:id)
 
     # Sync or update assignments
     assignments.each do |assignment_data|
@@ -153,32 +152,20 @@ class Course < ApplicationRecord
 
   # Sync a single assignment
   def self.sync_assignment(course_to_lms, assignment_data)
-    # assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-    if course_to_lms.id == 1
-      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-      assignment.name = assignment_data['name']
-
-      # Extract due_at and lock_at dates
-      assignment.due_date = extract_date_field(assignment_data, 'due_at')
-      assignment.late_due_date = extract_date_field(assignment_data, 'lock_at')
-    elsif course_to_lms.id == 2
-      assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data.id)
-      assignment.name = assignment_data.title
-      assignment.due_date = assignment_data.due_date
-      assignment.late_due_date = assignment_data.late_due_date
-      assignment.enabled = true
-    end
+    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data.id)
+    assignment.name = assignment_data.name
+    assignment.due_date = assignment_data.due_date
+    assignment.late_due_date = assignment_data.late_due_date
 
     assignment.save!
   end
 
-  # Helper method to extract dates from assignment data
-  def self.extract_date_field(assignment_data, field_name)
-    if assignment_data['base_date'] && assignment_data['base_date'][field_name].present?
-      DateTime.parse(assignment_data['base_date'][field_name])
-    elsif assignment_data[field_name].present?
-      DateTime.parse(assignment_data[field_name])
-    end
+  # Helper method to extract external course id from Gradescope course URL
+  def self.extract_gradescope_course_id(gradescope_course_url)
+    match = gradescope_course_url.match(%r{gradescope\.com/courses/(\d+)})
+    raise ArgumentError, "Invalid Gradescope course URL: #{gradescope_course_url}" unless match
+
+    match[1]
   end
 
   # Fetch users for a course from Canvas API

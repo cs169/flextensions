@@ -119,7 +119,9 @@
                                                           id: 'gradescope-course-url', 
                                                           placeholder: 'https://www.gradescope.com/courses/123456',
                                                           data: { course_settings_target: "gradescopeField" },
-                                                          disabled: !@course.course_settings&.enable_gradescope %>
+                                                          disabled: !@course.course_settings&.enable_gradescope,
+                                                          pattern: 'https://(www\.)?gradescope\.com/courses/\d+/?',
+                                                          title: 'Must be a valid Gradescope course URL (e.g. https://www.gradescope.com/courses/123456)' %>
                                     </div>
                                 </div>
 
