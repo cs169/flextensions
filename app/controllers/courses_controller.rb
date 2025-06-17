@@ -23,7 +23,7 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'Course not found.' unless @course
 
     course_to_canvas = @course.course_to_lms(1)
-    course_to_gradescope = @course.course_to_lms(2) if @course.course_settings.enable_gradescope
+    course_to_gradescope = @course.course_to_lms(2)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_canvas
 
     if @role == 'student'

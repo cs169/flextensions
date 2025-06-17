@@ -81,9 +81,9 @@ RSpec.describe Course, type: :model do
     let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: 'canvas_123') }
 
     it 'creates or updates an assignment' do
-      assignment_data = { 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s }
+      canvas_assignment = Lmss::Canvas::Assignment.new({ 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s })
       expect do
-        described_class.sync_assignment(course_to_lms, assignment_data)
+        described_class.sync_assignment(course_to_lms, canvas_assignment)
       end.to change(Assignment, :count).by(1)
 
       assignment = Assignment.last
@@ -98,9 +98,8 @@ RSpec.describe Course, type: :model do
     it 'calls sync_assignment for each assignment and deletes missing ones' do
       Assignment.create!(name: 'Old', course_to_lms_id: course_to_lms.id, external_assignment_id: 'old')
 
-      allow(course_to_lms).to receive(:fetch_assignments).and_return([
-                                                                       { 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil }
-                                                                     ])
+      canvas_assignment = Lmss::Canvas::Assignment.new({ 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil })
+      allow(course_to_lms).to receive(:fetch_canvas_assignments).and_return([canvas_assignment])
 
       # one created, one deleted
       expect do
