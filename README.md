@@ -1,15 +1,19 @@
 # [Flextensions](https://flextensions.eecs.cloud)
-[![Maintainability](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
-[![Code Coverage](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/test_coverage.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
-[![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml)
-[![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml)
-[![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml)
+---
+
+[![Maintainability](https://qlty.sh/gh/berkeley-cdss/projects/flextensions/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions) •
+[![Code Coverage](https://qlty.sh/gh/berkeley-cdss/projects/flextensions/coverage.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions) •
+[![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml) •
+[![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml) •
+[![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml) •
 [![RuboCop](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml)
 
+---
+
 ## [cs169/flextensions](https://github.com/cs169/flextensions)
-[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage) 
-[![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml) 
+[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage)
+[![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml)
 [![Accessibility Tests](https://github.com/cs169/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/a11y.yml)
 [![RuboCop](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml)
 
@@ -65,10 +69,10 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 
 ## Tech Stack
 
-- Ruby on Rails  
-- PostgreSQL  
-- JavaScript (ES6)  
-- Heroku (Deployment)  
+- Ruby on Rails
+- PostgreSQL
+- JavaScript (ES6)
+- Heroku (Deployment)
 - OAuth2 integration with bCourses (Canvas)
 
 ---
