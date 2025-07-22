@@ -39,9 +39,10 @@ Rails.application.routes.draw do
         post :reject
         post :cancel
       end
-    collection do
-      post :create_for_student
-    end      
+      collection do
+        post :create_for_student
+        get :export, defaults: { format: :csv }
+      end      
     end
     resource :form_setting, only: [:edit, :update]
   end
