@@ -55,7 +55,7 @@
                     N/A
                   <% end %>
                 </td>
-                <td class="text-center align-content-center">
+                <td class="text-center align-content-center" data-export="<%= status_export_string(request) %>">
                   <% case request.status %>
                     <% when 'pending' %>
                       <span class="badge text-bg-info">Pending</span>
