@@ -1,9 +1,11 @@
+require 'csv'
+
 class RequestsController < ApplicationController
-  before_action :authenticate_user
-  before_action :set_course_role_from_settings
-  before_action :authenticate_course
-  before_action :set_pending_request_count
-  before_action :check_extensions_enabled_for_students
+  before_action :authenticate_user, except: [:export]
+  before_action :set_course_role_from_settings, except: [:export]
+  before_action :authenticate_course, except: [:export]
+  before_action :set_pending_request_count, except: [:export]
+  before_action :check_extensions_enabled_for_students, except: [:export]
   before_action :ensure_request_is_pending, only: %i[update approve reject]
   before_action :set_request, only: %i[show edit cancel]
   before_action :check_instructor_permission, only: %i[approve reject]
@@ -48,14 +50,12 @@ class RequestsController < ApplicationController
 
   def new_for_student
     @side_nav = 'form'
-    # Only instructors allowed
     return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.' unless @role == 'instructor'
 
     course_to_lms = @course.course_to_lms(1)
     return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
-    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
-    @assignments = all_assignments
+    @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
     @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
     @request = @course.requests.new
   end
@@ -143,6 +143,19 @@ class RequestsController < ApplicationController
     end
   end
 
+  def export
+    course = Course.find_by(id: params[:course_id])
+    token = params[:readonly_api_token]
+
+    return render plain: 'Invalid or missing API token', status: :unauthorized unless course && ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, token.to_s)
+
+    requests = course.requests.includes(:assignment, :user)
+    requests = requests.where(status: params[:status]) if params[:status].present?
+
+    csv_data = Request.to_csv(requests)
+    send_data csv_data, filename: 'requests.csv', type: 'text/csv'
+  end
+
   private
 
   def set_request
@@ -158,8 +171,8 @@ class RequestsController < ApplicationController
 
   def handle_request_error
     flash.now[:alert] = 'There was a problem submitting your request.'
-    course_to_lms = @course.course_to_lms(1)
-    @assignments = Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+    # course_to_lms = @course.course_to_lms(1)
+    @assignments = Assignment.where(course_to_lms_id: @course.course_to_lms(1).id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
   end
@@ -221,17 +234,14 @@ class RequestsController < ApplicationController
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     if @selected_assignment&.has_pending_request_for_user?(@user, @course)
       pending_request = @course.requests.where(user: @user, assignment: @selected_assignment, status: 'pending').first
-      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.'
-      return true
+      redirect_to course_request_path(@course, pending_request), alert: 'You already have a pending request for this assignment.' and return true
     end
     @request = @course.requests.new
     false
   end
 
   def reject_other_student_requests(student, assignment_id)
-    @course.requests.where(user_id: student.id, assignment_id: assignment_id)
-           .where.not(status: 'denied')
-           .find_each do |req|
+    @course.requests.where(user_id: student.id, assignment_id: assignment_id).where.not(status: 'denied').find_each do |req|
       req.update(status: 'denied', last_processed_by_user_id: @user.id)
     end
   end

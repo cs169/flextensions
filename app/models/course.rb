@@ -1,4 +1,8 @@
 class Course < ApplicationRecord
+  has_secure_token :readonly_api_token
+
+  after_create :regenerate_readonly_api_token_if_blank
+
   # Associations
   has_many :course_to_lmss
   has_many :lmss, through: :course_to_lmss
@@ -211,5 +215,9 @@ class Course < ApplicationRecord
     sync_users_from_canvas(token, 'student')
     sync_users_from_canvas(token, 'teacher')
     sync_users_from_canvas(token, 'ta')
+  end
+
+  def regenerate_readonly_api_token_if_blank
+    regenerate_readonly_api_token if readonly_api_token.blank?
   end
 end

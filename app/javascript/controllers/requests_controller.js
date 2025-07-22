@@ -12,6 +12,8 @@ export default class extends Controller {
     connect() {
         if (!DataTable.isDataTable('#requests-table')) {
             const searchQuery = this.element.dataset.searchQuery;
+            const readonlyToken = this.element.dataset.readonlyToken;
+            const courseId = this.element.dataset.courseId;
 
             this.table = new DataTable('#requests-table', {
                 paging: true,
@@ -28,17 +30,40 @@ export default class extends Controller {
                     topStart: {
                         buttons: [
                             {
+                                extend: 'collection',
+                                text: 'Copy Google Sheets Import to Clipboard',
+                                buttons: [
+                                    {
+                                        text: 'All Requests',
+                                        className: 'dropdown-item',
+                                        action: function () {
+                                            const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
+                                            const formula = `=IMPORTDATA("${url}")`;
+                                            navigator.clipboard.writeText(formula);
+                                        }
+                                    },
+                                    {
+                                        text: 'Pending Requests',
+                                        className: 'dropdown-item',
+                                        action: function () {
+                                            const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}&status=pending`;
+                                            const formula = `=IMPORTDATA("${url}")`;
+                                            navigator.clipboard.writeText(formula);
+                                        }
+                                    }
+                                ]
+                            },
+                            {
                                 extend: 'copy',
                                 text: 'Copy Table to Clipboard',
                                 title: null,
                                 messageTop: null,
                                 messageBottom: null,
-                                info: false, // disables the notification
+                                info: false,
                                 exportOptions: {
                                     columns: ':visible:not(.no-sort)',
                                     format: {
                                         body: function (data, row, column, node) {
-                                            // For the Status column, use data-export attribute if present
                                             if (node && node.hasAttribute && node.hasAttribute('data-export')) {
                                                 return node.getAttribute('data-export');
                                             }
@@ -55,7 +80,6 @@ export default class extends Controller {
                                     columns: ':visible:not(.no-sort)',
                                     format: {
                                         body: function (data, row, column, node) {
-                                            // For the Status column, use data-export attribute if present
                                             if (node && node.hasAttribute && node.hasAttribute('data-export')) {
                                                 return node.getAttribute('data-export');
                                             }
