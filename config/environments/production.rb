@@ -87,6 +87,15 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  # Generate these keys by running:
+  # head -c 32 /dev/urandom | base64
+  config.active_record.encryption.primary_key =
+    ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+  config.active_record.encryption.deterministic_key =
+    ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+  config.active_record.encryption.key_derivation_salt =
+    ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
@@ -94,31 +103,28 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
   # --- BEGIN PROD DB CRED INITIALIZATION --- #
-  ENV['DB_PORT'] ||= String(Rails.application.credentials.config[:DB_PORT])
-  ENV['DB_USER'] ||= Rails.application.credentials.config[:DB_USER]
-  ENV['DB_PASSWORD'] ||= Rails.application.credentials.config[:DB_PASSWORD]
-  ENV['DB_NAME'] ||= Rails.application.credentials.config[:DB_NAME]
+  # ENV['DB_PORT'] ||= String(Rails.application.credentials.config[:DB_PORT])
+  # ENV['DB_USER'] ||= Rails.application.credentials.config[:DB_USER]
+  # ENV['DB_PASSWORD'] ||= Rails.application.credentials.config[:DB_PASSWORD]
+  # ENV['DB_NAME'] ||= Rails.application.credentials.config[:DB_NAME]
   # --- END PROD DB CRED INITIALIZATION --- #
 
-  # Action Mailer settings
-  if ENV["ENABLE_EMAIL_SENDING"] == "true"
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      address:              ENV.fetch("SMTP_ADDRESS"),
-      port:                 ENV.fetch("SMTP_PORT").to_i,
-      domain:               ENV.fetch("SMTP_DOMAIN"),
-      user_name:            ENV["SMTP_USERNAME"],
-      password:             ENV["SMTP_PASSWORD"],
-      authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
-      enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
-      ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
-      open_timeout:         30,
-      read_timeout:         60
-    }
-  else
-    config.action_mailer.delivery_method = :letter_opener_web
-  end
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              ENV.fetch("SMTP_ADDRESS"),
+    port:                 ENV.fetch("SMTP_PORT").to_i,
+    domain:               ENV.fetch("SMTP_DOMAIN"),
+    user_name:            ENV["SMTP_USERNAME"],
+    password:             ENV["SMTP_PASSWORD"],
+    authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
+    enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
+    ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
+    open_timeout:         30,
+    read_timeout:         60
+  }
+
   config.action_mailer.default_url_options = {
     host: ENV.fetch("APP_HOST", "localhost"),
     port: ENV.fetch("APP_PORT", "3000")
