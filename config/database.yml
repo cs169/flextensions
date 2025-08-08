@@ -30,4 +30,4 @@ production:
   <<: *default
   pool: 5
   timeout: 5000
-  database: flextensions_prod
+  database: flextensions_production

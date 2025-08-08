@@ -10,31 +10,21 @@ class LoginController < ApplicationController
   end
 
   def logout
-    # cur_user = User.find_by(canvas_uid: session[:user_id])
-    # Faraday.delete("#{ENV.fetch('CANVAS_URL', nil)}/login/oauth2/token") do |req|
-    #   req.headers['Authorization'] = "Bearer #{cur_user.lms_credentials.first.token}"
-    # end
-    # users.find_by(user_id: session[:user_id]).lms_credentials.destroy_all
-    # session[:user_id] = nil
-    # session[:username] = nil
     reset_session
     redirect_to root_path
   end
 
   private
 
+  # TODO: Replace this with the CanvasFacade
   def canvas_authorize_url
     query_params = {
       client_id: ENV.fetch('CANVAS_CLIENT_ID', nil),
       response_type: 'code',
       redirect_uri: "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/auth/canvas/callback",
-      scope: 'url:GET|/api/v1/users/self profile email'
+      scope: CanvasFacade::CANVAS_API_SCOPES
     }
-    # canvas_callback
 
     ENV.fetch('CANVAS_URL', nil) + "/login/oauth2/auth?#{query_params.to_query}"
-
-    # The following line is for testing purposes and skips redirections.
-    # :canvas_callback
   end
 end
