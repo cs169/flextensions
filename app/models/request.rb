@@ -24,6 +24,8 @@ class Request < ApplicationRecord
   end
 
   # Process a newly created request, including auto-approval check
+  # TODO: This should be APP_HOST or something like:
+  # Rails.application.routes.default_url_options[:host]
   def process_created_request(current_user)
     link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
 

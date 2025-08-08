@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe LoginController, type: :controller do
+  let(:encoded_scopes) { CGI.escape(CanvasFacade::CANVAS_API_SCOPES) }
+
   describe 'GET #canvas' do
     it 'redirects to canvas authorization URL' do
       allow(ENV).to receive(:fetch).with('CANVAS_CLIENT_ID', nil).and_return('test_client_id')
@@ -14,7 +16,7 @@ RSpec.describe LoginController, type: :controller do
       expect(response.location).to include('client_id=test_client_id')
       expect(response.location).to include('response_type=code')
       expect(response.location).to include('redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcanvas%2Fcallback')
-      expect(response.location).to include('scope=url%3AGET%7C%2Fapi%2Fv1%2Fusers%2Fself+profile+email')
+      expect(response.location).to include(encoded_scopes)
     end
   end
 
@@ -44,7 +46,7 @@ RSpec.describe LoginController, type: :controller do
       expect(url).to include('client_id=test_client_id')
       expect(url).to include('response_type=code')
       expect(url).to include('redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcanvas%2Fcallback')
-      expect(url).to include('scope=url%3AGET%7C%2Fapi%2Fv1%2Fusers%2Fself+profile+email')
+      expect(url).to include(encoded_scopes)
     end
   end
 end
