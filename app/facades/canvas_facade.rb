@@ -32,16 +32,14 @@ class CanvasFacade < ExtensionFacadeBase
     url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
     url:PUT|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
     url:DELETE|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:GET|/api/v1/sections/:course_section_id/assignments/:assignment_id/override
-    url:GET|/api/v1/groups/:group_id/assignments/:assignment_id/override
     url:GET|/api/v1/courses/:course_id/assignments/overrides
     url:PUT|/api/v1/courses/:course_id/assignments/overrides
     url:POST|/api/v1/courses/:course_id/assignments/overrides
-    url:GET|/api/v1/courses/:course_id/assignment_groups/:assignment_group_id/assignments
     url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members
   ].join(' ').freeze
 
   # Potential future scopes:
+  # url:GET|/api/v1/sections/:course_section_id/assignments/:assignment_id/override
   # url:GET|/api/v1/courses/:id/late_policy
   # url:POST|/api/v1/courses/:id/late_policy
   # url:PATCH|/api/v1/courses/:id/late_policy
