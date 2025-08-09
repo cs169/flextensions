@@ -102,9 +102,8 @@ class SessionController < ApplicationController
 
   private
 
-  # Everytime someone tries to log in, they have to get a new token.
-  # There is no way we reuse the token for login since when a user clicks
-  # the login button, they are redirected to the Canvas login page immediately.
+  # TODO: Replace this with the CanvasFacade
+  # We need to refresh the user's access token on each login.
   def get_access_token(code)
     client = OAuth2::Client.new(
       ENV.fetch('CANVAS_CLIENT_ID', nil),
@@ -112,7 +111,7 @@ class SessionController < ApplicationController
       site: ENV.fetch('CANVAS_URL', nil),
       token_url: '/login/oauth2/token'
     )
-    client.auth_code.get_token(code, redirect_uri: :omniauth_callback)
+    client.auth_code.get_token(code, redirect_uri: :omniauth_callback, scope: CanvasFacade::CANVAS_API_SCOPES)
   end
 
   def find_or_create_user(user_data, full_token)

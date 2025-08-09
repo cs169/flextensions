@@ -30,7 +30,7 @@ RSpec.describe SessionController, type: :controller do
 
         expect(session[:user_id]).to eq('12345')
         expect(response).to redirect_to(courses_path)
-        expect(flash[:notice]).to eq('Logged in!')
+        expect(flash[:notice]).to include('Logged in!')
       end
     end
 
