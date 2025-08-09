@@ -29,20 +29,21 @@ class SessionController < ApplicationController
   #    the logic from "create" to "omniauth_callback".
 
   def omniauth_callback
-    # Basic error-parameter guard – identical to `create`
     if params[:error].present?
-      redirect_to root_path, alert: 'Authentication failed. Please try again.'
+      Rails.logger.error("OmniAuth error: #{params[:error]}")
+      redirect_to root_path,
+                  alert: "Authentication failed. Please try again.\n\n#{params[:error]}"
       return
     end
 
-    # Did OmniAuth actually build an auth hash?
     auth = request.env['omniauth.auth']
     unless auth
-      redirect_to root_path, alert: 'Authentication failed. No credentials received.'
+      Rails.logger.error(request.env.inspect)
+      redirect_to root_path,
+                  alert: "Authentication failed. No credentials received.\nAuth data: #{auth.inspect}"
       return
     end
 
-    # Extract user info and credentials from the auth hash
     user_data = {
       'id' => auth.uid,
       'name' => auth.info.name,
@@ -61,14 +62,15 @@ class SessionController < ApplicationController
     # Persist / update the user just like `create`
     find_or_create_user(user_data, access_token)
 
-    redirect_to courses_path, notice: 'Logged in!'
+    redirect_to courses_path, notice: "Logged in! Welcome, #{user_data['name']}!"
   rescue StandardError => e
     Rails.logger.error("OmniAuth callback error: #{e.message}")
+    Rails.logger.error(request.env.inspect)
     redirect_to root_path, alert: 'Authentication failed. Invalid credentials.'
   end
 
   def omniauth_failure
-    Rails.logger.debug(request.env.inspect)
+    Rails.logger.error(request.env.inspect)
     redirect_to root_path, alert: 'Authentication failed. Please try again.'
     nil
   end
