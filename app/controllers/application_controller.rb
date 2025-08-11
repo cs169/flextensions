@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
     excluded_actions = {
       'home' => ['index'],
       'login' => ['canvas'],
-      'session' => %w[create omniauth_callback],
+      'session' => %w[create omniauth_callback omniauth_failure],
       'rails/health' => ['show'],
       'requests' => ['export']
     }
