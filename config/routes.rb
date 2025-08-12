@@ -12,14 +12,11 @@ Rails.application.routes.draw do
   get 'courses/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'
-  get "home/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Defines the root path route ("/")
   root "home#index"
   get '/courses', to: 'courses#index', as: 'courses'
   get '/courses/new', to: 'courses#new', as: :new_course
@@ -54,8 +51,7 @@ Rails.application.routes.draw do
     end
   end
 
-  #Authentication routes
-  # get '/login' => 'login#canvas', :as => :login
+  # Authentication routes
   match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
   get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
   get '/logout' => 'login#logout', :as => :logout

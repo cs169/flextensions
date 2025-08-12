@@ -30,22 +30,15 @@ class SessionController < ApplicationController
 
   def omniauth_callback
     if params[:error].present?
-      Rails.logger.error("OmniAuth error: #{params[:error]}")
-      redirect_to root_path,
-                  alert: "Authentication failed. Please try again.\n\n#{params[:error]}"
+      redirect_to root_path, alert: 'Authentication failed. Please try again.'
       return
     end
 
     auth = request.env['omniauth.auth']
     unless auth
-      Rails.logger.error(request.env.inspect)
-      redirect_to root_path,
-                  alert: "Authentication failed. No credentials received.\nAuth data: #{auth.inspect}"
+      redirect_to root_path, alert: 'Authentication failed. No credentials received.'
       return
     end
-
-    token = request.env['omniauth.auth'].credentials.token
-    Rails.logger.debug { "Canvas Access Token: #{token}" }
 
     user_data = {
       'id' => auth.uid,
@@ -53,7 +46,6 @@ class SessionController < ApplicationController
       'primary_email' => auth.info.email,
       'email' => auth.info.email
     }
-
     creds = auth.credentials # an OmniAuth::AuthHash
     access_token = OAuth2::AccessToken.new(
       OAuth2::Client.new('', ''), # client never used – stub
@@ -72,39 +64,8 @@ class SessionController < ApplicationController
   end
 
   def omniauth_failure
-    error_type = request.params[:error_reason] || request.params[:error]
-    error_description = request.params[:error_description]
-
-    Rails.logger.error "Omniauth Failure - Type: #{error_type}"
-    Rails.logger.error "Omniauth Failure - Description: #{error_description}"
-    # Rails.logger.error "Omniauth Failure - All params: #{request.params.inspect}"
-    Rails.logger.error "Omniauth Failure - Strategy: #{request.params[:strategy]}"
-
     redirect_to root_path, alert: 'Authentication failed. Please try again.'
-    nil
   end
-
-  # def create
-  #   if params[:error].present? || params[:code].blank?
-  #     redirect_to root_path, alert: 'Authentication failed. Please try again.'
-  #     return
-  #   end
-  #   canvas_code = params[:code]
-
-  #   token = get_access_token(canvas_code)
-  #   # Fetch user profile from Canvas API using the token
-  #   response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?") do |req|
-  #     req.headers['Authorization'] = "Bearer #{token.token}"
-  #   end
-
-  #   if response.success?
-  #     user_data = JSON.parse(response.body)
-  #     find_or_create_user(user_data, token)
-  #     redirect_to courses_path, notice: 'Logged in!'
-  #   else
-  #     redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-  #   end
-  # end
 
   def destroy
     redirect_to :logout, notice: 'Logged out!'
@@ -112,28 +73,9 @@ class SessionController < ApplicationController
 
   private
 
-  # TODO: Replace this with the CanvasFacade
-  # We need to refresh the user's access token on each login.
-  def get_access_token(code)
-    client = OAuth2::Client.new(
-      ENV.fetch('CANVAS_CLIENT_ID', nil),
-      ENV.fetch('CANVAS_APP_KEY', nil),
-      site: ENV.fetch('CANVAS_URL', nil),
-      token_url: '/login/oauth2/token'
-    )
-    client.auth_code.get_token(
-      code,
-      redirect_uri: "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/auth/canvas/callback",
-      scope: CanvasFacade::CANVAS_API_SCOPES
-    )
-    # client.auth_code.get_token(code,
-    #                            redirect_uri: :omniauth_callback,
-    #                            scopes: CanvasFacade::CANVAS_API_SCOPES)
-  end
-
-  def find_or_create_user(user_data, full_token)
-    # Find or create user in database
-    full_token.token
+  # TODO: Refactor.
+  def find_or_create_user(user_data, auth_token)
+    auth_token.token
     user = nil
     if User.exists?(email: user_data['primary_email'])
       user = User.find_by(email: user_data['primary_email'])
@@ -156,9 +98,9 @@ class SessionController < ApplicationController
     session[:user_id] = user.canvas_uid
   end
 
+  # TODO: Move this to a Canvas API libarary or user service
+  # TODO: Find credentals for the right LMS, not just the first one.
   def update_user_credential(user, token)
-    # update user's lms credentials.
-    # Refresh token before it expires.
     if user.lms_credentials.any?
       user.lms_credentials.first.update(
         token: token.token,
