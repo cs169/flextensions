@@ -91,7 +91,7 @@ class SessionController < ApplicationController
       )
     end
     user.save!
-    update_user_credential(user, full_token)
+    update_user_credential(user, auth_token)
 
     # Store user ID in session for authentication
     session[:username] = user.name

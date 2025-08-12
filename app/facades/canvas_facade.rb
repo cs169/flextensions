@@ -9,7 +9,7 @@ class CanvasFacade < ExtensionFacadeBase
 
   # Canvas instances can scope the flextensions developer key.
   # There must be one scope for each endpoint we can use.
-  # This may not exceed 8000 characters in length.
+  # This may not exceed 8000 characters in length, typically ~110 total scopes.
   # Pass these to the `scope` parameter of the `canvas_authorize_url` method.
   # This list must exactly match the scopes enabled for the Canvas developer key.
   # https://ucberkeleysandbox.instructure.com/accounts/1/developer_keys#api_key_modal_opened
@@ -24,34 +24,47 @@ class CanvasFacade < ExtensionFacadeBase
   # Whenever a new scope is added, it must be added to the Canvas developer key **FIRST**,
   # especially in the production environment. You will likely want to use feature flags
   # and coordination with Berkeley to ensure that the scopes are added to the developer key.
-  CANVAS_API_SCOPES = %w[
-    url:GET|/api/v1/users/:user_id/profile
-    url:GET|/api/v1/users/:id
-    url:GET|/api/v1/courses
-    url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/extensions
-    url:GET|/api/v1/courses/:course_id/users
-    url:GET|/api/v1/users/:user_id/courses
-    url:GET|/api/v1/users/:user_id/enrollments
-    url:GET|/api/v1/courses/:course_id/enrollments
-    url:GET|/api/v1/courses/:course_id/quizzes/assignment_overrides
-    url:GET|/api/v1/courses/:course_id/new_quizzes/assignment_overrides
-    url:POST|/api/v1/courses/:course_id/quizzes/:quiz_id/extensions
-    url:GET|/api/v1/courses/:course_id/assignments
-    url:GET|/api/v1/courses/:course_id/assignments/:id
-    url:GET|/api/v1/users/self/activity_stream
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
-    url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:PUT|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:DELETE|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:GET|/api/v1/courses/:course_id/assignments/overrides
-    url:PUT|/api/v1/courses/:course_id/assignments/overrides
-    url:POST|/api/v1/courses/:course_id/assignments/overrides
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members
+  # NOTE: This is read into the OmniAuth initializer in `config/initializers/omniauth.rb`.
+  # If you change this list, you will need to restart the Rails server.
+  CANVAS_API_SCOPES = [
+    # Scopes are sorted by the order in which they appear on the API Key edit modal.
+    # Assignments
+    'url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides',
+    'url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/overrides',
+    'url:GET|/api/v1/courses/:course_id/assignments/overrides',
+    'url:POST|/api/v1/courses/:course_id/assignments/overrides',
+    'url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id',
+    'url:PUT|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id',
+    'url:DELETE|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id',
+    # Assignments - Bulk Operations
+    'url:GET|/api/v1/courses/:course_id/assignments',
+    'url:PUT|/api/v1/courses/:course_id/assignments/overrides',
+    'url:POST|/api/v1/courses/:course_id/assignments/overrides',
+    # Assignments - Basic Info
+    'url:GET|/api/v1/courses/:course_id/assignments',
+    'url:GET|/api/v1/courses/:course_id/assignments/:id',
+    'url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members',
+    # Courses
+    # Note: /courses is scoped to the current user.
+    'url:GET|/api/v1/courses',
+    'url:GET|/api/v1/courses/:course_id/users',
+    # Quiz Assignment Overrides
+    'url:GET|/api/v1/courses/:course_id/quizzes/assignment_overrides',
+    'url:GET|/api/v1/courses/:course_id/new_quizzes/assignment_overrides',
+    # Users
+    'url:GET|/api/v1/users/:user_id/profile',
+    'url:GET|/api/v1/users/:id'
   ].join(' ')
 
   # Potential future scopes:
+  # Assignment extensions, for addtional attempts
+  # url:GET|/api/v1/users/:user_id/enrollments
+  # url:GET|/api/v1/courses/:course_id/enrollments
+  # For PL integration
+  # url:GET|/api/v1/courses/:course_id/quizzes/:quiz_id/ip_filters
+  # url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/extensions
   # url:GET|/api/v1/sections/:course_section_id/assignments/:assignment_id/override
+  # url:POST|/api/v1/courses/:course_id/quizzes/:quiz_id/extensions
   # url:GET|/api/v1/courses/:id/late_policy
   # url:POST|/api/v1/courses/:id/late_policy
   # url:PATCH|/api/v1/courses/:id/late_policy
