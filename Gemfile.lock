@@ -588,7 +588,7 @@ DEPENDENCIES
   lms-api
   newrelic_rpm
   omniauth
-  omniauth-canvas (~> 2.0)
+  omniauth-canvas
   omniauth-oauth2
   ostruct
   pg

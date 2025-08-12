@@ -22,7 +22,7 @@ class LoginController < ApplicationController
       state: SecureRandom.hex(16),
       redirect_uri: "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/auth/canvas/callback",
       # scope: 'url:GET|/api/v1/users/:id'
-      scopes: CanvasFacade::CANVAS_API_SCOPES
+      scope: CanvasFacade::CANVAS_API_SCOPES
     }
 
     ENV.fetch('CANVAS_URL', nil) + "/login/oauth2/auth?#{query_params.to_query}"

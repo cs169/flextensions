@@ -69,6 +69,7 @@ gem 'ostruct'
 
 # used to authenticate with the LMS
 gem 'omniauth'
+gem 'omniauth-canvas'
 gem 'omniauth-oauth2'
 
 # Font Awesome for icons
@@ -132,5 +133,3 @@ group :development do
 end
 
 gem 'rails-controller-testing', '~> 1.0'
-
-gem 'omniauth-canvas', '~> 2.0'

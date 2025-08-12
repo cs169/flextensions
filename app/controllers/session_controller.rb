@@ -44,6 +44,9 @@ class SessionController < ApplicationController
       return
     end
 
+    token = request.env['omniauth.auth'].credentials.token
+    Rails.logger.debug { "Canvas Access Token: #{token}" }
+
     user_data = {
       'id' => auth.uid,
       'name' => auth.info.name,
@@ -118,9 +121,14 @@ class SessionController < ApplicationController
       site: ENV.fetch('CANVAS_URL', nil),
       token_url: '/login/oauth2/token'
     )
-    client.auth_code.get_token(code,
-                               redirect_uri: :omniauth_callback,
-                               scopes: CanvasFacade::CANVAS_API_SCOPES)
+    client.auth_code.get_token(
+      code,
+      redirect_uri: "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/auth/canvas/callback",
+      scope: CanvasFacade::CANVAS_API_SCOPES
+    )
+    # client.auth_code.get_token(code,
+    #                            redirect_uri: :omniauth_callback,
+    #                            scopes: CanvasFacade::CANVAS_API_SCOPES)
   end
 
   def find_or_create_user(user_data, full_token)
