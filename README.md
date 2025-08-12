@@ -36,12 +36,12 @@ Flextensions is designed specifically for the UC Berkeley academic environment. 
 
 ## Documentation
 Our documentation provides detailed instructions on how to set up, use, and contribute to Flextensions.
-For the full documentation, visit our **[Flextensions Wiki](https://github.com/berkeley-cdss/flextensions/wiki)**.
+For the full documentation, visit the public **[Flextensions Docs](https://berkeley-cdss.github.io/flextensions)**. (Or read `/docs/` in this repository.)
 
 Below are the key resources available:
-- **[Developer Resources](https://github.com/berkeley-cdss/flextensions/wiki/Developer-Resources)**: Information on environment variables, database setup, and deployment.
-- **[Instructor Guide](https://github.com/berkeley-cdss/flextensions/wiki/Instructor-Resources)**: A comprehensive guide for instructors on how to use Flextensions.
-- **[Student Guide](https://github.com/berkeley-cdss/flextensions/wiki/Student-Resourcess)**: A comprehensive guide for students on how to use Flextensions.
+- **[Developer Resources](https://berkeley-cdss.github.io/flextensions/developers)**: Information on environment variables, database setup, and deployment.
+- **[Instructor Guide](https://berkeley-cdss.github.io/flextensions/instructors)**: A comprehensive guide for instructors on how to use Flextensions.
+- **[Student Guide](https://berkeley-cdss.github.io/flextensions/students)**: A comprehensive guide for students on how to use Flextensions.
 - **[API Documentation](https://github.com/saasbook/esaas-swagger)**: Details on the APIs used for integration with bCourses (Canvas).
 
 ---
@@ -70,3 +70,7 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 # Configuration
 
 Please see `.env.example` for the environment variables that need to be set up for Flextensions to run. You can copy this file to `.env` and fill in the required values.
+
+## Canvas Scoped Keys
+
+This deserves brief special mention. You must keep the Canvas API configuration (in Canvas) in sync with the list of scopes defined in the CanvasFacade. If you need to add a new scope, you will need to update the Canvas API configuration in the Canvas Developer Keys section **and will need to coordinate with the bCourses team to ensure the new scope is approved and turned on before deploying it to production**.
