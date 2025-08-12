@@ -47,6 +47,7 @@ class CanvasFacade < ExtensionFacadeBase
     # Courses
     # Note: /courses is scoped to the current user.
     'url:GET|/api/v1/courses',
+    'url:GET|/api/v1/courses/:id',
     'url:GET|/api/v1/courses/:course_id/users',
     # Quiz Assignment Overrides
     'url:GET|/api/v1/courses/:course_id/quizzes/assignment_overrides',

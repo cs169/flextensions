@@ -57,9 +57,9 @@ class CoursesController < ApplicationController
 
   def create
     token = @user.lms_credentials.first.token
-    courses_teacher = filter_courses(Course.fetch_courses(token), %w[teacher ta])
-    selected_courses = courses_teacher.select { |c| params[:courses]&.include?(c['id'].to_s) }
-    selected_courses.each { |course_data| Course.create_or_update_from_canvas(course_data, token, @user) }
+    filter_courses(Course.fetch_courses(token), %w[teacher ta])
+      .select { |c| params[:courses]&.include?(c['id'].to_s) }
+      .each { |course_api| Course.create_or_update_from_canvas(course_api, token, @user) }
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 
