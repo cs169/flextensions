@@ -13,30 +13,32 @@ class CanvasFacade < ExtensionFacadeBase
   # Pass these to the `scope` parameter of the `canvas_authorize_url` method.
   # This list must exactly match the scopes enabled for the Canvas developer key.
   # https://ucberkeleysandbox.instructure.com/accounts/1/developer_keys#api_key_modal_opened
-  CANVAS_API_SCOPES = %w[
-    url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/extensions
-    url:GET|/api/v1/courses/:id
-    url:GET|/api/v1/courses
-    url:GET|/api/v1/courses/:course_id/users
-    url:GET|/api/v1/users/:user_id/courses
-    url:GET|/api/v1/users/:user_id/enrollments
-    url:GET|/api/v1/courses/:course_id/enrollments
-    url:GET|/api/v1/courses/:course_id/quizzes/assignment_overrides
-    url:GET|/api/v1/courses/:course_id/new_quizzes/assignment_overrides
-    url:POST|/api/v1/courses/:course_id/quizzes/:quiz_id/extensions
-    url:GET|/api/v1/courses/:course_id/assignments
-    url:GET|/api/v1/courses/:course_id/assignments/:id
-    url:GET|/api/v1/users/self/activity_stream
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
-    url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:PUT|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:DELETE|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
-    url:GET|/api/v1/courses/:course_id/assignments/overrides
-    url:PUT|/api/v1/courses/:course_id/assignments/overrides
-    url:POST|/api/v1/courses/:course_id/assignments/overrides
-    url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members
-  ].join(' ').freeze
+  # CANVAS_API_SCOPES = [
+  #   'url:GET|/api/v1/courses/:id',
+  #   'url:GET|/api/v1/courses'
+  # ].join(' ')
+  CANVAS_API_SCOPES = ['url:GET|/api/v1/courses', 'url:GET|/api/v1/users/:id'].join(' ')
+
+  # url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/extensions
+  # url:GET|/api/v1/courses/:course_id/users
+  # url:GET|/api/v1/users/:user_id/courses
+  # url:GET|/api/v1/users/:user_id/enrollments
+  # url:GET|/api/v1/courses/:course_id/enrollments
+  # url:GET|/api/v1/courses/:course_id/quizzes/assignment_overrides
+  # url:GET|/api/v1/courses/:course_id/new_quizzes/assignment_overrides
+  # url:POST|/api/v1/courses/:course_id/quizzes/:quiz_id/extensions
+  # url:GET|/api/v1/courses/:course_id/assignments
+  # url:GET|/api/v1/courses/:course_id/assignments/:id
+  # url:GET|/api/v1/users/self/activity_stream
+  # url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
+  # url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/overrides
+  # url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
+  # url:PUT|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
+  # url:DELETE|/api/v1/courses/:course_id/assignments/:assignment_id/overrides/:id
+  # url:GET|/api/v1/courses/:course_id/assignments/overrides
+  # url:PUT|/api/v1/courses/:course_id/assignments/overrides
+  # url:POST|/api/v1/courses/:course_id/assignments/overrides
+  # url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members
 
   # Potential future scopes:
   # url:GET|/api/v1/sections/:course_section_id/assignments/:assignment_id/override

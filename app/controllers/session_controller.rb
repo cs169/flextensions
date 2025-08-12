@@ -65,15 +65,22 @@ class SessionController < ApplicationController
     redirect_to courses_path, notice: "Logged in! Welcome, #{user_data['name']}!"
   rescue StandardError => e
     Rails.logger.error("OmniAuth callback error: #{e.message}")
-    Rails.logger.error(request.env.inspect)
     redirect_to root_path, alert: 'Authentication failed. Invalid credentials.'
   end
 
   def omniauth_failure
-    Rails.logger.error(request.env.inspect)
+    error_type = request.params[:error_reason] || request.params[:error]
+    error_description = request.params[:error_description]
+
+    Rails.logger.error "Omniauth Failure - Type: #{error_type}"
+    Rails.logger.error "Omniauth Failure - Description: #{error_description}"
+    # Rails.logger.error "Omniauth Failure - All params: #{request.params.inspect}"
+    Rails.logger.error "Omniauth Failure - Strategy: #{request.params[:strategy]}"
+
     redirect_to root_path, alert: 'Authentication failed. Please try again.'
     nil
   end
+
   # def create
   #   if params[:error].present? || params[:code].blank?
   #     redirect_to root_path, alert: 'Authentication failed. Please try again.'
@@ -111,7 +118,9 @@ class SessionController < ApplicationController
       site: ENV.fetch('CANVAS_URL', nil),
       token_url: '/login/oauth2/token'
     )
-    client.auth_code.get_token(code, redirect_uri: :omniauth_callback, scope: CanvasFacade::CANVAS_API_SCOPES)
+    client.auth_code.get_token(code,
+                               redirect_uri: :omniauth_callback,
+                               scopes: CanvasFacade::CANVAS_API_SCOPES)
   end
 
   def find_or_create_user(user_data, full_token)

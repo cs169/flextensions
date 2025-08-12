@@ -2,12 +2,13 @@ Rails.application.routes.draw do
   if Rails.env.development? || !ActiveModel::Type::Boolean.new.cast(ENV["ENABLE_EMAIL_SENDING"])
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+
   post 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
   #   mount RackSessionAccess::Engine => '/rack_session'
   # end
-  
+
   get 'courses/index'
   get 'bcourses/index'
   get 'bcourses', to: 'bcourses#index'
@@ -24,7 +25,7 @@ Rails.application.routes.draw do
   get '/courses/new', to: 'courses#new', as: :new_course
   get '/courses/:id', to: 'courses#show', as: :course
   get '/courses/:id/edit', to: 'courses#edit', as: :course_settings
-  
+
   resources :courses do
     member do
       post :sync_assignments
@@ -42,7 +43,7 @@ Rails.application.routes.draw do
       collection do
         post :create_for_student
         get :export, defaults: { format: :csv }
-      end      
+      end
     end
     resource :form_setting, only: [:edit, :update]
   end
@@ -54,10 +55,9 @@ Rails.application.routes.draw do
   end
 
   #Authentication routes
-  get '/login/' => 'login#canvas', :as => :login 
+  get '/login' => 'login#canvas', :as => :login
   match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
   get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
-  #match '/auth/canvas/callback', to: 'session#create', as: :canvas_callback, via: [:get, :post]
   get '/logout' => 'login#logout', :as => :logout
 
   namespace :api do

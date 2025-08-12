@@ -1,6 +1,4 @@
 class LoginController < ApplicationController
-  def login; end
-
   def canvas
     redirect_to canvas_authorize_url, allow_other_host: true
   end
@@ -21,8 +19,10 @@ class LoginController < ApplicationController
     query_params = {
       client_id: ENV.fetch('CANVAS_CLIENT_ID', nil),
       response_type: 'code',
+      state: SecureRandom.hex(16),
       redirect_uri: "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/auth/canvas/callback",
-      scope: CanvasFacade::CANVAS_API_SCOPES
+      # scope: 'url:GET|/api/v1/users/:id'
+      scopes: CanvasFacade::CANVAS_API_SCOPES
     }
 
     ENV.fetch('CANVAS_URL', nil) + "/login/oauth2/auth?#{query_params.to_query}"
