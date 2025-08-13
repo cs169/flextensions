@@ -11,7 +11,7 @@ module Api
         # Use with_valid_token to ensure we have a fresh token
         with_valid_token(user) do |token|
           # Make API call with the token
-          response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self/activity_stream") do |req|
+          response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self/profile") do |req|
             req.headers['Authorization'] = "Bearer #{token}"
           end
 
