@@ -14,15 +14,16 @@
 				One stop solution to manage and access extensions on assignments of all your Berkeley courses, for course staff and students.
 			</p>
 			<p>
-				The app allows you to manage all your course extensions. As a course staff, you will be able to grant, monitor, and add extensions for your courses.
-				As a student, you will be able to see your available assignment extensions.
+				Flextensions allows you to manage all your assignment extensions.
+				As a student, you will be able to easily request extensions for your assignments, and get notified if they are approved.
 			</p>
 			<p>
-				For detailed guidance on how to use the tool, please refer to the <a href="https://github.com/berkeley-cdss/flextensions/wiki/" target="_blank" class="accessible-link">Wiki</a>. Otherwise, please login to get started.
+				For detailed guidance on how to use the tool, please refer to the <a href="https://berkeley-cdss.github.io/flextensions" target="_blank" class="accessible-link">documentation</a>. Otherwise, simply login to get started.
 			</p>
 		</div>
 		<div class="col-12 text-center">
-			<a href="/login" class="btn btn-secondary" id="login-button-index">Login</a>
+			<%= link_to 'Login', '/auth/canvas', class: 'btn btn-primary', id: 'login-button-index' %>
+			<%# <a href="/login" class="btn btn-secondary" id="login-button-index">Login</a> %>
 		</div>
 	</div>
 </div>

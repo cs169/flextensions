@@ -40,5 +40,9 @@ module Flextensions
     config.active_record.default_timezone = :utc
     config.time_zone = 'Pacific Time (US & Canada)'
     config.generators.system_tests = nil
+
+    # We do not require the master key and insetad use environment variables
+    # Review .env.example for required variables.
+    config.require_master_key = false
   end
 end

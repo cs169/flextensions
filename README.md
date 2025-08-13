@@ -67,12 +67,6 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 
 ---
 
-## Tech Stack
+# Configuration
 
-- Ruby on Rails
-- PostgreSQL
-- JavaScript (ES6)
-- Heroku (Deployment)
-- OAuth2 integration with bCourses (Canvas)
-
----
+Please see `.env.example` for the environment variables that need to be set up for Flextensions to run. You can copy this file to `.env` and fill in the required values.

@@ -30,7 +30,7 @@ RSpec.describe SessionController, type: :controller do
 
         expect(session[:user_id]).to eq('12345')
         expect(response).to redirect_to(courses_path)
-        expect(flash[:notice]).to eq('Logged in!')
+        expect(flash[:notice]).to include('Logged in!')
       end
     end
 
@@ -41,7 +41,7 @@ RSpec.describe SessionController, type: :controller do
         get :omniauth_callback, params: { provider: 'canvas' }  # <= add provider
 
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('Authentication failed. No credentials received.')
+        expect(flash[:alert]).to include('Authentication failed. No credentials received.')
       end
     end
 

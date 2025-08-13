@@ -28,6 +28,8 @@ config/master.key
 # TODO Comment out these rules if environment variables can be committed
 .env
 .env*.local
+!.env.example
+!.env.sample
 
 config/master.key
 

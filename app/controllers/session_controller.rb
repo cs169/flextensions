@@ -29,27 +29,23 @@ class SessionController < ApplicationController
   #    the logic from "create" to "omniauth_callback".
 
   def omniauth_callback
-    # Basic error-parameter guard – identical to `create`
     if params[:error].present?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
       return
     end
 
-    # Did OmniAuth actually build an auth hash?
     auth = request.env['omniauth.auth']
     unless auth
       redirect_to root_path, alert: 'Authentication failed. No credentials received.'
       return
     end
 
-    # Extract user info and credentials from the auth hash
     user_data = {
       'id' => auth.uid,
       'name' => auth.info.name,
       'primary_email' => auth.info.email,
       'email' => auth.info.email
     }
-
     creds = auth.credentials # an OmniAuth::AuthHash
     access_token = OAuth2::AccessToken.new(
       OAuth2::Client.new('', ''), # client never used – stub
@@ -61,38 +57,15 @@ class SessionController < ApplicationController
     # Persist / update the user just like `create`
     find_or_create_user(user_data, access_token)
 
-    redirect_to courses_path, notice: 'Logged in!'
+    redirect_to courses_path, notice: "Logged in! Welcome, #{user_data['name']}!"
   rescue StandardError => e
     Rails.logger.error("OmniAuth callback error: #{e.message}")
     redirect_to root_path, alert: 'Authentication failed. Invalid credentials.'
   end
 
   def omniauth_failure
-    Rails.logger.debug(request.env.inspect)
     redirect_to root_path, alert: 'Authentication failed. Please try again.'
-    nil
   end
-  # def create
-  #   if params[:error].present? || params[:code].blank?
-  #     redirect_to root_path, alert: 'Authentication failed. Please try again.'
-  #     return
-  #   end
-  #   canvas_code = params[:code]
-
-  #   token = get_access_token(canvas_code)
-  #   # Fetch user profile from Canvas API using the token
-  #   response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/users/self?") do |req|
-  #     req.headers['Authorization'] = "Bearer #{token.token}"
-  #   end
-
-  #   if response.success?
-  #     user_data = JSON.parse(response.body)
-  #     find_or_create_user(user_data, token)
-  #     redirect_to courses_path, notice: 'Logged in!'
-  #   else
-  #     redirect_to root_path, alert: 'Authentication failed. Invalid token.'
-  #   end
-  # end
 
   def destroy
     redirect_to :logout, notice: 'Logged out!'
@@ -100,22 +73,9 @@ class SessionController < ApplicationController
 
   private
 
-  # Everytime someone tries to log in, they have to get a new token.
-  # There is no way we reuse the token for login since when a user clicks
-  # the login button, they are redirected to the Canvas login page immediately.
-  def get_access_token(code)
-    client = OAuth2::Client.new(
-      ENV.fetch('CANVAS_CLIENT_ID', nil),
-      ENV.fetch('CANVAS_APP_KEY', nil),
-      site: ENV.fetch('CANVAS_URL', nil),
-      token_url: '/login/oauth2/token'
-    )
-    client.auth_code.get_token(code, redirect_uri: :omniauth_callback)
-  end
-
-  def find_or_create_user(user_data, full_token)
-    # Find or create user in database
-    full_token.token
+  # TODO: Refactor.
+  def find_or_create_user(user_data, auth_token)
+    auth_token.token
     user = nil
     if User.exists?(email: user_data['primary_email'])
       user = User.find_by(email: user_data['primary_email'])
@@ -131,16 +91,16 @@ class SessionController < ApplicationController
       )
     end
     user.save!
-    update_user_credential(user, full_token)
+    update_user_credential(user, auth_token)
 
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
   end
 
+  # TODO: Move this to a Canvas API libarary or user service
+  # TODO: Find credentals for the right LMS, not just the first one.
   def update_user_credential(user, token)
-    # update user's lms credentials.
-    # Refresh token before it expires.
     if user.lms_credentials.any?
       user.lms_credentials.first.update(
         token: token.token,

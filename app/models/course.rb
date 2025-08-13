@@ -101,13 +101,17 @@ class Course < ApplicationRecord
     canvas_facade = CanvasFacade.new(token)
     response = canvas_facade.get_course(course_data['id'])
 
-    if response.success?
-      course = find_or_initialize_by(canvas_id: course_data['id'])
-      response_data = JSON.parse(response.body)
-      course.course_name = response_data['name']
-      course.course_code = response_data['course_code']
-      course.save!
+    if response.nil? || !response.success?
+      Rails.logger.error "Failed to fetch course from Canvas: #{response.status} - #{response.body}"
+      # TODO: Raise error to user?
+      return nil
     end
+
+    course = find_or_initialize_by(canvas_id: course_data['id'])
+    response_data = JSON.parse(response.body)
+    course.course_name = response_data['name']
+    course.course_code = response_data['course_code']
+    course.save!
     course
   end
 
