@@ -104,13 +104,6 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-  # --- BEGIN PROD DB CRED INITIALIZATION --- #
-  # ENV['DB_PORT'] ||= String(Rails.application.credentials.config[:DB_PORT])
-  # ENV['DB_USER'] ||= Rails.application.credentials.config[:DB_USER]
-  # ENV['DB_PASSWORD'] ||= Rails.application.credentials.config[:DB_PASSWORD]
-  # ENV['DB_NAME'] ||= Rails.application.credentials.config[:DB_NAME]
-  # --- END PROD DB CRED INITIALIZATION --- #
-
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              ENV.fetch("SMTP_ADDRESS"),
