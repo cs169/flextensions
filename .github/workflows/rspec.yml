@@ -52,17 +52,18 @@ jobs:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
         COVERAGE: "true"
         CI: "true"
-    - name: Run after-build command
-      if: env.CC_TEST_REPORTER_ID != ''
-      run: |
-        if [ -f coverage/.resultset.json ]; then
-          ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
-        else
-          echo "No coverage report found"
-          ls -la coverage/
-          exit 1
-        fi
-    - uses: qltysh/qlty-action/coverage@v1
+    # - name: Submit Legacy Code Climate Coverage Report
+    #   if: env.CC_TEST_REPORTER_ID != ''
+    #   run: |
+    #     if [ -f coverage/.resultset.json ]; then
+    #       ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
+    #     else
+    #       echo "No coverage report found"
+    #       ls -la coverage/
+    #       exit 1
+    #     fi
+    - name: Submit QLTY Coverage Report
+      uses: qltysh/qlty-action/coverage@v1
       if: env.QLTY_COVERAGE_TOKEN != ''
       with:
         token: ${{ secrets.QLTY_COVERAGE_TOKEN }}

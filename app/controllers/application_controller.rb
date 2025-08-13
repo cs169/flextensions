@@ -6,8 +6,9 @@ class ApplicationController < ActionController::Base
     excluded_actions = {
       'home' => ['index'],
       'login' => ['canvas'],
-      'session' => %w[create omniauth_callback],
-      'rails/health' => ['show']
+      'session' => %w[create omniauth_callback omniauth_failure],
+      'rails/health' => ['show'],
+      'requests' => ['export']
     }
     controller = params[:controller]
     action = params[:action]

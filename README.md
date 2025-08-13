@@ -1,15 +1,19 @@
 # [Flextensions](https://flextensions.eecs.cloud)
-[![Maintainability](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
-[![Code Coverage](https://qlty.sh/badges/9cedbd0c-7bc3-4468-bc77-348c3be8992a/test_coverage.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions)
-[![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml)
-[![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml)
-[![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml)
+---
+
+[![Maintainability](https://qlty.sh/gh/berkeley-cdss/projects/flextensions/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions) •
+[![Code Coverage](https://qlty.sh/gh/berkeley-cdss/projects/flextensions/coverage.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions) •
+[![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml) •
+[![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml) •
+[![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml) •
 [![RuboCop](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml)
 
+---
+
 ## [cs169/flextensions](https://github.com/cs169/flextensions)
-[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability) 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage) 
-[![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml) 
+[![Maintainability](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/maintainability)](https://codeclimate.com/github/cs169/flextensions/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8d99ec9a1784ddba34ac/test_coverage)](https://codeclimate.com/github/cs169/flextensions/test_coverage)
+[![All Specs](https://github.com/cs169/flextensions/actions/workflows/main.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/main.yml)
 [![Accessibility Tests](https://github.com/cs169/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/a11y.yml)
 [![RuboCop](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/cs169/flextensions/actions/workflows/rubocop.yml)
 
@@ -32,12 +36,12 @@ Flextensions is designed specifically for the UC Berkeley academic environment. 
 
 ## Documentation
 Our documentation provides detailed instructions on how to set up, use, and contribute to Flextensions.
-For the full documentation, visit our **[Flextensions Wiki](https://github.com/berkeley-cdss/flextensions/wiki)**.
+For the full documentation, visit the public **[Flextensions Docs](https://berkeley-cdss.github.io/flextensions)**. (Or read `/docs/` in this repository.)
 
 Below are the key resources available:
-- **[Developer Resources](https://github.com/berkeley-cdss/flextensions/wiki/Developer-Resources)**: Information on environment variables, database setup, and deployment.
-- **[Instructor Guide](https://github.com/berkeley-cdss/flextensions/wiki/Instructor-Resources)**: A comprehensive guide for instructors on how to use Flextensions.
-- **[Student Guide](https://github.com/berkeley-cdss/flextensions/wiki/Student-Resourcess)**: A comprehensive guide for students on how to use Flextensions.
+- **[Developer Resources](https://berkeley-cdss.github.io/flextensions/developers)**: Information on environment variables, database setup, and deployment.
+- **[Instructor Guide](https://berkeley-cdss.github.io/flextensions/instructors)**: A comprehensive guide for instructors on how to use Flextensions.
+- **[Student Guide](https://berkeley-cdss.github.io/flextensions/students)**: A comprehensive guide for students on how to use Flextensions.
 - **[API Documentation](https://github.com/saasbook/esaas-swagger)**: Details on the APIs used for integration with bCourses (Canvas).
 
 ---
@@ -63,12 +67,10 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 
 ---
 
-## Tech Stack
+# Configuration
 
-- Ruby on Rails  
-- PostgreSQL  
-- JavaScript (ES6)  
-- Heroku (Deployment)  
-- OAuth2 integration with bCourses (Canvas)
+Please see `.env.example` for the environment variables that need to be set up for Flextensions to run. You can copy this file to `.env` and fill in the required values.
 
----
+## Canvas Scoped Keys
+
+This deserves brief special mention. You must keep the Canvas API configuration (in Canvas) in sync with the list of scopes defined in the CanvasFacade. If you need to add a new scope, you will need to update the Canvas API configuration in the Canvas Developer Keys section **and will need to coordinate with the bCourses team to ensure the new scope is approved and turned on before deploying it to production**.

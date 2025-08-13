@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   pool: 5
   timeout: 5000
-  host: localhost
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
   port: <%= ENV['DB_PORT'] || '5432' %>
   username: <%= ENV['DB_USER'] || ENV['USER'] || 'postgres' %>
   password: <%= ENV['DB_PASSWORD'] || 'password' %>
@@ -20,14 +20,14 @@ test:
   database: flextensions_test
 
 staging:
-  adapter: postgresql
+  <<: *default
   pool: 5
   timeout: 5000
-  database: flextensions_stage
+  database: flextensions_staging
 
 # MAKE SURE THE ENVIRONMENT CONFIG IS SET UP FOR PROD
 production:
-  adapter: postgresql
+  <<: *default
   pool: 5
   timeout: 5000
-  database: flextensions_prod
+  database: flextensions_production

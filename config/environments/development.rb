@@ -1,11 +1,10 @@
 require "active_support/core_ext/integer/time"
 
+# Settings specified here will take precedence over those in config/application.rb.
 Rails.application.configure do
   # Configure 'rails notes' to inspect Cucumber files
   config.annotations.register_directories('features')
   config.annotations.register_extensions('feature') { |tag| /#\s*(#{tag}):?\s*(.*)$/ }
-
-  # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
@@ -40,11 +39,6 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
-  # config.action_mailer.raise_delivery_errors = false
-
-  # config.action_mailer.perform_caching = false
-
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
@@ -70,7 +64,7 @@ Rails.application.configure do
   # config.i18n.raise_on_missing_translations = true
 
   # Annotate rendered view with file names.
-  # config.action_view.annotate_rendered_view_with_filenames = true
+  config.action_view.annotate_rendered_view_with_filenames = true
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
@@ -80,27 +74,15 @@ Rails.application.configure do
 
   config.hosts << "flextensions.lvh.me:3000"
 
-  # Action Mailer settings
-  if ENV["ENABLE_EMAIL_SENDING"] == "true"
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      address:              ENV.fetch("SMTP_ADDRESS"),
-      port:                 ENV.fetch("SMTP_PORT").to_i,
-      domain:               ENV.fetch("SMTP_DOMAIN"),
-      user_name:            ENV["SMTP_USERNAME"],
-      password:             ENV["SMTP_PASSWORD"],
-      authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
-      enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
-      ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
-      open_timeout:         30,
-      read_timeout:         60
-    }
-  else
-    config.action_mailer.delivery_method = :letter_opener_web
-  end
-
+  config.action_mailer.delivery_method = :letter_opener_web
+  config.action_mailer.perform_deliveries = true
   config.action_mailer.default_url_options = {
     host: ENV.fetch("APP_HOST", "localhost"),
     port: ENV.fetch("APP_PORT", "3000")
   }
+
+  # Set up default encryption keys for the development environment
+  config.active_record.encryption.primary_key = 'dev-primary-key-1234567890abcdef'
+  config.active_record.encryption.deterministic_key = 'dev-deterministic-key-1234567890abcdef'
+  config.active_record.encryption.key_derivation_salt = 'dev-salt-1234567890abcdef'
 end

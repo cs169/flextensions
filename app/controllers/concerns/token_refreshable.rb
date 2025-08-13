@@ -25,7 +25,7 @@ module TokenRefreshable
     credential = user.lms_credentials.first
     return unless credential&.refresh_token
 
-    # Create OAuth2 client
+    # TODO: Debug / test API scopes.
     client = OAuth2::Client.new(
       ENV.fetch('CANVAS_CLIENT_ID', nil),
       ENV.fetch('CANVAS_APP_KEY', nil),

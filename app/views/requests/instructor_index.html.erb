@@ -19,7 +19,11 @@
       </div>
 
       <% if @requests.any? %>
-        <table class="table table-bordered table-striped datatable" id="requests-table" data-controller="requests" data-search-query="<%= @search_query %>">
+        <table class="table table-bordered table-striped datatable"
+               id="requests-table"
+               data-controller="requests"
+               data-readonly-token="<%= @course.readonly_api_token %>"
+               data-course-id="<%= @course.id %>">
           <thead>
             <tr class="table-info">
               <th id="assignment">Assignment</th>
@@ -55,7 +59,7 @@
                     N/A
                   <% end %>
                 </td>
-                <td class="text-center align-content-center">
+                <td class="text-center align-content-center" data-export="<%= status_export_string(request) %>">
                   <% case request.status %>
                     <% when 'pending' %>
                       <span class="badge text-bg-info">Pending</span>

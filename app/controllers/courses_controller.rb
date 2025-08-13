@@ -22,9 +22,11 @@ class CoursesController < ApplicationController
     @side_nav = 'show'
     return redirect_to courses_path, alert: 'Course not found.' unless @course
 
-    course_to_canvas = @course.course_to_lms(1)
+    @course.regenerate_readonly_api_token_if_blank
+    course_to_lms = @course.course_to_lms(1)
     course_to_gradescope = @course.course_to_lms(2)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_canvas
+
+    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
 
     if @role == 'student'
       course_settings = @course.course_settings
@@ -58,9 +60,9 @@ class CoursesController < ApplicationController
 
   def create
     token = @user.lms_credentials.first.token
-    courses_teacher = filter_courses(Course.fetch_courses(token), %w[teacher ta])
-    selected_courses = courses_teacher.select { |c| params[:courses]&.include?(c['id'].to_s) }
-    selected_courses.each { |course_data| Course.create_or_update_from_canvas(course_data, token, @user) }
+    filter_courses(Course.fetch_courses(token), %w[teacher ta])
+      .select { |c| params[:courses]&.include?(c['id'].to_s) }
+      .each { |course_api| Course.create_or_update_from_canvas(course_api, token, @user) }
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
   end
 

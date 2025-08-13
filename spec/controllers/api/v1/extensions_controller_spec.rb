@@ -1,5 +1,5 @@
 require 'rails_helper'
-require 'byebug'
+
 module Api
   module V1
     describe ExtensionsController do
