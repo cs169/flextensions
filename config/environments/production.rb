@@ -43,6 +43,7 @@ Rails.application.configure do
   # config.action_cable.mount_path = nil
   # config.action_cable.url = "wss://example.com/cable"
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
+  config.hosts.clear
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   # Can be used together with config.force_ssl for Strict-Transport-Security and secure cookies.
@@ -104,20 +105,11 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address:              ENV.fetch("SMTP_ADDRESS"),
-    port:                 ENV.fetch("SMTP_PORT").to_i,
-    domain:               ENV.fetch("SMTP_DOMAIN"),
-    user_name:            ENV["SMTP_USERNAME"],
-    password:             ENV["SMTP_PASSWORD"],
-    authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
-    enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
-    ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
-    open_timeout:         30,
-    read_timeout:         60
-  }
-
+    if ENV["ENABLE_EMAIL_SENDING"] == "true"
+    config.action_mailer.delivery_method = :sendmail
+  else
+    config.action_mailer.delivery_method = :letter_opener_web
+  end
   config.action_mailer.default_url_options = {
     host: ENV.fetch("APP_HOST", "localhost"),
     port: ENV.fetch("APP_PORT", "3000")
