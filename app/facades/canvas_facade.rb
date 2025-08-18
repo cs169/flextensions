@@ -106,10 +106,10 @@ class CanvasFacade < ExtensionFacadeBase
     links = response.headers['Link']
     return JSON.parse(response.body) unless links
 
-    links = links.split(',').map(&:strip).map do |link|
+    links = links.split(',').map(&:strip).filter_map do |link|
       match = link.match(HEADER_LINK_PARTS)
       { url: match[:url], rel: match[:rel] } if match
-    end.compact
+    end
 
     # Canvas provides a 'next' page as long as there is more to query
     next_page = links.find { |page| page[:rel] == 'next' }
