@@ -35,6 +35,7 @@
 						</li>
 					<% else %>
 						<!-- Display this when there's NO logged-in user -->
+						<%# TODO: Need a test case for this. %>
 						<li class="nav-item">
 							<%= link_to 'Login', '/auth/canvas', class: 'btn btn-primary', id: 'login-button-index' %>
 						</li>
