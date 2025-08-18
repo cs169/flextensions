@@ -37,7 +37,7 @@ class Course < ApplicationRecord
     if all_courses.is_a?(Array)
       all_courses
     else
-      Rails.logger.error "Failed to fetch Canvas courses: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch courses: #{response.status} - #{response.body}"
       []
     end
   end
@@ -100,7 +100,7 @@ class Course < ApplicationRecord
     response = canvas_facade.get_course(course_data['id'])
 
     if response.nil? || !response.success?
-      Rails.logger.error "Failed to fetch course from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch course: #{response.status} - #{response.body}"
       # TODO: Raise error to user?
       return nil
     end
@@ -174,7 +174,7 @@ class Course < ApplicationRecord
     if response.success?
       JSON.parse(response.body)
     else
-      Rails.logger.error "Failed to fetch users from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch users: #{response.status} - #{response.body}"
       []
     end
   end
