@@ -51,10 +51,12 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
-  # Log to STDOUT by default
-  config.logger = ActiveSupport::Logger.new(STDOUT)
-    .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
-    .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+  # Log to ENVIRONMENT.rb
+  unless ENV["RAILS_LOG_TO_STDOUT"] == "true"
+    config.logger = ActiveSupport::Logger.new(Rails.root.join("log", "#{Rails.env}.log"))
+      .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
+      .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+  end
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
@@ -104,19 +106,23 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address:              ENV.fetch("SMTP_ADDRESS"),
-    port:                 ENV.fetch("SMTP_PORT").to_i,
-    domain:               ENV.fetch("SMTP_DOMAIN"),
-    user_name:            ENV["SMTP_USERNAME"],
-    password:             ENV["SMTP_PASSWORD"],
-    authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
-    enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
-    ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
-    open_timeout:         30,
-    read_timeout:         60
-  }
+  if ENV["ACTION_MAILER_DELIVERY_METHOD"] == "smtp"
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address:              ENV.fetch("SMTP_ADDRESS"),
+      port:                 ENV.fetch("SMTP_PORT").to_i,
+      domain:               ENV.fetch("SMTP_DOMAIN"),
+      user_name:            ENV["SMTP_USERNAME"],
+      password:             ENV["SMTP_PASSWORD"],
+      authentication:       ENV.fetch("SMTP_AUTH_METHOD", nil),
+      enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS", "false") == "true",
+      ssl:                  ENV.fetch("SMTP_SSL", "false") == "true",
+      open_timeout:         30,
+      read_timeout:         60
+    }
+  else
+    config.action_mailer.delivery_method = :sendmail
+  end
 
   config.action_mailer.default_url_options = {
     host: ENV.fetch("APP_HOST", "localhost"),
