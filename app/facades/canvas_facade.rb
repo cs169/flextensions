@@ -99,7 +99,7 @@ class CanvasFacade < ExtensionFacadeBase
     { Authorization: "Bearer #{@api_token}" }
   end
 
-  HEADER_LINK_PARTS = /\<(?<url>.*)\>;\s+rel="(?<rel>.*)"/
+  HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
   def self.depaginate_response(response)
     return response unless response.success?
 
@@ -110,7 +110,6 @@ class CanvasFacade < ExtensionFacadeBase
       match = link.match(HEADER_LINK_PARTS)
       { url: match[:url], rel: match[:rel] } if match
     end.compact
-
 
     # Canvas provides a 'next' page as long as there is more to query
     next_page = links.find { |page| page[:rel] == 'next' }

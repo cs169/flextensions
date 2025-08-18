@@ -72,7 +72,7 @@ Metrics/ParameterLists:
 # TODO-mb: this one is frustrating.
 # Fix to allow more left-aligned params.
 Layout/FirstHashElementIndentation:
-  enabled: false
+  Enabled: false
 
 Layout/LineLength:
   Max: 250
