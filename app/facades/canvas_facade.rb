@@ -70,11 +70,6 @@ class CanvasFacade < ExtensionFacadeBase
   # url:POST|/api/v1/courses/:id/late_policy
   # url:PATCH|/api/v1/courses/:id/late_policy
 
-  ## TODO:
-  #  We need to build in depaginate_response
-  # See https://canvas.instructure.com/doc/api/file.pagination
-  # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
-
   ##
   # Configures the facade with the canvas api endpoint configured in the environment.
   #
@@ -98,6 +93,14 @@ class CanvasFacade < ExtensionFacadeBase
   def auth_header
     { Authorization: "Bearer #{@api_token}" }
   end
+
+  # rubocop:disable Metrics/LineLength
+  # Depaginate a Canvas API response
+  # call as: CanvasFacade.depaginate_response(response)
+  # See https://canvas.instructure.com/doc/api/file.pagination
+  # Example Header response:
+  # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
+  # rubocop:enable Metrics/LineLength
 
   HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
   def self.depaginate_response(response)
