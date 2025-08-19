@@ -4,7 +4,7 @@ require 'faraday'
 require 'json'
 
 # Configuration
-CANVAS_BASE_URL = 'https://ucberkeleysandbox.instructure.com'
+CANVAS_BASE_URL = 'https://ucberkeleysandbox.instructure.com'.freeze
 ACCOUNT_ID = 1
 TEACHER_USER_ID = 136
 
