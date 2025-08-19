@@ -1,9 +1,9 @@
 ##
 # Base class for all extension facades.
 class ExtensionFacadeBase
-  abstract_class = true
-
-  def initialize(_user_token)
+  # Every facade must accept at least one optional argument for compatibility.
+  # This is usually the user token, or some other value passed to the supporting API.
+  def initialize(_user_token = nil)
     raise NotImplementedError
   end
 

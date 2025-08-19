@@ -97,7 +97,7 @@ RSpec.describe CourseSettingsController, type: :controller do
         }
 
         expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
-        expect(flash[:alert]).to eq('Failed to update course settings.')
+        expect(flash[:alert]).to eq('Failed to update course settings:')
       end
 
       it 'resets email templates and redirects' do
