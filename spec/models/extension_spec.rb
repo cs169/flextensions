@@ -1,4 +1,28 @@
 # spec/models/extension_spec.rb
+# == Schema Information
+#
+# Table name: extensions
+#
+#  id                    :bigint           not null, primary key
+#  initial_due_date      :datetime
+#  new_due_date          :datetime
+#  student_email         :string
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  assignment_id         :bigint
+#  external_extension_id :string
+#  last_processed_by_id  :bigint
+#
+# Indexes
+#
+#  index_extensions_on_assignment_id         (assignment_id)
+#  index_extensions_on_last_processed_by_id  (last_processed_by_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (assignment_id => assignments.id)
+#  fk_rails_...  (last_processed_by_id => users.id)
+#
 require 'rails_helper'
 
 RSpec.describe Extension, type: :model do
