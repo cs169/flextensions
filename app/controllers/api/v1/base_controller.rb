@@ -1,6 +1,6 @@
-module Api
+module API
   module V1
-    class BaseController < Api::BaseController
+    class BaseController < API::BaseController
     end
   end
 end
