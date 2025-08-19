@@ -129,7 +129,9 @@ class RequestsController < ApplicationController
   end
 
   def approve
-    if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
+    @assignment = Assignment.find_by(id: @request.assignment_id)
+    lms_facade = @assignment.lms_facade
+    if @request.approve(lms_facade.from_user(@user), @user)
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'

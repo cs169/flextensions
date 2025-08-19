@@ -54,6 +54,10 @@ class Course < ApplicationRecord
     Lms.facade_class(course_to_lms.lms_id)
   end
 
+  def gradescope_id
+    CourseToLms.find_by(course_id: id, lms_id: GRADESCOPE_LMS_ID)&.external_course_id
+  end
+
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
     response = CanvasFacade.new(token).get_all_courses

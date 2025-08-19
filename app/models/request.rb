@@ -227,10 +227,20 @@ class Request < ApplicationRecord
     canvas_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, override_id)
   end
 
-  def create_override(canvas_facade)
-    canvas_facade.create_assignment_override(
-      course.canvas_id, assignment.external_assignment_id, [user.canvas_uid], "Extension for #{user.name}",
-      requested_due_date.iso8601, nil, nil
+  # TODO: this should update the Canvas lock date.
+  def create_override(lms_facade)
+    # This suggests these should be Rails model instances
+    if lms_facade.is_a?(CanvasFacade)
+      external_course_id = course.canvas_id
+      external_user_id = user.canvas_uid
+    elsif lms_facade.is_a?(GradescopeFacade)
+      external_course_id = course.gradescope_id
+      # TODO: is this correct?
+      external_user_id = user.email
+    end
+
+    lms_facade.provision_extension(
+      external_course_id, external_user_id, assignment.external_assignment_id, requested_due_date.iso8601
     )
   end
 
