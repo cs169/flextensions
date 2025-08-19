@@ -1,6 +1,8 @@
 ##
 # Base class for all extension facades.
-class ExtensionFacadeBase
+class LmsFacade
+  class LmsAPIError < StandardError; end
+
   ##
   # Provisions a new extension to a user.
   #

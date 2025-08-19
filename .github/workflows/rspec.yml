@@ -34,8 +34,7 @@ jobs:
         bundler-cache: true
     - name: Setup Database
       run: |
-        bundle exec rails db:create
-        bundle exec rails db:migrate
+        bundle exec rails db:setup
     - name: Download and install Code Climate test reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter

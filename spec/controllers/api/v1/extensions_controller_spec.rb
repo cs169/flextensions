@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module Api
+module API
   module V1
     describe ExtensionsController do
       describe 'POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions' do
