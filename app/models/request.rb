@@ -239,6 +239,8 @@ class Request < ApplicationRecord
       external_user_id = user.email
     end
 
+    # Ideally...
+    # lms_facade.provision_extension(course, user, assignment, requested_due_date)
     lms_facade.provision_extension(
       external_course_id, external_user_id, assignment.external_assignment_id, requested_due_date.iso8601
     )

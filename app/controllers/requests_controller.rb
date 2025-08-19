@@ -1,6 +1,9 @@
 require 'csv'
 
+# We really should get a handle on this.
+# rubocop:disable Metrics/ClassLength
 class RequestsController < ApplicationController
+  # Consider moving export, approve/reject to a separate controller?
   before_action :authenticate_user, except: [:export]
   before_action :set_course_role_from_settings, except: [:export]
   before_action :authenticate_course, except: [:export]
@@ -175,6 +178,7 @@ class RequestsController < ApplicationController
   def handle_request_error
     flash.now[:alert] = 'There was a problem submitting your request.'
     # course_to_lms = @course.course_to_lms(1)
+    # TODO: move to load assgnments / refactor to grab from gradescope too.
     @assignments = Assignment.where(course_to_lms_id: @course.course_to_lms(1).id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
@@ -254,3 +258,4 @@ class RequestsController < ApplicationController
     redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
   end
 end
+# rubocop:enable Metrics/ClassLength

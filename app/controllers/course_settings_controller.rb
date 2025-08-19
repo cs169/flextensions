@@ -17,6 +17,7 @@ class CourseSettingsController < ApplicationController
   \n\nBest regards,
   \n{{course_name}} Staff".freeze
 
+  # rubocop:disable Metrics/AbcSize
   def update
     @side_nav = 'course_settings'
     @course_settings = @course.course_settings || @course.build_course_settings
@@ -46,6 +47,7 @@ class CourseSettingsController < ApplicationController
       redirect_to course_settings_path(@course, tab: params[:tab])
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   private
 

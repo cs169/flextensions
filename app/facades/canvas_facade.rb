@@ -99,13 +99,13 @@ class CanvasFacade < ExtensionFacadeBase
     new(token)
   end
 
-  # rubocop:disable Metrics/LineLength
+  # rubocop:disable Layout/LineLength
   # Depaginate a Canvas API response
   # call as: CanvasFacade.depaginate_response(response)
   # See https://canvas.instructure.com/doc/api/file.pagination
   # Example Header response:
   # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
-  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Layout/LineLength
 
   HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
   def self.depaginate_response(response)
@@ -205,6 +205,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param   [String]     unlockDate   the date the override should unlock the assignment.
   # @param   [String]     lockDate     the date the override should lock the assignment.
   # @return  [Faraday::Response] information about the new override.
+  # TODO: Rename this to create_assignment_extenstion. Title should be optional.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvas_conn.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
                       assignment_override: {

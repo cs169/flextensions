@@ -49,10 +49,12 @@ class Course < ApplicationRecord
     nil
   end
 
-  def lms_facade
-    course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
-    Lms.facade_class(course_to_lms.lms_id)
-  end
+  # TODO: This doesn't make sense actually.
+  # A course can be linked to many LMSs.
+  # def lms_facade
+  #   course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
+  #   Lms.facade_class(course_to_lms.lms_id)
+  # end
 
   def gradescope_id
     CourseToLms.find_by(course_id: id, lms_id: GRADESCOPE_LMS_ID)&.external_course_id
