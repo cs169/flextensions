@@ -52,11 +52,15 @@ Rails.application.configure do
   config.force_ssl = true
 
   # Log to ENVIRONMENT.rb
-  unless ENV["RAILS_LOG_TO_STDOUT"] == "true"
-    config.logger = ActiveSupport::Logger.new(Rails.root.join("log", "#{Rails.env}.log"))
-      .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
-      .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+  if ENV["RAILS_LOG_TO_STDOUT"] == "true"
+    log_dest = STDOUT
+  else
+    log_dest = Rails.root.join("log", "#{Rails.env}.log")
   end
+  config.logger = ActiveSupport::Logger.new(log_dest)
+    .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
+    .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+
 
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
