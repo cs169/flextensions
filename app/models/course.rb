@@ -47,8 +47,8 @@ class Course < ApplicationRecord
 
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
-    response = CanvasFacade.new(token).get_all_courses
-    all_courses = CanvasFacade.depaginate_response(response)
+    facade = CanvasFacade.new(token)
+    all_courses = facade.get_all_courses
     # response = CanvasFacade.new(token).get_instructor_courses
 
     if all_courses.is_a?(Array)

@@ -70,6 +70,10 @@ class CanvasFacade < ExtensionFacadeBase
   # url:POST|/api/v1/courses/:id/late_policy
   # url:PATCH|/api/v1/courses/:id/late_policy
 
+  def auth_header
+    { Authorization: "Bearer #{@api_token}" }
+  end
+
   ##
   # Configures the facade with the canvas api endpoint configured in the environment.
   #
@@ -100,7 +104,11 @@ class CanvasFacade < ExtensionFacadeBase
   # rubocop:enable Metrics/LineLength
 
   HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
-  def self.depaginate_response(response)
+  # TODO: This really needs tests
+  # Because this is an instance method, it's a little awkward to use:
+  # facade = CanvasFacade.new(token)
+  # all_courses = facade.depaginate_response(facade.get_all_courses)
+  def depaginate_response(response)
     return response unless response.success?
 
     links = response.headers['Link']
@@ -115,7 +123,9 @@ class CanvasFacade < ExtensionFacadeBase
     next_page = links.find { |page| page[:rel] == 'next' }
     return JSON.parse(response.body) if next_page.nil?
 
-    [JSON.parse(response.body)] + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
+    # NOTE: Do not log the full :url as it contains an auth token (from canvas)
+    Rails.logger.debug 'Fetching additional pages from Canvas API'
+    JSON.parse(response.body) + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
   end
 
   ##
@@ -123,10 +133,10 @@ class CanvasFacade < ExtensionFacadeBase
   #
   # @return [Faraday::Response] list of the courses the user has access to.
   def get_all_courses
-    @canvas_conn.get('courses', {
-      per_page: 100,
+    depaginate_response(@canvas_conn.get('courses', {
+      per_page: 10,
       'include[]': 'term'
-    })
+    }))
   end
 
   ##
@@ -394,9 +404,5 @@ class CanvasFacade < ExtensionFacadeBase
         courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
-  end
-
-  def auth_header
-    { Authorization: "Bearer #{@api_token}" }
   end
 end
