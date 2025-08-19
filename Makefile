@@ -26,5 +26,3 @@ db-seed: env
 init: env
 	@command -v yarn > /dev/null 2>&1 || { echo >&2 "please install yarn first"; exit 1; }
 	bin/rails db:setup
-	bin/rails db:migrate
-	bin/rails db:seed
