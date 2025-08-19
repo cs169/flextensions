@@ -1,6 +1,6 @@
 require 'json'
 
-module Api
+module API
   module V1
     class SwaggerController < BaseController
       def read

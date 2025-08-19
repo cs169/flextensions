@@ -1,5 +1,5 @@
 require 'rails_helper'
-module Api
+module API
   module V1
     describe UsersController do
       describe 'POST #create' do

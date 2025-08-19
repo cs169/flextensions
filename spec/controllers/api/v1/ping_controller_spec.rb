@@ -1,5 +1,5 @@
 require 'rails_helper'
-module Api
+module API
   module V1
     describe PingController do
       it 'returns a successful response' do
