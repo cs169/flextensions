@@ -44,9 +44,11 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 
-gem 'lms-api'
+# Alternative Canvas API. We probably don't need this.
+# gem 'lms-api'
 
-gem 'newrelic_rpm'
+gem "sentry-ruby"
+gem "sentry-rails"
 
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
