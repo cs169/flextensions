@@ -117,7 +117,7 @@ group :development do
   gem 'web-console'
 
   # Nice references to routes/db schema in files
-   gem "annotaterb"
+  gem 'annotaterb'
 
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
