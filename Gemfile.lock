@@ -139,6 +139,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.2)
     cucumber (9.2.1)
       builder (~> 3.2)
       cucumber-ci-environment (> 9, < 11)
@@ -233,6 +234,10 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.1.2)
     hashie (5.0.0)
+    httparty (0.22.0)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -267,6 +272,9 @@ GEM
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    lms-api (1.25.0)
+      activesupport (>= 3.0)
+      httparty
     logger (1.7.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
@@ -583,6 +591,7 @@ DEPENDENCIES
   json
   letter_opener
   letter_opener_web (~> 3.0)
+  lms-api
   omniauth
   omniauth-canvas
   omniauth-oauth2

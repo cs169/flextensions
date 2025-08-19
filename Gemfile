@@ -45,10 +45,11 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 gem 'bootsnap', require: false
 
 # Alternative Canvas API. We probably don't need this.
-# gem 'lms-api'
+# Verify instances of `LMS::Canvas`
+gem 'lms-api'
 
-gem "sentry-ruby"
-gem "sentry-rails"
+gem 'sentry-rails'
+gem 'sentry-ruby'
 
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
