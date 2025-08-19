@@ -74,24 +74,21 @@ class CanvasFacade < ExtensionFacadeBase
   # Configures the facade with the canvas api endpoint configured in the environment.
   #
   # @param [String]              masqueradeToken the token of the user to masquerade as.
-  # @param [Faraday::Connection] conn            existing connection to use (defaults to nil).
-  def initialize(masqueradeToken, conn = nil)
+  # @param [Faraday::Connection] existing connection to use (defaults to nil).
+  # Enable this to automatically parse JSON responses.
+  # This will require some refactoring (and rebuilding VCRs/webmock)
+  # do |faraday|
+  #     faraday.request :json
+  #     faraday.response :json, content_type: /\bjson$/
+  #     faraday.adapter Faraday.default_adapter
+  # end
+  def initialize(token, conn = nil)
     @current_response = nil
-    @api_token = masqueradeToken
+    @api_token = token
     @canvas_conn = conn || Faraday.new(
       url: "#{CanvasFacade::CANVAS_URL}/api/v1",
       headers: auth_header
-    ) do |faraday|
-      faraday.request :json
-      # Enable this to automatically parse JSON responses.
-      # This will require some refactoring.
-      # faraday.response :json, content_type: /\bjson$/
-      faraday.adapter Faraday.default_adapter
-    end
-  end
-
-  def auth_header
-    { Authorization: "Bearer #{@api_token}" }
+    )
   end
 
   # rubocop:disable Metrics/LineLength
@@ -397,5 +394,9 @@ class CanvasFacade < ExtensionFacadeBase
         courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
+  end
+
+  def auth_header
+    { Authorization: "Bearer #{@api_token}" }
   end
 end
