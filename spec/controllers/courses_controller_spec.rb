@@ -33,7 +33,10 @@ RSpec.describe CoursesController, type: :controller do
     context 'when course exists' do
       before do
         CourseToLms.create!(course: course, lms_id: 1)
-        Assignment.create!(name: 'Assignment 1', course_to_lms_id: course.course_to_lmss.first.id, external_assignment_id: 'xyz', enabled: true)
+        Assignment.create!(
+          name: 'Assignment 1', course_to_lms_id: course.course_to_lmss.first.id,
+          due_date: 1.day.from_now, external_assignment_id: 'xyz', enabled: true
+        )
       end
 
       it 'renders the shared role-based view with student template' do
@@ -189,7 +192,12 @@ RSpec.describe CoursesController, type: :controller do
 
   describe 'DELETE #delete' do
     let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
-    let!(:assignment) { Assignment.create!(name: 'Assignment to Delete', course_to_lms_id: course_to_lms.id, external_assignment_id: 'del123', enabled: true) }
+    let!(:assignment) do
+      Assignment.create!(
+        name: 'Assignment to Delete', course_to_lms_id: course_to_lms.id,
+        due_date: 1.day.from_now, external_assignment_id: 'del123', enabled: true
+      )
+    end
 
     before do
       Extension.create!(assignment: assignment, student_email: user.email)

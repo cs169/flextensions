@@ -80,6 +80,9 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    annotaterb (4.18.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     ast (2.4.2)
     autoprefixer-rails (10.4.19.0)
       execjs (~> 2)
@@ -165,8 +168,6 @@ GEM
       capybara (>= 3.11, < 4)
       cucumber (>= 5, < 10)
       railties (>= 5.2, < 9)
-    cucumber-rails-training-wheels (1.0.0)
-      cucumber-rails (>= 1.1.1)
     cucumber-tag-expressions (6.1.2)
     database_cleaner (2.1.0)
       database_cleaner-active_record (>= 2, < 3)
@@ -313,7 +314,6 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    newrelic_rpm (9.18.0)
     nio4r (2.7.4)
     nokogiri (1.18.9)
       mini_portile2 (~> 2.8.2)
@@ -495,6 +495,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    sentry-rails (5.26.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.26.0)
+    sentry-ruby (5.26.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     shellany (0.0.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
@@ -569,6 +575,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  annotaterb
   axe-core-api
   axe-core-cucumber
   axe-core-rspec
@@ -577,7 +584,6 @@ DEPENDENCIES
   capybara-screenshot
   codeclimate-test-reporter
   cucumber-rails
-  cucumber-rails-training-wheels
   database_cleaner
   database_cleaner-active_record
   debug
@@ -593,7 +599,6 @@ DEPENDENCIES
   letter_opener
   letter_opener_web (~> 3.0)
   lms-api
-  newrelic_rpm
   omniauth
   omniauth-canvas
   omniauth-oauth2
@@ -611,6 +616,8 @@ DEPENDENCIES
   rubocop-rspec
   sassc-rails (~> 2.1)
   selenium-webdriver
+  sentry-rails
+  sentry-ruby
   shoulda-matchers (~> 5.0)
   simplecov (~> 0.20.0)
   simplecov_json_formatter
@@ -623,7 +630,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 3.3.8p144
+   ruby 3.3.9
 
 BUNDLED WITH
    2.5.6

@@ -43,7 +43,8 @@
         <%= submit_tag "Import Selected Courses", class: "btn btn-secondary" %>
       <% end %>
     <% else %>
-      <p class="alert alert-danger">No courses found or unable to fetch courses.</p>
+      <%# TODO: this could be improved when user has imported all relevant courses %>
+      <p class="alert alert-warning">No new courses found.</p>
     <% end %>
 
     <% if @courses_student.any? %>

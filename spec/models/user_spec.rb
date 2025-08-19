@@ -1,4 +1,21 @@
 # spec/models/user_spec.rb
+# == Schema Information
+#
+# Table name: users
+#
+#  id         :bigint           not null, primary key
+#  canvas_uid :string
+#  email      :string
+#  name       :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  student_id :string
+#
+# Indexes
+#
+#  index_users_on_canvas_uid  (canvas_uid) UNIQUE
+#  index_users_on_email       (email) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe User, type: :model do

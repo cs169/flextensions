@@ -27,7 +27,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_12_005134) do
     t.bigint "course_to_lms_id", null: false
     t.datetime "due_date"
     t.datetime "late_due_date"
-    t.boolean "extensions_enabled"
     t.boolean "enabled", default: false
   end
 
@@ -66,16 +65,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_12_005134) do
     t.datetime "updated_at", null: false
     t.string "canvas_id"
     t.string "course_code"
-    t.boolean "enable_student_requests"
-    t.integer "auto_approve_days"
-    t.integer "auto_approve_dsp_days"
-    t.integer "max_auto_approve"
-    t.string "reply_email"
-    t.text "custom_question_1"
-    t.text "custom_question_2"
-    t.text "custom_question_3"
-    t.string "email_subject"
-    t.text "email_template"
     t.string "readonly_api_token"
     t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
     t.index ["readonly_api_token"], name: "index_courses_on_readonly_api_token", unique: true

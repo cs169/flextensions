@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: courses
+#
+#  id                 :bigint           not null, primary key
+#  course_code        :string
+#  course_name        :string
+#  readonly_api_token :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  canvas_id          :string
+#
+# Indexes
+#
+#  index_courses_on_canvas_id           (canvas_id) UNIQUE
+#  index_courses_on_readonly_api_token  (readonly_api_token) UNIQUE
+#
 class Course < ApplicationRecord
   has_secure_token :readonly_api_token
 
@@ -30,16 +47,14 @@ class Course < ApplicationRecord
 
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
-    response = Faraday.get("#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses") do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-      req.params['include[]'] = 'enrollment_type'
-    end
+    response = CanvasFacade.new(token).get_all_courses
+    all_courses = CanvasFacade.depaginate_response(response)
+    # response = CanvasFacade.new(token).get_instructor_courses
 
-    if response.success?
-      JSON.parse(response.body)
+    if all_courses.is_a?(Array)
+      all_courses
     else
-      Rails.logger.error "Failed to fetch courses from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch courses: #{response.status} - #{response.body}"
       []
     end
   end
@@ -113,7 +128,7 @@ class Course < ApplicationRecord
     response = canvas_facade.get_course(course_data['id'])
 
     if response.nil? || !response.success?
-      Rails.logger.error "Failed to fetch course from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch course: #{response.status} - #{response.body}"
       # TODO: Raise error to user?
       return nil
     end
@@ -177,6 +192,7 @@ class Course < ApplicationRecord
   end
 
   # Fetch users for a course from Canvas API
+  # TODO: Replace with call to Canvas Facade
   def fetch_users_from_canvas(token, enrollment_type = nil)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
     response = Faraday.get(url) do |req|
@@ -188,7 +204,7 @@ class Course < ApplicationRecord
     if response.success?
       JSON.parse(response.body)
     else
-      Rails.logger.error "Failed to fetch users from Canvas: #{response.status} - #{response.body}"
+      Rails.logger.error "Failed to fetch users: #{response.status} - #{response.body}"
       []
     end
   end

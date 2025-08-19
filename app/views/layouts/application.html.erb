@@ -11,7 +11,8 @@
 
 		<%= javascript_importmap_tags %>
 		<%= render "layouts/components/color_mode_critical" %>
-	</head>
+	  <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
 	<body class="d-flex flex-column vh-100">
 		<%= render "layouts/header" %>
 		<main class="d-flex flex-grow-1 overflow-hidden">

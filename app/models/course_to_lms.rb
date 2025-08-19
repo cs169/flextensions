@@ -1,9 +1,31 @@
+# == Schema Information
+#
+# Table name: course_to_lmss
+#
+#  id                 :bigint           not null, primary key
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  course_id          :bigint
+#  external_course_id :string
+#  lms_id             :bigint
+#
+# Indexes
+#
+#  index_course_to_lmss_on_course_id  (course_id)
+#  index_course_to_lmss_on_lms_id     (lms_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (course_id => courses.id)
+#  fk_rails_...  (lms_id => lmss.id)
+#
 class CourseToLms < ApplicationRecord
   # Associations
   belongs_to :course
   belongs_to :lms
 
   # Fetch assignments from Canvas API
+  # TODO: Replace with call to Canvas Facade
   def fetch_canvas_assignments(token)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{external_course_id}/assignments"
     response = Faraday.get(url) do |req|
