@@ -1,17 +1,13 @@
 Rails.application.routes.draw do
-  if Rails.env.development? || !ActiveModel::Type::Boolean.new.cast(ENV["ENABLE_EMAIL_SENDING"])
+  if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 
-  post 'course_settings/update'
   # Add rack_session_access routes for testing
   # if Rails.env.test?
   #   mount RackSessionAccess::Engine => '/rack_session'
   # end
 
-  get 'courses/index'
-  get 'bcourses/index'
-  get 'bcourses', to: 'bcourses#index'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -44,6 +40,7 @@ Rails.application.routes.draw do
     end
     resource :form_setting, only: [:edit, :update]
   end
+  post 'course_settings/update'
 
   resources :assignments do
     member do
@@ -54,7 +51,7 @@ Rails.application.routes.draw do
   # Authentication routes
   match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
   get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
-  get '/logout' => 'login#logout', :as => :logout
+  get '/logout', to: 'session#logout', as: :logout
 
   namespace :api do
     draw('api/v1')

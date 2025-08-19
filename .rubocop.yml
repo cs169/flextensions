@@ -69,6 +69,11 @@ Metrics/ParameterLists:
   Max: 8
 
 # Layout
+# TODO-mb: this one is frustrating.
+# Fix to allow more left-aligned params.
+Layout/FirstHashElementIndentation:
+  Enabled: false
+
 Layout/LineLength:
   Max: 250
 
@@ -166,4 +171,4 @@ Lint/EmptyBlock:
   Enabled: false
 
 Lint/EmptyFile:
-  Enabled: false 
+  Enabled: false

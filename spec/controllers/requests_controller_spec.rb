@@ -5,8 +5,16 @@ RSpec.describe RequestsController, type: :controller do
   let(:instructor) { User.create!(email: 'instructor@example.com', canvas_uid: '566', name: 'Instructor') }
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '456', course_code: 'TST101') }
   let(:teacher_course) { Course.create!(course_name: 'Instructor Course', canvas_id: '999', course_code: 'INST101') }
-  let(:assignment) { Assignment.create!(name: 'A1', course_to_lms_id: course_to_lms.id, external_assignment_id: 'x1', enabled: true) }
-  let(:request) { Request.create!(user:, course:, assignment:, reason: 'Need more time', requested_due_date: Date.tomorrow) }
+  let(:assignment) do
+    Assignment.create!(
+      name: 'A1',
+      course_to_lms_id: course_to_lms.id,
+      due_date: 2.days.from_now,
+      external_assignment_id: 'x1',
+      enabled: true
+    )
+  end
+  let(:request) { Request.create!(user:, course:, assignment:, reason: 'Need more time', requested_due_date: 4.days.from_now) }
   let(:course_to_lms) { CourseToLms.create!(course:, lms_id: 1) }
 
   before do
@@ -209,7 +217,14 @@ RSpec.describe RequestsController, type: :controller do
   end
 
   describe 'GET #edit' do
-    let(:assignment) { Assignment.create!(name: 'Assignment 1', external_assignment_id: 'a1', course_to_lms_id: CourseToLms.create!(course: course, lms_id: 1).id, enabled: true) }
+    let(:assignment) do
+      Assignment.create!(
+        name: 'Assignment 1',
+        external_assignment_id: 'a1',
+        due_date: 1.day.from_now,
+        course_to_lms_id: CourseToLms.create!(course: course, lms_id: 1).id, enabled: true
+      )
+    end
     let(:request_record) do
       Request.create!(
         assignment: assignment,

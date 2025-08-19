@@ -129,6 +129,7 @@ RSpec.describe CourseSettingsController, type: :controller do
       Assignment.create!(
         name: 'Test Assignment',
         course_to_lms: course_to_lms,
+        due_date: 3.days.from_now,
         external_assignment_id: 'abc123',
         enabled: true
       )

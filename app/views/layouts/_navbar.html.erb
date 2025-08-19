@@ -35,8 +35,9 @@
 						</li>
 					<% else %>
 						<!-- Display this when there's NO logged-in user -->
+						<%# TODO: Need a test case for this. %>
 						<li class="nav-item">
-							<a class="nav-link" href="/login/">Login</a>
+							<%= link_to 'Login', '/auth/canvas', class: 'btn btn-primary', id: 'login-button-index' %>
 						</li>
 					<% end %>
 					<li>
@@ -45,7 +46,7 @@
 						</div>
 					</li>
 				</ul>
-				
+
 			</div>
 		</div>
 	</div>
@@ -53,7 +54,7 @@
 
 <% unless (controller.controller_name == "home" && controller.action_name == "index") ||  (controller.controller_name == "courses" && ["index", "new"].include?(controller.action_name)) %>
 <!-- Mobile Sidebar Toggle Button (arrow) -->
-<button id="mobileSidebarToggle" 
+<button id="mobileSidebarToggle"
 		class="btn btn-light btn-sm d-md-none"
 		type="button"
 		data-controller="sidebar"

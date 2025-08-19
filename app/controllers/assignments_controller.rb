@@ -13,7 +13,7 @@ class AssignmentsController < ApplicationController
     if @assignment.update(enabled: params[:enabled])
       render json: { success: true }, status: :ok
     else
-      flash[:alert] = 'Failed to update assignment'
+      flash[:alert] = "Failed to update assignment: #{@assignment.errors.full_messages.to_sentence}"
       render json: { redirect_to: course_path(course) }, status: :unprocessable_entity
     end
   end

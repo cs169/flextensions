@@ -1,3 +1,38 @@
+# == Schema Information
+#
+# Table name: requests
+#
+#  id                        :bigint           not null, primary key
+#  auto_approved             :boolean          default(FALSE), not null
+#  custom_q1                 :text
+#  custom_q2                 :text
+#  documentation             :text
+#  reason                    :text
+#  requested_due_date        :datetime
+#  status                    :enum             default("pending"), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  assignment_id             :bigint           not null
+#  course_id                 :bigint           not null
+#  external_extension_id     :string
+#  last_processed_by_user_id :bigint
+#  user_id                   :bigint           not null
+#
+# Indexes
+#
+#  index_requests_on_assignment_id              (assignment_id)
+#  index_requests_on_auto_approved              (auto_approved)
+#  index_requests_on_course_id                  (course_id)
+#  index_requests_on_last_processed_by_user_id  (last_processed_by_user_id)
+#  index_requests_on_user_id                    (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (assignment_id => assignments.id)
+#  fk_rails_...  (course_id => courses.id)
+#  fk_rails_...  (last_processed_by_user_id => users.id)
+#  fk_rails_...  (user_id => users.id)
+#
 require 'rails_helper'
 
 RSpec.describe Request, type: :model do

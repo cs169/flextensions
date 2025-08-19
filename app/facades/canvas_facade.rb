@@ -74,14 +74,48 @@ class CanvasFacade < ExtensionFacadeBase
   # Configures the facade with the canvas api endpoint configured in the environment.
   #
   # @param [String]              masqueradeToken the token of the user to masquerade as.
-  # @param [Faraday::Connection] conn            existing connection to use (defaults to nil).
-  def initialize(masqueradeToken, conn = nil)
-    @canvasApi = conn || Faraday.new(
+  # @param [Faraday::Connection] existing connection to use (defaults to nil).
+  # Enable this to automatically parse JSON responses.
+  # This will require some refactoring (and rebuilding VCRs/webmock)
+  # do |faraday|
+  #     faraday.request :json
+  #     faraday.response :json, content_type: /\bjson$/
+  #     faraday.adapter Faraday.default_adapter
+  # end
+  def initialize(token, conn = nil)
+    @current_response = nil
+    @api_token = token
+    @canvas_conn = conn || Faraday.new(
       url: "#{CanvasFacade::CANVAS_URL}/api/v1",
-      headers: {
-        Authorization: "Bearer #{masqueradeToken}"
-      }
+      headers: auth_header
     )
+  end
+
+  # rubocop:disable Metrics/LineLength
+  # Depaginate a Canvas API response
+  # call as: CanvasFacade.depaginate_response(response)
+  # See https://canvas.instructure.com/doc/api/file.pagination
+  # Example Header response:
+  # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
+  # rubocop:enable Metrics/LineLength
+
+  HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
+  def self.depaginate_response(response)
+    return response unless response.success?
+
+    links = response.headers['Link']
+    return JSON.parse(response.body) unless links
+
+    links = links.split(',').map(&:strip).filter_map do |link|
+      match = link.match(HEADER_LINK_PARTS)
+      { url: match[:url], rel: match[:rel] } if match
+    end
+
+    # Canvas provides a 'next' page as long as there is more to query
+    next_page = links.find { |page| page[:rel] == 'next' }
+    return JSON.parse(response.body) if next_page.nil?
+
+    [JSON.parse(response.body)] + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
   end
 
   ##
@@ -89,7 +123,29 @@ class CanvasFacade < ExtensionFacadeBase
   #
   # @return [Faraday::Response] list of the courses the user has access to.
   def get_all_courses
-    @canvasApi.get('courses')
+    @canvas_conn.get('courses', {
+      per_page: 100,
+      'include[]': 'term'
+    })
+  end
+
+  ##
+  # Get all courses for which the user is an instructor.
+  # Makes 2 API calls to Canvas, one for `teacher` and one for `ta`.
+  #
+  # @return [Faraday::Response] list of the courses the user is an instructor for.
+  def get_instructor_courses
+    teacher_courses = @canvas_conn.get('courses', {
+      enrollment_type: 'teacher',
+      per_page: 100,
+      'include[]': 'term'
+    })
+    ta_courses = @canvas_conn.get('courses', {
+      enrollment_type: 'ta',
+      per_page: 100,
+      'include[]': 'term'
+    })
+    teacher_courses + ta_courses
   end
 
   ##
@@ -98,7 +154,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param  [Integer] courseId the course id to look up.
   # @return [Faraday::Response] information about the requested course.
   def get_course(courseId)
-    @canvasApi.get("courses/#{courseId}")
+    @canvas_conn.get("courses/#{courseId}")
   end
 
   ##
@@ -107,7 +163,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param  [Integer]    courseId the course id to fetch the assignments of.
   # @return [Faraday::Response] list of the assignments in the course.
   def get_assignments(courseId)
-    @canvasApi.get("courses/#{courseId}/assignments")
+    @canvas_conn.get("courses/#{courseId}/assignments")
   end
 
   ##
@@ -117,7 +173,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param  [Integer] assignmentId the id of the assignment to fetch.
   # @return [Faraday::Response] information about the requested assignment.
   def get_assignment(courseId, assignmentId)
-    @canvasApi.get("courses/#{courseId}/assignments/#{assignmentId}")
+    @canvas_conn.get("courses/#{courseId}/assignments/#{assignmentId}")
   end
 
   ##
@@ -127,7 +183,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param   [Integer]    assignmentId the assignment to fetch the overrides from.
   # @return  [Faraday::Response] all of the overrides for the specified assignment.
   def get_assignment_overrides(courseId, assignmentId)
-    @canvasApi.get("courses/#{courseId}/assignments/#{assignmentId}/overrides")
+    @canvas_conn.get("courses/#{courseId}/assignments/#{assignmentId}/overrides")
   end
 
   ##
@@ -142,7 +198,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param   [String]     lockDate     the date the override should lock the assignment.
   # @return  [Faraday::Response] information about the new override.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
-    @canvasApi.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
+    @canvas_conn.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
                       assignment_override: {
                         student_ids: studentIds,
                         title: title,
@@ -165,7 +221,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param   [String]     lockDate     the updated date the override should lock the assignment.
   # @return  [Faraday::Response] information about the updated override.
   def update_assignment_override(courseId, assignmentId, overrideId, studentIds, title, dueDate, unlockDate, lockDate)
-    @canvasApi.put("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}", {
+    @canvas_conn.put("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}", {
                      student_ids: studentIds,
                      title: title,
                      due_at: dueDate,
@@ -182,7 +238,7 @@ class CanvasFacade < ExtensionFacadeBase
   # @param  [Integer] overrideId the id of the override to delete.
   # @return [Faraday::Response] information about the deleted override.
   def delete_assignment_override(courseId, assignmentId, overrideId)
-    @canvasApi.delete("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}")
+    @canvas_conn.delete("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}")
   end
 
   ##
@@ -338,5 +394,9 @@ class CanvasFacade < ExtensionFacadeBase
         courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
+  end
+
+  def auth_header
+    { Authorization: "Bearer #{@api_token}" }
   end
 end

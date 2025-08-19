@@ -16,6 +16,7 @@ RSpec.describe AssignmentsController, type: :controller do
       Assignment.create!(
         name: 'Test Assignment',
         course_to_lms: course_to_lms,
+        due_date: 3.days.from_now,
         external_assignment_id: 'abc123',
         enabled: false
       )
@@ -67,6 +68,19 @@ RSpec.describe AssignmentsController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(assignment.reload.enabled).to be true
+      end
+    end
+
+    context 'when there is no due_date on an Assignment' do
+      before do
+        assignment.update!(due_date: nil)
+      end
+
+      it 'returns a bad request status' do
+        post :toggle_enabled, params: { id: assignment.id, enabled: true, role: 'instructor', user_id: user.id }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(flash[:alert]).to include('Due date must be present if assignment is enabled')
       end
     end
 
