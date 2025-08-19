@@ -1,3 +1,4 @@
+# rubocop:disable Layout/LineLength
 # == Schema Information
 #
 # Table name: course_settings
@@ -25,7 +26,26 @@
 #
 #  fk_rails_...  (course_id => courses.id)
 #
+# rubocop:enable Layout/LineLength
+
 class CourseSettings < ApplicationRecord
+  # TODO: Remove the db default text, and use an AR validation.
+  DEFAULT_EMAIL_TEMPLATE = <<~LIQUID.freeze
+    Hello {{student_name}},
+
+    Your extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.
+
+    Extension Details:
+    - Original Due Date: {{original_due_date}}
+    - New Due Date: {{new_due_date}}
+    - Extension Days: {{extension_days}}
+
+    If you have any questions, please reach out to your course staff.
+
+    Thank you,
+    {{course_name}} Staff
+  LIQUID
+
   belongs_to :course
 
   before_save :ensure_system_user_for_auto_approval
