@@ -47,14 +47,12 @@ class Course < ApplicationRecord
 
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
-    facade = CanvasFacade.new(token)
-    all_courses = facade.get_all_courses
-    # response = CanvasFacade.new(token).get_instructor_courses
+    all_courses = CanvasFacade.new(token).get_all_courses
 
     if all_courses.is_a?(Array)
       all_courses
     else
-      Rails.logger.error "Failed to fetch courses: #{response.status} - #{response.body}"
+      Rails.logger.error 'Failed to fetch courses'
       []
     end
   end

@@ -4,7 +4,9 @@ require 'json'
 require 'ostruct'
 
 # This is the facade for Canvas.
-class CanvasFacade < ExtensionFacadeBase
+class CanvasFacade < LmsFacade
+  class CanvasAPIError < LmsFacade::LmsAPIError; end
+
   CANVAS_URL = ENV.fetch('CANVAS_URL', nil)
 
   # Canvas instances can scope the flextensions developer key.
@@ -123,8 +125,9 @@ class CanvasFacade < ExtensionFacadeBase
     next_page = links.find { |page| page[:rel] == 'next' }
     return JSON.parse(response.body) if next_page.nil?
 
+    # raise CanvasAPIError, "Canvas API Error: #{response.status} - #{response.body}" if response.status != 200
+
     # NOTE: Do not log the full :url as it contains an auth token (from canvas)
-    Rails.logger.debug 'Fetching additional pages from Canvas API'
     JSON.parse(response.body) + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
   end
 
