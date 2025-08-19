@@ -6,6 +6,6 @@ Rails.application.config.after_initialize do
   GRADESCOPE_LMS_ID = 2
   next unless ActiveRecord::Base.connection.table_exists?('lmss')
 
-  CANVAS_LMS = Lms.find_or_create_by(id: CANVAS_LMS_ID, lms_name: 'Canvas', use_auth_token: true)
-  GRADESCOPE_LMS = Lms.find_or_create_by(id: GRADESCOPE_LMS_ID, lms_name: 'Gradescope', use_auth_token: false)
+  # CANVAS_LMS = Lms.find_or_create_by(id: CANVAS_LMS_ID, lms_name: 'Canvas', use_auth_token: true)
+  # GRADESCOPE_LMS = Lms.find_or_create_by(id: GRADESCOPE_LMS_ID, lms_name: 'Gradescope', use_auth_token: false)
 end
