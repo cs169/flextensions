@@ -137,7 +137,7 @@ class CanvasFacade < LmsFacade
   # @return [Faraday::Response] list of the courses the user has access to.
   def get_all_courses
     depaginate_response(@canvas_conn.get('courses', {
-      per_page: 10,
+      per_page: 100,
       'include[]': 'term'
     }))
   end
