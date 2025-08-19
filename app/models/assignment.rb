@@ -37,4 +37,13 @@ class Assignment < ApplicationRecord
   def enabled_requires_date_present
     errors.add(:due_date, 'must be present if assignment is enabled') if enabled && due_date.blank?
   end
+
+  def lms_id
+    course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
+    course_to_lms&.lms_id
+  end
+
+  def lms_facade
+    Lms.facade_class(lms_id)
+  end
 end

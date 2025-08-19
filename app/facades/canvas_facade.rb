@@ -5,6 +5,8 @@ require 'ostruct'
 
 # This is the facade for Canvas.
 class CanvasFacade < ExtensionFacadeBase
+  class CanvasAPIError < StandardError; end
+
   CANVAS_URL = ENV.fetch('CANVAS_URL', nil)
 
   # Canvas instances can scope the flextensions developer key.
@@ -83,12 +85,18 @@ class CanvasFacade < ExtensionFacadeBase
   #     faraday.adapter Faraday.default_adapter
   # end
   def initialize(token, conn = nil)
-    @current_response = nil
     @api_token = token
     @canvas_conn = conn || Faraday.new(
       url: "#{CanvasFacade::CANVAS_URL}/api/v1",
       headers: auth_header
     )
+  end
+
+  def self.from_user(user)
+    token = user.lms_credentials.first&.token
+    raise CanvasAPIError, 'Cannot find Canvas token for user' if token.nil?
+
+    new(token)
   end
 
   # rubocop:disable Metrics/LineLength

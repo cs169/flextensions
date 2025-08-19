@@ -49,6 +49,11 @@ class Course < ApplicationRecord
     nil
   end
 
+  def lms_facade
+    course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
+    Lms.facade_class(course_to_lms.lms_id)
+  end
+
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
     response = CanvasFacade.new(token).get_all_courses
