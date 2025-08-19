@@ -1,3 +1,4 @@
+# rubocop:disable Layout/LineLength
 # == Schema Information
 #
 # Table name: course_settings
@@ -25,6 +26,8 @@
 #
 #  fk_rails_...  (course_id => courses.id)
 #
+# rubocop:enable Layout/LineLength
+
 FactoryBot.define do
   factory :course_settings do
     association :course
