@@ -51,7 +51,7 @@ Rails.application.routes.draw do
   # Authentication routes
   match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
   get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
-  get '/logout' => 'login#logout', :as => :logout
+  get '/logout', to: 'session#logout', as: :logout
 
   namespace :api do
     draw('api/v1')

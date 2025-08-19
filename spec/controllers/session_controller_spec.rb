@@ -110,4 +110,18 @@ RSpec.describe SessionController, type: :controller do
       end
     end
   end
+
+  describe 'GET #logout' do
+    before do
+      session[:user_id] = 'test_user_id'
+      session[:username] = 'test_username'
+    end
+
+    it 'clears the session and redirects to root path' do
+      get :logout
+      expect(session[:user_id]).to be_nil
+      expect(session[:username]).to be_nil
+      expect(response).to redirect_to(root_path)
+    end
+  end
 end
