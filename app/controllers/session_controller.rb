@@ -28,6 +28,11 @@ class SessionController < ApplicationController
   #    user objects in the same way as Canvas login. You can also move part of
   #    the logic from "create" to "omniauth_callback".
 
+  def logout
+    reset_session
+    redirect_to root_path
+  end
+
   def omniauth_callback
     if params[:error].present?
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
