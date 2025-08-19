@@ -308,7 +308,6 @@ GEM
       timeout
     net-smtp (0.5.1)
       net-protocol
-    newrelic_rpm (9.18.0)
     nio4r (2.7.4)
     nokogiri (1.18.9)
       mini_portile2 (~> 2.8.2)
@@ -490,6 +489,12 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    sentry-rails (5.26.0)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.26.0)
+    sentry-ruby (5.26.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     shellany (0.0.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
@@ -587,7 +592,6 @@ DEPENDENCIES
   letter_opener
   letter_opener_web (~> 3.0)
   lms-api
-  newrelic_rpm
   omniauth
   omniauth-canvas
   omniauth-oauth2
@@ -605,6 +609,8 @@ DEPENDENCIES
   rubocop-rspec
   sassc-rails (~> 2.1)
   selenium-webdriver
+  sentry-rails
+  sentry-ruby
   shoulda-matchers (~> 5.0)
   simplecov (~> 0.20.0)
   simplecov_json_formatter
