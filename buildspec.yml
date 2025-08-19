@@ -20,7 +20,6 @@ phases:
       - bundle config set deployment true
       - bundle config set without 'development test'
       - bundle install
-      - npm install
 
   pre_build:
     commands:
