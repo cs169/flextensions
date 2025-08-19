@@ -37,6 +37,10 @@ class Course < ApplicationRecord
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
   end
 
+  def all_linked_lmss
+    CourseToLms.where(course_id: id)
+  end
+
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
     return 'instructor' if roles.include?('teacher') || roles.include?('ta')

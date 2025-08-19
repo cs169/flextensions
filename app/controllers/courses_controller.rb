@@ -5,7 +5,7 @@ class CoursesController < ApplicationController
   before_action :determine_user_role
 
   def index
-    # To-Do: lms creation shouldn't be in this controller, it should probably be in the earliest set up stages
+    # TODO: lms creation shouldn't be in this controller, it should probably be in the earliest set up stages
     Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     Lms.find_or_create_by(id: 2, lms_name: 'Gradescope', use_auth_token: false)
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
