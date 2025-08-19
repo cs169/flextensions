@@ -42,7 +42,8 @@ class CourseSettingsController < ApplicationController
       end
       redirect_to course_settings_path(@course, tab: params[:tab]), notice: 'Course settings updated successfully.'
     else
-      redirect_to course_settings_path(@course, tab: params[:tab]), alert: 'Failed to update course settings.'
+      flash[:alert] = "Failed to update course settings: #{@course_settings.errors.full_messages.to_sentence}"
+      redirect_to course_settings_path(@course, tab: params[:tab])
     end
   end
 

@@ -23,10 +23,10 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'Course not found.' unless @course
 
     @course.regenerate_readonly_api_token_if_blank
-    course_to_lms = @course.course_to_lms(1)
+    course_to_canvas = @course.course_to_lms(1)
     course_to_gradescope = @course.course_to_lms(2)
 
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_canvas
 
     if @role == 'student'
       course_settings = @course.course_settings
