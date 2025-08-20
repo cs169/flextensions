@@ -91,17 +91,14 @@ RSpec.describe CoursesController, type: :controller do
     before do
       roles = %w[teacher ta student]
       roles.each do |role|
-        stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users?enrollment_type=#{role}")
+        stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users")
           .with(
-            headers: {
-              'Accept' => '*/*',
-              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'Authorization' => 'Bearer fake_token',
-              'Content-Type' => 'application/json',
-              'User-Agent' => 'Faraday v2.12.2'
-            }
-          )
-          .to_return(status: 200, body: '[]', headers: {})
+            query: {
+              'enrollment_type[]' => role,
+              'per_page' => '100'
+            },
+            headers: { 'Authorization' => 'Bearer fake_token' }
+          ).to_return(status: 200, body: '[]', headers: {})
       end
     end
 
