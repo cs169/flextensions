@@ -5,7 +5,7 @@ import "datatables.net-responsive-bs5";
 
 export default class extends Controller {
 	static values = { courseId: Number }
-	
+
 	connect() {
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
@@ -48,7 +48,7 @@ export default class extends Controller {
 		})
 		  .then((response) => {
 			if (!response.ok) {
-			  throw new Error("Failed to sync enrollments.");
+			  throw new Error(`Failed to sync enrollments. ${response.status} - ${response.statusText}`);
 			}
 			return response.json();
 		  })
