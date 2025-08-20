@@ -43,6 +43,8 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!(allow_localhost: true)
   end
 
+  config.include WebMock::API
+
   config.expect_with :rspec do |expectations|
     # This option will default to `true` in RSpec 4. It makes the `description`
     # and `failure_message` of custom matchers include text for helper methods

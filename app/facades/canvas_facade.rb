@@ -84,7 +84,8 @@ class CanvasFacade < LmsFacade
   # Enable this to automatically parse JSON responses.
   # This will require some refactoring (and rebuilding VCRs/webmock)
   # do |faraday|
-  #     faraday.request :json
+  #     faraday.request :url_encoded # passed first, only affects request parameters.
+  #     faraday.request :json # 2nd, only affects request body
   #     faraday.response :json, content_type: /\bjson$/
   #     faraday.adapter Faraday.default_adapter
   # end
@@ -125,8 +126,6 @@ class CanvasFacade < LmsFacade
     next_page = links.find { |page| page[:rel] == 'next' }
     return JSON.parse(response.body) if next_page.nil?
 
-    # raise CanvasAPIError, "Canvas API Error: #{response.status} - #{response.body}" if response.status != 200
-
     # NOTE: Do not log the full :url as it contains an auth token (from canvas)
     JSON.parse(response.body) + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
   end
@@ -134,12 +133,32 @@ class CanvasFacade < LmsFacade
   ##
   # Gets all courses for the authorized user.
   #
-  # @return [Faraday::Response] list of the courses the user has access to.
+  # @return [Array<Hash>] list of the Course (hashes) the user has access to.
   def get_all_courses
     depaginate_response(@canvas_conn.get('courses', {
       per_page: 100,
       'include[]': 'term'
     }))
+  end
+
+  ##
+  # Get all enrollments for a course.
+  #
+  # https://ucberkeleysandbox.instructure.com/doc/api/courses.html#method.courses.users
+  # @param  [Course] A Course object.
+  # @param  [String|Array<String>] role the role to filter users by (optional).
+  # @return [Array<Hash>] list of the Enrollment (hashes) in the course.
+  def get_all_course_users(course, role = nil)
+    # sigh, manually construct query string until we tweak Faraday middleware
+    # to include :url_encoded, then use `'enrollment_type[]' : list_or_string`
+    query_string = 'per_page=100'
+    query_string += "&enrollment_type[]=#{role}" if role.is_a?(String) && role.present?
+
+    if role.is_a?(Array) && role.present? # rubocop:disable Style/IfUnlessModifier
+      query_string += role.map { |r| "&enrollment_type[]=#{r}" }.join
+    end
+
+    depaginate_response(@canvas_conn.get("courses/#{course.canvas_id}/users?#{query_string}"))
   end
 
   ##
