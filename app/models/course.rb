@@ -62,14 +62,12 @@ class Course < ApplicationRecord
 
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
-    response = CanvasFacade.new(token).get_all_courses
-    all_courses = CanvasFacade.depaginate_response(response)
-    # response = CanvasFacade.new(token).get_instructor_courses
+    all_courses = CanvasFacade.new(token).get_all_courses
 
     if all_courses.is_a?(Array)
       all_courses
     else
-      Rails.logger.error "Failed to fetch courses: #{response.status} - #{response.body}"
+      Rails.logger.error 'Failed to fetch courses'
       []
     end
   end
@@ -206,42 +204,25 @@ class Course < ApplicationRecord
     match[1]
   end
 
-  # Fetch users for a course from Canvas API
-  # TODO: Replace with call to Canvas Facade
-  def fetch_users_from_canvas(token, enrollment_type = nil)
-    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
-    response = Faraday.get(url) do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-      req.params['enrollment_type'] = enrollment_type if enrollment_type.present?
-    end
-
-    if response.success?
-      JSON.parse(response.body)
-    else
-      Rails.logger.error "Failed to fetch users: #{response.status} - #{response.body}"
-      []
-    end
-  end
-
   # Fetch users for a course and create/find their User and UserToCourse records
+  # TODO: This may need to become a background job
   def sync_users_from_canvas(token, role)
     # Fetch all users for the course from Canvas
-    users_data = fetch_users_from_canvas(token, role)
+    canvas_users = CanvasFacade.new(token).get_all_course_users(self, role)
 
     # Extract the Canvas user IDs from the fetched data
-    current_canvas_user_ids = users_data.pluck('id')
-
-    # Find all UserToCourse records for this course and role
-    existing_user_to_courses = UserToCourse.where(course_id: id, role: role)
+    current_canvas_user_ids = canvas_users.pluck('id')
 
     # Delete UserToCourse records for users no longer in the course
-    existing_user_to_courses.each do |user_to_course|
-      user_to_course.destroy unless current_canvas_user_ids.include?(user_to_course.user.canvas_uid)
-    end
+    # Find all UserToCourse records for this course and role
+    existing_user_to_courses = UserToCourse.where(course_id: id, role: role)
+    user_ids_to_remove = existing_user_to_courses.reject do |utc|
+      current_canvas_user_ids.include?(utc.user.canvas_uid)
+    end.map(&:id)
+    UserToCourse.where(id: user_ids_to_remove).destroy_all if user_ids_to_remove.any?
 
     # Create or update User and UserToCourse records for current users
-    users_data.each do |user_data|
+    canvas_users.each do |user_data|
       # this line skips importing a user if the api doesn't return their email
       # one case this is happening if the user was invited to the course but hasn't accepted
       next if user_data['email'].blank?
@@ -260,9 +241,9 @@ class Course < ApplicationRecord
   end
 
   def sync_enrollments_from_canvas(token)
-    sync_users_from_canvas(token, 'student')
     sync_users_from_canvas(token, 'teacher')
     sync_users_from_canvas(token, 'ta')
+    sync_users_from_canvas(token, 'student')
   end
 
   def regenerate_readonly_api_token_if_blank

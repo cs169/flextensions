@@ -52,13 +52,15 @@ describe CanvasFacade do
     end
   end
 
+  # NOTE: 2025-08: This method does not return a faraday class.
+  # other methods need to be refactors too.
   describe 'get_all_courses' do
     before do
-      stubs.get('courses') { [200, {}, '{}'] }
+      stubs.get('courses') { [200, {}, '[]'] }
     end
 
     it 'has correct response body on successful call' do
-      expect(facade.get_all_courses.body).to eq('{}')
+      expect(facade.get_all_courses).to eq([])
       stubs.verify_stubbed_calls
     end
   end
