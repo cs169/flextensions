@@ -7,11 +7,12 @@ on:
 
 jobs:
   rspec:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:17
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
@@ -20,10 +21,9 @@ jobs:
     env:
       # Do not install production/staging-only gems in test environment
       BUNDLE_WITHOUT: "production staging"
+      DB_HOST: localhost
       DB_USER: postgres
       DB_PASSWORD: password
-      RAILS_ENV: test
-      RUBY_ENV: test
       # TODO: This should not be required, but a few specs rely on it by using ENV.fetch.
       CANVAS_URL: https://ucberkeleysandbox.instructure.com
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}

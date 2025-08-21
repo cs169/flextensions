@@ -1,4 +1,4 @@
-name: RuboCop
+name: Checks
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  scan:
+  brakeman:
     runs-on: ubuntu-latest
     env:
       # Do not install production/staging-only gems in test environment

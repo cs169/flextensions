@@ -32,9 +32,9 @@ class CoursesController < ApplicationController
     end
 
     @assignments = if @role == 'student'
-                     Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+      Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
     else
-                     Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
+      Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
     end
     render_role_based_view
   end
