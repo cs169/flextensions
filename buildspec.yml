@@ -9,8 +9,8 @@ phases:
   install:
     # Use a Ruby version that matches the EB platform
     runtime-versions:
-      ruby: 3.3.8
-    
+      ruby: 3.3.9
+
     commands:
       - echo "Installing system dependencies for build..."
       - sudo dnf install -y postgresql17-devel ImageMagick --allowerasing

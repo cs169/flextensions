@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '~> 3.3.8'
+ruby '~> 3.3.9'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 7.2'
@@ -70,11 +70,11 @@ gem 'importmap-rails'
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem 'turbo-rails'
 
-
 gem 'bootstrap', '~> 5.3.3'
-# dependency for bootstrap #03-10-2025 this is deprecated but still works
+# dependency for bootstrap # 03-10-2025 this is deprecated but still works
 gem 'sassc-rails', '~> 2.1'
-# gem 'dartsass-sprockets' # alternative to sassc-rails, this is recommended but bootstrap 5.3.3 is still using "deprecated" @import statements which this gem doesn't like
+# alternative to sassc-rails, this is recommended but bootstrap 5.3.3 is still using "deprecated" @import statements which this gem doesn't like
+# gem 'dartsass-sprockets'
 
 # Font Awesome for icons
 gem 'font-awesome-sass'
