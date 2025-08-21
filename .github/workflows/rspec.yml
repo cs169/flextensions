@@ -7,38 +7,43 @@ on:
 
 jobs:
   rspec:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+
     env:
       # Do not install production/staging-only gems in test environment
       BUNDLE_WITHOUT: "production staging"
+      DB_HOST: localhost
       DB_USER: postgres
       DB_PASSWORD: password
-      RAILS_ENV: test
-      RUBY_ENV: test
       # TODO: This should not be required, but a few specs rely on it by using ENV.fetch.
       CANVAS_URL: https://ucberkeleysandbox.instructure.com
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
     steps:
+    # - name: Install packages
+    #   run: sudo apt-get update
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: .tool-versions
         bundler-cache: true
-    - name: Setup Database
-      run: |
-        bundle exec rails db:setup
     - name: Download and install Code Climate test reporter
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
         chmod +x ./cc-test-reporter
+    - name: Setup Database
+      run: |
+        bundle exec rails db:test:prepare
     - name: Run before-build command
       run: ./cc-test-reporter before-build
     - name: Create Chrome data directory
@@ -50,7 +55,6 @@ jobs:
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
         COVERAGE: "true"
-        CI: "true"
     # - name: Submit Legacy Code Climate Coverage Report
     #   if: env.CC_TEST_REPORTER_ID != ''
     #   run: |

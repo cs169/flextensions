@@ -9,8 +9,7 @@ module API
 
       def create
         course_name = params[:course_name]
-        existing_course = Course.find_by(course_name: course_name)
-        if existing_course
+        if Course.exists?(course_name: course_name)
           render json: { message: 'A course with the same course name already exists.' }, status: :unprocessable_entity
           return
         end

@@ -69,8 +69,8 @@ RSpec.describe EmailService, type: :service do
 
         mail = ActionMailer::Base.deliveries.last
         expect(mail).to be_present
-        expect(mail.to).to    eq([to])
-        expect(mail.from).to  eq([from])
+        expect(mail.to).to    eq([ to ])
+        expect(mail.from).to  eq([ from ])
         expect(mail.subject).to eq('Order 42 ready')
         # Our service inserts `<br>\n` for newlines in HTML mode
         expect(mail.body.encoded).to include('Hi Bob<br>')
