@@ -1,6 +1,5 @@
 name: Build (Currently Disabled)
 
-
 on:
   workflow_dispatch:
   push:
@@ -11,32 +10,34 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
     env:
       # Do not install production/staging-only gems in test environment
       BUNDLE_WITHOUT: "production staging"
+      DB_HOST: localhost
       DB_USER: postgres
       DB_PASSWORD: password
-      RAILS_ENV: test
-      RUBY_ENV: test
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-
       CANVAS_URL: http://bcourses.test.instructure.com/
       COVERAGE: "true"
       CHROME_DATA_DIR: /tmp/chrome-data-cucumber
       SELENIUM_HEADLESS: "true"
       SELENIUM_DRIVER_VERSION: stable
     steps:
+    - name: Install packages
+      run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: .tool-versions
         bundler-cache: true
     - name: Install Chrome and ChromeDriver
       uses: browser-actions/setup-chrome@v1

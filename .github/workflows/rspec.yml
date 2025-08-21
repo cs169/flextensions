@@ -29,12 +29,13 @@ jobs:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
     steps:
-    - name: Install packages
-      run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable
+    # - name: Install packages
+    #   run: sudo apt-get update
     - uses: actions/checkout@v3
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: .tool-versions
         bundler-cache: true
     - name: Download and install Code Climate test reporter
       run: |
