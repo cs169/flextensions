@@ -14,12 +14,11 @@ module API
         lms_id = params[:lms_id]
         external_course_id = params[:external_course_id]
 
-        # Ensure that the course and LMS exist
-        unless Course.exists?(course_id)
+        unless Course.exists?(id: course_id)
           render json: { error: 'Course not found' }, status: :not_found
           return
         end
-        unless Lms.exists?(lms_id)
+        unless Lms.exists?(id: lms_id)
           render json: { error: 'Lms not found' }, status: :not_found
           return
         end
