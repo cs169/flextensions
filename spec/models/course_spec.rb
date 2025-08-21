@@ -133,7 +133,7 @@ RSpec.describe Course, type: :model do
 
     before do
       stub_request(:get, %r{api/v1/courses/canvas_999/users.*})
-        .to_return(status: 200, body: [{ id: 'u1', name: 'User 1', email: 'user1@example.com', sis_user_id: 'SIS123' }].to_json)
+        .to_return(status: 200, body: [ { id: 'u1', name: 'User 1', email: 'user1@example.com', sis_user_id: 'SIS123' } ].to_json)
     end
 
     it 'creates user and user_to_course record' do

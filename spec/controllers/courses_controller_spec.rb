@@ -65,10 +65,10 @@ RSpec.describe CoursesController, type: :controller do
   describe 'POST #create' do
     it 'redirects to courses_path after importing courses' do
       allow(Course).to receive_messages(fetch_courses: [
-                                          { 'id' => '456', 'name' => 'New Canvas Course', 'course_code' => 'C101', 'enrollments' => [{ 'type' => 'teacher' }] }
+                                          { 'id' => '456', 'name' => 'New Canvas Course', 'course_code' => 'C101', 'enrollments' => [ { 'type' => 'teacher' } ] }
                                         ], create_or_update_from_canvas: true)
 
-      post :create, params: { courses: ['456'] }
+      post :create, params: { courses: [ '456' ] }
 
       expect(response).to redirect_to(courses_path)
       expect(flash[:notice]).to eq('Selected courses and their assignments have been imported successfully.')
@@ -122,13 +122,13 @@ RSpec.describe CoursesController, type: :controller do
                                                               'id' => '101',
                                                               'name' => 'Test Course 101',
                                                               'course_code' => 'TC101',
-                                                              'enrollments' => [{ 'type' => 'teacher' }]
+                                                              'enrollments' => [ { 'type' => 'teacher' } ]
                                                             },
                                                             {
                                                               'id' => '102',
                                                               'name' => 'Test Course 102',
                                                               'course_code' => 'TC102',
-                                                              'enrollments' => [{ 'type' => 'student' }]
+                                                              'enrollments' => [ { 'type' => 'student' } ]
                                                             }
                                                           ])
     end

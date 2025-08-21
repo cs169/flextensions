@@ -3,7 +3,7 @@ module API
     class AssignmentsController < ApplicationController
       include CanvasValidationHelper
 
-      before_action :validate_ids!, only: [:create]
+      before_action :validate_ids!, only: [ :create ]
       skip_before_action :verify_authenticity_token
 
       def index

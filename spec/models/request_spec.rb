@@ -443,7 +443,7 @@ RSpec.describe Request, type: :model do
       expect(canvas_facade).to receive(:create_assignment_override).with(
         course.canvas_id,
         assignment.external_assignment_id,
-        [user.canvas_uid],
+        [ user.canvas_uid ],
         "Extension for #{user.name}",
         request.requested_due_date.iso8601,
         nil,
@@ -469,8 +469,8 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when an existing override exists' do
-      let(:existing_override) { { 'id' => 'existing-override', 'student_ids' => [user.canvas_uid.to_s] } }
-      let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [existing_override].to_json) }
+      let(:existing_override) { { 'id' => 'existing-override', 'student_ids' => [ user.canvas_uid.to_s ] } }
+      let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [ existing_override ].to_json) }
 
       before do
         allow(canvas_facade).to receive(:delete_assignment_override).and_return(true)

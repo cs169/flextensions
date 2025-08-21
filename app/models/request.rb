@@ -196,7 +196,7 @@ class Request < ApplicationRecord
   end
 
   def self.to_csv(requests)
-    headers = ['Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status']
+    headers = [ 'Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status' ]
     CSV.generate(headers: true) do |csv|
       csv << headers
       requests.find_each do |request|
@@ -229,7 +229,7 @@ class Request < ApplicationRecord
 
   def create_override(canvas_facade)
     canvas_facade.create_assignment_override(
-      course.canvas_id, assignment.external_assignment_id, [user.canvas_uid], "Extension for #{user.name}",
+      course.canvas_id, assignment.external_assignment_id, [ user.canvas_uid ], "Extension for #{user.name}",
       requested_due_date.iso8601, nil, nil
     )
   end

@@ -2,7 +2,7 @@ module API
   module V1
     class LmssController < BaseController
       include CanvasValidationHelper
-      before_action :validate_ids!, only: [:create]
+      before_action :validate_ids!, only: [ :create ]
 
       def index
         render json: { message: 'not yet implemented' }, status: :not_implemented
