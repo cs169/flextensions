@@ -107,6 +107,8 @@ GEM
     bootstrap (5.3.3)
       autoprefixer-rails (>= 9.1.0)
       popper_js (>= 2.11.8, < 3)
+    brakeman (7.1.0)
+      racc
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -462,6 +464,10 @@ GEM
       rack (>= 1.1)
       rubocop (>= 1.72.1, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
+    rubocop-rails-omakase (1.1.0)
+      rubocop (>= 1.72)
+      rubocop-performance (>= 1.24)
+      rubocop-rails (>= 2.30)
     rubocop-rspec (3.5.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
@@ -564,11 +570,11 @@ PLATFORMS
 
 DEPENDENCIES
   annotaterb
-  axe-core-api
   axe-core-cucumber
   axe-core-rspec
   bootsnap
   bootstrap (~> 5.3.3)
+  brakeman
   capybara-screenshot
   codeclimate-test-reporter
   cucumber-rails
@@ -600,6 +606,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-rails
+  rubocop-rails-omakase
   rubocop-rspec
   sassc-rails (~> 2.1)
   selenium-webdriver
