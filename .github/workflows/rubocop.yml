@@ -6,6 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  scan:
+    runs-on: ubuntu-latest
+    env:
+      # Do not install production/staging-only gems in test environment
+      BUNDLE_WITHOUT: "production staging default test"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .tool-versions
+          bundler-cache: true
+      - name: Scan for security vulnerabilities
+        run: bin/brakeman
+
   lint:
     runs-on: ubuntu-24.04
     env:
@@ -17,6 +33,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: .tool-versions
         bundler-cache: true
     - name: Run RuboCop
-      run: bundle exec rubocop
+      run: bin/rubocop
