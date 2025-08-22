@@ -9,8 +9,8 @@ phases:
   install:
     # Use a Ruby version that matches the EB platform
     runtime-versions:
-      ruby: 3.3.8
-    
+      ruby: 3.3
+
     commands:
       - echo "Installing system dependencies for build..."
       - sudo dnf install -y postgresql17-devel ImageMagick --allowerasing
@@ -23,6 +23,8 @@ phases:
 
   pre_build:
     commands:
+      - echo "Saving git commit info"
+      - git rev-parse HEAD > REVISION 2>/dev/null || echo "unknown" > REVISION
       - echo "Pre-compiling assets for production..."
       - export RAILS_ENV=production
       - export SECRET_KEY_BASE=$(bundle exec rails secret)

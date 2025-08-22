@@ -98,13 +98,13 @@ class CanvasFacade < LmsFacade
     )
   end
 
-  # rubocop:disable Metrics/LineLength
+  # rubocop:disable Layout/LineLength
   # Depaginate a Canvas API response
   # call as: CanvasFacade.depaginate_response(response)
   # See https://canvas.instructure.com/doc/api/file.pagination
   # Example Header response:
   # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
-  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Layout/LineLength
 
   HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
   # TODO: This really needs tests
@@ -286,7 +286,7 @@ class CanvasFacade < LmsFacade
   def provision_extension(courseId, studentId, assignmentId, newDueDate)
     overrideTitle = "#{studentId} extended to #{newDueDate}"
     create_response = create_assignment_override(
-      courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+      courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
     )
     return create_response if create_response.status != 400
 
@@ -423,7 +423,7 @@ class CanvasFacade < LmsFacade
     else
       remove_student_from_override(courseId, curr_override, studentId)
       create_assignment_override(
-        courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+        courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
   end

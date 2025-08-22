@@ -241,7 +241,7 @@ RSpec.describe RequestsController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(assigns(:request)).to eq(request_record)
       expect(assigns(:selected_assignment)).to eq(assignment)
-      expect(assigns(:assignments)).to eq([assignment])
+      expect(assigns(:assignments)).to eq([ assignment ])
       expect(response).to render_template(:edit)
     end
 

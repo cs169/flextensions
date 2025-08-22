@@ -2,6 +2,10 @@
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 
+# Ensure there is always a CANVAS_URL present.
+# This is somewhat of an anti-pattern.
+ENV['CANVAS_URL'] ||= 'https://ucberkeleysandbox.instructure.com'
+
 require_relative '../config/environment'
 
 # Prevent database truncation if the environment is production

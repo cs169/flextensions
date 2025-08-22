@@ -20,7 +20,7 @@ describe CanvasFacade do
       due_at: mockDate,
       unlock_at: mockDate,
       lock_at: mockDate,
-      student_ids: [mockStudentId]
+      student_ids: [ mockStudentId ]
     }
   end
 
@@ -56,7 +56,7 @@ describe CanvasFacade do
   # other methods need to be refactors too.
   describe 'get_all_courses' do
     before do
-      stubs.get('courses') { [200, {}, '[]'] }
+      stubs.get('courses') { [ 200, {}, '[]' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -67,7 +67,7 @@ describe CanvasFacade do
 
   describe 'get_course' do
     before do
-      stubs.get("courses/#{mockCourseId}") { [200, {}, '{}'] }
+      stubs.get("courses/#{mockCourseId}") { [ 200, {}, '{}' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -78,7 +78,7 @@ describe CanvasFacade do
 
   describe('get_assignments') do
     before do
-      stubs.get("courses/#{mockCourseId}/assignments") { [200, {}, '{}'] }
+      stubs.get("courses/#{mockCourseId}/assignments") { [ 200, {}, '{}' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -89,7 +89,7 @@ describe CanvasFacade do
 
   describe('get_assignment') do
     before do
-      stubs.get("courses/#{mockCourseId}/assignments/#{mockAssignmentId}") { [200, {}, '{}'] }
+      stubs.get("courses/#{mockCourseId}/assignments/#{mockAssignmentId}") { [ 200, {}, '{}' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -102,7 +102,7 @@ describe CanvasFacade do
     before do
       stubs.get(
         "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides"
-      ) { [200, {}, '{}'] }
+      ) { [ 200, {}, '{}' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -117,14 +117,14 @@ describe CanvasFacade do
     before do
       stubs.post(
         createAssignmentOverrideUrl
-      ) { [200, {}, '{}'] }
+      ) { [ 200, {}, '{}' ] }
     end
 
     it 'has correct request body' do
       expect(conn).to receive(:post).with(
         createAssignmentOverrideUrl,
         { assignment_override: {
-          student_ids: [mockStudentId],
+          student_ids: [ mockStudentId ],
           title: mockTitle,
           due_at: mockDate,
           unlock_at: mockDate,
@@ -135,7 +135,7 @@ describe CanvasFacade do
       facade.create_assignment_override(
         mockCourseId,
         mockAssignmentId,
-        [mockStudentId],
+        [ mockStudentId ],
         mockTitle,
         mockDate,
         mockDate,
@@ -147,7 +147,7 @@ describe CanvasFacade do
       expect(facade.create_assignment_override(
         mockCourseId,
         mockAssignmentId,
-        [mockStudentId],
+        [ mockStudentId ],
         mockTitle,
         mockDate,
         mockDate,
@@ -165,14 +165,14 @@ describe CanvasFacade do
     before do
       stubs.put(
         updateAssignmentOverrideUrl
-      ) { [200, {}, '{}'] }
+      ) { [ 200, {}, '{}' ] }
     end
 
     it 'has correct request body' do
       expect(conn).to receive(:put).with(
         updateAssignmentOverrideUrl,
         {
-          student_ids: [mockStudentId],
+          student_ids: [ mockStudentId ],
           title: mockTitle,
           due_at: mockDate,
           unlock_at: mockDate,
@@ -184,7 +184,7 @@ describe CanvasFacade do
         mockCourseId,
         mockAssignmentId,
         mockOverrideId,
-        [mockStudentId],
+        [ mockStudentId ],
         mockTitle,
         mockDate,
         mockDate,
@@ -197,7 +197,7 @@ describe CanvasFacade do
         mockCourseId,
         mockAssignmentId,
         mockOverrideId,
-        [mockStudentId],
+        [ mockStudentId ],
         mockTitle,
         mockDate,
         mockDate,
@@ -211,7 +211,7 @@ describe CanvasFacade do
     before do
       stubs.delete(
         "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides/#{mockOverrideId}"
-      ) { [200, {}, '{}'] }
+      ) { [ 200, {}, '{}' ] }
     end
 
     it 'has correct response body on successful call' do
@@ -230,11 +230,11 @@ describe CanvasFacade do
       [
         400,
         {},
-        { errors: { assignment_override_students: [{
+        { errors: { assignment_override_students: [ {
           attribute: 'assignment_override_students',
           type: 'taken',
           message: 'already belongs to an assignment override'
-        }] } }.to_json
+        } ] } }.to_json
       ]
     end
 
@@ -243,7 +243,7 @@ describe CanvasFacade do
     end
 
     it 'returns correct response body on successful creation' do
-      stubs.post(mockOverrideCreationUrl) { [200, {}, '{}'] }
+      stubs.post(mockOverrideCreationUrl) { [ 200, {}, '{}' ] }
       expect(facade.provision_extension(
         mockCourseId,
         mockStudentId,
@@ -253,7 +253,7 @@ describe CanvasFacade do
     end
 
     it 'throws a pipeline error if the creation response body is improperly formatted' do
-      stubs.post(mockOverrideCreationUrl) { [400, {}, '{invalid json}'] }
+      stubs.post(mockOverrideCreationUrl) { [ 400, {}, '{invalid json}' ] }
       expect do
         facade.provision_extension(
           mockCourseId,
@@ -321,7 +321,7 @@ describe CanvasFacade do
     let(:getAssignmentOverridesUrl) { "courses/#{mockCourseId}/assignments/#{mockAssignmentId}/overrides" }
 
     it 'throws an error if the overrides response body cannot be parsed' do
-      stubs.get(getAssignmentOverridesUrl) { [200, {}, '{invalid json}'] }
+      stubs.get(getAssignmentOverridesUrl) { [ 200, {}, '{invalid json}' ] }
       expect do
         facade.send(
           :get_existing_student_override,
@@ -334,12 +334,12 @@ describe CanvasFacade do
 
     it 'returns the override that the student is listed in' do
       mockOverrideWithoutStudent = mockOverride.clone
-      mockOverrideWithoutStudent[:student_ids] = [mockStudentId + 1]
+      mockOverrideWithoutStudent[:student_ids] = [ mockStudentId + 1 ]
       stubs.get(getAssignmentOverridesUrl) do
         [
           200,
           {},
-          [mockOverrideWithoutStudent, mockOverride].to_json
+          [ mockOverrideWithoutStudent, mockOverride ].to_json
         ]
       end
       expect(facade.send(
@@ -351,7 +351,7 @@ describe CanvasFacade do
     end
 
     it 'returns nil if no override for that student is found' do
-      mockOverride[:student_ids] = [mockStudentId + 1]
+      mockOverride[:student_ids] = [ mockStudentId + 1 ]
       stubs.get(getAssignmentOverridesUrl) do
         [
           200,
@@ -387,7 +387,7 @@ describe CanvasFacade do
 
     it 'removes the student and keeps everything else the same' do
       mockOverrideWithoutStudent = OpenStruct.new(mockOverride)
-      mockOverrideWithoutStudent.student_ids = [mockStudentId + 1]
+      mockOverrideWithoutStudent.student_ids = [ mockStudentId + 1 ]
       expect(facade).to receive(:update_assignment_override).with(
         mockCourseId,
         mockOverrideStruct.assignment_id,
