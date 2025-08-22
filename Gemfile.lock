@@ -500,11 +500,11 @@ GEM
     shellany (0.0.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
-    simplecov (0.20.0)
+    simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.13.1)
+    simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
@@ -616,7 +616,7 @@ DEPENDENCIES
   sentry-rails
   sentry-ruby
   shoulda-matchers (~> 5.0)
-  simplecov (~> 0.20.0)
+  simplecov (~> 0.22.0)
   simplecov_json_formatter
   sprockets-rails
   stimulus-rails
