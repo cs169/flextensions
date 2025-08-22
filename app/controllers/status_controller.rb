@@ -9,7 +9,6 @@ class StatusController < ApplicationController
 
   def version
     git_commit = fetch_git_commit
-    git_commit_time = fetch_git_commit_time
     puma_start_time = fetch_puma_start_time
     server_time = Time.zone.now
 
