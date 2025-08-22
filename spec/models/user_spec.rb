@@ -59,7 +59,7 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe '#ensure_fresh_token' do
+  describe '#ensure_fresh_canvas_token!' do
     let(:user) { described_class.create!(email: 'test@example.com', canvas_uid: '123') }
 
     context 'when token does not expire soon' do
@@ -73,7 +73,7 @@ RSpec.describe User, type: :model do
       end
 
       it 'returns the current token' do
-        expect(user.ensure_fresh_token).to eq('valid_token')
+        expect(user.ensure_fresh_canvas_token!).to eq('valid_token')
       end
     end
 
@@ -94,7 +94,7 @@ RSpec.describe User, type: :model do
 
         allow_any_instance_of(SessionController).to receive(:refresh_user_token).and_return('refreshed_token')
 
-        result = user.ensure_fresh_token
+        result = user.ensure_fresh_canvas_token!
 
         expect(result).to eq('stale_token') # Still returns the credential.token
       end
