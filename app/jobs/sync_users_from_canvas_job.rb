@@ -19,11 +19,11 @@ class SyncUsersFromCanvasJob < ApplicationJob
 
   private
 
-# Batch LMS Roster Sync
-# We rely on Postgres' upsert for performance
-# NOTE: This still skips model validations. That is probably OK.
-# rubocop:disable Rails/SkipsModelValidations
-def sync_users_for_role(course, user, role)
+  # Batch LMS Roster Sync
+  # We rely on Postgres' upsert for performance
+  # NOTE: This still skips model validations. That is probably OK.
+  # rubocop:disable Rails/SkipsModelValidations
+  def sync_users_for_role(course, user, role)
     token = user.ensure_fresh_canvas_token!
     canvas_users = CanvasFacade.new(token).get_all_course_users(course, role)
     if !canvas_users.is_a?(Array)

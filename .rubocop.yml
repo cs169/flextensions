@@ -137,9 +137,6 @@ RSpec/VariableName:
 Naming/MethodParameterName:
   Enabled: false
 
-Naming/PredicatePrefix:
-  Enabled: false
-
 Naming/BlockParameterName:
   Enabled: false
 
