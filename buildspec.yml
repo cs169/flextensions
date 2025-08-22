@@ -9,7 +9,7 @@ phases:
   install:
     # Use a Ruby version that matches the EB platform
     runtime-versions:
-      ruby: 3.3.9
+      ruby: 3.3
 
     commands:
       - echo "Installing system dependencies for build..."
