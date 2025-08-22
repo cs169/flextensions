@@ -3,9 +3,9 @@
     <div class="col-12">
       <%= render "courses/course_title" %>
       <h1 class="sr-only">Instructor View</h1>
-      
+
       <%= render "shared/extension_status_warning", course: @course %>
-      
+
       <div class="table-responsive">
         <table class="table table-bordered table-striped" id="assignments-table">
           <thead>
@@ -23,7 +23,7 @@
                 <td class="">
                   <div class="d-flex justify-content-between align-items-center">
                     <span><%= assignment.name %></span>
-                    <a href="<%= "#{ENV.fetch('CANVAS_URL')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="text-nowrap ms-2">
+                    <a href="<%= "#{ENV.fetch('CANVAS_URL', '')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="text-nowrap ms-2">
                       bCourses <i class="fas fa-up-right-from-square"></i>
                     </a>
                   </div>
@@ -32,14 +32,14 @@
                 <td class="text-center"><%= assignment.late_due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>
                 <td class="justify-content-center align-content-center">
                   <div class="form-check form-switch mx-auto" style="width: 45px;" data-controller="assignment">
-                    <input class="form-check-input assignment-enabled-switch" type="checkbox" 
-                           role="switch" 
-                           id="assignment-<%= assignment.id %>-enabled" 
-                           <%= 'checked' if assignment.enabled %> 
+                    <input class="form-check-input assignment-enabled-switch" type="checkbox"
+                           role="switch"
+                           id="assignment-<%= assignment.id %>-enabled"
+                           <%= 'checked' if assignment.enabled %>
                            data-assignment-target="checkbox"
-                           data-assignment-id="<%= assignment.id %>" 
-                           data-url="<%= toggle_enabled_assignment_path(assignment) %>" 
-                           data-role="<%= @role %>" 
+                           data-assignment-id="<%= assignment.id %>"
+                           data-url="<%= toggle_enabled_assignment_path(assignment) %>"
+                           data-role="<%= @role %>"
                            data-user-id="<%= @user.id %>">
                     <label class="visually-hidden" for="assignment-<%= assignment.id %>-enabled">
                       Enable <%= assignment.name %> assignment
