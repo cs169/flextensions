@@ -7,7 +7,7 @@ RSpec.describe "Status", type: :request do
       expect(response).to have_http_status(:ok)
       json = response.parsed_body
       expect(json["status"]).to eq("ok")
-      expect(json["database"]).to eq(true)
+      expect(json["database"]).to be(true)
     end
   end
 
