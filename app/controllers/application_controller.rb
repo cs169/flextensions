@@ -1,14 +1,16 @@
 class ApplicationController < ActionController::Base
   before_action :authenticated!, unless: -> { excluded_controller_action? }
 
+  rescue_from LmsFacade::LmsAPIError, with: :handle_lms_api_error
+
   def excluded_controller_action?
     # Actions and controllers that do NOT require authentication
     excluded_actions = {
-      'home' => ['index'],
-      'login' => ['canvas'],
+      'home' => [ 'index' ],
+      'login' => [ 'canvas' ],
       'session' => %w[create omniauth_callback omniauth_failure],
-      'rails/health' => ['show'],
-      'requests' => ['export']
+      'rails/health' => [ 'show' ],
+      'requests' => [ 'export' ]
     }
     controller = params[:controller]
     action = params[:action]
@@ -43,6 +45,14 @@ class ApplicationController < ActionController::Base
     flash[:alert] = message
     redirect_to root_path
     false
+  end
+
+  def handle_lms_api_error(error)
+    Rails.logger.error "LMS API Error: #{error.message}"
+    # Truncate to 1K characters so we are well short of cookie limits.
+    error_message = error.message.truncate(1000)
+    flash[:alert] = "An error occurred while communicating with the LMS. Please reach out to flextension@berkeley.edu if you continue to have trouble. Error: #{error_message}"
+    redirect_back(fallback_location: root_path)
   end
 
   def set_pending_request_count

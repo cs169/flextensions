@@ -21,18 +21,20 @@ class Course < ApplicationRecord
   after_create :regenerate_readonly_api_token_if_blank
 
   # Associations
-  has_many :course_to_lmss
+  has_many :course_to_lmss, dependent: :destroy
   has_many :lmss, through: :course_to_lmss
-  has_many :user_to_courses
-  has_many :users, through: :user_to_courses
+  has_many :user_to_courses, dependent: :destroy
   has_one :form_setting, dependent: :destroy
   has_one :course_settings, dependent: :destroy
   has_many :requests, dependent: :destroy
+
+  has_many :users, through: :user_to_courses
 
   # Validations
   validates :course_name, presence: true
 
   # Helper function for the controller
+  # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
   end
@@ -45,22 +47,32 @@ class Course < ApplicationRecord
     nil
   end
 
+  def assignments
+    Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: id })
+  end
+
+  def destroy_associations
+    assignments.destroy_all
+    course_to_lmss.destroy_all
+    user_to_courses.destroy_all
+    form_setting.destroy if form_setting
+    course_settings.destroy if course_settings
+  end
+
   # Fetch courses from Canvas API
   def self.fetch_courses(token)
-    response = CanvasFacade.new(token).get_all_courses
-    all_courses = CanvasFacade.depaginate_response(response)
-    # response = CanvasFacade.new(token).get_instructor_courses
+    all_courses = CanvasFacade.new(token).get_all_courses
 
     if all_courses.is_a?(Array)
       all_courses
     else
-      Rails.logger.error "Failed to fetch courses: #{response.status} - #{response.body}"
+      Rails.logger.error 'Failed to fetch courses'
       []
     end
   end
 
   # Create or find a course and its associated CourseToLms and assignments
-  def self.create_or_update_from_canvas(course_data, token, _user)
+  def self.create_or_update_from_canvas(course_data, token, user)
     course = find_or_create_course(course_data, token)
     course_to_lms = find_or_create_course_to_lms(course, course_data)
 
@@ -107,7 +119,7 @@ class Course < ApplicationRecord
     end
 
     sync_assignments(course_to_lms, token)
-    course.sync_enrollments_from_canvas(token)
+    course.sync_all_enrollments_from_canvas(user.id)
     course
   end
 
@@ -178,63 +190,14 @@ class Course < ApplicationRecord
     end
   end
 
-  # Fetch users for a course from Canvas API
-  # TODO: Replace with call to Canvas Facade
-  def fetch_users_from_canvas(token, enrollment_type = nil)
-    url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{canvas_id}/users"
-    response = Faraday.get(url) do |req|
-      req.headers['Authorization'] = "Bearer #{token}"
-      req.headers['Content-Type'] = 'application/json'
-      req.params['enrollment_type'] = enrollment_type if enrollment_type.present?
-    end
-
-    if response.success?
-      JSON.parse(response.body)
-    else
-      Rails.logger.error "Failed to fetch users: #{response.status} - #{response.body}"
-      []
-    end
-  end
-
   # Fetch users for a course and create/find their User and UserToCourse records
-  def sync_users_from_canvas(token, role)
-    # Fetch all users for the course from Canvas
-    users_data = fetch_users_from_canvas(token, role)
-
-    # Extract the Canvas user IDs from the fetched data
-    current_canvas_user_ids = users_data.pluck('id')
-
-    # Find all UserToCourse records for this course and role
-    existing_user_to_courses = UserToCourse.where(course_id: id, role: role)
-
-    # Delete UserToCourse records for users no longer in the course
-    existing_user_to_courses.each do |user_to_course|
-      user_to_course.destroy unless current_canvas_user_ids.include?(user_to_course.user.canvas_uid)
-    end
-
-    # Create or update User and UserToCourse records for current users
-    users_data.each do |user_data|
-      # this line skips importing a user if the api doesn't return their email
-      # one case this is happening if the user was invited to the course but hasn't accepted
-      next if user_data['email'].blank?
-
-      # Create or find the User model
-      user = User.find_or_create_by(canvas_uid: user_data['id']) do |u|
-        u.name = user_data['name']
-        u.email = user_data['email'] # Assuming login_id is the email
-      end
-      user.student_id = user_data['sis_user_id']
-      user.save!
-
-      # Create or update the UserToCourse record
-      UserToCourse.find_or_create_by(user_id: user.id, course_id: id, role: role)
-    end
+  # TODO: This may need to become a background job
+  def sync_users_from_canvas(user, roles = [ 'student' ])
+    SyncUsersFromCanvasJob.perform_now(id, user, roles)
   end
 
-  def sync_enrollments_from_canvas(token)
-    sync_users_from_canvas(token, 'student')
-    sync_users_from_canvas(token, 'teacher')
-    sync_users_from_canvas(token, 'ta')
+  def sync_all_enrollments_from_canvas(user)
+    sync_users_from_canvas(user, [ 'teacher', 'ta', 'student' ])
   end
 
   def regenerate_readonly_api_token_if_blank

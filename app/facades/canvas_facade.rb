@@ -4,7 +4,9 @@ require 'json'
 require 'ostruct'
 
 # This is the facade for Canvas.
-class CanvasFacade < ExtensionFacadeBase
+class CanvasFacade < LmsFacade
+  class CanvasAPIError < LmsFacade::LmsAPIError; end
+
   CANVAS_URL = ENV.fetch('CANVAS_URL', nil)
 
   # Canvas instances can scope the flextensions developer key.
@@ -70,6 +72,10 @@ class CanvasFacade < ExtensionFacadeBase
   # url:POST|/api/v1/courses/:id/late_policy
   # url:PATCH|/api/v1/courses/:id/late_policy
 
+  def auth_header
+    { Authorization: "Bearer #{@api_token}" }
+  end
+
   ##
   # Configures the facade with the canvas api endpoint configured in the environment.
   #
@@ -78,7 +84,8 @@ class CanvasFacade < ExtensionFacadeBase
   # Enable this to automatically parse JSON responses.
   # This will require some refactoring (and rebuilding VCRs/webmock)
   # do |faraday|
-  #     faraday.request :json
+  #     faraday.request :url_encoded # passed first, only affects request parameters.
+  #     faraday.request :json # 2nd, only affects request body
   #     faraday.response :json, content_type: /\bjson$/
   #     faraday.adapter Faraday.default_adapter
   # end
@@ -91,16 +98,20 @@ class CanvasFacade < ExtensionFacadeBase
     )
   end
 
-  # rubocop:disable Metrics/LineLength
+  # rubocop:disable Layout/LineLength
   # Depaginate a Canvas API response
   # call as: CanvasFacade.depaginate_response(response)
   # See https://canvas.instructure.com/doc/api/file.pagination
   # Example Header response:
   # link: <https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="current",<https://bcourses.berkeley.edu/api/v1/courses?page=2&per_page=10>; rel="next",<https://bcourses.berkeley.edu/api/v1/courses?page=1&per_page=10>; rel="first",<https://bcourses.berkeley.edu/api/v1/courses?page=11&per_page=10>; rel="last"
-  # rubocop:enable Metrics/LineLength
+  # rubocop:enable Layout/LineLength
 
   HEADER_LINK_PARTS = /<(?<url>.*)>;\s+rel="(?<rel>.*)"/
-  def self.depaginate_response(response)
+  # TODO: This really needs tests
+  # Because this is an instance method, it's a little awkward to use:
+  # facade = CanvasFacade.new(token)
+  # all_courses = facade.depaginate_response(facade.get_all_courses)
+  def depaginate_response(response)
     return response unless response.success?
 
     links = response.headers['Link']
@@ -115,18 +126,39 @@ class CanvasFacade < ExtensionFacadeBase
     next_page = links.find { |page| page[:rel] == 'next' }
     return JSON.parse(response.body) if next_page.nil?
 
-    [JSON.parse(response.body)] + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
+    # NOTE: Do not log the full :url as it contains an auth token (from canvas)
+    JSON.parse(response.body) + depaginate_response(@canvas_conn.get(next_page[:url], headers: auth_header))
   end
 
   ##
   # Gets all courses for the authorized user.
   #
-  # @return [Faraday::Response] list of the courses the user has access to.
+  # @return [Array<Hash>] list of the Course (hashes) the user has access to.
   def get_all_courses
-    @canvas_conn.get('courses', {
+    depaginate_response(@canvas_conn.get('courses', {
       per_page: 100,
       'include[]': 'term'
-    })
+    }))
+  end
+
+  ##
+  # Get all enrollments for a course.
+  #
+  # https://ucberkeleysandbox.instructure.com/doc/api/courses.html#method.courses.users
+  # @param  [Course] A Course object.
+  # @param  [String|Array<String>] role the role to filter users by (optional).
+  # @return [Array<Hash>] list of the Enrollment (hashes) in the course.
+  def get_all_course_users(course, role = nil)
+    # sigh, manually construct query string until we tweak Faraday middleware
+    # to include :url_encoded, then use `'enrollment_type[]' : list_or_string`
+    query_string = 'per_page=100'
+    query_string += "&enrollment_type[]=#{role}" if role.is_a?(String) && role.present?
+
+    if role.is_a?(Array) && role.present? # rubocop:disable Style/IfUnlessModifier
+      query_string += role.map { |r| "&enrollment_type[]=#{r}" }.join
+    end
+
+    depaginate_response(@canvas_conn.get("courses/#{course.canvas_id}/users?#{query_string}"))
   end
 
   ##
@@ -254,7 +286,7 @@ class CanvasFacade < ExtensionFacadeBase
   def provision_extension(courseId, studentId, assignmentId, newDueDate)
     overrideTitle = "#{studentId} extended to #{newDueDate}"
     create_response = create_assignment_override(
-      courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+      courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
     )
     return create_response if create_response.status != 400
 
@@ -391,12 +423,8 @@ class CanvasFacade < ExtensionFacadeBase
     else
       remove_student_from_override(courseId, curr_override, studentId)
       create_assignment_override(
-        courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+        courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
-  end
-
-  def auth_header
-    { Authorization: "Bearer #{@api_token}" }
   end
 end

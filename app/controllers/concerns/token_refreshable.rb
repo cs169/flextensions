@@ -20,6 +20,7 @@ module TokenRefreshable
 
   private
 
+  # This needs to be moved to the user model or CanvasFacade
   def refresh_user_token(user)
     # Get the user's credentials
     credential = user.lms_credentials.first

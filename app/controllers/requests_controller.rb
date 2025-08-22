@@ -1,11 +1,11 @@
 require 'csv'
 
 class RequestsController < ApplicationController
-  before_action :authenticate_user, except: [:export]
-  before_action :set_course_role_from_settings, except: [:export]
-  before_action :authenticate_course, except: [:export]
-  before_action :set_pending_request_count, except: [:export]
-  before_action :check_extensions_enabled_for_students, except: [:export]
+  before_action :authenticate_user, except: [ :export ]
+  before_action :set_course_role_from_settings, except: [ :export ]
+  before_action :authenticate_course, except: [ :export ]
+  before_action :set_pending_request_count, except: [ :export ]
+  before_action :check_extensions_enabled_for_students, except: [ :export ]
   before_action :ensure_request_is_pending, only: %i[update approve reject]
   before_action :set_request, only: %i[show edit cancel]
   before_action :check_instructor_permission, only: %i[approve reject]
@@ -14,9 +14,9 @@ class RequestsController < ApplicationController
     @side_nav = 'requests'
     @requests = if params[:show_all] == 'true'
                   @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
-                else
+    else
                   @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
-                end
+    end
 
     # Pass the search query to the view
     @search_query = params[:search]
@@ -62,7 +62,7 @@ class RequestsController < ApplicationController
 
   def edit
     @selected_assignment = @request.assignment
-    @assignments = [@selected_assignment]
+    @assignments = [ @selected_assignment ]
   end
 
   def create

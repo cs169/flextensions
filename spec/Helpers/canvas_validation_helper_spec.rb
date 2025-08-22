@@ -67,19 +67,19 @@ describe 'CanvasValidationHelper', type: :helper do
 
   describe 'is_valid_student_ids' do
     it 'returns true on positive integral input' do
-      expect(helper.is_valid_student_ids([16, 18])).to be(true)
+      expect(helper.is_valid_student_ids([ 16, 18 ])).to be(true)
     end
 
     it 'returns false on negative integer input' do
-      expect(helper.is_valid_student_ids([-16, 16])).to be(false)
+      expect(helper.is_valid_student_ids([ -16, 16 ])).to be(false)
     end
 
     it 'returns false on boolean input' do
-      expect(helper.is_valid_student_ids([16, 0.1])).to be(false)
+      expect(helper.is_valid_student_ids([ 16, 0.1 ])).to be(false)
     end
 
     it 'returns false on alphabetical input' do
-      expect(helper.is_valid_student_ids(['abc', 16])).to be(false)
+      expect(helper.is_valid_student_ids([ 'abc', 16 ])).to be(false)
     end
   end
 

@@ -32,10 +32,10 @@ class CoursesController < ApplicationController
     end
 
     @assignments = if @role == 'student'
-                     Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
-                   else
-                     Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
-                   end
+      Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+    else
+      Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
+    end
     render_role_based_view
   end
 
@@ -45,7 +45,8 @@ class CoursesController < ApplicationController
     flash[:alert] = 'No courses found.' if @courses.empty?
 
     teacher_roles = %w[teacher ta]
-    existing_canvas_ids = Course.pluck(:canvas_id)
+    # TODO: Add spec for when a course is created, but the user is not enrolled in it.
+    existing_canvas_ids = @user.courses.pluck(:canvas_id)
     @courses_teacher = filter_courses(@courses, teacher_roles, existing_canvas_ids)
     @courses_student = @courses.select { |c| c['enrollments'].any? { |e| e['type'] == 'student' } }
   end
@@ -73,7 +74,7 @@ class CoursesController < ApplicationController
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    @course.sync_enrollments_from_canvas(@user.lms_credentials.first.token)
+    @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
   end
 
@@ -103,6 +104,7 @@ class CoursesController < ApplicationController
 
   private
 
+  # TODO: Move to app controller.
   def authenticate_user
     @user = User.find_by(canvas_uid: session[:user_id])
     redirect_to root_path, alert: 'Please log in to access this page.' unless @user

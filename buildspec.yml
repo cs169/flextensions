@@ -1,0 +1,40 @@
+# buildspec.yml (Native Ruby Version)
+#
+# This buildspec installs dependencies and precompiles assets.
+# The final artifact is the application source code itself.
+
+version: 0.2
+
+phases:
+  install:
+    # Use a Ruby version that matches the EB platform
+    runtime-versions:
+      ruby: 3.3
+
+    commands:
+      - echo "Installing system dependencies for build..."
+      - sudo dnf install -y postgresql17-devel ImageMagick --allowerasing
+
+      - echo "Installing application dependencies..."
+      - gem install bundler
+      - bundle config set deployment true
+      - bundle config set without 'development test'
+      - bundle install
+
+  pre_build:
+    commands:
+      - echo "Saving git commit info"
+      - git rev-parse HEAD > REVISION 2>/dev/null || echo "unknown" > REVISION
+      - echo "Pre-compiling assets for production..."
+      - export RAILS_ENV=production
+      - export SECRET_KEY_BASE=$(bundle exec rails secret)
+      - bundle exec rake assets:precompile
+
+  build:
+    commands:
+      - echo "Build phase complete. Preparing artifacts..."
+
+# The artifact is now the entire application directory.
+artifacts:
+  files:
+    - '**/*'

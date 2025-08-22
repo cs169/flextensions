@@ -65,10 +65,10 @@ RSpec.describe CoursesController, type: :controller do
   describe 'POST #create' do
     it 'redirects to courses_path after importing courses' do
       allow(Course).to receive_messages(fetch_courses: [
-                                          { 'id' => '456', 'name' => 'New Canvas Course', 'course_code' => 'C101', 'enrollments' => [{ 'type' => 'teacher' }] }
+                                          { 'id' => '456', 'name' => 'New Canvas Course', 'course_code' => 'C101', 'enrollments' => [ { 'type' => 'teacher' } ] }
                                         ], create_or_update_from_canvas: true)
 
-      post :create, params: { courses: ['456'] }
+      post :create, params: { courses: [ '456' ] }
 
       expect(response).to redirect_to(courses_path)
       expect(flash[:notice]).to eq('Selected courses and their assignments have been imported successfully.')
@@ -91,22 +91,19 @@ RSpec.describe CoursesController, type: :controller do
     before do
       roles = %w[teacher ta student]
       roles.each do |role|
-        stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users?enrollment_type=#{role}")
+        stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users")
           .with(
-            headers: {
-              'Accept' => '*/*',
-              'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-              'Authorization' => 'Bearer fake_token',
-              'Content-Type' => 'application/json',
-              'User-Agent' => 'Faraday v2.12.2'
-            }
-          )
-          .to_return(status: 200, body: '[]', headers: {})
+            query: {
+              'enrollment_type[]' => role,
+              'per_page' => '100'
+            },
+            headers: { 'Authorization' => 'Bearer fake_token' }
+          ).to_return(status: 200, body: '[]', headers: {})
       end
     end
 
     it 'syncs enrollments and returns OK' do
-      allow(course).to receive(:sync_enrollments_from_canvas)
+      allow(course).to receive(:sync_all_enrollments_from_canvas)
 
       post :sync_enrollments, params: { id: course.id }
 
@@ -125,13 +122,13 @@ RSpec.describe CoursesController, type: :controller do
                                                               'id' => '101',
                                                               'name' => 'Test Course 101',
                                                               'course_code' => 'TC101',
-                                                              'enrollments' => [{ 'type' => 'teacher' }]
+                                                              'enrollments' => [ { 'type' => 'teacher' } ]
                                                             },
                                                             {
                                                               'id' => '102',
                                                               'name' => 'Test Course 102',
                                                               'course_code' => 'TC102',
-                                                              'enrollments' => [{ 'type' => 'student' }]
+                                                              'enrollments' => [ { 'type' => 'student' } ]
                                                             }
                                                           ])
     end

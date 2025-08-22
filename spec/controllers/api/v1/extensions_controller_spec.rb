@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-module Api
+module API
   module V1
     describe ExtensionsController do
       describe 'POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions' do
@@ -26,7 +26,7 @@ module Api
                   assignment_override: hash_including({
                                                         'due_at' => @mock_new_due_date,
                                                         'lock_at' => @mock_new_due_date,
-                                                        'student_ids' => [@mock_student_uid.to_s],
+                                                        'student_ids' => [ @mock_student_uid.to_s ],
                                                         'title' => "#{@mock_student_uid} extended to #{@mock_new_due_date}"
                                                       })
                 },
@@ -82,7 +82,7 @@ module Api
             stub_request(:post, @mock_override_url)
               .to_return(
                 status: 500,
-                body: { errors: ['unknown student ids'] }.to_json
+                body: { errors: [ 'unknown student ids' ] }.to_json
               )
 
             stub_request(:get, "#{@mock_assignments_url}/#{@assignment.external_assignment_id}")
@@ -110,7 +110,7 @@ module Api
                 body: hash_including({
                                        due_at: @mock_new_due_date,
                                        lock_at: @mock_new_due_date,
-                                       student_ids: [@mock_student_uid.to_s],
+                                       student_ids: [ @mock_student_uid.to_s ],
                                        title: "#{@mock_student_uid} extended to #{@mock_new_due_date}"
                                      }),
                 headers: { Authorization: "Bearer #{@auth_token}" }
