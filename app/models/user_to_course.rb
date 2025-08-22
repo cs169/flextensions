@@ -19,11 +19,18 @@
 #  fk_rails_...  (course_id => courses.id)
 #  fk_rails_...  (user_id => users.id)
 #
+# TODO: In the future we should name this CourseEnrollment
 class UserToCourse < ApplicationRecord
   # Associations
   belongs_to :user
   belongs_to :course
 
   # Validations
+  # NOTE: Validations are skipped when a User is created by SyncUsersFromCanvasJob
+  # You should update that job if these validations become complex.
+  # In the meantime, we can trust that the data coming from Canvas is valid.
   validates :role, presence: true
+
+  # def staff?
+  # def course_admin?
 end

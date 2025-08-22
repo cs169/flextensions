@@ -103,7 +103,7 @@ RSpec.describe CoursesController, type: :controller do
     end
 
     it 'syncs enrollments and returns OK' do
-      allow(course).to receive(:sync_enrollments_from_canvas)
+      allow(course).to receive(:sync_all_enrollments_from_canvas)
 
       post :sync_enrollments, params: { id: course.id }
 

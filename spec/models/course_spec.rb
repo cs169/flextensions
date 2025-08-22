@@ -146,7 +146,7 @@ RSpec.describe Course, type: :model do
   describe '.create_or_update_from_canvas' do
     it 'creates course, course_to_lms, form_setting, syncs assignments and enrollments' do
       allow(described_class).to receive(:sync_assignments)
-      allow_any_instance_of(described_class).to receive(:sync_enrollments_from_canvas)
+      allow_any_instance_of(described_class).to receive(:sync_all_enrollments_from_canvas)
       stub_request(:get, %r{api/v1/courses/canvas_123})
         .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
 
