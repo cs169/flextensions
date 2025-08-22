@@ -293,7 +293,7 @@ class CanvasFacade < LmsFacade
   def provision_extension(courseId, studentId, assignmentId, newDueDate)
     overrideTitle = "#{studentId} extended to #{newDueDate}"
     create_response = create_assignment_override(
-      courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+      courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
     )
     return create_response if create_response.status != 400
 
@@ -430,7 +430,7 @@ class CanvasFacade < LmsFacade
     else
       remove_student_from_override(courseId, curr_override, studentId)
       create_assignment_override(
-        courseId, assignmentId, [studentId], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+        courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
       )
     end
   end

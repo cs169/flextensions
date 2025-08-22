@@ -13,10 +13,13 @@ AllCops:
     - 'coverage/**/*'
   SuggestExtensions: false
 
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
 # Plugins
 require: []
 plugins:
-  - rubocop-rails
+  # - rubocop-rails
   - rubocop-rspec
   - rubocop-performance
 
@@ -132,9 +135,6 @@ RSpec/VariableName:
     - 'spec/Facades/extension_facade_base_spec.rb'
 
 Naming/MethodParameterName:
-  Enabled: false
-
-Naming/PredicateName:
   Enabled: false
 
 Naming/BlockParameterName:

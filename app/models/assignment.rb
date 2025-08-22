@@ -46,4 +46,15 @@ class Assignment < ApplicationRecord
   def lms_facade
     Lms.facade_class(lms_id)
   end
+
+  # TODO: Arguably we should get the base URL from the course
+  def external_url
+    external_course_id = course_to_lms.external_course_id
+    case lms_id
+    when 1
+      "#{ENV.fetch('CANVAS_URL', '')}/courses/#{external_course_id}/assignments/#{external_assignment_id}"
+    when 2
+      "https://www.gradescope.com/courses/#{external_course_id}/assignments/#{external_assignment_id}"
+    end
+  end
 end

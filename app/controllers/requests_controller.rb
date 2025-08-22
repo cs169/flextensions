@@ -17,9 +17,9 @@ class RequestsController < ApplicationController
     @side_nav = 'requests'
     @requests = if params[:show_all] == 'true'
                   @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
-                else
+    else
                   @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
-                end
+    end
 
     # Pass the search query to the view
     @search_query = params[:search]
@@ -66,7 +66,7 @@ class RequestsController < ApplicationController
 
   def edit
     @selected_assignment = @request.assignment
-    @assignments = [@selected_assignment]
+    @assignments = [ @selected_assignment ]
   end
 
   def create

@@ -196,7 +196,7 @@ class Request < ApplicationRecord
   end
 
   def self.to_csv(requests)
-    headers = ['Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status']
+    headers = [ 'Assignment', 'Student Name', 'Student ID', 'Requested At', 'Original Due Date', 'Requested Due Date', 'Status' ]
     CSV.generate(headers: true) do |csv|
       csv << headers
       requests.find_each do |request|

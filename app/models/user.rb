@@ -21,6 +21,9 @@ class User < ApplicationRecord
   # This association is for when a request is processed by a different user:
   has_many :processed_requests, class_name: 'Request', foreign_key: 'last_processed_by_id', inverse_of: :last_processed_by
 
+  # NOTE: Validations are skipped when a User is created by SyncUsersFromCanvasJob
+  # You should update that job if these validations become complex.
+  # In the meantime, we can trust that the data coming from Canvas is valid.
   validates :email, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, message: 'must be a valid email address' }
 
@@ -33,6 +36,11 @@ class User < ApplicationRecord
   # Relationship with Course (and UserToCourse)
   has_many :user_to_courses
   has_many :courses, through: :user_to_courses
+
+  # TODO: We should probably use lms_id over lms_name
+  def canvas_credentials
+    lms_credentials.find_by(lms_name: 'canvas')
+  end
 
   def token_expired?
     return false unless lms_credentials.any?
@@ -56,7 +64,7 @@ class User < ApplicationRecord
   end
 
   # Get active token or refresh if needed
-  def ensure_fresh_token
+  def ensure_fresh_canvas_token!
     return nil unless lms_credentials.any?
 
     credential = lms_credentials.first

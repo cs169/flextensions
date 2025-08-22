@@ -26,7 +26,7 @@ module API
                   assignment_override: hash_including({
                                                         'due_at' => @mock_new_due_date,
                                                         'lock_at' => @mock_new_due_date,
-                                                        'student_ids' => [@mock_student_uid.to_s],
+                                                        'student_ids' => [ @mock_student_uid.to_s ],
                                                         'title' => "#{@mock_student_uid} extended to #{@mock_new_due_date}"
                                                       })
                 },
@@ -82,7 +82,7 @@ module API
             stub_request(:post, @mock_override_url)
               .to_return(
                 status: 500,
-                body: { errors: ['unknown student ids'] }.to_json
+                body: { errors: [ 'unknown student ids' ] }.to_json
               )
 
             stub_request(:get, "#{@mock_assignments_url}/#{@assignment.external_assignment_id}")
@@ -110,7 +110,7 @@ module API
                 body: hash_including({
                                        due_at: @mock_new_due_date,
                                        lock_at: @mock_new_due_date,
-                                       student_ids: [@mock_student_uid.to_s],
+                                       student_ids: [ @mock_student_uid.to_s ],
                                        title: "#{@mock_student_uid} extended to #{@mock_new_due_date}"
                                      }),
                 headers: { Authorization: "Bearer #{@auth_token}" }

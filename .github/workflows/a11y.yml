@@ -11,25 +11,29 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
     env:
       # Do not install production/staging-only gems in test environment
       BUNDLE_WITHOUT: "production staging"
+      DB_HOST: localhost
       DB_USER: postgres
       DB_PASSWORD: password
-      RAILS_ENV: test
-      RUBY_ENV: test
       CANVAS_URL: http://bcourses.test.instructure.com/
     steps:
-     - uses: actions/checkout@v3
-     - name: Set up Ruby
-       uses: ruby/setup-ruby@v1
-       with:
-         bundler-cache: true
+    - name: Install packages
+      run: sudo apt-get update && sudo apt-get install --no-install-recommends -y google-chrome-stable
+    - uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: .tool-versions
+        bundler-cache: true
      - name: Set up Database
        run: bundle exec rails db:setup
      - name: Create separate Chrome data directories
@@ -39,3 +43,8 @@ jobs:
        run: bundle exec rspec spec/ --tag a11y
        env:
          CHROME_DATA_DIR: /tmp/chrome-data-rspec
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v2
+        with:
+          name: screenshot
+          path: /tmp/chrome-data-rspec/screenshots
