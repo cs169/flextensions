@@ -7,6 +7,7 @@ class SyncUsersFromCanvasJob < ApplicationJob
     course = Course.find(course_id)
     user = User.find(user_id)
     roles = Array(role_or_roles)
+
     roles.each do |role|
       status_callback&.call("syncing role: #{role}")
       results_by_role[role] = sync_users_for_role(course, user, role)
@@ -21,6 +22,7 @@ class SyncUsersFromCanvasJob < ApplicationJob
 # Batch LMS Roster Sync
 # We rely on Postgres' upsert for performance
 # NOTE: This still skips model validations. That is probably OK.
+# rubocop:disable Rails/SkipsModelValidations
 def sync_users_for_role(course, user, role)
     token = user.ensure_fresh_canvas_token!
     canvas_users = CanvasFacade.new(token).get_all_course_users(course, role)
@@ -30,7 +32,6 @@ def sync_users_for_role(course, user, role)
     end
     current_canvas_user_ids = canvas_users.pluck('id')
 
-    # Initialize counters
     users_added = 0
     users_removed = 0
     users_updated = 0
@@ -49,7 +50,6 @@ def sync_users_for_role(course, user, role)
       users_removed = enrollments_to_remove.size
     end
 
-    # Skip users without emails upfront
     valid_canvas_users = canvas_users.reject { |user_data| user_data['email'].blank? }
 
     # Prepare user data for upsert - ensure canvas_uid is string
@@ -64,7 +64,6 @@ def sync_users_for_role(course, user, role)
       }
     end
 
-    # Batch upsert users
     if users_to_upsert.any?
       # Track which users are new vs updated
       canvas_uid_strings = users_to_upsert.pluck(:canvas_uid)
@@ -109,13 +108,9 @@ def sync_users_for_role(course, user, role)
       }
     end
 
-    Rails.logger.debug { "DEBUG: Preparing to insert #{enrollments_to_create.size} new enrollments" }
-
-    # Batch insert enrollments (only new ones)
     if enrollments_to_create.any?
       begin
         UserToCourse.insert_all(enrollments_to_create)
-        Rails.logger.debug { "DEBUG: Successfully inserted #{enrollments_to_create.size} enrollments" }
       rescue => e
         Rails.logger.debug { "DEBUG: Insert failed: #{e.message}" }
         Rails.logger.debug { "DEBUG: #{e.backtrace.first(3)}" }
@@ -128,4 +123,5 @@ def sync_users_for_role(course, user, role)
       updated: users_updated
     }
   end
+  # rubocop:enable Rails/SkipsModelValidations
 end

@@ -33,4 +33,14 @@ class UserToCourse < ApplicationRecord
 
   # def staff?
   # def course_admin?
+  #   role == 'teacher' || role == 'leadta'
+  # end
+
+  # def student?
+  #   role == 'student'
+  # end
+
+  # def self.roles
+  #   %w[teacher ta student]
+  # end
 end
