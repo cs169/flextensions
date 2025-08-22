@@ -18,9 +18,9 @@ class SyncUsersFromCanvasJob < ApplicationJob
 
   private
 
-  # Batch LMS Roster Sync
-  # We rely on Postgres' upsert for performance
-  # NOTE: This still skips model validations. That is probably OK.
+# Batch LMS Roster Sync
+# We rely on Postgres' upsert for performance
+# NOTE: This still skips model validations. That is probably OK.
 def sync_users_for_role(course, user, role)
     token = user.ensure_fresh_canvas_token!
     canvas_users = CanvasFacade.new(token).get_all_course_users(course, role)
@@ -67,14 +67,14 @@ def sync_users_for_role(course, user, role)
     # Batch upsert users
     if users_to_upsert.any?
       # Track which users are new vs updated
-      canvas_uid_strings = users_to_upsert.map { |u| u[:canvas_uid] }
+      canvas_uid_strings = users_to_upsert.pluck(:canvas_uid)
       existing_canvas_uids = User.where(canvas_uid: canvas_uid_strings).pluck(:canvas_uid)
-      new_user_count = users_to_upsert.count { |u| !existing_canvas_uids.include?(u[:canvas_uid]) }
+      new_user_count = users_to_upsert.count { |u| existing_canvas_uids.exclude?(u[:canvas_uid]) }
 
       User.upsert_all(
         users_to_upsert,
         unique_by: :canvas_uid,
-        update_only: [:name, :email, :student_id]
+        update_only: [ :name, :email, :student_id ]
       )
 
       users_added = new_user_count
@@ -109,16 +109,16 @@ def sync_users_for_role(course, user, role)
       }
     end
 
-    puts "DEBUG: Preparing to insert #{enrollments_to_create.size} new enrollments"
+    Rails.logger.debug { "DEBUG: Preparing to insert #{enrollments_to_create.size} new enrollments" }
 
     # Batch insert enrollments (only new ones)
     if enrollments_to_create.any?
       begin
         UserToCourse.insert_all(enrollments_to_create)
-        puts "DEBUG: Successfully inserted #{enrollments_to_create.size} enrollments"
+        Rails.logger.debug { "DEBUG: Successfully inserted #{enrollments_to_create.size} enrollments" }
       rescue => e
-        puts "DEBUG: Insert failed: #{e.message}"
-        puts "DEBUG: #{e.backtrace.first(3)}"
+        Rails.logger.debug { "DEBUG: Insert failed: #{e.message}" }
+        Rails.logger.debug { "DEBUG: #{e.backtrace.first(3)}" }
       end
     end
 
