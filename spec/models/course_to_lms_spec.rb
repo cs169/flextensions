@@ -29,7 +29,7 @@ RSpec.describe CourseToLms, type: :model do
 
   let(:token) { 'fake_token' }
 
-  describe '#fetch_assignments' do
+  describe '#get_all_canvas_assignments' do
     let(:assignments_response) do
       [
         { 'id' => '1', 'name' => 'Assignment 1' },
@@ -50,7 +50,7 @@ RSpec.describe CourseToLms, type: :model do
     end
 
     it 'fetches and returns assignments from the Canvas API' do
-      result = course_to_lms.fetch_assignments(token)
+      result = course_to_lms.get_all_canvas_assignments(token)
       expect(result).to be_an(Array)
       expect(result.size).to eq(2)
       expect(result.first['name']).to eq('Assignment 1')
@@ -71,7 +71,7 @@ RSpec.describe CourseToLms, type: :model do
 
       it 'returns an empty array and logs the error' do
         expect(Rails.logger).to receive(:error).with(/Failed to fetch assignments/)
-        result = course_to_lms.fetch_assignments(token)
+        result = course_to_lms.get_all_canvas_assignments(token)
         expect(result).to eq([])
       end
     end

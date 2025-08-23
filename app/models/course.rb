@@ -153,7 +153,7 @@ class Course < ApplicationRecord
   # Sync assignments for the course
   def self.sync_assignments(course_to_lms, token)
     # Fetch assignments from Canvas
-    assignments = course_to_lms.fetch_assignments(token)
+    assignments = course_to_lms.get_all_canvas_assignments(token)
 
     # Keep track of external assignment IDs from Canvas
     external_assignment_ids = assignments.pluck('id')

@@ -126,7 +126,7 @@ RSpec.describe Course, type: :model do
     it 'calls sync_assignment for each assignment and deletes missing ones' do
       Assignment.create!(name: 'Old', course_to_lms_id: course_to_lms.id, external_assignment_id: 'old')
 
-      allow(course_to_lms).to receive(:fetch_assignments).and_return([
+      allow(course_to_lms).to receive(:get_all_canvas_assignments).and_return([
                                                                        { 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil }
                                                                      ])
 

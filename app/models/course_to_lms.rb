@@ -26,7 +26,7 @@ class CourseToLms < ApplicationRecord
 
   # Fetch assignments from Canvas API
   # TODO: Replace with call to Canvas Facade
-  def fetch_assignments(token)
+  def get_all_canvas_assignments(token)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{external_course_id}/assignments"
     response = Faraday.get(url) do |req|
       req.headers['Authorization'] = "Bearer #{token}"
