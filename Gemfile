@@ -95,7 +95,7 @@ group :test do
 
   gem 'capybara-screenshot'
   gem 'codeclimate-test-reporter'
-  gem 'database_cleaner'
+  # Database Cleaner is used only with Cucumber
   gem 'database_cleaner-active_record'
   gem 'factory_bot_rails'
   gem 'guard-rspec'

@@ -6,7 +6,7 @@ Feature: Extension Requests
         When I go to the Course page
         # Homework 1: Due Date is 1 Day from now, Late Due Date is 10 Days from now
 		And I enable "Homework 1"
-        # Homework 2: Due Date is 2 Day from now, Late Due Date is 20 Days from now 
+        # Homework 2: Due Date is 2 Day from now, Late Due Date is 20 Days from now
 		And I enable "Homework 2"
         # Homework 3: Due Date is 3 Day from now, Late Due Date is 30 Days from now
 		And I enable "Homework 3"
@@ -16,7 +16,7 @@ Feature: Extension Requests
 		Given I'm logged in as a student
 		And I go to the Course page
 		And I click New for "Homework 3" in the "assignments-table"
-        Then I should be redirected to the "Request Extension page" with param assignment_id=3
+        Then I should be redirected to the "Request Extension page" for assignment "Homework 3"
         And the "Select Assignment" select should have "Homework 3" selected
         And I should see "Original Due Date" formatted as 3 days from now
         And I should see "Original Late Due Date" formatted as 30 days from now
@@ -77,4 +77,3 @@ Feature: Extension Requests
         Then I log in as a teacher
 		And I go to the Requests page
 		Then I should see "Homework 3"
-

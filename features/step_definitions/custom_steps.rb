@@ -59,6 +59,24 @@ Then(/^I should be (on|redirected to) the "(.*?)"(?: with param (\w+)=(.+))?$/) 
   end
 end
 
+# TODO: Consider allowing the model to be an option instead of just an assignment
+# Use phrase "the page" to avoid an ambiguous regex match with the above step.
+# We should consolidate these two or use more different phrases
+Then(/^I should be (?:on|redirected to) the page "(.*?)" for assignment "(.*?)"$/) do |page_name, assignment_name|
+  # sleep 2 # Wait for redirection if needed
+  expected_path = path_to(page_name)
+
+  current_url = page.current_url
+  url = URI.parse(current_url)
+
+  # Check that path matches expected
+  expect(url.path).to eq(expected_path)
+
+  assignment = Assignment.find_by(name: assignment_name)
+  expect(assignment).to be_present
+  expect(query_params).to include('assignment_id' => assignment.id)
+end
+
 # Checks a select input has a selected option
 # Then the "Assignment" select should have "Homework 2" selected
 Then(/^the "([^"]*)" select should have "([^"]*)" selected$/) do |field, expected_option|

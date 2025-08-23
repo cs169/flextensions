@@ -26,8 +26,7 @@ require 'rails_helper'
 
 RSpec.describe CourseToLms, type: :model do
   let!(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
-  let!(:lms) { Lms.create!(id: 1, lms_name: 'Canvas', use_auth_token: true) }
-  let!(:course_to_lms) { described_class.create!(course: course, lms: lms, external_course_id: '123') }
+  let!(:course_to_lms) { described_class.create!(course: course, lms_id: 1, external_course_id: '123') }
 
   let(:token) { 'fake_token' }
 

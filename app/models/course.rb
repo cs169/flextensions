@@ -175,6 +175,7 @@ class Course < ApplicationRecord
   end
 
   # Sync a single assignment
+  # TODO: Move to Assignment model
   def self.sync_assignment(course_to_lms, assignment_data)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']
