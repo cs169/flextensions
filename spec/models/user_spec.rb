@@ -4,6 +4,7 @@
 # Table name: users
 #
 #  id         :bigint           not null, primary key
+#  admin      :boolean          default(FALSE)
 #  canvas_uid :string
 #  email      :string
 #  name       :string

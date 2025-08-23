@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_21_022646) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_23_045226) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -157,6 +157,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_21_022646) do
     t.string "canvas_uid"
     t.string "name"
     t.string "student_id"
+    t.boolean "admin", default: false
     t.index ["canvas_uid"], name: "index_users_on_canvas_uid", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
   end
