@@ -1,15 +1,18 @@
 <%
-rerun = File.file?('rerun.txt') ? IO.read('rerun.txt') : ""
+rerun = File.file?('tmp/rerun.txt') ? IO.read('tmp/rerun.txt') : ""
 rerun = rerun.strip.gsub /\s/, ' '
 rerun_opts = rerun.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} features" : "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} #{rerun}"
 std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip'"
 %>
 default: --publish-quiet --format pretty --tags 'not @skip'
-wip: --tags @wip:3 --wip features
-rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags 'not @wip'
+wip: --tags @wip --wip features
+rerun: <%= rerun_opts %> --format rerun --out tmp/rerun.txt --strict --tags 'not @wip'
 
 # Use rack_test for faster non-JavaScript tests
-rack_test: --publish-quiet --format pretty --tags 'not @javascript'
+rack_test: --publish-quiet --tags 'not @javascript and not @skip and not @wip'
 
 # Use headless Chrome for JavaScript tests
-selenium_chrome_headless: --publish-quiet --format pretty --tags '@javascript'
+javascript: --publish-quiet --tags '@javascript and not @skip and not @wip' --retry 2
+
+# Shortcut for Accessibility tests
+a11y: --publish-quiet --tags '@a11y and not @skip and not @wip' --retry 2
