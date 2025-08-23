@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
       elsif @current_user.lms_credentials.empty?
         return handle_authentication_failure('User has no credentials.')
       elsif @current_user.lms_credentials.first.expire_time < Time.zone.now
-        return handle_authentication_failure('User token has expired.')
+        return handle_authentication_failure('You have been logged out.')
       end
     end
 

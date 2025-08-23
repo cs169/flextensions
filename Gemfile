@@ -52,10 +52,12 @@ gem 'omniauth'
 gem 'omniauth-canvas'
 gem 'omniauth-oauth2'
 
+# Audit for potentially unsafe database migrations
+gem 'strong_migrations'
+
+
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
-
-# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -123,9 +125,6 @@ group :development do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
-
-  # Audit for potentially unsafe database migrations
-  gem 'strong_migrations'
 end
 
 # Tools, incase you need to install just the linters
