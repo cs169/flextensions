@@ -45,4 +45,9 @@ class UserToCourse < ApplicationRecord
   # def self.roles
   #   %w[teacher ta student]
   # end
+
+  def self.staff_roles
+    %w[teacher ta leadta]
+  end
+
 end

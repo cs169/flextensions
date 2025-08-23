@@ -33,7 +33,6 @@ class Course < ApplicationRecord
   # Validations
   validates :course_name, presence: true
 
-  # Helper function for the controller
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
@@ -57,6 +56,12 @@ class Course < ApplicationRecord
     user_to_courses.destroy_all
     form_setting.destroy if form_setting
     course_settings.destroy if course_settings
+  end
+
+  # Find the first staff user who has a Canvas Token that can be used
+  # to post requests to Canvas.
+  def staff_user_for_auto_approval
+    user_to_courses.where(role: UserToCourse.staff_roles).first&.user
   end
 
   # Fetch courses from Canvas API

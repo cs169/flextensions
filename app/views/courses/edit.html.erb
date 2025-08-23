@@ -70,7 +70,9 @@
                                 </div>
 
                                 <div class="mb-3 row">
-                                    <label for="auto-approve-dsp" class="col-sm-4 col-form-label">Auto approve within days (DSP)</label>
+                                    <label for="auto-approve-dsp" class="col-sm-4 col-form-label">
+                                        Auto approve extended requests within days
+                                    </label>
                                     <div class="col-sm-8">
                                         <%= number_field_tag 'course_settings[auto_approve_extended_request_days]',
                                                            @course.course_settings&.auto_approve_extended_request_days,
@@ -80,7 +82,10 @@
                                                            id: 'auto-approve-dsp',
                                                            placeholder: 'Number of days',
                                                            disabled: true %>
-                                        <small class="text-muted"><em>This feature is currently under construction.</em></small>
+                                        <small class="text-muted">
+                                            <em>This feature is currently under construction.</em>
+                                            This allows students who have 'Allow Extended Requests' checked to have requests automatically approved within an extended timeframe. Use this for students who have extenuating circumstances.
+                                        </small>
                                     </div>
                                 </div>
 
