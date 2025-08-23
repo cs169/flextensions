@@ -62,7 +62,7 @@ class Request < ApplicationRecord
   # TODO: This should be APP_HOST or something like:
   # Rails.application.routes.default_url_options[:host]
   def process_created_request(current_user)
-    link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
+    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
 
     if try_auto_approval(current_user)
       slack_message, result = build_created_slack_and_result(:auto_approved, link)
@@ -77,7 +77,7 @@ class Request < ApplicationRecord
 
   # Handle request update and check for auto-approval
   def process_update(_current_user)
-    link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
+    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
     notify_slack = true
 
     if status == 'pending' && try_auto_approval(_current_user)
