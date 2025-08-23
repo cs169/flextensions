@@ -1,10 +1,10 @@
-class GradescopeFacade < ExtensionFacadeBase
+class GradescopeFacade < LmsFacade
   class GradescopeAPIError < StandardError; end
 
-  GRADESCOPE_URL = ENV.fetch('GRADESCOPE_URL', nil)
+  GRADESCOPE_URL = ENV.fetch('GRADESCOPE_URL', 'https://www.gradescope.com')
 
-  def initialize(token)
-    @api_token = token
+  def initialize(_token)
+    @api_token = nil # Gradescope does not support API tokens.
     @gradescope_conn = Lmss::Gradescope::Client.new
   end
 
