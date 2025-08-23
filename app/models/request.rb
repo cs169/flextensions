@@ -76,11 +76,11 @@ class Request < ApplicationRecord
   end
 
   # Handle request update and check for auto-approval
-  def process_update(current_user)
+  def process_update(_current_user)
     link = "#{ENV.fetch('CANVAS_REDIRECT_URI', nil)}/courses/#{course.id}/requests/#{id}"
     notify_slack = true
 
-    if status == 'pending' && try_auto_approval(current_user)
+    if status == 'pending' && try_auto_approval(_current_user)
       slack_message = build_slack_message(:auto_approved, link)
       result = build_result_hash('Your request was updated and has been approved.')
     else
@@ -97,14 +97,17 @@ class Request < ApplicationRecord
     (requested_due_date.to_date - assignment.due_date.to_date).to_i
   end
 
-  def try_auto_approval(current_user)
+  # Attempt to auto-approve by posting to the LMS.
+  # TODO: (Gradescope) figure out how this method should change.
+  def try_auto_approval(_current_user)
     return false unless auto_approval_eligible_for_course?
+    return false unless eligible_for_auto_approval?
 
-    token = current_user.lms_credentials.first&.token
-    return false unless token.present? && eligible_for_auto_approval?
+    approval_user = course.staff_user_for_auto_approval
+    approval_user.ensure_fresh_canvas_token!
+    return false if approval_user.canvas_credentials.blank?
 
-    canvas_facade = CanvasFacade.new(token)
-    auto_approve(canvas_facade)
+    auto_approve(CanvasFacade.for_user(approval_user))
   end
 
   def auto_approval_eligible_for_course?
@@ -132,9 +135,7 @@ class Request < ApplicationRecord
   def auto_approve(canvas_facade)
     return false unless eligible_for_auto_approval?
 
-    system_user = SystemUserService.auto_approval_user
-    system_user ||= SystemUserService.ensure_auto_approval_user_exists
-
+    system_user = SystemUserService.ensure_auto_approval_user_exists
     return false unless system_user
 
     # Reuse the regular approve method but mark as auto-approved afterward
@@ -143,6 +144,8 @@ class Request < ApplicationRecord
     result
   end
 
+  # TODO: This is what should take in a LmsFacade
+  # These functions should be methods on the facade, rather than a request.
   def approve(canvas_facade, processed_user_id)
     existing_override = existing_override(canvas_facade)
 
