@@ -5,7 +5,7 @@ class CreateCourseSettings < ActiveRecord::Migration[7.1]
         t.references :course, null: false, foreign_key: true
         t.boolean :enable_extensions, default: false
         t.integer :auto_approve_days, default: 0
-        t.integer :auto_approve_dsp_days, default: 0
+        t.integer :auto_approve_extended_request_days, default: 0
         t.integer :max_auto_approve, default: 0
         t.boolean :enable_emails, default: false
         t.string :reply_email
@@ -16,4 +16,4 @@ class CreateCourseSettings < ActiveRecord::Migration[7.1]
       end
     end
   end
-end 
+end

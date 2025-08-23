@@ -3,12 +3,14 @@
 #
 # Table name: course_to_lmss
 #
-#  id                 :bigint           not null, primary key
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  course_id          :bigint
-#  external_course_id :string
-#  lms_id             :bigint
+#  id                     :bigint           not null, primary key
+#  recent_assignment_sync :jsonb
+#  recent_roster_sync     :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  course_id              :bigint
+#  external_course_id     :string
+#  lms_id                 :bigint
 #
 # Indexes
 #

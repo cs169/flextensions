@@ -33,7 +33,7 @@ RSpec.describe CourseSettingsController, type: :controller do
           course_settings: {
             enable_extensions: 'true',
             auto_approve_days: '3',
-            auto_approve_dsp_days: '5',
+            auto_approve_extended_request_days: '5',
             enable_emails: 'true'
           },
           tab: 'general'
@@ -54,7 +54,7 @@ RSpec.describe CourseSettingsController, type: :controller do
           course: course,
           enable_extensions: false,
           auto_approve_days: 1,
-          auto_approve_dsp_days: 2,
+          auto_approve_extended_request_days: 2,
           max_auto_approve: 5,
           enable_emails: false
         )

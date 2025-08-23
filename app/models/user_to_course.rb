@@ -2,12 +2,14 @@
 #
 # Table name: user_to_courses
 #
-#  id         :bigint           not null, primary key
-#  role       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  course_id  :bigint
-#  user_id    :bigint
+#  id                      :bigint           not null, primary key
+#  allow_extended_requests :boolean          default(FALSE), not null
+#  removed                 :boolean          default(FALSE), not null
+#  role                    :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  course_id               :bigint
+#  user_id                 :bigint
 #
 # Indexes
 #

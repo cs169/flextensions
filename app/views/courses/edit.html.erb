@@ -6,26 +6,26 @@
             <h1 class="sr-only">Course Settings</h1>
             <ul class="nav nav-pills mb-4 justify-content-center" id="courses-tab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link <%= params[:tab] == 'email' ? '' : 'active' %>" 
-                            id="course-default-tab" 
-                            data-bs-toggle="pill" 
-                            data-bs-target="#course-default" 
-                            type="button" 
-                            role="tab" 
-                            aria-controls="course-default" 
+                    <button class="nav-link <%= params[:tab] == 'email' ? '' : 'active' %>"
+                            id="course-default-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#course-default"
+                            type="button"
+                            role="tab"
+                            aria-controls="course-default"
                             aria-selected="<%= params[:tab] == 'email' ? 'false' : 'true' %>"
                             data-course-settings-target="tab"
                             data-action="click->course-settings#updateUrlParam"
                             data-tab="general">General Settings</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link <%= params[:tab] == 'email' ? 'active' : '' %>" 
-                            id="course-email-tab" 
-                            data-bs-toggle="pill" 
-                            data-bs-target="#course-email" 
-                            type="button" 
-                            role="tab" 
-                            aria-controls="course-email" 
+                    <button class="nav-link <%= params[:tab] == 'email' ? 'active' : '' %>"
+                            id="course-email-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#course-email"
+                            type="button"
+                            role="tab"
+                            aria-controls="course-email"
                             aria-selected="<%= params[:tab] == 'email' ? 'true' : 'false' %>"
                             data-course-settings-target="tab"
                             data-action="click->course-settings#updateUrlParam"
@@ -46,53 +46,53 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_extensions]', false %>
-                                        <%= check_box_tag 'course_settings[enable_extensions]', 
-                                                         true, 
-                                                         @course.course_settings&.enable_extensions, 
-                                                         class: 'form-check-input', 
+                                        <%= check_box_tag 'course_settings[enable_extensions]',
+                                                         true,
+                                                         @course.course_settings&.enable_extensions,
+                                                         class: 'form-check-input',
                                                          id: 'course-enable' %>
                                         <label class="form-check-label" for="course-enable">Enable Students to request extensions</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="auto-approve" class="col-sm-4 col-form-label">Auto approve within days</label>
                                     <div class="col-sm-8">
-                                        <%= number_field_tag 'course_settings[auto_approve_days]', 
-                                                           @course.course_settings&.auto_approve_days, 
-                                                           min: 0, 
-                                                           step: 1, 
-                                                           class: 'form-control', 
-                                                           id: 'auto-approve', 
+                                        <%= number_field_tag 'course_settings[auto_approve_days]',
+                                                           @course.course_settings&.auto_approve_days,
+                                                           min: 0,
+                                                           step: 1,
+                                                           class: 'form-control',
+                                                           id: 'auto-approve',
                                                            placeholder: 'Number of days' %>
                                         <small class="text-muted">Extensions requested within this many days will be automatically approved, subject to the maximum limit below.</small>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="auto-approve-dsp" class="col-sm-4 col-form-label">Auto approve within days (DSP)</label>
                                     <div class="col-sm-8">
-                                        <%= number_field_tag 'course_settings[auto_approve_dsp_days]', 
-                                                           @course.course_settings&.auto_approve_dsp_days, 
-                                                           min: 0, 
-                                                           step: 1, 
-                                                           class: 'form-control', 
-                                                           id: 'auto-approve-dsp', 
+                                        <%= number_field_tag 'course_settings[auto_approve_extended_request_days]',
+                                                           @course.course_settings&.auto_approve_extended_request_days,
+                                                           min: 0,
+                                                           step: 1,
+                                                           class: 'form-control',
+                                                           id: 'auto-approve-dsp',
                                                            placeholder: 'Number of days',
                                                            disabled: true %>
                                         <small class="text-muted"><em>This feature is currently under construction.</em></small>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row border-bottom pb-3">
                                     <label for="max-auto-approve" class="col-sm-4 col-form-label">Maximum requests to auto approve</label>
                                     <div class="col-sm-8">
-                                        <%= number_field_tag 'course_settings[max_auto_approve]', 
-                                                           @course.course_settings&.max_auto_approve, 
-                                                           min: 0, 
-                                                           step: 1, 
-                                                           class: 'form-control', 
-                                                           id: 'max-auto-approve', 
+                                        <%= number_field_tag 'course_settings[max_auto_approve]',
+                                                           @course.course_settings&.max_auto_approve,
+                                                           min: 0,
+                                                           step: 1,
+                                                           class: 'form-control',
+                                                           id: 'max-auto-approve',
                                                            placeholder: 'Number' %>
                                         <small class="text-muted">This limit applies per student per course. Set to zero for no limit on auto-approved requests.</small>
                                     </div>
@@ -100,22 +100,22 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_emails]', false %>
-                                        <%= check_box_tag 'course_settings[enable_emails]', 
-                                                         true, 
-                                                         @course.course_settings&.enable_emails, 
-                                                         class: 'form-check-input', 
+                                        <%= check_box_tag 'course_settings[enable_emails]',
+                                                         true,
+                                                         @course.course_settings&.enable_emails,
+                                                         class: 'form-check-input',
                                                          id: 'enable-email' %>
                                         <label class="form-check-label" for="enable-email">Enable email notifications</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row border-bottom pb-3">
                                     <label for="reply-email" class="col-sm-4 col-form-label">Course Reply Email Address</label>
                                     <div class="col-sm-8">
-                                        <%= email_field_tag 'course_settings[reply_email]', 
-                                                          @course.course_settings&.reply_email, 
-                                                          class: 'form-control', 
-                                                          id: 'reply-email', 
+                                        <%= email_field_tag 'course_settings[reply_email]',
+                                                          @course.course_settings&.reply_email,
+                                                          class: 'form-control',
+                                                          id: 'reply-email',
                                                           placeholder: 'example@example.com',
                                                           data: { course_settings_target: "emailField" },
                                                           disabled: !@course.course_settings&.enable_emails %>
@@ -125,10 +125,10 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_slack_webhook_url]', false %>
-                                        <%= check_box_tag 'course_settings[enable_slack_webhook_url]', 
-                                                         true, 
-                                                         @course.course_settings&.enable_slack_webhook_url, 
-                                                         class: 'form-check-input', 
+                                        <%= check_box_tag 'course_settings[enable_slack_webhook_url]',
+                                                         true,
+                                                         @course.course_settings&.enable_slack_webhook_url,
+                                                         class: 'form-check-input',
                                                          id: 'enable-slack' %>
                                         <label class="form-check-label" for="enable-slack">Enable Slack Notifications</label>
                                     </div>
@@ -171,31 +171,31 @@
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                 <h2 class="card-title mb-0 h5">Email Template</h2>
-                                <%= button_tag "Reset to Default", 
-                                              name: "reset_email_template", 
-                                              value: "true", 
+                                <%= button_tag "Reset to Default",
+                                              name: "reset_email_template",
+                                              value: "true",
                                               class: "btn btn-secondary btn-sm",
                                               type: "submit" %>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="email-subject" class="form-label">Email Subject</label>
-                                    <%= text_field_tag 'course_settings[email_subject]', 
-                                                     @course.course_settings&.email_subject || "Extension Request Status: {{status}} - {{course_code}}", 
-                                                     class: 'form-control', 
+                                    <%= text_field_tag 'course_settings[email_subject]',
+                                                     @course.course_settings&.email_subject || "Extension Request Status: {{status}} - {{course_code}}",
+                                                     class: 'form-control',
                                                      id: 'email-subject' %>
                                     <small class="text-muted">Use {{variable_name}} to insert dynamic values</small>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label for="email-template" class="form-label">Email Body</label>
-                                    <%= text_area_tag 'course_settings[email_template]', 
-                                                    @course.course_settings&.email_template || "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff", 
-                                                    class: 'form-control', 
-                                                    id: 'email-template', 
+                                    <%= text_area_tag 'course_settings[email_template]',
+                                                    @course.course_settings&.email_template || "Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff",
+                                                    class: 'form-control',
+                                                    id: 'email-template',
                                                     rows: 10 %>
                                 </div>
-                                
+
                                 <div class="card bg-light mt-3">
                                     <div class="card-body">
                                         <h3 class="card-title h5">Available Variables</h3>

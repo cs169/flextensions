@@ -94,7 +94,7 @@ class Course < ApplicationRecord
       course_settings = course.build_course_settings(
         enable_extensions: false,
         auto_approve_days: 0,
-        auto_approve_dsp_days: 0,
+        auto_approve_extended_request_days: 0,
         max_auto_approve: 0,
         enable_emails: false,
         reply_email: nil,

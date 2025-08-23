@@ -5,7 +5,7 @@
 #
 #  id                       :bigint           not null, primary key
 #  auto_approve_days        :integer          default(0)
-#  auto_approve_dsp_days    :integer          default(0)
+#  auto_approve_extended_request_days    :integer          default(0)
 #  email_subject            :string           default("Extension Request Status: {{status}} - {{course_code}}")
 #  email_template           :text             default("Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff")
 #  enable_emails            :boolean          default(FALSE)

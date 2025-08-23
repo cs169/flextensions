@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_23_045226) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_23_055349) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,7 +34,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_23_045226) do
     t.bigint "course_id", null: false
     t.boolean "enable_extensions", default: false
     t.integer "auto_approve_days", default: 0
-    t.integer "auto_approve_dsp_days", default: 0
+    t.integer "auto_approve_extended_request_days", default: 0
     t.integer "max_auto_approve", default: 0
     t.boolean "enable_emails", default: false
     t.string "reply_email"
@@ -53,6 +53,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_23_045226) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "external_course_id"
+    t.jsonb "recent_roster_sync", default: {}
+    t.jsonb "recent_assignment_sync", default: {}
     t.index ["course_id"], name: "index_course_to_lmss_on_course_id"
     t.index ["lms_id"], name: "index_course_to_lmss_on_lms_id"
   end
@@ -146,6 +148,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_23_045226) do
     t.string "role"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "removed", default: false, null: false
+    t.boolean "allow_extended_requests", default: false, null: false
     t.index ["course_id"], name: "index_user_to_courses_on_course_id"
     t.index ["user_id"], name: "index_user_to_courses_on_user_id"
   end
