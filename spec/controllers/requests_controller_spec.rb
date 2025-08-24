@@ -101,7 +101,7 @@ RSpec.describe RequestsController, type: :controller do
         )
       end
 
-      it 'auto-approves eligible requests', :focus do
+      it 'auto-approves eligible requests' do
         post :create, params: {
           course_id: course.id,
           request: {

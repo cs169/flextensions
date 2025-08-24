@@ -32,14 +32,14 @@ FactoryBot.define do
 
     trait :with_students do
       after(:create) do |course|
-        create_list(:user, 3, courses: [course])
+        create_list(:user, 3, courses: [ course ])
       end
     end
 
     trait :with_staff do
       after(:create) do |course|
-        create_list(:user, 1, :with_canvas_token, courses: [course], role: 'teacher')
-        create_list(:user, 3, :with_canvas_token, courses: [course], role: 'ta')
+        create_list(:user, 1, :with_canvas_token, courses: [ course ], role: 'teacher')
+        create_list(:user, 3, :with_canvas_token, courses: [ course ], role: 'ta')
       end
     end
   end
