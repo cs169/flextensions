@@ -174,15 +174,14 @@ Before('@javascript') do
 
   # Reset to default valid mock before each scenario
   OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new({
-                                                                provider: 'canvas',
-                                                                uid: '12345',
-                                                                info: {
-                                                                  name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'),
-                                                                  email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com')
-                                                                },
-                                                                credentials: { token: 'mock_token' }
-                                                                # Add other fields as needed
-                                                              })
+    provider: 'canvas',
+    uid: '12345',
+    info: {
+      name: ENV.fetch('CANVAS_TEST_NAME', 'Test User'),
+      email: ENV.fetch('CANVAS_TEST_USERNAME', 'testuser@example.com')
+    },
+    credentials: { token: 'mock_token' }
+  })
 end
 
 Before('@visible_browser') do
@@ -193,7 +192,3 @@ After do
   # Always reset to default driver
   Capybara.use_default_driver
 end
-
-# Configure Capybara to use port 3000 for tests
-# This is important for OAuth redirect_uri to work correctly
-Capybara.server_port = 3000

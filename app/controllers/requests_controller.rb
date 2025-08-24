@@ -12,10 +12,12 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = if params[:show_all] == 'true'
-                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
+    if @role == 'student'
+      @requests = @course.requests.for_user(@user)
+    elsif params[:show_all] == 'true'
+      @requests = @course.requests.includes(:assignment)
     else
-                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
+      @requests = @course.requests.includes(:assignment).where(status: 'pending')
     end
 
     # Pass the search query to the view

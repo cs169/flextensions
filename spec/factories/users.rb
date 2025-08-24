@@ -45,15 +45,15 @@ FactoryBot.define do
       end
     end
 
-    trait :teacher do
+    factory :teacher do
       after(:create) { |user| create(:user_to_course, user: user, role: 'teacher') }
     end
 
-    trait :ta do
+    factory :ta do
       after(:create) { |user| create(:user_to_course, user: user, role: 'ta') }
     end
 
-    trait :student do
+    factory :student do
       after(:create) { |user| create(:user_to_course, user: user, role: 'student') }
     end
   end
