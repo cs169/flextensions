@@ -22,15 +22,38 @@ FactoryBot.define do
     sequence(:canvas_uid, &:to_s)
     sequence(:name) { |n| "User #{n}" }
 
-    factory :teacher do
+    factory :admin do
+      admin { true }
+    end
+
+    # Allow passing in :courses and :role
+    transient do
+      courses { [] }
+      role { 'student' }
+    end
+
+    after(:create) do |user, evaluator|
+      evaluator.courses.each do |course|
+        create(:user_to_course, user: user, course: course, role: evaluator.role)
+      end
+    end
+
+    # Test with a long refresh time to minimize the need to mock things out.
+    trait :with_canvas_token do
+      after(:create) do |user|
+        create(:lms_credential, user: user, expire_time: 10.days.from_now)
+      end
+    end
+
+    trait :teacher do
       after(:create) { |user| create(:user_to_course, user: user, role: 'teacher') }
     end
 
-    factory :ta do
+    trait :ta do
       after(:create) { |user| create(:user_to_course, user: user, role: 'ta') }
     end
 
-    factory :student do
+    trait :student do
       after(:create) { |user| create(:user_to_course, user: user, role: 'student') }
     end
   end

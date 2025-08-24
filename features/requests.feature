@@ -16,7 +16,7 @@ Feature: Extension Requests
 		Given I'm logged in as a student
 		And I go to the Course page
 		And I click New for "Homework 3" in the "assignments-table"
-        Then I should be redirected to the "Request Extension page" for assignment "Homework 3"
+        Then I should be redirected to the page "Request Extension page" for assignment "Homework 3"
         And the "Select Assignment" select should have "Homework 3" selected
         And I should see "Original Due Date" formatted as 3 days from now
         And I should see "Original Late Due Date" formatted as 30 days from now
