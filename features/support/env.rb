@@ -158,11 +158,6 @@ else
   Capybara.default_max_wait_time = 10
 end
 
-# Set up hooks
-Before('@seeds') do
-  Rails.application.load_seed
-end
-
 Before do
   # Use rack_test by default
   Capybara.current_driver = :rack_test

@@ -74,7 +74,8 @@ Then(/^I should be (?:on|redirected to) the page "(.*?)" for assignment "(.*?)"$
 
   assignment = Assignment.find_by(name: assignment_name)
   expect(assignment).to be_present
-  expect(query_params).to include('assignment_id' => assignment.id)
+  query_params = Rack::Utils.parse_query(url.query)
+  expect(query_params).to include('assignment_id' => assignment.id.to_s)
 end
 
 # Checks a select input has a selected option

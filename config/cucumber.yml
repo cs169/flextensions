@@ -1,18 +1,23 @@
 <%
-rerun = File.file?('tmp/rerun.txt') ? IO.read('tmp/rerun.txt') : ""
-rerun = rerun.strip.gsub /\s/, ' '
-rerun_opts = rerun.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} features" : "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} #{rerun}"
-std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags 'not @wip'"
+default_options = [
+  '--publish-quiet',
+  '--format pretty',
+  '--format rerun --out tmp/rerun.txt',
+  '--tags "not @wip"',
+  '--tags "not @skip"',
+  '--require features/support',
+  '--require features/step_definitions'
+].join(' ')
 %>
-default: --publish-quiet --format pretty --tags 'not @skip'
-wip: --tags @wip --wip features
-rerun: <%= rerun_opts %> --format rerun --out tmp/rerun.txt --strict --tags 'not @wip'
 
-# Use rack_test for faster non-JavaScript tests
-rack_test: --publish-quiet --tags 'not @javascript and not @skip and not @wip'
+default: <%= default_options %>
 
-# Use headless Chrome for JavaScript tests
-javascript: --publish-quiet --tags '@javascript and not @skip and not @wip' --retry 2
+rerun: <%= default_options %> --strict @tmp/rerun.txt
 
-# Shortcut for Accessibility tests
-a11y: --publish-quiet --tags '@a11y and not @skip and not @wip' --retry 2
+wip: <%= default_options.gsub('--tags "not @wip"', '--tags @wip') %> --wip features
+
+rack_test: <%= default_options %> --tags "not @javascript and not @skip and not @wip"
+
+javascript: <%= default_options %> --tags "@javascript and not @skip and not @wip" --retry 2
+
+a11y: <%= default_options %> --tags "@a11y and not @skip and not @wip" --retry 2
