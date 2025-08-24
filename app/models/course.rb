@@ -38,6 +38,8 @@ class Course < ApplicationRecord
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
   end
 
+  # TODO: Replace this with staff_role?(user) or student_role?(user)
+  # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
     return 'instructor' if roles.include?('teacher') || roles.include?('ta')
@@ -49,6 +51,11 @@ class Course < ApplicationRecord
   def assignments
     Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: id })
   end
+
+  # TODO: Write these soon and test/refactor elsewhere
+  # def students; end
+  # def staff; end
+  # def instructors; end
 
   def destroy_associations
     assignments.destroy_all
@@ -65,6 +72,7 @@ class Course < ApplicationRecord
   end
 
   # Fetch courses from Canvas API
+  # TODO: This belongs elsewhere.
   def self.fetch_courses(token)
     all_courses = CanvasFacade.new(token).get_all_courses
 

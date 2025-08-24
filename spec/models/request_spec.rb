@@ -38,12 +38,13 @@ require 'rails_helper'
 RSpec.describe Request, type: :model do
   let(:user) { User.create!(email: 'student@example.com', canvas_uid: '123', name: 'Student', student_id: 'S12345') }
   let(:instructor) { User.create!(email: 'instructor@example.com', canvas_uid: '456', name: 'Instructor') }
-  let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '789', course_code: 'TST101') }
-  let(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
+  # Course.create!(course_name: 'Test Course', canvas_id: '789', course_code: 'TST101')
+  let(:course) { create(:course, :with_students, :with_staff, course_name: 'Test Course', canvas_id: '789', course_code: 'TST101') }
+  # let(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
   let(:assignment) do
     Assignment.create!(
       name: 'Assignment 1',
-      course_to_lms_id: course_to_lms.id,
+      course_to_lms_id: course.course_to_lms(1).id,
       external_assignment_id: 'ext1',
       enabled: true,
       due_date: 2.days.from_now
@@ -68,7 +69,6 @@ RSpec.describe Request, type: :model do
   end
 
   before do
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     UserToCourse.create!(user: user, course: course, role: 'student')
     user.lms_credentials.create!(
       lms_name: 'canvas',
@@ -303,7 +303,6 @@ RSpec.describe Request, type: :model do
     let(:canvas_facade) { instance_double(CanvasFacade) }
 
     before do
-      course_settings
       allow(CanvasFacade).to receive(:new).and_return(canvas_facade)
     end
 
@@ -313,7 +312,7 @@ RSpec.describe Request, type: :model do
       end
 
       it 'returns true' do
-        expect(request.try_auto_approval(user)).to be true
+        expect(request.try_auto_approval(nil)).to be true
       end
 
       it 'calls auto_approve with a canvas_facade' do
@@ -344,7 +343,7 @@ RSpec.describe Request, type: :model do
       end
 
       it 'returns false' do
-        expect(request.try_auto_approval(user)).to be false
+        expect(request.try_auto_approval(nil)).to be false
       end
     end
 
@@ -361,7 +360,7 @@ RSpec.describe Request, type: :model do
 
   describe '#auto_approve' do
     let(:canvas_facade) { instance_double(CanvasFacade) }
-    let(:system_user) { User.create!(email: 'system@example.com', canvas_uid: '789', name: 'System') }
+    let(:system_user) { SystemUserService.auto_approval_user }
 
     before do
       allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)

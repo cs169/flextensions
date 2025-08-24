@@ -48,7 +48,7 @@ RSpec.describe Course, type: :model do
       )
       UserToCourse.create!(user: user, course: course, role: 'ta')
 
-      staff_user = described_class.staff_user_for_auto_approval
+      staff_user = course.staff_user_for_auto_approval
       expect(staff_user).to eq(user)
     end
   end
