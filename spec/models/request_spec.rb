@@ -196,7 +196,6 @@ RSpec.describe Request, type: :model do
   # TODO: Investigate the odd relationship with `course_settings`
   # Consider dropping the don't exist spec in favor a validation on `Course`.
   describe '#eligible_for_auto_approval?' do
-
     context 'when all conditions are met' do
       it 'returns true' do
         course_settings # ensure this exists/is created.
@@ -353,14 +352,13 @@ RSpec.describe Request, type: :model do
 
   describe '#auto_approve' do
     let(:canvas_facade) { instance_double(CanvasFacade) }
-    let(:system_user) { SystemUserService.auto_approval_user }
 
     before do
-      # allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
       allow(request).to receive_messages(eligible_for_auto_approval?: true, approve: true)
     end
 
     it 'calls approve with the system user' do
+      system_user = SystemUserService.ensure_auto_approval_user_exists
       expect(request).to receive(:approve).with(canvas_facade, system_user)
       request.auto_approve(canvas_facade)
     end
@@ -370,14 +368,17 @@ RSpec.describe Request, type: :model do
       expect(request.auto_approved).to be true
     end
 
+    # TODO: Consider whether this kind of a case is worth testing / can even happen.
     context 'when the system user does not exist yet' do
       before do
-        allow(SystemUserService).to receive_messages(auto_approval_user: nil, ensure_auto_approval_user_exists: system_user)
+        # Remove any existing system user to test creation
+        User.find_by(email: SystemUserService::AUTO_APPROVAL_EMAIL)&.destroy
       end
 
       it 'creates a system user' do
-        expect(SystemUserService).to receive(:ensure_auto_approval_user_exists)
-        request.auto_approve(canvas_facade)
+        expect {
+          request.auto_approve(canvas_facade)
+        }.to change { User.where(email: SystemUserService::AUTO_APPROVAL_EMAIL).count }.by(1)
       end
     end
 
