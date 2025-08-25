@@ -19,6 +19,7 @@ class Course < ApplicationRecord
   has_secure_token :readonly_api_token
 
   after_create :regenerate_readonly_api_token_if_blank
+  # TODO: after_initialize :build_course_settings_if_necessary
 
   # Associations
   has_many :course_to_lmss, dependent: :destroy
@@ -32,13 +33,15 @@ class Course < ApplicationRecord
 
   # Validations
   validates :course_name, presence: true
+  # validate :ensure_course_settings
 
-  # Helper function for the controller
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
   end
 
+  # TODO: Replace this with staff_role?(user) or student_role?(user)
+  # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
     return 'instructor' if roles.include?('teacher') || roles.include?('ta')
@@ -51,6 +54,11 @@ class Course < ApplicationRecord
     Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: id })
   end
 
+  # TODO: Write these soon and test/refactor elsewhere
+  # def students; end
+  # def staff; end
+  # def instructors; end
+
   def destroy_associations
     assignments.destroy_all
     course_to_lmss.destroy_all
@@ -59,7 +67,14 @@ class Course < ApplicationRecord
     course_settings.destroy if course_settings
   end
 
+  # Find the first staff user who has a Canvas Token that can be used
+  # to post requests to Canvas.
+  def staff_user_for_auto_approval
+    user_to_courses.where(role: UserToCourse.staff_roles).first&.user
+  end
+
   # Fetch courses from Canvas API
+  # TODO: This belongs elsewhere.
   def self.fetch_courses(token)
     all_courses = CanvasFacade.new(token).get_all_courses
 
@@ -94,7 +109,7 @@ class Course < ApplicationRecord
       course_settings = course.build_course_settings(
         enable_extensions: false,
         auto_approve_days: 0,
-        auto_approve_dsp_days: 0,
+        auto_approve_extended_request_days: 0,
         max_auto_approve: 0,
         enable_emails: false,
         reply_email: nil,
@@ -153,7 +168,7 @@ class Course < ApplicationRecord
   # Sync assignments for the course
   def self.sync_assignments(course_to_lms, token)
     # Fetch assignments from Canvas
-    assignments = course_to_lms.fetch_assignments(token)
+    assignments = course_to_lms.get_all_canvas_assignments(token)
 
     # Keep track of external assignment IDs from Canvas
     external_assignment_ids = assignments.pluck('id')
@@ -170,6 +185,7 @@ class Course < ApplicationRecord
   end
 
   # Sync a single assignment
+  # TODO: Move to Assignment model
   def self.sync_assignment(course_to_lms, assignment_data)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
     assignment.name = assignment_data['name']

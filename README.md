@@ -1,4 +1,4 @@
-# [Flextensions](https://flextensions.eecs.cloud)
+# [Flextensions](https://flextensions.berkeley.edu)
 ---
 
 [![Maintainability](https://qlty.sh/gh/berkeley-cdss/projects/flextensions/maintainability.svg)](https://qlty.sh/gh/berkeley-cdss/projects/flextensions) •
@@ -19,7 +19,7 @@
 
 ---
 ### **Flextensions** is a web application built for UC Berkeley students and course staff to manage assignment extensions across all their bCourses (Canvas) courses.
-#### To use Flextensions, visit [https://flextensions.eecs.cloud](https://flextensions.eecs.cloud).
+#### To use Flextensions, visit [https://flextensions.berkeley.edu](https://flextensions.berkeley.edu).
 
 
 ---

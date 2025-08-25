@@ -3,12 +3,14 @@
 #
 # Table name: course_to_lmss
 #
-#  id                 :bigint           not null, primary key
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  course_id          :bigint
-#  external_course_id :string
-#  lms_id             :bigint
+#  id                     :bigint           not null, primary key
+#  recent_assignment_sync :jsonb
+#  recent_roster_sync     :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  course_id              :bigint
+#  external_course_id     :string
+#  lms_id                 :bigint
 #
 # Indexes
 #
@@ -24,12 +26,11 @@ require 'rails_helper'
 
 RSpec.describe CourseToLms, type: :model do
   let!(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
-  let!(:lms) { Lms.create!(id: 1, lms_name: 'Canvas', use_auth_token: true) }
-  let!(:course_to_lms) { described_class.create!(course: course, lms: lms, external_course_id: '123') }
+  let!(:course_to_lms) { described_class.create!(course: course, lms_id: 1, external_course_id: '123') }
 
   let(:token) { 'fake_token' }
 
-  describe '#fetch_assignments' do
+  describe '#get_all_canvas_assignments' do
     let(:assignments_response) do
       [
         { 'id' => '1', 'name' => 'Assignment 1' },
@@ -50,7 +51,7 @@ RSpec.describe CourseToLms, type: :model do
     end
 
     it 'fetches and returns assignments from the Canvas API' do
-      result = course_to_lms.fetch_assignments(token)
+      result = course_to_lms.get_all_canvas_assignments(token)
       expect(result).to be_an(Array)
       expect(result.size).to eq(2)
       expect(result.first['name']).to eq('Assignment 1')
@@ -71,7 +72,7 @@ RSpec.describe CourseToLms, type: :model do
 
       it 'returns an empty array and logs the error' do
         expect(Rails.logger).to receive(:error).with(/Failed to fetch assignments/)
-        result = course_to_lms.fetch_assignments(token)
+        result = course_to_lms.get_all_canvas_assignments(token)
         expect(result).to eq([])
       end
     end

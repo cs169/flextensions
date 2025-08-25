@@ -27,8 +27,7 @@ require 'rails_helper'
 
 RSpec.describe Extension, type: :model do
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '101') }
-  let(:lms) { Lms.create!(lms_name: 'Canvas', use_auth_token: true) }
-  let(:course_to_lms) { CourseToLms.create!(course: course, lms: lms, external_course_id: '101') }
+  let(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: '101') }
   let(:assignment) { Assignment.create!(name: 'Test Assignment', external_assignment_id: '200', course_to_lms_id: course_to_lms.id) }
 
   describe 'associations' do

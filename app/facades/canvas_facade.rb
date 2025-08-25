@@ -98,6 +98,11 @@ class CanvasFacade < LmsFacade
     )
   end
 
+  def self.for_user(user)
+    token = user.canvas_credentials&.token
+    new(token) if token.present?
+  end
+
   # rubocop:disable Layout/LineLength
   # Depaginate a Canvas API response
   # call as: CanvasFacade.depaginate_response(response)
