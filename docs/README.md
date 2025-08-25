@@ -1,13 +1,16 @@
 ---
-title: Flextensions - Assignment Extension Management for UC Berkeley
+title: Flextensions - Assignment Extension Management for Canvas
 permalink: /
 ---
+
 <!-- NOTE to Authors: all absolute URLs should start with /flextensions/
 -->
 
-# Welcome to [Flextensions][flextensions] 👋
+# Welcome to Flextensions 👋 [→][flextensions]
 
-[**Flextensions**][flextensions] is your one-stop solution to manage and access assignment extensions across all your UC Berkeley courses. Whether you're course staff or a student, Flextensions streamlines extension workflows and makes extension data easy to access and manage.
+[**Flextensions**][flextensions] is your one-stop solution to manage and access assignment extensions across all your UC Berkeley courses*. Whether you're course staff or a student, Flextensions streamlines extension workflows and makes extension data easy to access and manage.
+
+_* Well, all of your courses which use bCourses and enable assignment extensions. :)_
 
 [flextensions]: https://flextensions.berkeley.edu
 
@@ -55,4 +58,6 @@ Student developers (in alphabetical order):
 * [Yaman Tarakji](https://www.linkedin.com/in/yaman-tarakji-602530196), Spring 2025
 * Zee Babar, Spring 2024
 
-Michael Ball, Armando Fox, and Lisa Yan are the faculty members who have overseen the development of Flextensions.
+[Michael Ball][mball], Armando Fox, and Lisa Yan are the faculty members who have overseen the development of Flextensions.
+
+[mball]: https://mball.co/
