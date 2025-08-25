@@ -6,7 +6,6 @@ RSpec.describe CourseSettingsController, type: :controller do
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
 
   before do
-    Lms.create!(lms_name: 'Canvas', use_auth_token: true)
     instructor.lms_credentials.create!(
       lms_name: 'canvas',
       token: 'fake_token',
@@ -33,7 +32,7 @@ RSpec.describe CourseSettingsController, type: :controller do
           course_settings: {
             enable_extensions: 'true',
             auto_approve_days: '3',
-            auto_approve_dsp_days: '5',
+            auto_approve_extended_request_days: '5',
             enable_emails: 'true'
           },
           tab: 'general'
@@ -54,7 +53,7 @@ RSpec.describe CourseSettingsController, type: :controller do
           course: course,
           enable_extensions: false,
           auto_approve_days: 1,
-          auto_approve_dsp_days: 2,
+          auto_approve_extended_request_days: 2,
           max_auto_approve: 5,
           enable_emails: false
         )

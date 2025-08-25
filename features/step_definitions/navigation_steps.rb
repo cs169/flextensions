@@ -40,8 +40,8 @@ When(/^I directly access the "(.*?)"$/) do |page_name|
     visit offerings_path
   when 'Home page'
     visit root_path
-  when 'bCourses login page'
-    visit bcourses_login_path
+  # when 'bCourses login page'
+  #   visit bcourses_login_path
   else
     raise "Unknown page: #{page_name}"
   end

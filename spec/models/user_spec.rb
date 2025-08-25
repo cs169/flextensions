@@ -4,6 +4,7 @@
 # Table name: users
 #
 #  id         :bigint           not null, primary key
+#  admin      :boolean          default(FALSE)
 #  canvas_uid :string
 #  email      :string
 #  name       :string
@@ -56,6 +57,22 @@ RSpec.describe User, type: :model do
       it 'returns true' do
         expect(user.token_expired?).to be true
       end
+    end
+  end
+
+  describe '#canvas_credentials' do
+    let(:user) { described_class.create!(email: 'test@example.com', canvas_uid: '123') }
+
+    it 'returns the correct credentials for a user' do
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'valid_token',
+        refresh_token: 'refresh_token',
+        expire_time: 1.hour.from_now
+      )
+
+      credentials = user.canvas_credentials
+      expect(credentials).to be_an_instance_of(LmsCredential)
     end
   end
 

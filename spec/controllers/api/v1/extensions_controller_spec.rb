@@ -5,11 +5,11 @@ module API
     describe ExtensionsController do
       describe 'POST /api/v1/courses/:course_id/lmss/:lms_id/assignments/:assignment_id/extensions' do
         before(:all) do
-          load Rails.root.join('db/seeds.rb').to_s
+          load Rails.root.join('db/api_spec_seeds.rb').to_s
           @course = Course.take
           @assignment = Assignment.take
           @extension = Extension.take
-          @lms = Lms.take
+          @lms = Lms.first
           @course_to_lms = CourseToLms.find(@assignment.course_to_lms_id)
           @mock_student_uid = 123
           @mock_new_due_date = '2024-04-16T16:00:00Z'

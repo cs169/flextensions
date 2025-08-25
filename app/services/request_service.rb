@@ -46,7 +46,7 @@ class RequestService
     end
   end
 
-  # Authenticate a user from session
+  # TODO: Deprecate this and move to ApplicationController.
   def self.authenticate_user(session_user_id)
     user = User.find_by(canvas_uid: session_user_id)
     return { user: user } if user

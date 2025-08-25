@@ -7,9 +7,8 @@ module API
       end
 
       before do
-        # Manually create a course and LMS in the database
         @course = Course.create!(course_name: 'Mock CS169 Course')
-        @lms = Lms.create!(lms_name: 'Mock Canvas', use_auth_token: true)
+        @lms = Lms.first
         @external_course_id = 'mock_external_course_id'
       end
 
@@ -73,10 +72,7 @@ module API
         context 'when lms does not exist' do
           it 'returns status :not_found' do
             # Ensure that the LMS does not exist
-            selected_lms = Lms.find_by(id: @lms.id)
-            selected_lms&.destroy
-
-            post :create, params: { course_id: @course.id, lms_id: 1, external_course_id: @external_course_id }
+            post :create, params: { course_id: @course.id, lms_id: Lms.maximum(:id) + 1, external_course_id: @external_course_id }
             expect(response).to have_http_status(:not_found)
             expect(response.body).to include('Lms not found')
           end

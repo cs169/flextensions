@@ -9,7 +9,7 @@ permalink: /
 
 [**Flextensions**][flextensions] is your one-stop solution to manage and access assignment extensions across all your UC Berkeley courses. Whether you're course staff or a student, Flextensions streamlines extension workflows and makes extension data easy to access and manage.
 
-[flextensions]: https://flextensions.eecs.cloud
+[flextensions]: https://flextensions.berkeley.edu
 
 ---
 
