@@ -19,6 +19,7 @@ class Course < ApplicationRecord
   has_secure_token :readonly_api_token
 
   after_create :regenerate_readonly_api_token_if_blank
+  # TODO: after_initialize :build_course_settings_if_necessary
 
   # Associations
   has_many :course_to_lmss, dependent: :destroy
@@ -32,6 +33,7 @@ class Course < ApplicationRecord
 
   # Validations
   validates :course_name, presence: true
+  # validate :ensure_course_settings
 
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)

@@ -6,7 +6,6 @@ RSpec.describe CourseSettingsController, type: :controller do
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
 
   before do
-    Lms.create!(lms_name: 'Canvas', use_auth_token: true)
     instructor.lms_credentials.create!(
       lms_name: 'canvas',
       token: 'fake_token',

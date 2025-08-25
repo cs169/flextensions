@@ -36,11 +36,10 @@
 require 'rails_helper'
 
 RSpec.describe Request, type: :model do
-  let(:user) { User.create!(email: 'student@example.com', canvas_uid: '123', name: 'Student', student_id: 'S12345') }
-  let(:instructor) { User.create!(email: 'instructor@example.com', canvas_uid: '456', name: 'Instructor') }
-  # Course.create!(course_name: 'Test Course', canvas_id: '789', course_code: 'TST101')
+  # TODO: consider refactoring the tests to make these a little easier to work with.
+  let(:user) { create(:user, email: 'student@example.com', name: 'Student', student_id: 'S12345') }
+  let(:instructor) { create(:user, email: 'instructor@example.com', name: 'Instructor') }
   let(:course) { create(:course, :with_students, :with_staff, course_name: 'Test Course', canvas_id: '789', course_code: 'TST101') }
-  # let(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
   let(:assignment) do
     Assignment.create!(
       name: 'Assignment 1',
@@ -50,6 +49,7 @@ RSpec.describe Request, type: :model do
       due_date: 2.days.from_now
     )
   end
+  # TODO: Move this to course model initialization
   let(:course_settings) do
     CourseSettings.create!(
       course: course,
@@ -164,13 +164,9 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when course settings do not exist' do
-      before do
-        # Ensure course settings don't exist
-        course.course_settings&.destroy
-      end
-
       it 'returns false' do
-        # Add this line to debug
+        course.course_settings&.destroy
+        course.reload
         expect(request.course.course_settings).to be_nil
         expect(request.auto_approval_eligible_for_course?).to be false
       end
@@ -197,25 +193,21 @@ RSpec.describe Request, type: :model do
     end
   end
 
+  # TODO: Investigate the odd relationship with `course_settings`
+  # Consider dropping the don't exist spec in favor a validation on `Course`.
   describe '#eligible_for_auto_approval?' do
-    before { course_settings }
 
     context 'when all conditions are met' do
       it 'returns true' do
+        course_settings # ensure this exists/is created.
         expect(request.eligible_for_auto_approval?).to be true
       end
     end
 
     context 'when course settings do not exist' do
-      before do
-        # Actually destroy the settings
-        course.course_settings.destroy
-        # Reload course to clear relationship cache
-        course.reload
-      end
-
       it 'returns false' do
-        # Verify settings are gone
+        course.course_settings&.destroy
+        course.reload
         expect(course.course_settings).to be_nil
         expect(request.eligible_for_auto_approval?).to be false
       end
@@ -232,11 +224,12 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when requested extension is too long' do
-      before do
-        course_settings.update(auto_approve_days: 1)
-      end
+      # before do
+      #   # course_settings.update(auto_approve_days: 1)
+      # end
 
       it 'returns false' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
         expect(request.eligible_for_auto_approval?).to be false
       end
     end
@@ -363,7 +356,7 @@ RSpec.describe Request, type: :model do
     let(:system_user) { SystemUserService.auto_approval_user }
 
     before do
-      allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
+      # allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
       allow(request).to receive_messages(eligible_for_auto_approval?: true, approve: true)
     end
 
