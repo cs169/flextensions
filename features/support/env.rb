@@ -51,7 +51,7 @@ OmniAuth.config.mock_auth[:canvas] = OmniAuth::AuthHash.new(
 )
 
 # Handle invalid credentials mock if needed for specific tests
-OmniAuth.config.add_mock(:canvas, { uid: nil, info: {} }) # Default invalid mock
+# OmniAuth.config.add_mock(:canvas, { uid: nil, info: {} }) # Default invalid mock
 
 # Optional: A helper to simulate authentication failure
 def mock_invalid_canvas_auth
@@ -79,6 +79,7 @@ Capybara.register_driver :selenium_chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
 
   # Basic Chrome options
+  options.add_argument('--headless')
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
   options.add_argument('--disable-gpu')
@@ -96,7 +97,6 @@ Capybara.register_driver :selenium_chrome do |app|
 
   # Add headless mode if in CI
   if ENV['CI']
-    options.add_argument('--headless=new')
     options.add_argument('--disable-extensions')
   end
 

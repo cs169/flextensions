@@ -20,16 +20,26 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # TODO: Refactor all auth methods
+  def current_user
+    @current_user ||= User.find_by(canvas_uid: session[:user_id])
+  end
+
+  def authenticate_user
+    @user = current_user
+    return unless @user.nil?
+
+    redirect_to root_path, alert: 'User not found in the database.'
+  end
+
   # This method checks if the user has loggedin and has valid credentials.
   def authenticated!
     if session[:user_id].blank? || !Rails.env.test?
-      @current_user = User.find_by(canvas_uid: session[:user_id])
-
-      if @current_user.nil?
+      if current_user.nil?
         return handle_authentication_failure('User not found in the database.')
-      elsif @current_user.lms_credentials.empty?
+      elsif current_user.lms_credentials.empty?
         return handle_authentication_failure('User has no credentials.')
-      elsif @current_user.lms_credentials.first.expire_time < Time.zone.now
+      elsif current_user.lms_credentials.first.expire_time < Time.zone.now
         return handle_authentication_failure('You have been logged out.')
       end
     end
@@ -104,12 +114,5 @@ class ApplicationController < ActionController::Base
 
     flash[:alert] = 'You do not have access to this page.'
     redirect_to courses_path
-  end
-
-  def authenticate_user
-    @user = User.find_by(canvas_uid: session[:user_id])
-    return unless @user.nil?
-
-    redirect_to root_path, alert: 'User not found in the database.'
   end
 end

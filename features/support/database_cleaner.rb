@@ -20,14 +20,21 @@ end
 #   ActiveRecord::Base.connection.rollback_transaction
 # end
 
-# # Run before each scenario
-Before do
-  DatabaseCleaner.strategy = :transaction
+# Set up database cleaner for different strategies
+DatabaseCleaner.allow_remote_database_url = true
+
+Before do |scenario|
+  if scenario.source_tag_names.include?('@javascript')
+    # Use truncation for JavaScript tests since they run in different threads
+    DatabaseCleaner.strategy = :truncation
+  else
+    # Use faster transactions for non-JS tests
+    DatabaseCleaner.strategy = :transaction
+  end
   DatabaseCleaner.start
 end
 
-# Run after each scenario
-After do
+After do |scenario|
   DatabaseCleaner.clean
 end
 

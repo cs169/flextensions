@@ -6,9 +6,9 @@ Feature: Navigation
   @skip @javascript
   Scenario: Navigate from Home to Login page
     Given I am on the "Home page"
-    When I click "Login with bCourses"
+    When I click "Login"
     Then I should be on the "bCourses login page"
-  
+
   @skip @javascript
   Scenario: Navigate from Home to Offerings page when logged in
     Given I am logged in as a user
@@ -39,4 +39,4 @@ Feature: Navigation
     Then I should see "Home" in the navbar
     And I should see "Login with bCourses" in the navbar
     And I should not see "Offerings" in the navbar
-    And I should not see "Logout" in the navbar 
+    And I should not see "Logout" in the navbar
