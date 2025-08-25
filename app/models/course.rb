@@ -133,7 +133,7 @@ class Course < ApplicationRecord
       course_settings.save!
     end
 
-    sync_assignments(course_to_lms, token)
+    self.sync_assignments(course_to_lms, token)
     course.sync_all_enrollments_from_canvas(user.id)
     course
   end
@@ -166,44 +166,16 @@ class Course < ApplicationRecord
   end
 
   # Sync assignments for the course
-  def self.sync_assignments(course_to_lms, token)
-    # Fetch assignments from Canvas
-    assignments = course_to_lms.get_all_canvas_assignments(token)
+  # def self.sync_assignments(course_to_lms, token)
+  #   SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+  # end
 
-    # Keep track of external assignment IDs from Canvas
-    external_assignment_ids = assignments.pluck('id')
+  # Instance method to sync assignments for this course
+  def sync_assignments(token)
+    course_to_lms = self.course_to_lms
+    return unless course_to_lms
 
-    # Sync or update assignments
-    assignments.each do |assignment_data|
-      sync_assignment(course_to_lms, assignment_data)
-    end
-
-    # Delete assignments that no longer exist in Canvas
-    Assignment.where(course_to_lms_id: course_to_lms.id)
-              .where.not(external_assignment_id: external_assignment_ids)
-              .destroy_all
-  end
-
-  # Sync a single assignment
-  # TODO: Move to Assignment model
-  def self.sync_assignment(course_to_lms, assignment_data)
-    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-    assignment.name = assignment_data['name']
-
-    # Extract due_at and lock_at dates
-    assignment.due_date = extract_date_field(assignment_data, 'due_at')
-    assignment.late_due_date = extract_date_field(assignment_data, 'lock_at')
-
-    assignment.save!
-  end
-
-  # Helper method to extract dates from assignment data
-  def self.extract_date_field(assignment_data, field_name)
-    if assignment_data['base_date'] && assignment_data['base_date'][field_name].present?
-      DateTime.parse(assignment_data['base_date'][field_name])
-    elsif assignment_data[field_name].present?
-      DateTime.parse(assignment_data[field_name])
-    end
+    SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records

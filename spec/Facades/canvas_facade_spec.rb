@@ -34,6 +34,109 @@ describe CanvasFacade do
     Faraday.default_connection = nil
   end
 
+  describe '#get_assignments_for_course' do
+    let(:external_course_id) { '123' }
+    let(:assignments_response) do
+      [
+        {
+          'id' => '456',
+          'name' => 'Assignment 1',
+          'due_at' => '2025-01-15T23:59:00Z',
+          'all_dates' => [
+            { 'base' => true, 'due_at' => '2025-01-15T23:59:00Z' },
+            { 'base' => false, 'due_at' => '2025-01-20T23:59:00Z' }
+          ]
+        }
+      ].to_json
+    end
+
+    before do
+      stubs.get("courses/#{external_course_id}/assignments") do |env|
+        expect(env.params['include[]']).to eq('all_dates')
+        [ 200, {}, assignments_response ]
+      end
+    end
+
+    it 'makes a request with correct parameters' do
+      result = facade.get_assignments_for_course(external_course_id)
+      expect(result.status).to eq(200)
+      expect(result.body).to eq(assignments_response)
+    end
+  end
+
+  describe '#get_all_assignments_for_course' do
+    let(:external_course_id) { '123' }
+    let(:assignments_data) do
+      [
+        {
+          'id' => '456',
+          'name' => 'Assignment 1',
+          'due_at' => '2025-01-15T23:59:00Z',
+          'all_dates' => [
+            { 'base' => true, 'due_at' => '2025-01-15T23:59:00Z', 'lock_at' => '2025-01-20T23:59:00Z' },
+            { 'base' => false, 'due_at' => '2025-01-20T23:59:00Z', 'lock_at' => '2025-01-25T23:59:00Z' }
+          ]
+        },
+        {
+          'id' => '789',
+          'name' => 'Assignment 2',
+          'due_at' => '2025-02-15T23:59:00Z',
+          'all_dates' => []
+        }
+      ]
+    end
+
+    before do
+      allow(facade).to receive(:get_assignments_for_course).and_return(double('response'))
+      allow(facade).to receive(:depaginate_response).and_return(assignments_data)
+    end
+
+    it 'calls get_assignments_for_course and depaginate_response' do
+      facade.get_all_assignments_for_course(external_course_id)
+      
+      expect(facade).to have_received(:get_assignments_for_course).with(external_course_id)
+      expect(facade).to have_received(:depaginate_response)
+    end
+
+    it 'processes assignments to extract base dates' do
+      result = facade.get_all_assignments_for_course(external_course_id)
+      
+      expect(result[0]['base_date']).to eq({
+        'base' => true,
+        'due_at' => '2025-01-15T23:59:00Z',
+        'lock_at' => '2025-01-20T23:59:00Z'
+      })
+      expect(result[1]['base_date']).to be_nil
+    end
+
+    it 'returns all assignments with base_date processed' do
+      result = facade.get_all_assignments_for_course(external_course_id)
+      
+      expect(result).to be_an(Array)
+      expect(result.length).to eq(2)
+      expect(result[0]['id']).to eq('456')
+      expect(result[1]['id']).to eq('789')
+    end
+
+    context 'when assignment has no all_dates' do
+      let(:assignments_data) do
+        [
+          {
+            'id' => '999',
+            'name' => 'Assignment without all_dates',
+            'due_at' => '2025-03-15T23:59:00Z'
+          }
+        ]
+      end
+
+      it 'does not add base_date' do
+        result = facade.get_all_assignments_for_course(external_course_id)
+        
+        expect(result[0]['base_date']).to be_nil
+      end
+    end
+  end
+
   describe('initialization') do
     it 'sets the proper URL' do
       expect(Faraday).to receive(:new).with(hash_including(
