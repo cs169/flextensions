@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
-  let(:course) { create(:course) }
-  let(:course_to_lms) { create(:course_to_lms, course: course) }
+  let(:course) { create(:course, :with_staff) }
+  let(:course_to_lms) { course.course_to_lms }
+  # let(:course_to_lms) { create(:course_to_lms, course: course) }
   let(:token) { 'test_token' }
 
   describe '#perform' do

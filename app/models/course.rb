@@ -133,7 +133,8 @@ class Course < ApplicationRecord
       course_settings.save!
     end
 
-    self.sync_assignments(course_to_lms, token)
+    # TODO: Consider disabling these if performance becomes an issue
+    course.sync_assignments(user)
     course.sync_all_enrollments_from_canvas(user.id)
     course
   end
@@ -165,17 +166,13 @@ class Course < ApplicationRecord
     end
   end
 
-  # Sync assignments for the course
-  # def self.sync_assignments(course_to_lms, token)
-  #   SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
-  # end
-
-  # Instance method to sync assignments for this course
-  def sync_assignments(token)
-    course_to_lms = self.course_to_lms
+  def sync_assignments(sync_user)
+    # Explicitly look for Canvas links.
+    # TODO: In the future, we will need to adapt this to work with Gradescope.
+    course_to_lms = self.course_to_lms(lms_id: 1)
     return unless course_to_lms
 
-    SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+    SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records

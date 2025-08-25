@@ -34,7 +34,7 @@ describe CanvasFacade do
     Faraday.default_connection = nil
   end
 
-  describe '#get_assignments_for_course' do
+  describe '#get_assignments' do
     let(:external_course_id) { '123' }
     let(:assignments_response) do
       [
@@ -52,13 +52,15 @@ describe CanvasFacade do
 
     before do
       stubs.get("courses/#{external_course_id}/assignments") do |env|
-        expect(env.params['include[]']).to eq('all_dates')
         [ 200, {}, assignments_response ]
       end
     end
 
     it 'makes a request with correct parameters' do
-      result = facade.get_assignments_for_course(external_course_id)
+      result = facade.get_assignments(external_course_id)
+      params = Rack::Utils.parse_query(URI(result.env.url).query)
+      expect(params['include[]']).to eq('all_dates')
+      expect(params['per_page']).to eq(100)
       expect(result.status).to eq(200)
       expect(result.body).to eq(assignments_response)
     end
@@ -87,20 +89,22 @@ describe CanvasFacade do
     end
 
     before do
-      allow(facade).to receive(:get_assignments_for_course).and_return(double('response'))
-      allow(facade).to receive(:depaginate_response).and_return(assignments_data)
+      allow(facade).to receive_messages(
+        get_assignments: double('response'),
+        depaginate_response: double('response', body: assignments_data)
+      )
     end
 
-    it 'calls get_assignments_for_course and depaginate_response' do
+    it 'calls get_assignments and depaginate_response' do
       facade.get_all_assignments_for_course(external_course_id)
-      
-      expect(facade).to have_received(:get_assignments_for_course).with(external_course_id)
+
+      expect(facade).to have_received(:get_assignments).with(external_course_id)
       expect(facade).to have_received(:depaginate_response)
     end
 
     it 'processes assignments to extract base dates' do
       result = facade.get_all_assignments_for_course(external_course_id)
-      
+
       expect(result[0]['base_date']).to eq({
         'base' => true,
         'due_at' => '2025-01-15T23:59:00Z',
@@ -111,7 +115,7 @@ describe CanvasFacade do
 
     it 'returns all assignments with base_date processed' do
       result = facade.get_all_assignments_for_course(external_course_id)
-      
+
       expect(result).to be_an(Array)
       expect(result.length).to eq(2)
       expect(result[0]['id']).to eq('456')
@@ -131,7 +135,7 @@ describe CanvasFacade do
 
       it 'does not add base_date' do
         result = facade.get_all_assignments_for_course(external_course_id)
-        
+
         expect(result[0]['base_date']).to be_nil
       end
     end
