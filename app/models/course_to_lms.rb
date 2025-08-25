@@ -2,12 +2,14 @@
 #
 # Table name: course_to_lmss
 #
-#  id                 :bigint           not null, primary key
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  course_id          :bigint
-#  external_course_id :string
-#  lms_id             :bigint
+#  id                     :bigint           not null, primary key
+#  recent_assignment_sync :jsonb
+#  recent_roster_sync     :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  course_id              :bigint
+#  external_course_id     :string
+#  lms_id                 :bigint
 #
 # Indexes
 #
@@ -26,7 +28,7 @@ class CourseToLms < ApplicationRecord
 
   # Fetch assignments from Canvas API
   # TODO: Replace with call to Canvas Facade
-  def fetch_assignments(token)
+  def get_all_canvas_assignments(token)
     url = "#{ENV.fetch('CANVAS_URL')}/api/v1/courses/#{external_course_id}/assignments"
     response = Faraday.get(url) do |req|
       req.headers['Authorization'] = "Bearer #{token}"

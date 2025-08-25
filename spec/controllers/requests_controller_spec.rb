@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe RequestsController, type: :controller do
   let(:user) { User.create!(email: 'student@example.com', canvas_uid: '123', name: 'Student') }
   let(:instructor) { User.create!(email: 'instructor@example.com', canvas_uid: '566', name: 'Instructor') }
-  let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '456', course_code: 'TST101') }
+  let(:course) { create(:course, :with_staff, course_name: 'Test Course', canvas_id: '456', course_code: 'TST101') }
   let(:teacher_course) { Course.create!(course_name: 'Instructor Course', canvas_id: '999', course_code: 'INST101') }
   let(:assignment) do
     Assignment.create!(
@@ -25,7 +25,6 @@ RSpec.describe RequestsController, type: :controller do
       custom_q1_disp: 'hidden',
       custom_q2_disp: 'hidden'
     )
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     UserToCourse.create!(user: user, course: course, role: 'student')
     CourseToLms.create!(course:, lms_id: 1)
 
@@ -85,18 +84,13 @@ RSpec.describe RequestsController, type: :controller do
 
     context 'with auto-approval enabled' do
       before do
-        CourseSettings.create!(
-          course: course,
+        course.course_settings.update!(
           enable_extensions: true,
           auto_approve_days: 5,
           max_auto_approve: 3
         )
 
         assignment.update(due_date: 1.day.from_now)
-
-        # Mock the SystemUserService
-        system_user = User.create!(email: 'system@example.com', canvas_uid: '999', name: 'System')
-        allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
 
         # Mock Canvas facade
         allow_any_instance_of(CanvasFacade).to receive(:get_assignment_overrides).and_return(

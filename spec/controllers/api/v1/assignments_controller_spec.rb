@@ -7,7 +7,7 @@ module API
       end
 
       let(:mock_course) { Course.create!(course_name: 'Test Course') }
-      let(:mock_lms) { Lms.create!(lms_name: 'Test LMS') }
+      let(:mock_lms) { Lms.first }
       let(:mock_course_to_lms) { CourseToLms.create!(course_id: mock_course.id, lms_id: mock_lms.id) }
 
       let(:valid_params) { { name: 'Test Assignment', external_assignment_id: '123ABC', course_id: mock_course.id, lms_id: mock_lms.id } }

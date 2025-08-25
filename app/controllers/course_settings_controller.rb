@@ -59,7 +59,7 @@ class CourseSettingsController < ApplicationController
     params.require(:course_settings).permit(
       :enable_extensions,
       :auto_approve_days,
-      :auto_approve_dsp_days,
+      :auto_approve_extended_request_days,
       :max_auto_approve,
       :enable_emails,
       :reply_email,

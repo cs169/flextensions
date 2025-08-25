@@ -23,6 +23,8 @@ export default class extends Controller {
 				ordering: true,
 				info: true,
 				responsive: true,
+				pageLength: 500,
+				lengthMenu: [[-1, 25, 50, 100, 500], ["All", 25, 50, 100, 500]],
 				columns: [
 					null, // Name
 					null, // Email

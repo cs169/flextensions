@@ -36,8 +36,21 @@ RSpec.describe Course, type: :model do
     { "id": 240, "name": "Sherri Johnson", "created_at": "2025-05-05T11:57:36-07:00", "sortable_name": "Johnson, Sherri", "short_name": "Sherri Johnson", "sis_user_id": "216573718", "integration_id": "sherri.johnson53", "sis_import_id": 5, "login_id": "sherri.johnson53@example.com", "email": "sherri.johnson53@example.com", "has_non_collaborative_groups": false }
   ]
 
-  before do
-    Lms.create!(id: 1, lms_name: 'Canvas', use_auth_token: true)
+  describe '#staff_user_for_auto_approval' do
+    it 'returns the correct user for auto approval' do
+      course = described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'TEST101')
+      user = User.create!(email: 'test@example.com', canvas_uid: '123')
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'valid_token',
+        refresh_token: 'refresh_token',
+        expire_time: 1.hour.from_now
+      )
+      UserToCourse.create!(user: user, course: course, role: 'ta')
+
+      staff_user = course.staff_user_for_auto_approval
+      expect(staff_user).to eq(user)
+    end
   end
 
   describe '.fetch_courses' do
@@ -126,7 +139,7 @@ RSpec.describe Course, type: :model do
     it 'calls sync_assignment for each assignment and deletes missing ones' do
       Assignment.create!(name: 'Old', course_to_lms_id: course_to_lms.id, external_assignment_id: 'old')
 
-      allow(course_to_lms).to receive(:fetch_assignments).and_return([
+      allow(course_to_lms).to receive(:get_all_canvas_assignments).and_return([
                                                                        { 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil }
                                                                      ])
 

@@ -95,5 +95,3 @@ production:
   <<: *default
   timeout: 5000
   database: flextensions_production
-  username: flextensions
-  password: <%= ENV["FLEXTENSIONS_DATABASE_PASSWORD"] %>
