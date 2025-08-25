@@ -15,7 +15,7 @@
   </head>
 	<body class="d-flex flex-column vh-100">
 		<%= render "layouts/header" %>
-		<main class="d-flex flex-grow-1 overflow-hidden">
+		<main class="d-flex flex-grow-1">
 			<% unless (controller.controller_name == "home" && controller.action_name == "index") ||  (controller.controller_name == "courses" && ["index", "new"].include?(controller.action_name)) %>
 				<% if @course.present? %>
 					<%= render 'layouts/sidebar' %>
