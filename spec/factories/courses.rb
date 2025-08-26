@@ -26,7 +26,8 @@ FactoryBot.define do
 
       create(:course_settings, course: course)
       create(:form_setting, course: course)
-      course_to_lms = create(:course_to_lms, course: course, lms: lms)
+      course_to_lms = create(:course_to_lms,
+        course: course, lms: lms, external_course_id: course.canvas_id)
       create_list(:assignment, 5, course_to_lms: course_to_lms)
     end
 

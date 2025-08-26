@@ -195,12 +195,34 @@ class CanvasFacade < LmsFacade
   end
 
   ##
-  # Gets a list of assignments for a specified course.
+  # Gets assignments for a course (single page).
   #
-  # @param  [Integer]    courseId the course id to fetch the assignments of.
-  # @return [Faraday::Response] list of the assignments in the course.
-  def get_assignments(courseId)
-    @canvas_conn.get("courses/#{courseId}/assignments")
+  # @param  [String] course_id the Canvas course id to fetch assignments for.
+  # @return [Faraday::Response] single page of assignments in the course.
+  def get_assignments(course_id)
+    @canvas_conn.get("courses/#{course_id}/assignments", {
+      'include[]' => 'all_dates',
+      'per_page' => 100
+    })
+  end
+
+  ##
+  # Gets all assignments for a course (paginated).
+  #
+  # @param  [String] course_id the Canvas course id to fetch assignments for.
+  # @return [Array<Hash>] all assignments in the course with base_date processed.
+  def get_all_assignments(course_id)
+    assignments = depaginate_response(get_assignments(course_id))
+
+    # Process assignments to extract base dates
+    assignments.each do |assignment|
+      if assignment['all_dates']
+        base_date = assignment['all_dates'].find { |date| date['base'] == true }
+        assignment['base_date'] = base_date
+      end
+    end
+
+    assignments
   end
 
   ##

@@ -5,8 +5,6 @@ class CoursesController < ApplicationController
   before_action :determine_user_role
 
   def index
-    # To-Do: lms creation shouldn't be in this controller, it should probably be in the earliest set up stages
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
 
     # Only show courses to students if extensions are enabled at the course level
@@ -67,7 +65,7 @@ class CoursesController < ApplicationController
   def sync_assignments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    Course.create_or_update_from_canvas(course_data_for_sync, @user.lms_credentials.first.token, @user)
+    @course.sync_assignments(@user)
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 
