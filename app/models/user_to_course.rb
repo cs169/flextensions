@@ -47,7 +47,7 @@ class UserToCourse < ApplicationRecord
   end
 
   def self.roles
-    ['student'] + UserToCourse.staff_roles
+    [ 'student' ] + UserToCourse.staff_roles
   end
 
   def self.staff_roles
