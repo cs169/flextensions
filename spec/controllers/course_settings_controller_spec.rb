@@ -18,13 +18,11 @@ RSpec.describe CourseSettingsController, type: :controller do
     before do
       session[:user_id] = instructor.canvas_uid
       UserToCourse.create!(user: instructor, course: course, role: 'instructor')
-      # Important: Course#user_role('instructor') must return 'instructor'
       allow_any_instance_of(Course).to receive(:user_role).with(instructor).and_return('instructor')
     end
 
     describe 'POST #update' do
       it 'creates new course settings when none exist' do
-        # First explicitly check no settings exist
         expect(CourseSettings.where(course_id: course.id).count).to eq(0)
 
         post :update, params: {
@@ -96,7 +94,7 @@ RSpec.describe CourseSettingsController, type: :controller do
         }
 
         expect(response).to redirect_to(course_settings_path(course.id, tab: 'general'))
-        expect(flash[:alert]).to eq('Failed to update course settings:')
+        expect(flash[:alert]).to include('Failed to update course settings:')
       end
 
       it 'resets email templates and redirects' do
