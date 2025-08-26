@@ -3,12 +3,12 @@ require 'rails_helper'
 RSpec.describe CoursesController, type: :controller do
   let(:user) { User.create!(email: 'student@example.com', canvas_uid: '123', name: 'Student') }
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '456', course_code: 'TST101') }
+  let(:course_to_lms) { CourseToLms.create!(course: course, external_course_id: '456', lms_id: 1) }
   let(:student_course) { Course.create!(course_name: 'Student Course', canvas_id: '789', course_code: 'STU101') }
 
   before do
     session[:user_id] = user.canvas_uid
     UserToCourse.create!(user: user, course: course, role: 'student')
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     user.lms_credentials.create!(
       lms_name: 'canvas',
       token: 'fake_token',
@@ -88,6 +88,7 @@ RSpec.describe CoursesController, type: :controller do
 
   describe 'POST #sync_enrollments' do
     before do
+      course_to_lms
       roles = %w[teacher ta student]
       roles.each do |role|
         stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users")

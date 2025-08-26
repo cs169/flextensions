@@ -119,9 +119,11 @@ end
 
   describe '#sync_users_from_canvas' do
     let!(:course) { described_class.create!(canvas_id: 'canvas_999', course_name: 'User Sync', course_code: 'USYNC') }
+    let(:course_to_lms) { CourseToLms.create!(course: course, external_course_id: 'canvas_999', lms_id: 1) }
     let(:user) { create(:user, id: 999, canvas_uid: 'u1', name: 'User 1', email: 'user1@example.com') }
 
     before do
+      course_to_lms
       stub_request(:get, %r{api/v1/courses/canvas_999/users.*})
         .to_return(
           status: 200,
