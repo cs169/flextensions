@@ -90,8 +90,8 @@ describe CanvasFacade do
 
     before do
       allow(facade).to receive_messages(
-        get_assignments: double('response'),
-        depaginate_response: double('response', body: assignments_data)
+        get_assignments: instance_double(Faraday::Response),
+        depaginate_response: assignments_data
       )
     end
 
