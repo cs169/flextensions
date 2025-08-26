@@ -56,8 +56,11 @@ class Course < ApplicationRecord
 
   # TODO: Write these soon and test/refactor elsewhere
   # def students; end
-  # def staff; end
   # def instructors; end
+
+  def staff_users
+    user_to_courses.where(role: UserToCourse.staff_roles).map(&:user)
+  end
 
   def destroy_associations
     assignments.destroy_all
@@ -169,7 +172,7 @@ class Course < ApplicationRecord
   def sync_assignments(sync_user)
     # Explicitly look for Canvas links.
     # TODO: In the future, we will need to adapt this to work with Gradescope.
-    course_to_lms = self.course_to_lms(lms_id: 1)
+    course_to_lms = self.course_to_lms(1)
     return unless course_to_lms
 
     SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)

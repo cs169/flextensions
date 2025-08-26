@@ -32,7 +32,7 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     results[:deleted_assignments] = deleted_assignments.count
     results[:synced_at] = Time.current
 
-    course_to_lmss.recent_assignment_sync = results
+    course_to_lms.recent_assignment_sync = results
     course_to_lms.save!
     results
   end

@@ -28,7 +28,7 @@ class CourseToLms < ApplicationRecord
 
   # Fetch assignments from Canvas API
   def get_all_canvas_assignments(user)
-    CanvasFacade.for_user(user).get_all_assignments_for_course(external_course_id)
+    CanvasFacade.for_user(user).get_all_assignments(external_course_id)
   rescue StandardError => e
     Rails.logger.error "Failed to fetch assignments: #{e.message}"
     []

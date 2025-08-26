@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
   let(:course) { create(:course, :with_staff) }
-  let(:course_to_lms) { course.course_to_lms }
-  # let(:course_to_lms) { create(:course_to_lms, course: course) }
-  let(:token) { 'test_token' }
+  let(:course_to_lms) { course.course_to_lms(1) }
+  # We need to use *a* staff user for the sync, this just returns the first.
+  # TODO: We should fix when we have `course.staff_users`
+  let(:sync_user) { course.staff_user_for_auto_approval }
 
   describe '#perform' do
     let(:canvas_assignments) do
@@ -26,13 +27,13 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
 
     before do
       allow_any_instance_of(CourseToLms).to receive(:get_all_canvas_assignments)
-        .with(token)
+        .with(sync_user)
         .and_return(canvas_assignments)
     end
 
     it 'creates new assignments from Canvas data' do
       expect {
-        SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+        described_class.perform_now(course_to_lms.id, sync_user.id)
       }.to change(Assignment, :count).by(2)
 
       assignment1 = Assignment.find_by(external_assignment_id: '123')
@@ -53,7 +54,7 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
         name: 'Old Name'
       )
 
-      SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+      described_class.perform_now(course_to_lms.id, sync_user.id)
 
       existing_assignment.reload
       expect(existing_assignment.name).to eq('Assignment 1')
@@ -67,10 +68,22 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       )
 
       expect {
-        SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+        described_class.perform_now(course_to_lms.id, sync_user.id)
       }.to change(Assignment, :count).by(1) # 2 new, 1 deleted = +1
 
       expect(Assignment.find_by(id: orphaned_assignment.id)).to be_nil
+    end
+
+    it 'returns sync results' do
+      result = described_class.perform_now(course_to_lms.id, sync_user.id)
+
+      expect(result).to include(
+        added_assignments: 2,
+        updated_assignments: 0,
+        unchanged_assignments: 0,
+        deleted_assignments: 0,
+        synced_at: be_within(1.second).of(Time.current)
+      )
     end
 
     context 'when assignment has base_date field' do
@@ -90,12 +103,46 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       end
 
       it 'uses base_date when present' do
-        SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, token)
+        described_class.perform_now(course_to_lms.id, sync_user.id)
 
         assignment = Assignment.find_by(external_assignment_id: '123')
         expect(assignment.due_date).to eq(DateTime.parse('2025-03-15T23:59:00Z'))
         expect(assignment.late_due_date).to eq(DateTime.parse('2025-03-20T23:59:00Z'))
       end
+    end
+
+    context 'when sync_user is not staff' do
+      let(:student_user) { create(:user) }
+
+      before do
+        create(:user_to_course, user: student_user, course: course, role: 'student')
+      end
+
+      it 'can still perform the job' do
+        expect {
+          described_class.perform_now(course_to_lms.id, student_user.id)
+        }.not_to raise_error
+      end
+    end
+  end
+
+
+  # THIS MUST BE REWRITTEN
+  # This was moved from Course.sync_assignment
+  # It is now a helper method within the job.
+  describe '.sync_assignment' do
+    skip 'Need to migrate from using Course'
+    # let!(:course) { Course.create(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'T101') }
+    # let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: 'canvas_123') }
+
+    it 'creates or updates an assignment' do
+      assignment_data = { 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s }
+      expect do
+        described_class.sync_assignment(course_to_lms, assignment_data)
+      end.to change(Assignment, :count).by(1)
+
+      assignment = Assignment.last
+      expect(assignment.name).to eq('HW1')
     end
   end
 end

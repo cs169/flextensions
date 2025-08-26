@@ -211,7 +211,7 @@ class CanvasFacade < LmsFacade
   #
   # @param  [String] course_id the Canvas course id to fetch assignments for.
   # @return [Array<Hash>] all assignments in the course with base_date processed.
-  def get_all_assignments_for_course(course_id)
+  def get_all_assignments(course_id)
     assignments = depaginate_response(get_assignments(course_id))
 
     # Process assignments to extract base dates
