@@ -50,13 +50,18 @@ class Course < ApplicationRecord
     nil
   end
 
+  # TODO: Add specs for these 4 simple methods
   def assignments
     Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: id })
   end
 
-  # TODO: Write these soon and test/refactor elsewhere
-  # def students; end
-  # def instructors; end
+  def students
+    user_to_courses.where(role: 'student').map(&:user)
+  end
+
+  def instructors
+    user_to_courses.where(role: 'teacher').map(&:user)
+  end
 
   def staff_users
     user_to_courses.where(role: UserToCourse.staff_roles).map(&:user)

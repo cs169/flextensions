@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
-  let(:course) { create(:course, :with_staff) }
+  let(:course) { create(:course, :with_staff, :with_students) }
   let(:course_to_lms) { course.course_to_lms(1) }
   # We need to use *a* staff user for the sync, this just returns the first.
   let(:sync_user) { course.staff_users.first }
@@ -28,6 +28,8 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
     end
 
     before do
+      course.assignments.destroy_all
+
       allow_any_instance_of(CourseToLms).to receive(:get_all_canvas_assignments)
         .with(sync_user)
         .and_return(canvas_assignments)
@@ -114,10 +116,12 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
     end
 
     context 'when sync_user is not staff' do
-      let(:student_user) { create(:user) }
+      let(:student_user) { course.students.first }
 
       before do
-        create(:user_to_course, user: student_user, course: course, role: 'student')
+        allow_any_instance_of(CourseToLms).to receive(:get_all_canvas_assignments)
+          .with(any_args) # Accept any arguments
+          .and_return(canvas_assignments)
       end
 
       it 'can still perform the job' do
@@ -133,8 +137,8 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
   # This was moved from Course.sync_assignment
   # It is now a helper method within the job.
   describe '.sync_assignment' do
-    skip 'Need to migrate from using Course'
     it 'creates or updates an assignment' do
+      pending 'moved from course_spec and should be rewritten'
       assignment_data = { 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s }
       expect do
         described_class.sync_assignment(course_to_lms, assignment_data)
