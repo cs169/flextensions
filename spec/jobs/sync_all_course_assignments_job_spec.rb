@@ -4,9 +4,11 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
   let(:course) { create(:course, :with_staff) }
   let(:course_to_lms) { course.course_to_lms(1) }
   # We need to use *a* staff user for the sync, this just returns the first.
-  # TODO: We should fix when we have `course.staff_users`
-  let(:sync_user) { course.staff_user_for_auto_approval }
+  let(:sync_user) { course.staff_users.first }
 
+  # TODO: Spec out the return values of the job
+  # TODO: Spec out that it updates course_to_lms.recent_assignment_sync
+  # TODO: Spec out behavior for add/update/delete assignments
   describe '#perform' do
     let(:canvas_assignments) do
       [
@@ -132,9 +134,6 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
   # It is now a helper method within the job.
   describe '.sync_assignment' do
     skip 'Need to migrate from using Course'
-    # let!(:course) { Course.create(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'T101') }
-    # let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: 'canvas_123') }
-
     it 'creates or updates an assignment' do
       assignment_data = { 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s }
       expect do
@@ -145,4 +144,22 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       expect(assignment.name).to eq('HW1')
     end
   end
+
+  # This was also migrated from the course spec.
+  # describe '.sync_assignments' do
+  #   it 'calls sync_assignment for each assignment and deletes missing ones' do
+  #     Assignment.create!(name: 'Old', course_to_lms_id: course_to_lms.id, external_assignment_id: 'old')
+
+  #     allow(course_to_lms).to receive(:get_all_canvas_assignments).and_return([
+  #       { 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil }
+  #     ])
+
+  #     # one created, one deleted
+  #     expect do
+  #       described_class.sync_assignments(course_to_lms, 'fake_token')
+  #     end.not_to(change(Assignment, :count))
+  #     expect(Assignment.find_by(external_assignment_id: 'old')).to be_nil
+  #     expect(Assignment.find_by(external_assignment_id: 'new1')).not_to be_nil
+  #   end
+  # end
 end

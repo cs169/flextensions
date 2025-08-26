@@ -77,7 +77,6 @@ RSpec.describe CoursesController, type: :controller do
 
   describe 'POST #sync_assignments' do
     it 'syncs assignments and returns OK' do
-      CourseToLms.create!(course: course, lms_id: 1)
       allow(Course).to receive(:create_or_update_from_canvas)
 
       post :sync_assignments, params: { id: course.id }
