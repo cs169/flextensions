@@ -33,18 +33,22 @@ class UserToCourse < ApplicationRecord
   # In the meantime, we can trust that the data coming from Canvas is valid.
   validates :role, presence: true
 
-  # def staff?
-  # def course_admin?
-  #   role == 'teacher' || role == 'leadta'
-  # end
 
-  # def student?
-  #   role == 'student'
-  # end
+  def staff?
+    UserToCourse.staff_roles.include?(role)
+  end
 
-  # def self.roles
-  #   %w[teacher ta student]
-  # end
+  def course_admin?
+    role == 'teacher' || role == 'leadta'
+  end
+
+  def student?
+    role == 'student'
+  end
+
+  def self.roles
+    [ 'student' ] + UserToCourse.staff_roles
+  end
 
   def self.staff_roles
     %w[teacher ta leadta]

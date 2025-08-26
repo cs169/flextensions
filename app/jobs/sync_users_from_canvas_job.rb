@@ -14,6 +14,11 @@ class SyncUsersFromCanvasJob < ApplicationJob
       status_callback&.call("finished syncing role: #{role}")
     end
     status_callback&.call('all roles synced')
+    results_by_role[:synced_at] = Time.current
+
+    course_to_lms = course.course_to_lms(1)
+    course_to_lms.recent_roster_sync = results_by_role
+    course_to_lms.save!
     results_by_role
   end
 
