@@ -19,7 +19,7 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link" href="https://github.com/berkeley-cdss/flextensions/wiki/" target="_blank">Help</a>
+					<a class="nav-link" href="https://berkeley-cdss.github.io/flextensions/" target="_blank">Help</a>
 				</li>
 			</ul>
 			<div class="d-lg-flex col-lg-3 justify-content-lg-end">
@@ -34,7 +34,6 @@
 							</ul>
 						</li>
 					<% else %>
-						<!-- Display this when there's NO logged-in user -->
 						<%# TODO: Need a test case for this. %>
 						<li class="nav-item">
 							<%= link_to 'Login', '/auth/canvas', class: 'btn btn-primary', id: 'login-button-index' %>
@@ -46,7 +45,6 @@
 						</div>
 					</li>
 				</ul>
-
 			</div>
 		</div>
 	</div>
