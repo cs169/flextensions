@@ -2,12 +2,14 @@
 #
 # Table name: user_to_courses
 #
-#  id         :bigint           not null, primary key
-#  role       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  course_id  :bigint
-#  user_id    :bigint
+#  id                      :bigint           not null, primary key
+#  allow_extended_requests :boolean          default(FALSE), not null
+#  removed                 :boolean          default(FALSE), not null
+#  role                    :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  course_id               :bigint
+#  user_id                 :bigint
 #
 # Indexes
 #
@@ -31,16 +33,24 @@ class UserToCourse < ApplicationRecord
   # In the meantime, we can trust that the data coming from Canvas is valid.
   validates :role, presence: true
 
-  # def staff?
-  # def course_admin?
-  #   role == 'teacher' || role == 'leadta'
-  # end
 
-  # def student?
-  #   role == 'student'
-  # end
+  def staff?
+    UserToCourse.staff_roles.include?(role)
+  end
 
-  # def self.roles
-  #   %w[teacher ta student]
-  # end
+  def course_admin?
+    role == 'teacher' || role == 'leadta'
+  end
+
+  def student?
+    role == 'student'
+  end
+
+  def self.roles
+    [ 'student' ] + UserToCourse.staff_roles
+  end
+
+  def self.staff_roles
+    %w[teacher ta leadta]
+  end
 end

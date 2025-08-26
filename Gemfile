@@ -53,10 +53,12 @@ gem 'omniauth'
 gem 'omniauth-canvas'
 gem 'omniauth-oauth2'
 
+# Audit for potentially unsafe database migrations
+gem 'strong_migrations'
+
+
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
-
-# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -94,7 +96,7 @@ group :test do
 
   gem 'capybara-screenshot'
   gem 'codeclimate-test-reporter'
-  gem 'database_cleaner'
+  # Database Cleaner is used only with Cucumber
   gem 'database_cleaner-active_record'
   gem 'factory_bot_rails'
   gem 'guard-rspec'

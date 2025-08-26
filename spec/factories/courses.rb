@@ -26,8 +26,22 @@ FactoryBot.define do
 
       create(:course_settings, course: course)
       create(:form_setting, course: course)
-      course_to_lms = create(:course_to_lms, course: course, lms: lms)
+      course_to_lms = create(:course_to_lms,
+        course: course, lms: lms, external_course_id: course.canvas_id)
       create_list(:assignment, 5, course_to_lms: course_to_lms)
+    end
+
+    trait :with_students do
+      after(:create) do |course|
+        create_list(:user, 3, courses: [ course ])
+      end
+    end
+
+    trait :with_staff do
+      after(:create) do |course|
+        create(:user, :with_canvas_token, courses: [ course ], role: 'teacher')
+        create_list(:user, 3, :with_canvas_token, courses: [ course ], role: 'ta')
+      end
     end
   end
 end

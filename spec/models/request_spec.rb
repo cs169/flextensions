@@ -36,19 +36,20 @@
 require 'rails_helper'
 
 RSpec.describe Request, type: :model do
-  let(:user) { User.create!(email: 'student@example.com', canvas_uid: '123', name: 'Student', student_id: 'S12345') }
-  let(:instructor) { User.create!(email: 'instructor@example.com', canvas_uid: '456', name: 'Instructor') }
-  let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '789', course_code: 'TST101') }
-  let(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1) }
+  # TODO: consider refactoring the tests to make these a little easier to work with.
+  let(:user) { create(:user, email: 'student@example.com', name: 'Student', student_id: 'S12345') }
+  let(:instructor) { create(:user, email: 'instructor@example.com', name: 'Instructor') }
+  let(:course) { create(:course, :with_students, :with_staff, course_name: 'Test Course', canvas_id: '789', course_code: 'TST101') }
   let(:assignment) do
     Assignment.create!(
       name: 'Assignment 1',
-      course_to_lms_id: course_to_lms.id,
+      course_to_lms_id: course.course_to_lms(1).id,
       external_assignment_id: 'ext1',
       enabled: true,
       due_date: 2.days.from_now
     )
   end
+  # TODO: Move this to course model initialization
   let(:course_settings) do
     CourseSettings.create!(
       course: course,
@@ -68,7 +69,6 @@ RSpec.describe Request, type: :model do
   end
 
   before do
-    Lms.find_or_create_by(id: 1, lms_name: 'Canvas', use_auth_token: true)
     UserToCourse.create!(user: user, course: course, role: 'student')
     user.lms_credentials.create!(
       lms_name: 'canvas',
@@ -164,13 +164,9 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when course settings do not exist' do
-      before do
-        # Ensure course settings don't exist
-        course.course_settings&.destroy
-      end
-
       it 'returns false' do
-        # Add this line to debug
+        course.course_settings&.destroy
+        course.reload
         expect(request.course.course_settings).to be_nil
         expect(request.auto_approval_eligible_for_course?).to be false
       end
@@ -197,25 +193,20 @@ RSpec.describe Request, type: :model do
     end
   end
 
+  # TODO: Investigate the odd relationship with `course_settings`
+  # Consider dropping the don't exist spec in favor a validation on `Course`.
   describe '#eligible_for_auto_approval?' do
-    before { course_settings }
-
     context 'when all conditions are met' do
       it 'returns true' do
+        course_settings # ensure this exists/is created.
         expect(request.eligible_for_auto_approval?).to be true
       end
     end
 
     context 'when course settings do not exist' do
-      before do
-        # Actually destroy the settings
-        course.course_settings.destroy
-        # Reload course to clear relationship cache
-        course.reload
-      end
-
       it 'returns false' do
-        # Verify settings are gone
+        course.course_settings&.destroy
+        course.reload
         expect(course.course_settings).to be_nil
         expect(request.eligible_for_auto_approval?).to be false
       end
@@ -232,11 +223,12 @@ RSpec.describe Request, type: :model do
     end
 
     context 'when requested extension is too long' do
-      before do
-        course_settings.update(auto_approve_days: 1)
-      end
+      # before do
+      #   # course_settings.update(auto_approve_days: 1)
+      # end
 
       it 'returns false' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
         expect(request.eligible_for_auto_approval?).to be false
       end
     end
@@ -303,7 +295,6 @@ RSpec.describe Request, type: :model do
     let(:canvas_facade) { instance_double(CanvasFacade) }
 
     before do
-      course_settings
       allow(CanvasFacade).to receive(:new).and_return(canvas_facade)
     end
 
@@ -313,7 +304,7 @@ RSpec.describe Request, type: :model do
       end
 
       it 'returns true' do
-        expect(request.try_auto_approval(user)).to be true
+        expect(request.try_auto_approval(nil)).to be true
       end
 
       it 'calls auto_approve with a canvas_facade' do
@@ -344,7 +335,7 @@ RSpec.describe Request, type: :model do
       end
 
       it 'returns false' do
-        expect(request.try_auto_approval(user)).to be false
+        expect(request.try_auto_approval(nil)).to be false
       end
     end
 
@@ -361,14 +352,13 @@ RSpec.describe Request, type: :model do
 
   describe '#auto_approve' do
     let(:canvas_facade) { instance_double(CanvasFacade) }
-    let(:system_user) { User.create!(email: 'system@example.com', canvas_uid: '789', name: 'System') }
 
     before do
-      allow(SystemUserService).to receive(:auto_approval_user).and_return(system_user)
       allow(request).to receive_messages(eligible_for_auto_approval?: true, approve: true)
     end
 
     it 'calls approve with the system user' do
+      system_user = SystemUserService.ensure_auto_approval_user_exists
       expect(request).to receive(:approve).with(canvas_facade, system_user)
       request.auto_approve(canvas_facade)
     end
@@ -378,14 +368,17 @@ RSpec.describe Request, type: :model do
       expect(request.auto_approved).to be true
     end
 
+    # TODO: Consider whether this kind of a case is worth testing / can even happen.
     context 'when the system user does not exist yet' do
       before do
-        allow(SystemUserService).to receive_messages(auto_approval_user: nil, ensure_auto_approval_user_exists: system_user)
+        # Remove any existing system user to test creation
+        User.find_by(email: SystemUserService::AUTO_APPROVAL_EMAIL)&.destroy
       end
 
       it 'creates a system user' do
-        expect(SystemUserService).to receive(:ensure_auto_approval_user_exists)
-        request.auto_approve(canvas_facade)
+        expect {
+          request.auto_approve(canvas_facade)
+        }.to change { User.where(email: SystemUserService::AUTO_APPROVAL_EMAIL).count }.by(1)
       end
     end
 

@@ -19,6 +19,7 @@ class Course < ApplicationRecord
   has_secure_token :readonly_api_token
 
   after_create :regenerate_readonly_api_token_if_blank
+  # TODO: after_initialize :build_course_settings_if_necessary
 
   # Associations
   has_many :course_to_lmss, dependent: :destroy
@@ -32,8 +33,8 @@ class Course < ApplicationRecord
 
   # Validations
   validates :course_name, presence: true
+  # validate :ensure_course_settings
 
-  # Helper function for the controller
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
@@ -43,6 +44,8 @@ class Course < ApplicationRecord
     CourseToLms.where(course_id: id)
   end
 
+  # TODO: Replace this with staff_role?(user) or student_role?(user)
+  # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
     return 'instructor' if roles.include?('teacher') || roles.include?('ta')
@@ -66,8 +69,21 @@ class Course < ApplicationRecord
     CourseToLms.find_by(course_id: id, lms_id: GRADESCOPE_LMS_ID)&.external_course_id
   end
 
+  # TODO: Add specs for these 4 simple methods
   def assignments
     Assignment.joins(:course_to_lms).where(course_to_lms: { course_id: id })
+  end
+
+  def students
+    user_to_courses.where(role: 'student').map(&:user)
+  end
+
+  def instructors
+    user_to_courses.where(role: 'teacher').map(&:user)
+  end
+
+  def staff_users
+    user_to_courses.where(role: UserToCourse.staff_roles).map(&:user)
   end
 
   def destroy_associations
@@ -78,7 +94,14 @@ class Course < ApplicationRecord
     course_settings.destroy if course_settings
   end
 
+  # Find the first staff user who has a Canvas Token that can be used
+  # to post requests to Canvas.
+  def staff_user_for_auto_approval
+    user_to_courses.where(role: UserToCourse.staff_roles).first&.user
+  end
+
   # Fetch courses from Canvas API
+  # TODO: This belongs elsewhere.
   def self.fetch_courses(token)
     all_courses = CanvasFacade.new(token).get_all_courses
 
@@ -113,7 +136,7 @@ class Course < ApplicationRecord
       course_settings = course.build_course_settings(
         enable_extensions: false,
         auto_approve_days: 0,
-        auto_approve_dsp_days: 0,
+        auto_approve_extended_request_days: 0,
         max_auto_approve: 0,
         enable_gradescope: false,
         gradescope_course_url: nil,
@@ -139,19 +162,19 @@ class Course < ApplicationRecord
       course_settings.save!
     end
 
-    # Sync assignments from Canvas
-    sync_assignments(course_to_lms, token)
+    # TODO: Consider disabling these if performance becomes an issue
+    course.sync_assignments(user)
+    course.sync_all_enrollments_from_canvas(user.id)
+
     # TODO-MB: This doesn't need to be in the overall create flow?
     # Move some logic to CourseSettings models (after update?)
     # Sync assignments from Gradescope if enabled
     # To-do: if disabled should unsync Gradescope assignments
-    if course.course_settings.enable_gradescope
-      gradescope_course_id = extract_gradescope_course_id(course.course_settings.gradescope_course_url)
-      course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => gradescope_course_id }, 2)
-      sync_assignments(course_to_gradescope)
-    end
-
-    course.sync_all_enrollments_from_canvas(user.id)
+    # if course.course_settings.enable_gradescope
+    #   gradescope_course_id = extract_gradescope_course_id(course.course_settings.gradescope_course_url)
+    #   course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => gradescope_course_id }, 2)
+    #   sync_assignments(course_to_gradescope)
+    # end
     course
   end
 
@@ -182,46 +205,21 @@ class Course < ApplicationRecord
     end
   end
 
-  # Sync assignments for the course
-  def self.sync_assignments(course_to_lms, token = nil)
-    case course_to_lms.lms_id
-    when 1
-      # Fetch assignments from Canvas
-      assignments = course_to_lms.fetch_canvas_assignments(token)
-    when 2
-      # Fetch assignments from Gradescope
-      assignments = course_to_lms.fetch_gradescope_assignments
-    end
-    # Keep track of external assignments IDs
-    external_assignment_ids = assignments.map(&:id)
-
-    # Sync or update assignments
-    assignments.each do |assignment_data|
-      sync_assignment(course_to_lms, assignment_data)
-    end
-
-    # Delete assignments that no longer exist in Canvas
-    Assignment.where(course_to_lms_id: course_to_lms.id)
-              .where.not(external_assignment_id: external_assignment_ids)
-              .destroy_all
-  end
-
-  # Sync a single assignment
-  def self.sync_assignment(course_to_lms, assignment_data)
-    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data.id)
-    assignment.name = assignment_data.name
-    assignment.due_date = assignment_data.due_date
-    assignment.late_due_date = assignment_data.late_due_date
-
-    assignment.save!
-  end
-
   # Helper method to extract external course id from Gradescope course URL
   def self.extract_gradescope_course_id(gradescope_course_url)
     match = gradescope_course_url.match(%r{gradescope\.com/courses/(\d+)})
     raise ArgumentError, "Invalid Gradescope course URL: #{gradescope_course_url}" unless match
 
     match[1]
+  end
+
+  def sync_assignments(sync_user)
+    lms_links = self.course_to_lmss
+    return unless lms_links.any?
+
+    lms_links.each do |course_to_lms|
+      SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)
+    end
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records

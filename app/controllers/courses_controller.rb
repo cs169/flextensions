@@ -67,7 +67,7 @@ class CoursesController < ApplicationController
   def sync_assignments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
 
-    Course.create_or_update_from_canvas(course_data_for_sync, @user.lms_credentials.first.token, @user)
+    @course.sync_assignments(@user)
     render json: { message: 'Assignments synced successfully.' }, status: :ok
   end
 

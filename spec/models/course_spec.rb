@@ -36,8 +36,21 @@ RSpec.describe Course, type: :model do
     { "id": 240, "name": "Sherri Johnson", "created_at": "2025-05-05T11:57:36-07:00", "sortable_name": "Johnson, Sherri", "short_name": "Sherri Johnson", "sis_user_id": "216573718", "integration_id": "sherri.johnson53", "sis_import_id": 5, "login_id": "sherri.johnson53@example.com", "email": "sherri.johnson53@example.com", "has_non_collaborative_groups": false }
   ]
 
-  before do
-    Lms.create!(id: 1, lms_name: 'Canvas', use_auth_token: true)
+  describe '#staff_user_for_auto_approval' do
+    it 'returns the correct user for auto approval' do
+      course = described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'TEST101')
+      user = User.create!(email: 'test@example.com', canvas_uid: '123')
+      user.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'valid_token',
+        refresh_token: 'refresh_token',
+        expire_time: 1.hour.from_now
+      )
+      UserToCourse.create!(user: user, course: course, role: 'ta')
+
+      staff_user = course.staff_user_for_auto_approval
+      expect(staff_user).to eq(user)
+    end
   end
 
   describe '.fetch_courses' do
@@ -102,47 +115,15 @@ RSpec.describe Course, type: :model do
       expect(result).to be_persisted
       expect(result.external_course_id).to eq('canvas_123')
     end
-  end
-
-  describe '.sync_assignment' do
-    let!(:course) { described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'T101') }
-    let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: 'canvas_123') }
-
-    it 'creates or updates an assignment' do
-      canvas_assignment = Lmss::Canvas::Assignment.new({ 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s })
-      expect do
-        described_class.sync_assignment(course_to_lms, canvas_assignment)
-      end.to change(Assignment, :count).by(1)
-
-      assignment = Assignment.last
-      expect(assignment.name).to eq('HW1')
-    end
-  end
-
-  describe '.sync_assignments' do
-    let!(:course) { described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'T101') }
-    let!(:course_to_lms) { CourseToLms.create!(course: course, lms_id: 1, external_course_id: 'canvas_123') }
-
-    it 'calls sync_assignment for each assignment and deletes missing ones' do
-      Assignment.create!(name: 'Old', course_to_lms_id: course_to_lms.id, external_assignment_id: 'old')
-
-      canvas_assignment = Lmss::Canvas::Assignment.new({ 'id' => 'new1', 'name' => 'New Assignment', 'due_at' => nil })
-      allow(course_to_lms).to receive(:fetch_canvas_assignments).and_return([canvas_assignment])
-
-      # one created, one deleted
-      expect do
-        described_class.sync_assignments(course_to_lms, 'fake_token')
-      end.not_to(change(Assignment, :count))
-      expect(Assignment.find_by(external_assignment_id: 'old')).to be_nil
-      expect(Assignment.find_by(external_assignment_id: 'new1')).not_to be_nil
-    end
-  end
+end
 
   describe '#sync_users_from_canvas' do
     let!(:course) { described_class.create!(canvas_id: 'canvas_999', course_name: 'User Sync', course_code: 'USYNC') }
+    let(:course_to_lms) { CourseToLms.create!(course: course, external_course_id: 'canvas_999', lms_id: 1) }
     let(:user) { create(:user, id: 999, canvas_uid: 'u1', name: 'User 1', email: 'user1@example.com') }
 
     before do
+      course_to_lms
       stub_request(:get, %r{api/v1/courses/canvas_999/users.*})
         .to_return(
           status: 200,
@@ -164,16 +145,14 @@ RSpec.describe Course, type: :model do
     let(:user) { create(:user, id: 999, canvas_uid: 'u1', name: 'User 1', email: 'user1@example.com') }
 
     it 'creates course, course_to_lms, form_setting, syncs assignments and enrollments' do
-      allow(described_class).to receive(:sync_assignments)
-      allow_any_instance_of(described_class).to receive(:sync_all_enrollments_from_canvas)
+      expect_any_instance_of(described_class).to receive(:sync_assignments)
+
       stub_request(:get, %r{api/v1/courses/canvas_123})
         .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
 
       expect do
         described_class.create_or_update_from_canvas(course_data, 'fake_token', user)
       end.to change(described_class, :count).by(1).and change(FormSetting, :count).by(1)
-
-      expect(described_class).to have_received(:sync_assignments)
     end
   end
 end

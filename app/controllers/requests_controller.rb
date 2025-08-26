@@ -15,10 +15,12 @@ class RequestsController < ApplicationController
 
   def index
     @side_nav = 'requests'
-    @requests = if params[:show_all] == 'true'
-                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment)
+    if @role == 'student'
+      @requests = @course.requests.for_user(@user)
+    elsif params[:show_all] == 'true'
+      @requests = @course.requests.includes(:assignment)
     else
-                  @role == 'student' ? @course.requests.for_user(@user) : @course.requests.includes(:assignment).where(status: 'pending')
+      @requests = @course.requests.includes(:assignment).where(status: 'pending')
     end
 
     # Pass the search query to the view
@@ -177,8 +179,6 @@ class RequestsController < ApplicationController
 
   def handle_request_error
     flash.now[:alert] = 'There was a problem submitting your request.'
-    # course_to_lms = @course.course_to_lms(1)
-    # TODO: move to load assgnments / refactor to grab from gradescope too.
     @assignments = Assignment.where(course_to_lms_id: @course.course_to_lms(1).id, enabled: true).order(:name)
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
     render :new
