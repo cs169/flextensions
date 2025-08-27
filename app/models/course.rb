@@ -165,16 +165,6 @@ class Course < ApplicationRecord
     # TODO: Consider disabling these if performance becomes an issue
     course.sync_assignments(user)
     course.sync_all_enrollments_from_canvas(user.id)
-
-    # TODO-MB: This doesn't need to be in the overall create flow?
-    # Move some logic to CourseSettings models (after update?)
-    # Sync assignments from Gradescope if enabled
-    # To-do: if disabled should unsync Gradescope assignments
-    # if course.course_settings.enable_gradescope
-    #   gradescope_course_id = extract_gradescope_course_id(course.course_settings.gradescope_course_url)
-    #   course_to_gradescope = find_or_create_course_to_lms(course, { 'id' => gradescope_course_id }, 2)
-    #   sync_assignments(course_to_gradescope)
-    # end
     course
   end
 
@@ -205,14 +195,7 @@ class Course < ApplicationRecord
     end
   end
 
-  # Helper method to extract external course id from Gradescope course URL
-  def self.extract_gradescope_course_id(gradescope_course_url)
-    match = gradescope_course_url.match(%r{gradescope\.com/courses/(\d+)})
-    raise ArgumentError, "Invalid Gradescope course URL: #{gradescope_course_url}" unless match
-
-    match[1]
-  end
-
+  # NOTE: this must be the plural course_to_lmss
   def sync_assignments(sync_user)
     lms_links = self.course_to_lmss
     return unless lms_links.any?

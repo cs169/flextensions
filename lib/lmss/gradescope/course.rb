@@ -7,13 +7,25 @@ module Lmss
       end
 
       def assignments
-        response = @client.get("/courses/#{@course_id}/assignments")
-        props = @client.extract_react_props(response.body, 'AssignmentsTable')
+        html = @client.get("/courses/#{@course_id}/assignments")
+        # if !response
+        #   Rails.logger.error "Failed to fetch assignments: No response"
+        #   return []
+        # elsif response.status == 401 || response.status == 403
+        #   raise Lmss::Gradescope::AuthenticationError, "Unauthorized access: #{response&.body}"
+        # elsif !response&.success?
+        #   Rails.logger.error "Failed to fetch assignments: #{response&.body}"
+        #   return []
+        # end
+
+        props = @client.extract_react_props(html, 'AssignmentsTable')
 
         return [] unless props
 
         assignments = props['table_data'] || []
         assignments.map { |data| Lmss::Gradescope::Assignment.new(@course_id, data, @client) }
+        binding.irb
+        assignments
       end
 
       # def memberships

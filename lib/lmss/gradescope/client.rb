@@ -76,13 +76,13 @@ module Lmss
       def handle_response(response)
         case response.status
         when 200..299
-          response
-          # when 401, 403
-          #   raise AuthenticationError, 'Authentication required'
-          # when 404
-          #   raise NotFoundError, 'Resource not found'
-          # else
-          #   raise RequestError, "Request failed: #{response.code}"
+          response.body
+        when 401, 403
+          raise Lmss::Gradescope::AuthenticationError, 'Authentication required'
+        when 404
+          raise Lmss::Gradescope::NotFoundError, 'Resource not found'
+        else
+          raise Lmss::Gradescope::RequestError, "Request failed: #{response.code}"
         end
       end
     end

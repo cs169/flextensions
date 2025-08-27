@@ -42,7 +42,7 @@ class CourseToLms < ApplicationRecord
       ENV.fetch('GRADESCOPE_PASSWORD')
     )
 
-    course = Lmss::Gradescope::Course.new(external_course_id, client)
+  course = Lmss::Gradescope::Course.new(external_course_id, client)
     assignments = course.assignments
 
     if assignments.any?
