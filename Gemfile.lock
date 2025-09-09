@@ -266,6 +266,11 @@ GEM
       activesupport (>= 3.0)
       httparty
     logger (1.7.0)
+    lograge (0.14.0)
+      actionpack (>= 4)
+      activesupport (>= 4)
+      railties (>= 4)
+      request_store (~> 1.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -417,6 +422,8 @@ GEM
     regexp_parser (2.11.2)
     reline (0.6.2)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     rexml (3.4.1)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
@@ -595,6 +602,7 @@ DEPENDENCIES
   letter_opener
   letter_opener_web (~> 3.0)
   lms-api
+  lograge
   omniauth
   omniauth-canvas
   omniauth-oauth2
@@ -613,7 +621,6 @@ DEPENDENCIES
   sassc-rails (~> 2.1)
   selenium-webdriver
   sentry-rails
-  sentry-ruby
   shoulda-matchers (~> 6.5)
   simplecov (~> 0.22.0)
   simplecov_json_formatter

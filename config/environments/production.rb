@@ -58,6 +58,15 @@ Rails.application.configure do
   else
     log_dest = Rails.root.join("log", "#{Rails.env}.log")
   end
+
+  # Setup logging with Lograge
+  config.lograge.enabled = true
+
+  # add time to lograge
+  config.lograge.custom_options = lambda do |event|
+    { time: Time.now }
+  end
+
   config.logger = ActiveSupport::Logger.new(log_dest)
     .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
     .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
