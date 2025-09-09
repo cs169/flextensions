@@ -174,10 +174,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.6.2)
     docile (1.4.1)
-    dotenv (3.1.8)
-    dotenv-rails (3.1.8)
-      dotenv (= 3.1.8)
-      railties (>= 6.1)
     drb (2.2.3)
     dumb_delegator (1.1.0)
     erb (5.0.2)
@@ -591,7 +587,6 @@ DEPENDENCIES
   cucumber-rails
   database_cleaner-active_record
   debug
-  dotenv-rails
   factory_bot_rails
   faraday
   font-awesome-sass
