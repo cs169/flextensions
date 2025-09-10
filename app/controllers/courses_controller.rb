@@ -42,11 +42,12 @@ class CoursesController < ApplicationController
     @courses = Course.fetch_courses(token)
     flash[:alert] = 'No courses found.' if @courses.empty?
 
-    teacher_roles = %w[teacher ta]
+    teacher_enrollment_types = %w[teacher ta]
     # TODO: Add spec for when a course is created, but the user is not enrolled in it.
+    # TODO: Why do some courses have empty enrollments?
     existing_canvas_ids = @user.courses.pluck(:canvas_id)
-    @courses_teacher = filter_courses(@courses, teacher_roles, existing_canvas_ids)
-    @courses_student = @courses.select { |c| c['enrollments'].any? { |e| e['type'] == 'student' } }
+    @courses_teacher = filter_courses(@courses, teacher_enrollment_types, existing_canvas_ids)
+    @courses_student = filter_courses(@courses, [ 'student' ], existing_canvas_ids)
   end
 
   def edit
@@ -117,10 +118,15 @@ class CoursesController < ApplicationController
     @role = @course&.user_role(@user)
   end
 
+  # TODO: This should be moved to the Canvas Facade
   def filter_courses(courses, roles, exclude_ids = [])
-    courses.select do |course|
-      course['enrollments'].any? { |e| roles.include?(e['type']) } && exclude_ids.exclude?(course['id'].to_s)
-    end
+    missing_enrollments = courses.select { |course| course['enrollments'].blank? }
+    Rails.logger.warn("Canvas API by #{current_user.id}: Courses with missing enrollments: #{missing_enrollments.pluck('id').join(', ')}") unless missing_enrollments.empty?
+
+    courses = courses - missing_enrollments - courses.select { |course| exclude_ids.include?(course['id'].to_s) }
+    return [] if courses.empty?
+
+    courses.select { |course| course['enrollments'].any? { |e| roles.include?(e['type']) } }
   end
 
   def course_data_for_sync
