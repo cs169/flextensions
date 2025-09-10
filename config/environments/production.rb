@@ -59,21 +59,32 @@ Rails.application.configure do
     log_dest = Rails.root.join("log", "#{Rails.env}.log")
   end
 
-  # Setup logging with Lograge
+  # Setup logging with Lograge [https://github.com/roidrage/lograge]
   config.lograge.enabled = true
-
-  # add time to lograge
+  config.lograge.formatter = Lograge::Formatters::Json.new
+  # TODO: Should this be moved to an initializer
+  # config.lograge.ignore_actions = ['Rails::HealthController#show', 'StatusController#show']
+  config.lograge.custom_payload do |controller|
+    {
+      request_id: controller.request.uuid,
+      user_id: controller.current_user.try(:id)
+    }
+  end
   config.lograge.custom_options = lambda do |event|
-    { time: Time.now }
+    exceptions = %w(controller action format id)
+    {
+      time: Time.now,
+      params: event.payload[:params].except(*exceptions)
+    }
   end
 
-  config.logger = ActiveSupport::Logger.new(log_dest)
-    .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
-    .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+  # config.logger = ActiveSupport::Logger.new(log_dest)
+  #   .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
+  #   .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
 
 
-  # Prepend all log lines with the following tags.
-  config.log_tags = [ :request_id ]
+  # # Prepend all log lines with the following tags.
+  # config.log_tags = [ :request_id ]
 
   # "info" includes generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
