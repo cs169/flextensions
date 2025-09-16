@@ -37,15 +37,9 @@ jobs:
       with:
         ruby-version: .tool-versions
         bundler-cache: true
-    - name: Download and install Code Climate test reporter
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        chmod +x ./cc-test-reporter
     - name: Setup Database
       run: |
         bundle exec rails db:test:prepare
-    - name: Run before-build command
-      run: ./cc-test-reporter before-build
     - name: Create Chrome data directory
       run: mkdir -p /tmp/chrome-data-rspec
     - name: Run RSpec Tests
@@ -55,16 +49,6 @@ jobs:
       env:
         CHROME_DATA_DIR: /tmp/chrome-data-rspec
         COVERAGE: "true"
-    # - name: Submit Legacy Code Climate Coverage Report
-    #   if: env.CC_TEST_REPORTER_ID != ''
-    #   run: |
-    #     if [ -f coverage/.resultset.json ]; then
-    #       ./cc-test-reporter after-build --coverage-input-type simplecov --exit-code $?
-    #     else
-    #       echo "No coverage report found"
-    #       ls -la coverage/
-    #       exit 1
-    #     fi
     - name: Submit QLTY Coverage Report
       uses: qltysh/qlty-action/coverage@v1
       if: env.QLTY_COVERAGE_TOKEN != ''

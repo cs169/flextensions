@@ -47,7 +47,7 @@ class CoursesController < ApplicationController
     # TODO: Why do some courses have empty enrollments?
     existing_canvas_ids = @user.courses.pluck(:canvas_id)
     @courses_teacher = filter_courses(@courses, teacher_enrollment_types, existing_canvas_ids)
-    @courses_student = filter_courses(@courses, ['student'], existing_canvas_ids)
+    @courses_student = filter_courses(@courses, [ 'student' ], existing_canvas_ids)
   end
 
   def edit
