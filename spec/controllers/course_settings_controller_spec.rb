@@ -249,7 +249,7 @@ RSpec.describe CourseSettingsController, type: :controller do
       }
 
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to eq('User not found in the database.')
+      expect(flash[:alert]).to eq('You must be logged in to access that page.')
     end
 
     it 'redirects to courses path when course is not found' do

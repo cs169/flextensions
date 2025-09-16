@@ -52,31 +52,8 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   #config.force_ssl = true
 
-  # Log to ENVIRONMENT.rb
-  if ENV["RAILS_LOG_TO_STDOUT"] == "true"
-    log_dest = STDOUT
-  else
-    log_dest = Rails.root.join("log", "#{Rails.env}.log")
-  end
-
   # Setup logging with Lograge [https://github.com/roidrage/lograge]
   config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Json.new
-  # TODO: Should this be moved to an initializer
-  # config.lograge.ignore_actions = ['Rails::HealthController#show', 'StatusController#show']
-  config.lograge.custom_payload do |controller|
-    {
-      request_id: controller.request.uuid,
-      user_id: controller.current_user.try(:id)
-    }
-  end
-  config.lograge.custom_options = lambda do |event|
-    exceptions = %w(controller action format id)
-    {
-      time: Time.now,
-      params: event.payload[:params].except(*exceptions)
-    }
-  end
 
   # config.logger = ActiveSupport::Logger.new(log_dest)
   #   .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
