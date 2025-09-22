@@ -1,12 +1,12 @@
 ---
 title: Flextensions for Instructors
-permalink: /instructors/
+permalink: /flextensions/instructors/
 ---
 
 # Setting Up Flextensions for Instructors
 
 This guide will get you started with using Flextensions as an instructor.
-When you're ready, view the [integration guide](/integrations).
+When you're ready, view the [integration guide](/flextensions/integrations).
 
 ## Importing a Course
 
