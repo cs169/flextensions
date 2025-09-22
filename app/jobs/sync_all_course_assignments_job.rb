@@ -15,26 +15,21 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
       deleted_assignments: 0
     }
 
-    case course_to_lms.lms_id
-    when 1
-      # Fetch assignments from Canvas
-      assignments = course_to_lms.get_all_canvas_assignments(sync_user)
-    when 2
-      # Fetch assignments from Gradescope
-      assignments = course_to_lms.fetch_gradescope_assignments
-    end
+    # Get the corresponding LMS syncer
+    syncer = get_syncer(course_to_lms.lms_id)
+    lms_assignments = syncer.fetch_assignments(course_to_lms, sync_user)
 
-    # Keep track of external assignment IDs from Canvas
-    external_assignment_ids = assignments.pluck('id')
+    # Keep track of external assignment IDs from LMS
+    external_assignment_ids = lms_assignments.map(&:id)
 
     # Sync or update assignments
-    assignments.each do |assignment_data|
-      sync_assignment(course_to_lms, assignment_data, results)
+    lms_assignments.each do |lms_assignment|
+      sync_assignment(course_to_lms, lms_assignment, results, syncer)
     end
 
-    # Delete assignments that no longer exist in Canvas
+    # Delete assignments that no longer exist in LMS
     deleted_assignments = Assignment.where(course_to_lms_id: course_to_lms.id)
-                                     .where.not(external_assignment_id: external_assignment_ids)
+                                    .where.not(external_assignment_id: external_assignment_ids)
     deleted_assignments.destroy_all
 
     results[:deleted_assignments] = deleted_assignments.count
@@ -48,13 +43,12 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
   private
 
   # Sync a single assignment
-  def sync_assignment(course_to_lms, assignment_data, results)
-    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: assignment_data['id'])
-    assignment.name = assignment_data['name']
+  def sync_assignment(course_to_lms, lms_assignment, results, syncer)
+    assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: lms_assignment.id)
+    assignment.name = lms_assignment.name
 
-    # Extract due_at and lock_at dates
-    assignment.due_date = extract_date_field(assignment_data, 'due_at')
-    assignment.late_due_date = extract_date_field(assignment_data, 'lock_at')
+    # syncer populate assignment details
+    syncer.populate_assignment(assignment, lms_assignment)
 
     if assignment.new_record?
       results[:added_assignments] += 1
@@ -66,12 +60,14 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     assignment.save!
   end
 
-  # Helper method to extract dates from assignment data
-  def extract_date_field(assignment_data, field_name)
-    if assignment_data['base_date'] && assignment_data['base_date'][field_name].present?
-      DateTime.parse(assignment_data['base_date'][field_name])
-    elsif assignment_data[field_name].present?
-      DateTime.parse(assignment_data[field_name])
+  def get_syncer(lms_id)
+    case lms_id
+    when 1
+      Lmss::Canvas::AssignmentSyncer.new
+    when 2
+      Lmss::Gradescope::AssignmentSyncer.new
+    else
+      raise "Unsupported LMS ID: #{lms_id}"
     end
   end
 end
