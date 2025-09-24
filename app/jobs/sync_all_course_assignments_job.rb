@@ -15,16 +15,18 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
       deleted_assignments: 0
     }
 
-    # Get the corresponding LMS syncer
-    syncer = get_syncer(course_to_lms.lms_id)
-    lms_assignments = syncer.fetch_assignments(course_to_lms, sync_user)
+    # Get the suitable LMS facade and fetch assignments correspondingly
+    # @type [LmsFacade]
+    facade = get_facade_for_lms(course_to_lms.lms_id, sync_user)
+    # @type [Array<Lmss::BaseAssignment>]
+    lms_assignments = facade.get_all_assignments(course_to_lms.external_course_id)
 
     # Keep track of external assignment IDs from LMS
     external_assignment_ids = lms_assignments.map(&:id)
 
     # Sync or update assignments
     lms_assignments.each do |lms_assignment|
-      sync_assignment(course_to_lms, lms_assignment, results, syncer)
+      sync_assignment(course_to_lms, lms_assignment, results)
     end
 
     # Delete assignments that no longer exist in LMS
@@ -43,12 +45,14 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
   private
 
   # Sync a single assignment
-  def sync_assignment(course_to_lms, lms_assignment, results, syncer)
+  def sync_assignment(course_to_lms, lms_assignment, results)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: lms_assignment.id)
-    assignment.name = lms_assignment.name
 
-    # syncer populate assignment details
-    syncer.populate_assignment(assignment, lms_assignment)
+    # Use shared LmsAssignment to populate Assignment
+    assignment.name = lms_assignment.name
+    assignment.due_date = lms_assignment.due_date
+    assignment.late_due_date = lms_assignment.late_due_date
+    assignment.external_assignment_id = lms_assignment.id
 
     if assignment.new_record?
       results[:added_assignments] += 1
@@ -60,14 +64,14 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     assignment.save!
   end
 
-  def get_syncer(lms_id)
+  def get_facade_for_lms(lms_id, sync_user)
     case lms_id
-    when 1
-      Lmss::Canvas::AssignmentSyncer.new
-    when 2
-      Lmss::Gradescope::AssignmentSyncer.new
+    when 1 # Canvas
+      CanvasFacade.from_user(sync_user)
+    when 2 # Gradescope
+      GradescopeFacade.from_user()
     else
-      raise "Unsupported LMS ID: #{lms_id}"
+      raise "Unsupported LMS: #{lms_id}"
     end
   end
 end

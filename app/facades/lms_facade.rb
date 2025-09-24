@@ -41,6 +41,15 @@ class LmsFacade
   end
 
   ##
+  # Fetches all assignments from LMS for a given course.
+  #
+  # @param   [String] external_course_id the external course ID in the LMS.
+  # @return  [Array<Lmss::BaseAssignment>] list of assignments.
+  def get_all_assignments(external_course_id)
+    raise NotImplementedError
+  end
+
+  ##
   # Provisions a new extension to a user.
   #
   # @param   [Course] course the course to provision the extension in.

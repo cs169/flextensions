@@ -97,7 +97,7 @@ class CanvasFacade < LmsFacade
     )
   end
 
-  def self.for_user(user)
+  def self.from_user(user)
     token = user.canvas_credentials&.token
     raise CanvasAPIError, 'Cannot find Canvas token for user' if token.nil?
 
@@ -208,23 +208,23 @@ class CanvasFacade < LmsFacade
   end
 
   ##
-  # Gets all assignments for a course (paginated).
+  # Gets all Canvas assignments for a course (paginated).
   #
   # @param  [String] course_id the Canvas course id to fetch assignments for.
-  # @return [Array<Hash>] all assignments in the course with base_date processed.
+  # @return [Array<Lmss::Canvas::Assignment>] list of assignments in the course.
   def get_all_assignments(course_id)
     assignments = depaginate_response(get_assignments(course_id))
 
     # Process assignments to extract base dates
-    assignments.each do |assignment|
-      if assignment['all_dates']
-        base_date = assignment['all_dates'].find { |date| date['base'] == true }
-        assignment['base_date'] = base_date
+    assignments.map do |assignment_data|
+      # Unpack base date from all_dates array
+      if assignment_data['all_dates']
+        base_date = assignment_data['all_dates'].find { |date| date['base'] == true }
+        assignment_data['base_date'] = base_date
       end
-      # Lmss::Canvas::Assignment.new(assignment)
+      # Return as Lmss::Canvas::Assignment object
+      Lmss::Canvas::Assignment.new(assignment_data)
     end
-
-    assignments
   end
 
   ##

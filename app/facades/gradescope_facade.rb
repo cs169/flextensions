@@ -3,7 +3,7 @@ class GradescopeFacade < LmsFacade
 
   GRADESCOPE_URL = ENV.fetch('GRADESCOPE_URL', 'https://www.gradescope.com')
 
-  def initialize(_token)
+  def initialize(_token = nil)
     @api_token = nil # Gradescope does not support API tokens.
     @gradescope_conn = nil  # Wait until authenticated
   end
@@ -18,28 +18,34 @@ class GradescopeFacade < LmsFacade
   ### Review the Canvas Facade for methods which might need to be implemented here.
   # Add those methods to the base facade as well.
 
-  # Fetch all Gradescope assignments for a given course.
+  ##
+  # Gets all Gradescope assignments for a course.
+  #
+  # @param  [String] course_id the Gradescope course id to fetch assignments for.
+  # @return [Array<Lmss::Gradescope::Assignment>] list of assignments in the course.
   def get_all_assignments(course_id)
     ensure_authenticated!
-    html = @client.get("/courses/#{@course_id}/assignments")
-    if !response
-      Rails.logger.error "Failed to fetch assignments: No response"
-      return []
-    elsif response.status == 401 || response.status == 403
-      raise Lmss::Gradescope::AuthenticationError, "Unauthorized access: #{response&.body}"
-    elsif !response&.success?
-      Rails.logger.error "Failed to fetch assignments: #{response&.body}"
-      return []
+    begin
+      # Get HTML content from Gradescope
+      html = @gradescope_conn.get("/courses/#{course_id}/assignments")
+      if html.blank?
+        Rails.logger.error 'Failed to fetch assignments: No response'
+        return []
+      end
+
+      # Extract React props containing assignment data from HTML
+      props = @gradescope_conn.extract_react_props(html, 'AssignmentsTable')
+      return [] unless props
+
+      assignments = props['table_data'] || []
+      assignments.map { |data| Lmss::Gradescope::Assignment.new(data) }
+    rescue Lmss::Gradescope::AuthenticationError => e
+      Rails.logger.error "Authentication failed: #{e.message}"
+      raise e
+    rescue => e
+      Rails.logger.error "Failed to fetch Gradescope assignments: #{e.message}"
+      []
     end
-
-    props = @client.extract_react_props(html, 'AssignmentsTable')
-
-    return [] unless props
-
-    assignments = props['table_data'] || []
-    assignments.map { |data| Lmss::Gradescope::Assignment.new(data) }
-    assignments
-
   end
 
   ##
@@ -56,14 +62,16 @@ class GradescopeFacade < LmsFacade
     raise NotImplementedError, 'SOON!'
   end
 
+  private
+
+  # Performs authentication to Gradescope if not already authenticated.
   def ensure_authenticated!
     return if @gradescope_conn
 
-    @gradescope_conn = Lmss::Gradescope.login(
+    @gradescope_conn = Lmss::Gradescope::Client.new(
       ENV.fetch('GRADESCOPE_EMAIL'),
-      ENV.fetch('GRADESCOPE_PASSWORD')
+      ENV.fetch('GRADESCOPE_PASSWORD'),
     )
     raise GradescopeAPIError, 'Failed to authenticate to Gradescope' unless @gradescope_conn
   end
-
 end

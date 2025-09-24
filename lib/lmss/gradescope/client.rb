@@ -8,13 +8,14 @@ module Lmss
     class Client
       BASE_URL = 'https://www.gradescope.com'.freeze
 
-      def initialize
+      def initialize(email, password)
         @cookie_jar = HTTP::CookieJar.new
         @conn = Faraday.new(url: BASE_URL) do |f|
           f.request :url_encoded
           f.use :cookie_jar, jar: @cookie_jar
           f.adapter Faraday.default_adapter
         end
+        login(email, password)
       end
 
       def login(email, password)
