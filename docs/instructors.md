@@ -1,6 +1,6 @@
 ---
 title: Flextensions for Instructors
-permalink: /flextensions/instructors/
+permalink: /instructors/
 ---
 
 # Setting Up Flextensions for Instructors
