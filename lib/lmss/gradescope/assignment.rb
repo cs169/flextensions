@@ -5,9 +5,9 @@ module Lmss
     class Assignment < Lmss::BaseAssignment
       attr_reader :id, :name, :due_date, :late_due_date
 
-      def initialize(course_id, data, client)
-        @course_id = course_id
-        @client = client
+      def initialize(data)
+        # @course_id = course_id
+        # @client = client
         @id = parse_id(data['id'])
         @name = data['title']
         @due_date = data.dig('submission_window', 'due_date')
