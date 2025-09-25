@@ -37,8 +37,8 @@ class GradescopeFacade < LmsFacade
       props = @gradescope_conn.extract_react_props(html, 'AssignmentsTable')
       return [] unless props
 
-      assignments = props['table_data'] || []
-      assignments.map { |data| Lmss::Gradescope::Assignment.new(data) }
+      assignment_data = props['table_data'] || []
+      assignment_data.map { |data| Lmss::Gradescope::Assignment.new(data) }
     rescue Lmss::Gradescope::AuthenticationError => e
       Rails.logger.error "Authentication failed: #{e.message}"
       raise e
@@ -47,6 +47,42 @@ class GradescopeFacade < LmsFacade
       []
     end
   end
+
+  ##
+  # Gets a list of the assignment overrides for a specified assignment.
+  #
+  # @param   [String]    courseId     the course to fetch the overrides from.
+  # @param   [String]    assignmentId the assignment to fetch the overrides from.
+  # @return  [Array<Lmss::Gradescope::Override>] all of the overrides for the specified assignment.
+  def get_assignment_overrides(course_id, assignment_id)
+    ensure_authenticated!
+    begin
+      html = @gradescope_conn.get("/courses/#{course_id}/assignments/#{assignment_id}/extensions")
+      if html.blank?
+        Rails.logger.error 'Failed to fetch assignment extensions: No response'
+        return []
+      end
+
+      # Extract React props containing overrides data from HTML
+      overrides_data = @gradescope_conn.extract_all_react_props(html, 'EditExtension')
+      return [] unless overrides_data
+
+      overrides_data.map { |data| Lmss::Gradescope::Extension.new(data) }
+    rescue => e
+      Rails.logger.error "Failed to fetch assignment extensions: #{e.message}"
+      []
+    end
+  end
+
+  def get_existing_student_override(course_id, assignment_id, student_id)
+    ensure_authenticated!
+    overrides = get_assignment_overrides(course_id, assignment_id)
+    overrides.find { |override| override.student_id == student_id }
+  end
+
+  # def create_assignment_override(course_id, assignment_id, student_id, new_due_date)
+  #   ensure_authenticated!
+  #   student_existing_override = get_existing_student_override(course_id, assignment_id, student_id)
 
   ##
   # Provisions a new extension to a user.
@@ -59,7 +95,7 @@ class GradescopeFacade < LmsFacade
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
   def provision_extension(courseId, studentIds, assignmentId, newDueDate)
-    raise NotImplementedError, 'SOON!'
+    ensure_authenticated!
   end
 
   private

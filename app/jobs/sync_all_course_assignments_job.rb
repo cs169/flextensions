@@ -5,7 +5,7 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     # TODO: Replace this with just the course idea, then find all linked LMS.
     course_to_lms = CourseToLms.find(course_to_lms_id)
     sync_user = User.find(sync_user_id)
-    course = Course.find(course_to_lms.course_id)
+    # course = Course.find(course_to_lms.course_id)
 
     # TODO: This isn't great if we fire off two distinct jobs...
     results = {
@@ -15,10 +15,9 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
       deleted_assignments: 0
     }
 
-    # Get the suitable LMS facade and fetch assignments correspondingly
-    # @type [LmsFacade]
-    facade = get_facade_for_lms(course_to_lms.lms_id, sync_user)
-    # @type [Array<Lmss::BaseAssignment>]
+    # @return [LmsFacade] facade for the LMS
+    facade = Lms.facade_class(course_to_lms.lms_id).for_user(sync_user)
+    # @return [Array<Lmss::BaseAssignment>] list of assignments from LMS
     lms_assignments = facade.get_all_assignments(course_to_lms.external_course_id)
 
     # Keep track of external assignment IDs from LMS
@@ -62,16 +61,5 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
       results[:unchanged_assignments] += 1
     end
     assignment.save!
-  end
-
-  def get_facade_for_lms(lms_id, sync_user)
-    case lms_id
-    when 1 # Canvas
-      CanvasFacade.from_user(sync_user)
-    when 2 # Gradescope
-      GradescopeFacade.from_user()
-    else
-      raise "Unsupported LMS: #{lms_id}"
-    end
   end
 end

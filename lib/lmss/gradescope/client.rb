@@ -59,17 +59,25 @@ module Lmss
         handle_response(response)
       end
 
-      def extract_react_props(html, data_react_class)
+      def extract_all_react_props(html, data_react_class)
         doc = Nokogiri::HTML(html)
-        element = doc.css("[data-react-class='#{data_react_class}']").first
-        return nil unless element
+        elements = doc.css("[data-react-class='#{data_react_class}']")
+        return [] if elements.empty?
 
-        props_attr = element.attr('data-react-props')
-        return nil unless props_attr
+        elements.map do |element|
+          props_attr = element.attr('data-react-props')
+          next nil unless props_attr
 
-        JSON.parse(props_attr)
-      rescue JSON::ParserError
-        nil
+          begin
+            JSON.parse(props_attr)
+          rescue JSON::ParserError
+            nil
+          end
+        end.compact # Remove nil values from failed JSON parsing
+      end
+
+      def extract_react_props(html, data_react_class)
+        extract_all_react_props(html, data_react_class).first
       end
 
       private

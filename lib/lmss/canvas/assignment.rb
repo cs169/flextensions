@@ -1,6 +1,6 @@
 module Lmss
   module Canvas
-    class Assignment < Lmss::BaseAssignment
+    class Assignment < BaseAssignment
       attr_reader :id, :name, :due_date, :late_due_date
 
       def initialize(data)

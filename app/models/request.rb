@@ -107,7 +107,8 @@ class Request < ApplicationRecord
     approval_user.ensure_fresh_canvas_token!
     return false if approval_user.canvas_credentials.blank?
 
-    auto_approve(CanvasFacade.for_user(approval_user))
+    lms_facade_from_user = assignment.lms_facade.from_user(approval_user)
+    auto_approve(lms_facade_from_user)
   end
 
   def auto_approval_eligible_for_course?
@@ -132,14 +133,14 @@ class Request < ApplicationRecord
     auto_approved_count < max_approvals
   end
 
-  def auto_approve(canvas_facade)
+  def auto_approve(lms_facade_from_user)
     return false unless eligible_for_auto_approval?
 
     system_user = SystemUserService.ensure_auto_approval_user_exists
     return false unless system_user
 
     # Reuse the regular approve method but mark as auto-approved afterward
-    result = approve(canvas_facade, system_user)
+    result = approve(lms_facade_from_user, system_user)
     update(auto_approved: true) if result
     result
   end

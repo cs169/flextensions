@@ -49,6 +49,15 @@ class LmsFacade
     raise NotImplementedError
   end
 
+  ## Fetch existing extensions for an assignment
+  #
+  # @param   [String] external_course_id the external course ID in the LMS.
+  # @param   [String] external_assignment_id the external assignment ID in the LMS.
+  # @return  [Array<Lmss::BaseExtension>] list of existing extensions for assignment.
+  def get_assignment_overrides(external_course_id, external_assignment_id)
+    raise NotImplementedError
+  end
+
   ##
   # Provisions a new extension to a user.
   #

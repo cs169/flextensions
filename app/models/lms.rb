@@ -30,9 +30,9 @@ class Lms < ApplicationRecord
   # You should be able to call item.course_to_lms.lms_id to get the LMS ID
   def self.facade_class(id)
     case id
-    when 1
+    when CANVAS_LMS_ID
       CanvasFacade
-    when 2
+    when GRADESCOPE_LMS_ID
       GradescopeFacade
     else
       raise "Unsupported LMS ID: #{id}"
