@@ -67,7 +67,7 @@ class GradescopeFacade < LmsFacade
       overrides_data = @gradescope_conn.extract_all_react_props(html, 'EditExtension')
       return [] unless overrides_data
 
-      overrides_data.map { |data| Lmss::Gradescope::Extension.new(data) }
+      overrides_data.map { |data| Lmss::Gradescope::Override.new(data) }
     rescue => e
       Rails.logger.error "Failed to fetch assignment extensions: #{e.message}"
       []
@@ -94,8 +94,33 @@ class GradescopeFacade < LmsFacade
   # @return  [Faraday::Response] the override that acts as the extension.
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
-  def provision_extension(courseId, studentIds, assignmentId, newDueDate)
+  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_hard_due_date)
     ensure_authenticated!
+    begin
+      request_payload = {
+        'override' => {
+          'user_id' => student_id,
+          'settings' => {
+            'due_date' => {
+              'type' => 'absolute',
+              'value' => new_due_date
+            },
+            'hard_due_date' => {
+              'type' => 'absolute',
+              'value' => new_hard_due_date
+            },
+            'visible' => true
+          }
+        }
+      }
+
+      @gradescope_conn.post(
+        "/courses/#{course_id}/assignments/#{assignment_id}/extensions", request_payload)
+
+    rescue => e
+      Rails.logger.error "Failed to provision extension: #{e.message}"
+      raise e
+    end
   end
 
   private

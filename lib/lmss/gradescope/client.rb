@@ -37,6 +37,8 @@ module Lmss
 
         # Confirm Gradescope log in
         res = @conn.get('/account')
+        # extract new csrf token after login
+        @csrf_token = extract_csrf_token(res.body)
         raise AuthenticationError, 'Login failed' if res.status != 200
       end
 
@@ -51,11 +53,11 @@ module Lmss
       end
 
       def post(path, data)
-        response = @conn.post(
-          path, {
-            body: data.to_json
-          }
-        )
+        response = @conn.post(path) do |req|
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-CSRF-Token'] = @csrf_token if @csrf_token
+          req.body = data.to_json
+        end
         handle_response(response)
       end
 
