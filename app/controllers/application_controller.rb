@@ -22,11 +22,14 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
   def current_user
     @current_user ||= User.find_by(canvas_uid: session[:user_id])
+    # TODO: Remove this line after refactoring all auth methods,
+    # and remove other instances of @user in controllers + views
+    @user ||= @current_user
   end
 
   private
   def authenticate_user
-    return unless current_user.nil?
+    return true if current_user.present?
 
     redirect_to root_path, alert: 'You must be logged in to access that page.'
   end
