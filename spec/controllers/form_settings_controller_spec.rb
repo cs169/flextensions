@@ -55,7 +55,7 @@ RSpec.describe FormSettingsController, type: :controller do
       it 'redirects to root_path' do
         get :edit, params: { course_id: course.id }
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('User not found in the database.')
+        expect(flash[:alert]).to eq('You must be logged in to access that page.')
       end
     end
   end
@@ -109,7 +109,7 @@ RSpec.describe FormSettingsController, type: :controller do
           form_setting: { documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden' }
         }
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('User not found in the database.')
+        expect(flash[:alert]).to eq('You must be logged in to access that page.')
       end
     end
 

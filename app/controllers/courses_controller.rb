@@ -102,13 +102,6 @@ class CoursesController < ApplicationController
   end
 
   private
-
-  # TODO: Move to app controller.
-  def authenticate_user
-    @user = User.find_by(canvas_uid: session[:user_id])
-    redirect_to root_path, alert: 'Please log in to access this page.' unless @user
-  end
-
   def set_course
     @course = Course.find_by(id: params[:id])
     redirect_to courses_path, alert: 'Course not found.' unless @course

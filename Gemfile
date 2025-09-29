@@ -36,8 +36,8 @@ gem 'bootsnap', require: false
 # Verify instances of `LMS::Canvas`
 gem 'lms-api'
 
+# TODO: Not used with UCB env, but used on Heroku.
 gem 'sentry-rails'
-gem 'sentry-ruby'
 
 gem 'json'
 
@@ -55,6 +55,8 @@ gem 'omniauth-oauth2'
 # Audit for potentially unsafe database migrations
 gem 'strong_migrations'
 
+# Logging Customization
+gem 'lograge'
 
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
@@ -119,12 +121,8 @@ group :development do
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 
-  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
-  # gem "spring"
-
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[mri windows]
-  gem 'dotenv-rails'
 end
 
 # Tools, incase you need to install just the linters

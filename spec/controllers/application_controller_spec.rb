@@ -73,7 +73,7 @@ RSpec.describe ApplicationController, type: :controller do
 
         get :index
         expect(response).to redirect_to(root_path)
-        expect(flash[:alert]).to eq('User not found in the database.')
+        expect(flash[:alert]).to eq('You must be logged in to access that page.')
       end
     end
 
