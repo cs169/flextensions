@@ -80,39 +80,61 @@ class GradescopeFacade < LmsFacade
     overrides.find { |override| override.student_id == student_id }
   end
 
-  # def create_assignment_override(course_id, assignment_id, student_id, new_due_date)
-  #   ensure_authenticated!
-  #   student_existing_override = get_existing_student_override(course_id, assignment_id, student_id)
-
   ##
   # Provisions a new extension to a user.
   #
-  # @param   [Integer] courseId the course to provision the extension in.
-  # @param   [Array<Integer>] studentIds the students to provision the extension for.
-  # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
+  # @param   [String] courseId the course to provision the extension in.
+  # @param   [String] email of student to provision the extension for.
+  # @param   [String] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
-  # @return  [Faraday::Response] the override that acts as the extension.
-  # @raises  [FailedPipelineError] if the creation response body could not be parsed.
-  # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
-  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_hard_due_date)
+  # @return  [Lmss::BaseExtension] the extension that was provisioned.
+  def provision_extension(course_id, student_email, assignment_id, new_due_date, new_hard_due_date)
     ensure_authenticated!
     begin
+      # get extension page
+      html = @gradescope_conn.get("/courses/#{course_id}/assignments/#{assignment_id}/extensions")
+      if html.blank?
+        Rails.logger.error 'Failed to fetch assignment extensions: No response'
+        return nil
+      end
+
+      # Extract React props containing students data from HTML
+      students_data = @gradescope_conn.extract_react_props(html, 'AddExtension')
+      return nil unless students_data
+
+      student_data = students_data['students'].find { |s| s['email'] == student_email }
+      unless student_data
+        Rails.logger.error "Failed to fetch assignment extensions: No response for student #{student_email}"
+        return nil
+      end
+      student_id = student_data['id']
+
+      # Build request payload
       request_payload = {
         'override' => {
           'user_id' => student_id,
-          'settings' => {
-            'due_date' => {
-              'type' => 'absolute',
-              'value' => new_due_date
-            },
-            'hard_due_date' => {
-              'type' => 'absolute',
-              'value' => new_hard_due_date
-            },
-            'visible' => true
-          }
+          'settings' => {},
+          'visible' => true
         }
       }
+
+      if new_due_date
+        request_payload['override']['settings']['due_date'] = {
+          'type' => 'absolute',
+          'value' => new_due_date
+        }
+
+        # Set hard due date to new due date if not provided
+        if new_hard_due_date.nil?
+          new_hard_due_date = new_due_date
+        end
+
+        request_payload['override']['settings']['hard_due_date'] = {
+          'type' => 'absolute',
+          'value' => new_hard_due_date
+        }
+
+      end
 
       @gradescope_conn.post(
         "/courses/#{course_id}/assignments/#{assignment_id}/extensions", request_payload)

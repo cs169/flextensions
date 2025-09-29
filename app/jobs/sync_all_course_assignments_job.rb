@@ -16,7 +16,7 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     }
 
     # @return [LmsFacade] facade for the LMS
-    facade = Lms.facade_class(course_to_lms.lms_id).for_user(sync_user)
+    facade = Lms.facade_class(course_to_lms.lms_id).from_user(sync_user)
     # @return [Array<Lmss::BaseAssignment>] list of assignments from LMS
     lms_assignments = facade.get_all_assignments(course_to_lms.external_course_id)
 

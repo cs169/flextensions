@@ -147,15 +147,37 @@ class Request < ApplicationRecord
 
   # TODO: This is what should take in a LmsFacade
   # These functions should be methods on the facade, rather than a request.
-  def approve(canvas_facade, processed_user_id)
-    existing_override = existing_override(canvas_facade)
+  def approve(lms_facade, processed_user_id)
+    # existing_override = existing_override(lms_facade)
+    # delete_override(lms_facade, existing_override['id']) if existing_override
+    # response = assignment_override = JSON.parse(response.body)
 
-    delete_override(canvas_facade, existing_override['id']) if existing_override
+    case lms_facade
+    when CanvasFacade
+      assignment_override = lms_facade.provision_extension(
+        course.canvas_id,
+        user.canvas_uid,
+        assignment.external_assignment_id,
+        requested_due_date.iso8601,
+        nil
+      )
+    when GradescopeFacade
+      assignment_override = lms_facade.provision_extension(
+        course.gradescope_id,
+        user.email,  # use email as identifier for Gradescope
+        assignment.external_assignment_id,
+        requested_due_date.iso8601,
+        nil
+      )
+    end
 
-    response = create_override(canvas_facade)
-    return false unless response.success?
+    # existing_extensions = lms_facade.get_assignment_extensions(course.canvas_id, assignment.external_assignment_id)
+    # lms_facade.delete_assignment_extension(course.canvas_id, assignment.external_assignment_id, extension_id) if existing_extensions
+    # lms_facade.create_assignment_extension(course.canvas_id, assignment.external_assignment_id, user.canvas_uid, new_due_date)
 
-    assignment_override = JSON.parse(response.body)
+    # response = create_override(lms_facade)
+    # return false unless response.success?
+
     update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: assignment_override['id'])
     send_email_response if course.course_settings&.enable_emails
     true
@@ -219,36 +241,36 @@ class Request < ApplicationRecord
 
   private
 
-  def existing_override(canvas_facade)
-    overrides_response = canvas_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
-    return nil unless overrides_response.success?
+  # def existing_override(canvas_facade)
+  #   overrides_response = canvas_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
+  #   return nil unless overrides_response.success?
 
-    overrides = JSON.parse(overrides_response.body)
-    overrides.find { |override| override['student_ids'].map(&:to_i).include?(user.canvas_uid.to_i) }
-  end
+  #   overrides = JSON.parse(overrides_response.body)
+  #   overrides.find { |override| override['student_ids'].map(&:to_i).include?(user.canvas_uid.to_i) }
+  # end
 
-  def delete_override(canvas_facade, override_id)
-    canvas_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, override_id)
-  end
+  # def delete_override(canvas_facade, override_id)
+  #   canvas_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, override_id)
+  # end
 
   # TODO: this should update the Canvas lock date.
-  def create_override(lms_facade)
-    # This suggests these should be Rails model instances
-    if lms_facade.is_a?(CanvasFacade)
-      external_course_id = course.canvas_id
-      external_user_id = user.canvas_uid
-    elsif lms_facade.is_a?(GradescopeFacade)
-      external_course_id = course.gradescope_id
-      # TODO: is this correct?
-      external_user_id = user.email
-    end
+  # def create_override(lms_facade)
+  #   # This suggests these should be Rails model instances
+  #   if lms_facade.is_a?(CanvasFacade)
+  #     external_course_id = course.canvas_id
+  #     external_user_id = user.canvas_uid
+  #   elsif lms_facade.is_a?(GradescopeFacade)
+  #     external_course_id = course.gradescope_id
+  #     # TODO: is this correct?
+  #     external_user_id = user.email
+  #   end
 
-    # Ideally...
-    # lms_facade.provision_extension(course, user, assignment, requested_due_date)
-    lms_facade.provision_extension(
-      external_course_id, external_user_id, assignment.external_assignment_id, requested_due_date.iso8601
-    )
-  end
+  #   # Ideally...
+  #   # lms_facade.provision_extension(course, user, assignment, requested_due_date)
+  #   lms_facade.provision_extension(
+  #     external_course_id, external_user_id, assignment.external_assignment_id, requested_due_date.iso8601
+  #   )
+  # end
 
   def build_slack_message(type, link)
     case type

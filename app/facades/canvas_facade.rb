@@ -310,10 +310,11 @@ class CanvasFacade < LmsFacade
   # @param   [Integer] studentId the student to provisoin the extension for.
   # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
+  # @param   [String]  newHardDueDate the hard due date for the assignment.
   # @return  [Faraday::Response] the override that acts as the extension.
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
-  def provision_extension(courseId, studentId, assignmentId, newDueDate)
+  def provision_extension(courseId, studentId, assignmentId, newDueDate, newHardDueDate)
     overrideTitle = "#{studentId} extended to #{newDueDate}"
     create_response = create_assignment_override(
       courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate

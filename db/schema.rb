@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_23_055350) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_29_191410) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -120,6 +120,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_23_055350) do
     t.boolean "use_auth_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "lms_base_url"
   end
 
   create_table "requests", force: :cascade do |t|

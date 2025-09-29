@@ -26,6 +26,8 @@ class Assignment < ApplicationRecord
 
   validate :enabled_requires_date_present
 
+  delegate :lms_id, to: :course_to_lms
+
   # Returns enabled assignments for a specific course
   scope :enabled_for_course, ->(course_to_lms_id) { where(course_to_lms_id: course_to_lms_id, enabled: true) }
 
@@ -38,23 +40,18 @@ class Assignment < ApplicationRecord
     errors.add(:due_date, 'must be present if assignment is enabled') if enabled && due_date.blank?
   end
 
-  def lms_id
-    course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
-    course_to_lms&.lms_id
-  end
-
   def lms_facade
     Lms.facade_class(lms_id)
   end
 
   # TODO: Arguably we should get the base URL from the course
   def external_url
-    external_course_id = course_to_lms.external_course_id
+    base_lms_url = course_to_lms.lms.lms_base_url if course_to_lms
     case lms_id
-    when 1
-      "#{ENV.fetch('CANVAS_URL', '')}/courses/#{external_course_id}/assignments/#{external_assignment_id}"
-    when 2
-      "https://www.gradescope.com/courses/#{external_course_id}/assignments/#{external_assignment_id}"
+    when CANVAS_LMS_ID
+      "#{base_lms_url}/courses/#{external_course_id}/assignments/#{external_assignment_id}"
+    when GRADESCOPE_LMS_ID
+      "#{base_lms_url}/courses/#{external_course_id}/assignments/#{external_assignment_id}"
     end
   end
 end

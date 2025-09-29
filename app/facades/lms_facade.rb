@@ -61,12 +61,12 @@ class LmsFacade
   ##
   # Provisions a new extension to a user.
   #
-  # @param   [Course] course the course to provision the extension in.
-  # @param   [User] student the student to provisoin the extension for.
-  # @param   [Assignment] assignment the assignment the extension should be provisioned for.
+  # @param   [Integer] courseId the course to provision the extension in.
+  # @param   [Integer] studentId the student to provisoin the extension for.
+  # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
-  # @return  [Hash] the extension that was provisioned.
-  def provision_extension(course, student, assignment, newDueDate)
+  # @return  [Lmss::BaseExtension] the extension that was provisioned.
+  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_hard_due_date)
     raise NotImplementedError
   end
 end
