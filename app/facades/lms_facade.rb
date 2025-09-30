@@ -66,7 +66,7 @@ class LmsFacade
   # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
   # @return  [Lmss::BaseExtension] the extension that was provisioned.
-  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_hard_due_date)
+  def provision_extension(course_id, student_id, assignment_id, new_due_date)
     raise NotImplementedError
   end
 end

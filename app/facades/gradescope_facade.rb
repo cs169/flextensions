@@ -86,9 +86,9 @@ class GradescopeFacade < LmsFacade
   # @param   [String] courseId the course to provision the extension in.
   # @param   [String] email of student to provision the extension for.
   # @param   [String] assignmentId the assignment the extension should be provisioned for.
-  # @param   [String]  newDueDate the date the assignment should be due.
-  # @return  [Lmss::BaseExtension] the extension that was provisioned.
-  def provision_extension(course_id, student_email, assignment_id, new_due_date, new_hard_due_date)
+  # @param   [String] newDueDate the date the assignment should be due.
+  # @return  [Lmss::Gradescope::BaseExtension] the extension that was provisioned.
+  def provision_extension(course_id, student_email, assignment_id, new_due_date)
     ensure_authenticated!
     begin
       # get extension page
@@ -123,22 +123,22 @@ class GradescopeFacade < LmsFacade
           'type' => 'absolute',
           'value' => new_due_date
         }
-
-        # Set hard due date to new due date if not provided
-        if new_hard_due_date.nil?
-          new_hard_due_date = new_due_date
-        end
-
         request_payload['override']['settings']['hard_due_date'] = {
           'type' => 'absolute',
-          'value' => new_hard_due_date
+          'value' => new_due_date
         }
-
       end
 
       @gradescope_conn.post(
         "/courses/#{course_id}/assignments/#{assignment_id}/extensions", request_payload)
 
+      # get id of created extension
+      override = get_existing_student_override(course_id, assignment_id, student_id)
+      unless override
+        Rails.logger.error "Failed to verify extension creation for student #{student_email}"
+        return nil
+      end
+      override
     rescue => e
       Rails.logger.error "Failed to provision extension: #{e.message}"
       raise e

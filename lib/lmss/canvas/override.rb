@@ -4,7 +4,7 @@ module Lmss
       attr_reader :id
 
       def initialize(data)
-        raise NotImplementedError
+        @id = data.id
       end
     end
   end
