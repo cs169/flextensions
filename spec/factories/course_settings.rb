@@ -10,7 +10,9 @@
 #  email_template                     :text             default("Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff")
 #  enable_emails                      :boolean          default(FALSE)
 #  enable_extensions                  :boolean          default(FALSE)
+#  enable_gradescope                  :boolean          default(FALSE)
 #  enable_slack_webhook_url           :boolean
+#  gradescope_course_url              :string
 #  max_auto_approve                   :integer          default(0)
 #  reply_email                        :string
 #  slack_webhook_url                  :string
