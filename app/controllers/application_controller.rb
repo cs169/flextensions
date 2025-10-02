@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
   def require_admin
     return if current_user.present? && current_user.admin?
 
-    redirect_to '/', alert: "You are not authorized to view this page."
+    redirect_to '/', alert: 'You are not authorized to view this page.'
   end
 
   private

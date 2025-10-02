@@ -66,7 +66,7 @@ gem 'lograge'
 # gem "image_processing", "~> 1.2"
 
 ## BI and Admin Dashboard Tools
-# 
+#
 gem 'blazer'
 gem 'hypershield'
 
