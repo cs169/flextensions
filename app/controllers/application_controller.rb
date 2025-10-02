@@ -27,6 +27,14 @@ class ApplicationController < ActionController::Base
     @user ||= @current_user
   end
 
+  # Because blazer is mounted as a module, `root_path` doesn't seem to work appropriately.
+  helper_method :require_admin
+  def require_admin
+    return if current_user.present? && current_user.admin?
+
+    redirect_to '/', alert: "You are not authorized to view this page."
+  end
+
   private
   def authenticate_user
     return true if current_user.present?

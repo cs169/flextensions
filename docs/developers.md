@@ -16,32 +16,32 @@ git clone git@github.com:berkeley-cdss/flextensions.git
 cd flextensions
 ```
 ---
+
 ### Set Up Ruby Environment
-#### Linux / WSL (If you are on Windows, please use WSL instead).
+#### (If you are on Windows, please use WSL instead).
+
+Install `mise`, such as `brew install mise` or any other ruby language manager.
+
 Make sure you are using Ruby 3.3.0:
 
 ```
-rvm use 3.3.0
+mise use ruby@3.3
 ```
-**_If the above command errors because `rvm 3.3.0` is not installed_**, then install it instead:
-```
-rvm install 3.3.0
-```
-#### Macs
-Similar to rvm for Linux, use `asdf` instead of `RVM` to make sure you are using the right version of Ruby on Rails（3.3.0). If you are unsure how to do this, please follow Athe ssignment [Cue-to-Cue Dry Run of the Tool-Rich Agile Workflow] on bcourses.
 
 ### Install dependencies:
 
 ```
 bundle install --without production
 ```
+
 ### Install PostgreSQL
 #### On macOS:
 
 ```bash
 brew install postgresql
-brew services start postgresql@14
-/opt/homebrew/opt/postgresql@14/bin/postgres -D /opt/homebrew/var/postgresql@14
+# Optionally, if it does not start by default
+brew services start postgresql@16
+/opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
 ```
 #### On Linux / WSL:
 
@@ -93,6 +93,16 @@ make env
 run `rails db:setup`
 
 To start the server locally, run `rails server` . You should be able to land to the login page.
+
+### Hypershield
+
+Hypershield is a tool which allows admins to query data, without relevaing sensitive tokens.
+
+You may need to run:
+
+```sh
+rake hypershield:refresh:dry_run
+```
 
 ---
 
