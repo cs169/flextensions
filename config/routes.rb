@@ -56,4 +56,7 @@ Rails.application.routes.draw do
   namespace :api do
     draw('api/v1')
   end
+
+  # This is protected by `require_admin` via blazer.yml
+  mount Blazer::Engine, at: "admin/blazer"
 end

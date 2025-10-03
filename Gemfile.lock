@@ -100,6 +100,12 @@ GEM
     benchmark (0.4.1)
     bigdecimal (3.2.3)
     bindex (0.8.1)
+    blazer (3.3.0)
+      activerecord (>= 7.1)
+      chartkick (>= 5)
+      csv
+      railties (>= 7.1)
+      safely_block (>= 0.4)
     bootsnap (1.18.6)
       msgpack (~> 1.2)
     bootstrap (5.3.5)
@@ -119,6 +125,7 @@ GEM
     capybara-screenshot (1.0.26)
       capybara (>= 1.0, < 4)
       launchy
+    chartkick (5.2.0)
     childprocess (5.1.0)
       logger (~> 1.5)
     codeclimate-test-reporter (1.0.7)
@@ -224,6 +231,8 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
+    hypershield (0.5.1)
+      activerecord (>= 7.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -478,6 +487,7 @@ GEM
       rubocop (~> 1.72, >= 1.72.1)
     ruby-progressbar (1.13.0)
     rubyzip (3.0.2)
+    safely_block (0.5.0)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -581,6 +591,7 @@ DEPENDENCIES
   annotaterb
   axe-core-cucumber
   axe-core-rspec
+  blazer
   bootsnap
   bootstrap (~> 5.3.3)
   brakeman
@@ -593,6 +604,7 @@ DEPENDENCIES
   faraday
   font-awesome-sass
   guard-rspec
+  hypershield
   importmap-rails
   jbuilder
   json
@@ -618,6 +630,7 @@ DEPENDENCIES
   sassc-rails (~> 2.1)
   selenium-webdriver
   sentry-rails
+  sentry-ruby
   shoulda-matchers (~> 6.5)
   simplecov (~> 0.22.0)
   simplecov_json_formatter

@@ -37,6 +37,7 @@ gem 'bootsnap', require: false
 gem 'lms-api'
 
 # TODO: Not used with UCB env, but used on Heroku.
+gem 'sentry-ruby'
 gem 'sentry-rails'
 
 gem 'json'
@@ -63,6 +64,11 @@ gem 'lograge'
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
+
+## BI and Admin Dashboard Tools
+#
+gem 'blazer'
+gem 'hypershield'
 
 #### Frontend related tools
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
