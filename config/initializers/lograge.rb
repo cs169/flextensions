@@ -1,18 +1,28 @@
-if Rails.application.config.lograge.enabled
-
-  # Log to ENVIRONMENT.rb
-  if ENV["RAILS_LOG_TO_STDOUT"] == "true"
-    log_dest = STDOUT
-  else
+Rails.application.configure do
+  log_dest = STDOUT
+  if ENV["RAILS_LOG_TO_FILE"].present?
+    # Log to environment.rb
     log_dest = Rails.root.join("log", "#{Rails.env}.log")
   end
 
-  Rails.application.configure do
+  # Basic config moved from production.rb
+  config.log_level = (ENV["LOG_LEVEL"] || "info").downcase.to_sym
+
+  if !Rails.application.config.lograge.enabled
     config.logger = ActiveSupport::Logger.new(log_dest)
+      .tap { |logger| logger.formatter = ::Logger::Formatter.new }
+      .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+
+    config.log_tags = [:request_id]
+  else
+    # This should be set before the logger is created
     config.lograge.formatter = Lograge::Formatters::Json.new
+    config.logger = ActiveSupport::Logger.new(log_dest)
     config.colorize_logging = false
-    config.lograge.ignore_actions = [ 'Rails::HealthController#show',
-      'StatusController#health_check']
+    config.lograge.ignore_actions = [
+      'Rails::HealthController#show',
+      'StatusController#health_check'
+    ]
 
     config.lograge.custom_payload do |controller|
       {
@@ -20,6 +30,7 @@ if Rails.application.config.lograge.enabled
         user_id: controller.current_user.try(:id)
       }
     end
+
     config.lograge.custom_options = lambda do |event|
       exceptions = %w(controller action format id)
       options = {
@@ -37,7 +48,7 @@ if Rails.application.config.lograge.enabled
         options[:exception_backtrace] = event.payload[:exception_object].backtrace.join("\n")
       end
       options
-  end
+    end
 
     ActionDispatch::DebugExceptions.register_interceptor do |request, exception|
       case exception

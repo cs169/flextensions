@@ -53,20 +53,22 @@ Rails.application.configure do
   #config.force_ssl = true
 
   # Setup logging with Lograge [https://github.com/roidrage/lograge]
+  # See config/initializers/lograge.rb for more details.
   config.lograge.enabled = true
-
-  # config.logger = ActiveSupport::Logger.new(log_dest)
-  #   .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
-  #   .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
-
-
-  # # Prepend all log lines with the following tags.
-  # config.log_tags = [ :request_id ]
 
   # "info" includes generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+
+  # Disable query logging
+  # config.active_record.logger = nil
+  # config.logger = ActiveSupport::Logger.new(STDOUT)
+  #   .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
+  #   .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+
+  # # Prepend all log lines with the following tags.
+  # config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
