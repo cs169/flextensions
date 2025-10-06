@@ -95,4 +95,10 @@ Rails.application.configure do
   config.active_record.encryption.primary_key = 'dev-primary-key-1234567890abcdef'
   config.active_record.encryption.deterministic_key = 'dev-deterministic-key-1234567890abcdef'
   config.active_record.encryption.key_derivation_salt = 'dev-salt-1234567890abcdef'
+
+  # Setup logging with Lograge [https://github.com/roidrage/lograge]
+  # See config/initializers/lograge.rb for more details.
+  # This should normally be false in development, but set it to true to
+  # test log formatting during development.
+  config.lograge.enabled = false
 end

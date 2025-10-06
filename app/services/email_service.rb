@@ -1,7 +1,6 @@
-# app/services/email_service.rb
-##########################################################################################
-# if you want to use Letter Opener Web make sure to set ENV[ENABLE_EMAIL_SENDING] to false
-##########################################################################################
+# frozen_string_literal: true
+
+# A class for sending templated emails, using basic `{{variable}}` substitution.
 class EmailService
   class << self
     # Given a subject_template and body_template (both strings
@@ -12,7 +11,7 @@ class EmailService
       mapping.each_with_object(
         { subject: subject_template.dup, body: body_template.dup }
       ) do |(key, val), memo|
-        placeholder = "{{#{key}}}"
+        placeholder = /{{\s*#{key}\s*}}/i
         memo[:subject].gsub!(placeholder, val.to_s)
         memo[:body].gsub!(placeholder, val.to_s)
       end
