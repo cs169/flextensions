@@ -11,7 +11,7 @@ class EmailService
       mapping.each_with_object(
         { subject: subject_template.dup, body: body_template.dup }
       ) do |(key, val), memo|
-        placeholder = "{{\s*#{key}\s*}}"
+        placeholder = /{{\s*#{key}\s*}}/i
         memo[:subject].gsub!(placeholder, val.to_s)
         memo[:body].gsub!(placeholder, val.to_s)
       end
