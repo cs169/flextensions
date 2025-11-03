@@ -110,7 +110,7 @@ group :test do
   gem 'rack_session_access'
   gem 'rspec-retry'
   gem 'selenium-webdriver'
-  gem 'shoulda-matchers', '~> 6.5'
+  gem 'shoulda-matchers', '~> 7.0'
   gem 'simplecov', '~> 0.22.0', require: false
   gem 'simplecov_json_formatter'
   gem 'timecop'
