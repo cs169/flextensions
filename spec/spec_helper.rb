@@ -12,7 +12,6 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
-require 'dotenv'
 require 'webmock/rspec'
 require 'rspec/retry'
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
@@ -30,8 +29,6 @@ SimpleCov.start 'rails' do
   # add_filter '/app/controllers/bcourses_controller.rb'
 end
 
-# manually load environment variables
-Dotenv.load('.env.test', '.env')
 # load libraries from lib
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
