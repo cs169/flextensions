@@ -176,6 +176,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_01_192900) do
     t.boolean "use_auth_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "lms_base_url"
   end
 
   create_table "requests", force: :cascade do |t|

@@ -90,7 +90,6 @@ class CanvasFacade < LmsFacade
   #     faraday.adapter Faraday.default_adapter
   # end
   def initialize(token, conn = nil)
-    @current_response = nil
     @api_token = token
     @canvas_conn = conn || Faraday.new(
       url: "#{CanvasFacade::CANVAS_URL}/api/v1",
@@ -98,9 +97,11 @@ class CanvasFacade < LmsFacade
     )
   end
 
-  def self.for_user(user)
+  def self.from_user(user)
     token = user.canvas_credentials&.token
-    new(token) if token.present?
+    raise CanvasAPIError, 'Cannot find Canvas token for user' if token.nil?
+
+    new(token)
   end
 
   # rubocop:disable Layout/LineLength
@@ -207,22 +208,23 @@ class CanvasFacade < LmsFacade
   end
 
   ##
-  # Gets all assignments for a course (paginated).
+  # Gets all Canvas assignments for a course (paginated).
   #
   # @param  [String] course_id the Canvas course id to fetch assignments for.
-  # @return [Array<Hash>] all assignments in the course with base_date processed.
+  # @return [Array<Lmss::Canvas::Assignment>] list of assignments in the course.
   def get_all_assignments(course_id)
     assignments = depaginate_response(get_assignments(course_id))
 
     # Process assignments to extract base dates
-    assignments.each do |assignment|
-      if assignment['all_dates']
-        base_date = assignment['all_dates'].find { |date| date['base'] == true }
-        assignment['base_date'] = base_date
+    assignments.map do |assignment_data|
+      # Unpack base date from all_dates array
+      if assignment_data['all_dates']
+        base_date = assignment_data['all_dates'].find { |date| date['base'] == true }
+        assignment_data['base_date'] = base_date
       end
+      # Return as Lmss::Canvas::Assignment object
+      Lmss::Canvas::Assignment.new(assignment_data)
     end
-
-    assignments
   end
 
   ##
@@ -256,6 +258,7 @@ class CanvasFacade < LmsFacade
   # @param   [String]     unlockDate   the date the override should unlock the assignment.
   # @param   [String]     lockDate     the date the override should lock the assignment.
   # @return  [Faraday::Response] information about the new override.
+  # TODO: Rename this to create_assignment_extenstion. Title should be optional.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvas_conn.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
                       assignment_override: {
@@ -307,21 +310,30 @@ class CanvasFacade < LmsFacade
   # @param   [Integer] studentId the student to provisoin the extension for.
   # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
-  # @return  [Faraday::Response] the override that acts as the extension.
+  # @return  [Lmss::Canvas::Override] the override that acts as the extension.
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
-  def provision_extension(courseId, studentId, assignmentId, newDueDate)
-    overrideTitle = "#{studentId} extended to #{newDueDate}"
+  def provision_extension(course_id, student_id, assignment_id, new_due_date)
+    # get existing_overrides for an assignment
+    student_override = get_existing_student_override(course_id, student_id, assignment_id)
+    if !student_override.nil?
+      delete_assignment_override(course_id, assignment_id, student_override.id)
+    end
+
+    # create new override
+    override_title = "#{student_id} extended to #{new_due_date}"
     create_response = create_assignment_override(
-      courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newDueDate
+      course_id, assignment_id, [ student_id ], override_title, new_due_date, get_current_formatted_time, new_due_date
     )
-    return create_response if create_response.status != 400
 
     decoded_response = parse_create_response(create_response)
-    return create_response if override_has_errors?(decoded_response)
+    if create_response.status != 400 || override_has_errors?(decoded_response)
+      return Lmss::Canvas::Override.new(decoded_response)
+    end
 
-    curr_override = fetch_existing_override(courseId, studentId, assignmentId)
-    handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate)
+    curr_override = fetch_existing_override(course_id, student_id, assignment_id)
+    handle_response = handle_override_logic(course_id, curr_override, student_id, assignment_id, override_title, new_due_date)
+    Lmss::Canvas::Override.new(parse_create_response(handle_response))
   end
 
   private
@@ -334,10 +346,10 @@ class CanvasFacade < LmsFacade
   # @param  [Integer] assignmentId the assignmnet to check for an existing override for.
   # @return [OpenStruct|nil] the override if it is found or nil if not.
   # @throws [FailedPipelineError] if the existing overrides response body could not be parsed.
-  def get_existing_student_override(courseId, studentId, assignmentId)
+  def get_existing_student_override(course_id, student_id, assignment_id)
     begin
-      allAssignmentOverrides = JSON.parse(
-        get_assignment_overrides(courseId, assignmentId).body,
+      all_assignment_overrides = JSON.parse(
+        get_assignment_overrides(course_id, assignment_id).body,
         object_class: OpenStruct
       )
     rescue JSON::ParserError
@@ -348,8 +360,8 @@ class CanvasFacade < LmsFacade
       )
     end
 
-    allAssignmentOverrides.each do |override|
-      return override if override&.student_ids&.include?(studentId)
+    all_assignment_overrides.each do |override|
+      return override if override&.student_ids.map(&:to_i)&.include?(student_id.to_i)
     end
     nil
   end

@@ -30,7 +30,16 @@ class CourseToLms < ApplicationRecord
   def get_all_canvas_assignments(user)
     CanvasFacade.for_user(user).get_all_assignments(external_course_id)
   rescue StandardError => e
-    Rails.logger.error "Failed to fetch assignments: #{e.message}"
+    Rails.logger.error "Failed to fetch Canvas assignments: #{e.message}"
+    []
+  end
+
+  def fetch_gradescope_assignments
+    return [] unless course.course_settings.enable_gradescope?
+
+    GradescopeFacade.for_user.get_all_assignments(external_course_id)
+  rescue StandardError => e
+    Rails.logger.error "Failed to fetch Gradescope assignments: #{e.message}"
     []
   end
 end

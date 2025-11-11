@@ -20,19 +20,21 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'Course not found.' unless @course
 
     @course.regenerate_readonly_api_token_if_blank
+    course_to_canvas = @course.course_to_lms(1)
+    course_to_gradescope = @course.course_to_lms(2)
 
-    course_to_lms = @course.course_to_lms(1)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_canvas
 
     if @role == 'student'
       course_settings = @course.course_settings
       return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' if course_settings && !course_settings.enable_extensions
     end
 
+    course_to_lms_ids = [course_to_canvas, course_to_gradescope].compact.map(&:id)
     @assignments = if @role == 'student'
-      Assignment.where(course_to_lms_id: course_to_lms.id, enabled: true).order(:name)
+      Assignment.where(course_to_lms_id: course_to_lms_ids, enabled: true).order(:name)
     else
-      Assignment.where(course_to_lms_id: course_to_lms.id).order(:name)
+      Assignment.where(course_to_lms_id: course_to_lms_ids).order(:name)
     end
     render_role_based_view
   end

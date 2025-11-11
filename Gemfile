@@ -44,6 +44,7 @@ gem 'json'
 
 # Used to make http requests.
 gem 'faraday'
+gem 'faraday-cookie_jar'
 
 # Used to allow dot notation of hashes.
 gem 'ostruct'

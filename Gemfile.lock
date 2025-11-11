@@ -197,6 +197,9 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
+    faraday-cookie_jar (0.0.7)
+      faraday (>= 0.8.0)
+      http-cookie (~> 1.0.0)
     faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
     ffi (1.17.2)
@@ -230,6 +233,8 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.2.1)
     hashie (5.0.0)
+    http-cookie (1.0.8)
+      domain_name (~> 0.5)
     httparty (0.23.2)
       csv
       mini_mime (>= 1.0.0)
@@ -610,6 +615,7 @@ DEPENDENCIES
   debug
   factory_bot_rails
   faraday
+  faraday-cookie_jar
   font-awesome-sass
   guard-rspec
   hypershield

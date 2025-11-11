@@ -40,6 +40,10 @@ class Course < ApplicationRecord
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
   end
 
+  def all_linked_lmss
+    CourseToLms.where(course_id: id)
+  end
+
   # TODO: Replace this with staff_role?(user) or student_role?(user)
   # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
@@ -48,6 +52,21 @@ class Course < ApplicationRecord
     return 'student' if roles.include?('student')
 
     nil
+  end
+
+  # TODO: This doesn't make sense actually.
+  # A course can be linked to many LMSs.
+  # def lms_facade
+  #   course_to_lms = CourseToLms.find_by(id: course_to_lms_id)
+  #   Lms.facade_class(course_to_lms.lms_id)
+  # end
+
+  def canvas_id
+    CourseToLms.find_by(course_id: id, lms_id: CANVAS_LMS_ID)&.external_course_id
+  end
+
+  def gradescope_id
+    CourseToLms.find_by(course_id: id, lms_id: GRADESCOPE_LMS_ID)&.external_course_id
   end
 
   # TODO: Add specs for these 4 simple methods
@@ -119,6 +138,8 @@ class Course < ApplicationRecord
         auto_approve_days: 0,
         auto_approve_extended_request_days: 0,
         max_auto_approve: 0,
+        enable_gradescope: false,
+        gradescope_course_url: nil,
         enable_emails: false,
         reply_email: nil,
         email_subject: 'Extension Request Status: {{status}} - {{course_code}}',
@@ -167,20 +188,21 @@ class Course < ApplicationRecord
   end
 
   # Find or create the CourseToLms record
-  def self.find_or_create_course_to_lms(course, course_data)
-    CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: 1).tap do |course_to_lms|
+  def self.find_or_create_course_to_lms(course, course_data, lms_id = 1)
+    CourseToLms.find_or_initialize_by(course_id: course.id, lms_id: lms_id).tap do |course_to_lms|
       course_to_lms.external_course_id = course_data['id']
       course_to_lms.save!
     end
   end
 
+  # NOTE: this must be the plural course_to_lmss
   def sync_assignments(sync_user)
-    # Explicitly look for Canvas links.
-    # TODO: In the future, we will need to adapt this to work with Gradescope.
-    course_to_lms = self.course_to_lms(1)
-    return unless course_to_lms
+    lms_links = self.course_to_lmss
+    return unless lms_links.any?
 
-    SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)
+    lms_links.each do |course_to_lms|
+      SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)
+    end
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records

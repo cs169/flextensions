@@ -1,11 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["emailField", "tab", "slackWebhookField"]
+  static targets = ["emailField", "tab", "gradescopeField", "slackWebhookField"];
 
   connect() {
     this.toggleEmailFields();
     this.toggleSlackWebhookField();
+    this.toggleGradescopeFields();
+
+    const gradescopeToggle = document.getElementById('enable-gradescope');
+    if (gradescopeToggle) {
+      gradescopeToggle.addEventListener('change', this.toggleGradescopeFields.bind(this));
+    }
 
     const emailToggle = document.getElementById('enable-email');
     if (emailToggle) {
@@ -15,6 +21,16 @@ export default class extends Controller {
     const slackToggle = document.getElementById('enable-slack');
     if (slackToggle) {
       slackToggle.addEventListener('change', this.toggleSlackWebhookField.bind(this));
+    }
+  }
+
+  toggleGradescopeFields() {
+    const gradescopeToggle = document.getElementById('enable-gradescope');
+    const gradescopeCourseUrlField = document.getElementById('gradescope-course-url');
+
+    if (gradescopeToggle && gradescopeCourseUrlField) {
+      const isEnabled = gradescopeToggle.checked;
+      gradescopeCourseUrlField.disabled = !isEnabled;
     }
   }
 
