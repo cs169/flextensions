@@ -11,7 +11,7 @@ module ApplicationHelper
       nil
     end
     link_to url, target: '_blank', class: 'text-nowrap ms-2', rel: 'noopener' do
-      safe_join([name, content_tag(:i, '', class: 'fas fa-up-right-from-square')], ' ')
+      safe_join([ name, content_tag(:i, '', class: 'fas fa-up-right-from-square') ], ' ')
     end
   end
 end

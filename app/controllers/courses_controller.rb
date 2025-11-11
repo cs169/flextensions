@@ -30,7 +30,7 @@ class CoursesController < ApplicationController
       return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' if course_settings && !course_settings.enable_extensions
     end
 
-    course_to_lms_ids = [course_to_canvas, course_to_gradescope].compact.map(&:id)
+    course_to_lms_ids = [ course_to_canvas, course_to_gradescope ].compact.map(&:id)
     @assignments = if @role == 'student'
       Assignment.where(course_to_lms_id: course_to_lms_ids, enabled: true).order(:name)
     else
