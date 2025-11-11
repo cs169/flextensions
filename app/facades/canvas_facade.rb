@@ -261,14 +261,14 @@ class CanvasFacade < LmsFacade
   # TODO: Rename this to create_assignment_extenstion. Title should be optional.
   def create_assignment_override(courseId, assignmentId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvas_conn.post("courses/#{courseId}/assignments/#{assignmentId}/overrides", {
-                      assignment_override: {
-                        student_ids: studentIds,
-                        title: title,
-                        due_at: dueDate,
-                        unlock_at: unlockDate,
-                        lock_at: lockDate
-                      }
-                    })
+      assignment_override: {
+        student_ids: studentIds,
+        title: title,
+        due_at: dueDate,
+        unlock_at: unlockDate,
+        lock_at: lockDate
+      }
+    })
   end
 
   ##
@@ -284,12 +284,12 @@ class CanvasFacade < LmsFacade
   # @return  [Faraday::Response] information about the updated override.
   def update_assignment_override(courseId, assignmentId, overrideId, studentIds, title, dueDate, unlockDate, lockDate)
     @canvas_conn.put("courses/#{courseId}/assignments/#{assignmentId}/overrides/#{overrideId}", {
-                     student_ids: studentIds,
-                     title: title,
-                     due_at: dueDate,
-                     unlock_at: unlockDate,
-                     lock_at: lockDate
-                   })
+      student_ids: studentIds,
+      title: title,
+      due_at: dueDate,
+      unlock_at: unlockDate,
+      lock_at: lockDate
+    })
   end
 
   ##
@@ -332,7 +332,8 @@ class CanvasFacade < LmsFacade
     end
 
     curr_override = fetch_existing_override(course_id, student_id, assignment_id)
-    handle_response = handle_override_logic(course_id, curr_override, student_id, assignment_id, override_title, new_due_date)
+    handle_response = handle_override_logic(course_id, curr_override, student_id, assignment_id, override_title,
+new_due_date)
     Lmss::Canvas::Override.new(parse_create_response(handle_response))
   end
 

@@ -30,9 +30,6 @@ Style/Documentation:
 Style/StringLiterals:
   EnforcedStyle: single_quotes
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Style/ClassAndModuleChildren:
   Enabled: false
 
@@ -75,10 +72,11 @@ Metrics/ParameterLists:
 # TODO-mb: this one is frustrating.
 # Fix to allow more left-aligned params.
 Layout/FirstHashElementIndentation:
-  Enabled: false
+  EnforcedStyle: consistent
+  Enabled: true
 
 Layout/LineLength:
-  Max: 250
+  Max: 120
 
 # Rails
 Rails:

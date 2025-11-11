@@ -24,11 +24,11 @@ module API
               .with(
                 body: {
                   assignment_override: hash_including({
-                                                        'due_at' => @mock_new_due_date,
+                    'due_at' => @mock_new_due_date,
                                                         'lock_at' => @mock_new_due_date,
                                                         'student_ids' => [ @mock_student_uid.to_s ],
                                                         'title' => "#{@mock_student_uid} extended to #{@mock_new_due_date}"
-                                                      })
+                  })
                 },
                 headers: { Authorization: "Bearer #{@auth_token}" }
               ).to_return(
@@ -69,10 +69,10 @@ module API
 
             expect do
               post(:create, params: {
-                     course_id: @course.id,
+                course_id: @course.id,
                      lms_id: @lms.id,
                      assignment_id: @assignment.id
-                   })
+              })
             end.to raise_error(FailedPipelineError)
           end
         end
@@ -108,11 +108,11 @@ module API
             stub_request(:post, @mock_override_url)
               .with(
                 body: hash_including({
-                                       due_at: @mock_new_due_date,
+                  due_at: @mock_new_due_date,
                                        lock_at: @mock_new_due_date,
                                        student_ids: [ @mock_student_uid.to_s ],
                                        title: "#{@mock_student_uid} extended to #{@mock_new_due_date}"
-                                     }),
+                }),
                 headers: { Authorization: "Bearer #{@auth_token}" }
               )
               .to_return(
