@@ -47,7 +47,7 @@ RSpec.describe CourseToLms, type: :model do
       result = course_to_lms.get_all_canvas_assignments(staff_user)
       expect(result).to be_an(Array)
       expect(result.size).to eq(2)
-      expect(result.first.name).to eq('Assignment 1')
+  expect(result.first['name']).to eq('Assignment 1')
     end
 
     context 'when the API call fails' do
@@ -58,7 +58,7 @@ RSpec.describe CourseToLms, type: :model do
       end
 
       it 'returns an empty array and logs the error' do
-        expect(Rails.logger).to receive(:error).with(/Failed to fetch assignments/)
+  expect(Rails.logger).to receive(:error).with('Failed to fetch Canvas assignments: Canvas API Error')
         result = course_to_lms.get_all_canvas_assignments(staff_user)
         expect(result).to eq([])
       end
