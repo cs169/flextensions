@@ -146,23 +146,47 @@ class Request < ApplicationRecord
 
   def approve(lms_facade, processed_user_id)
     begin
-      case lms_facade
-      when CanvasFacade
-        override = lms_facade.provision_extension(
+      # Handle Canvas-style facades which expose overrides APIs
+      if lms_facade.respond_to?(:get_assignment_overrides)
+        overrides_response = lms_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
+        overrides = JSON.parse(overrides_response.body) rescue []
+
+        existing = overrides.find do |ov|
+          (ov['student_ids'] || ov[:student_ids]).map(&:to_s).include?(user.canvas_uid.to_s)
+        end
+
+        if existing
+          # delete the existing override first
+          lms_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, existing['id'])
+        end
+
+        create_response = lms_facade.create_assignment_override(
+          course.canvas_id,
+          assignment.external_assignment_id,
+          [user.canvas_uid],
+          "Extension for #{user.name}",
+          requested_due_date.iso8601,
+          nil,
+          nil
+        )
+
+        return false unless create_response&.success?
+
+        body = JSON.parse(create_response.body) rescue {}
+        external_id = body['id'] || body[:id]
+
+      # Handle other LMS facades that may provide a provision_extension helper
+      elsif lms_facade.respond_to?(:provision_extension)
+        override_obj = lms_facade.provision_extension(
           course.canvas_id,
           user.canvas_uid.to_i,
           assignment.external_assignment_id,
-          requested_due_date.iso8601,
-          nil
+          requested_due_date.iso8601
         )
-      when GradescopeFacade
-        override = lms_facade.provision_extension(
-          course.gradescope_id,
-          user.email,  # use email as identifier for Gradescope
-          assignment.external_assignment_id,
-          requested_due_date.iso8601,
-          nil
-        )
+        external_id = override_obj&.id
+      else
+        # Unknown facade API
+        raise "Unsupported LMS facade provided to Request#approve"
       end
 
     rescue => e
@@ -170,8 +194,7 @@ class Request < ApplicationRecord
       return false
     end
 
-    external_extension_id = override.id if override && override.respond_to?(:id) | nil
-    update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: external_extension_id)
+    update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: external_id)
     send_email_response if course.course_settings&.enable_emails
     true
   end

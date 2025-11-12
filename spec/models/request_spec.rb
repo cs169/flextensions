@@ -492,6 +492,18 @@ RSpec.describe Request, type: :model do
         expect(request.status).not_to eq('approved')
       end
     end
+
+    context 'when facade implements provision_extension' do
+      let(:provisioned_override) { OpenStruct.new(id: 'prov-1') }
+      let(:prov_facade) { double('LmsFacade', provision_extension: provisioned_override) }
+
+      it 'falls back to provision_extension and sets external_extension_id' do
+        request.approve(prov_facade, instructor)
+        expect(request.external_extension_id).to eq('prov-1')
+        expect(request.status).to eq('approved')
+        expect(request.last_processed_by_user_id).to eq(instructor.id)
+      end
+    end
   end
 
   describe '#reject' do
