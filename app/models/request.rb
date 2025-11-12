@@ -220,8 +220,6 @@ class Request < ApplicationRecord
   # If the flag EXTEND_LATE_DUE_DATE is not set, ensure that the late due date
   #   is at least as late as the requested due date
   def calculate_new_assignment_dates
-
-
     {
       release_date: assignment_release_date,
       due_date: requested_due_date,

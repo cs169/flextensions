@@ -346,10 +346,8 @@ describe CanvasFacade do
     end
 
     before do
-      allow(facade).to receive(:get_current_formatted_time).and_return(mock_date)
-      allow(facade).to receive(:get_existing_student_override).and_return(nil)
       allow(facade).to receive(:delete_assignment_override)
-      allow(facade).to receive(:create_assignment_override).and_return(create_success_response)
+      allow(facade).to receive_messages(get_current_formatted_time: mock_date, get_existing_student_override: nil, create_assignment_override: create_success_response)
     end
 
     it 'returns correct response body on successful creation' do
@@ -376,8 +374,7 @@ describe CanvasFacade do
     end
 
     it 'throws an error if the existing override cannot be found' do
-      allow(facade).to receive(:create_assignment_override).and_return(create_taken_response)
-      allow(facade).to receive(:get_existing_student_override).and_return(nil)
+      allow(facade).to receive_messages(create_assignment_override: create_taken_response, get_existing_student_override: nil)
       expect do
         facade.provision_extension(
           course_id,
