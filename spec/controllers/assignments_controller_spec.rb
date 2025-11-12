@@ -78,7 +78,7 @@ RSpec.describe AssignmentsController, type: :controller do
       it 'returns a bad request status' do
         post :toggle_enabled, params: { id: assignment.id, enabled: true, role: 'instructor', user_id: user.id }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(flash[:alert]).to include('Due date must be present if assignment is enabled')
       end
     end

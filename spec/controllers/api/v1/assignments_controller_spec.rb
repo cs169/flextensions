@@ -61,10 +61,10 @@ module API
         end
 
         context 'save is unsuccessful' do
-          it 'returns status :unprocessable_entity' do
+          it 'returns status :unprocessable_content' do
             allow_any_instance_of(Assignment).to receive(:save).and_return(false)
             post :create, params: valid_params
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
           end
         end
 

@@ -51,10 +51,10 @@ module API
         end
 
         context 'when course_to_lms fails to save' do
-          it 'returns status :unprocessable_entity' do
+          it 'returns status :unprocessable_content' do
             allow_any_instance_of(CourseToLms).to receive(:save).and_return(false)
             post :create, params: { course_id: @course.id, lms_id: @lms.id, external_course_id: @external_course_id }
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
           end
         end
 
