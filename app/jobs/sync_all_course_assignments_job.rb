@@ -41,8 +41,6 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
     results
   end
 
-  private
-
   # Sync a single assignment
   def sync_assignment(course_to_lms, lms_assignment, results)
     assignment = Assignment.find_or_initialize_by(course_to_lms_id: course_to_lms.id, external_assignment_id: lms_assignment.id)

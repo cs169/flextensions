@@ -144,6 +144,9 @@ class Request < ApplicationRecord
     result
   end
 
+  # TODO: This code was most recently refactored using ChatGPT.
+  # It does correctly handle both Canvas and Gradescope, but the design
+  # is bad. Botth Facades should implement a common interface for extension provisioning.
   def approve(lms_facade, processed_user_id)
     begin
       # Handle Canvas-style facades which expose overrides APIs
@@ -163,7 +166,7 @@ class Request < ApplicationRecord
         create_response = lms_facade.create_assignment_override(
           course.canvas_id,
           assignment.external_assignment_id,
-          [user.canvas_uid],
+          [ user.canvas_uid ],
           "Extension for #{user.name}",
           requested_due_date.iso8601,
           nil,
@@ -186,7 +189,7 @@ class Request < ApplicationRecord
         external_id = override_obj&.id
       else
         # Unknown facade API
-        raise "Unsupported LMS facade provided to Request#approve"
+        raise 'Unsupported LMS facade provided to Request#approve'
       end
 
     rescue => e
@@ -206,8 +209,28 @@ class Request < ApplicationRecord
     true
   end
 
-  # app/models/request.rb
-  def send_email_response
+  # Based on this request, set the right 3 assignment dates
+  # Always keep the assignment release date the same
+  # Calculate the delta from the original due date to the requested due date
+  # Set the due date to the requested due date
+  # If the current (approval) time is beyond the requested due date,
+  #   then extend the requested due date by the delta with a max of 3 days
+  # If the flag EXTEND_LATE_DUE_DATE is set, then set the late due date to
+  #   the delta beyond the requested due date, otherwise keep it the same
+  # If the flag EXTEND_LATE_DUE_DATE is not set, ensure that the late due date
+  #   is at least as late as the requested due date
+  def calculate_new_assignment_dates
+
+
+    {
+      release_date: assignment_release_date,
+      due_date: requested_due_date,
+      late_due_date: late_due_date,
+      message: approval_message
+    }
+  end
+
+def send_email_response
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
