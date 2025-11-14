@@ -1,6 +1,6 @@
 module API
   module V1
-    class ExtensionsController < BaseController
+    class RequestsController < BaseController
       before_action :set_facade
 
       def index
