@@ -29,6 +29,9 @@ SimpleCov.start 'rails' do
   # add_filter '/app/controllers/bcourses_controller.rb'
 end
 
+# load libraries from lib
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+
 RSpec.configure do |config|
   # Exclude accessibility tests by default
   config.filter_run_excluding :a11y

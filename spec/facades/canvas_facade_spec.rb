@@ -105,21 +105,17 @@ describe CanvasFacade do
     it 'processes assignments to extract base dates' do
       result = facade.get_all_assignments(external_course_id)
 
-      expect(result[0]['base_date']).to eq({
-        'base' => true,
-        'due_at' => '2025-01-15T23:59:00Z',
-        'lock_at' => '2025-01-20T23:59:00Z'
-      })
-      expect(result[1]['base_date']).to be_nil
+      expect(result.first.due_date).to eq(DateTime.parse('2025-01-15T23:59:00Z'))
+      expect(result.first.late_due_date).to eq(DateTime.parse('2025-01-20T23:59:00Z'))
+      expect(result.second.due_date).to eq(DateTime.parse('2025-02-15T23:59:00Z'))
+      expect(result.second.late_due_date).to be_nil
     end
 
-    it 'returns all assignments with base_date processed' do
+    it 'returns all assignments as Lmss objects' do
       result = facade.get_all_assignments(external_course_id)
 
-      expect(result).to be_an(Array)
-      expect(result.length).to eq(2)
-      expect(result[0]['id']).to eq('456')
-      expect(result[1]['id']).to eq('789')
+      expect(result).to all(be_a(Lmss::Canvas::Assignment))
+      expect(result.map(&:id)).to contain_exactly('456', '789')
     end
 
     context 'when assignment has no all_dates' do
@@ -133,10 +129,11 @@ describe CanvasFacade do
         ]
       end
 
-      it 'does not add base_date' do
+      it 'falls back to top-level due_at when base dates missing' do
         result = facade.get_all_assignments(external_course_id)
 
-        expect(result[0]['base_date']).to be_nil
+        expect(result.first.due_date).to eq(DateTime.parse('2025-03-15T23:59:00Z'))
+        expect(result.first.late_due_date).to be_nil
       end
     end
   end
@@ -333,6 +330,9 @@ describe CanvasFacade do
 
   describe('provision_extension') do
     let(:mock_override_creation_url) { "courses/#{course_id}/assignments/#{assignment_id}/overrides" }
+    let(:create_success_response) { instance_double(Faraday::Response, status: 200, body: '{}') }
+    let(:create_invalid_json_response) { instance_double(Faraday::Response, status: 400, body: '{invalid json}') }
+    let(:create_taken_response) { instance_double(Faraday::Response, status: 400, body: creation_error_response_already_exists[2]) }
     let(:creation_error_response_already_exists) do
       [
         400,
@@ -346,21 +346,23 @@ describe CanvasFacade do
     end
 
     before do
-      allow(facade).to receive(:get_current_formatted_time).and_return(mock_date)
+      allow(facade).to receive(:delete_assignment_override)
+      allow(facade).to receive_messages(get_current_formatted_time: mock_date, get_existing_student_override: nil, create_assignment_override: create_success_response)
     end
 
     it 'returns correct response body on successful creation' do
-      stubs.post(mock_override_creation_url) { [ 200, {}, '{}' ] }
-      expect(facade.provision_extension(
+      result = facade.provision_extension(
         course_id,
         student_id,
         assignment_id,
         mock_date
-      ).body).to eq('{}')
+      )
+
+      expect(result).to be_a(Lmss::Canvas::Override)
     end
 
     it 'throws a pipeline error if the creation response body is improperly formatted' do
-      stubs.post(mock_override_creation_url) { [ 400, {}, '{invalid json}' ] }
+      allow(facade).to receive(:create_assignment_override).and_return(create_invalid_json_response)
       expect do
         facade.provision_extension(
           course_id,
@@ -372,8 +374,7 @@ describe CanvasFacade do
     end
 
     it 'throws an error if the existing override cannot be found' do
-      stubs.post(mock_override_creation_url) { creation_error_response_already_exists }
-      expect(facade).to receive(:get_existing_student_override).and_return(nil)
+      allow(facade).to receive_messages(create_assignment_override: create_taken_response, get_existing_student_override: nil)
       expect do
         facade.provision_extension(
           course_id,
@@ -385,8 +386,9 @@ describe CanvasFacade do
     end
 
     it 'updates the existing assignment override if the student is the only student the override is provisioned to' do
-      stubs.post(mock_override_creation_url) { creation_error_response_already_exists }
-      expect(facade).to receive(:get_existing_student_override).and_return(OpenStruct.new(mock_override))
+      allow(facade).to receive(:create_assignment_override).and_return(create_taken_response)
+      allow(facade).to receive(:create_assignment_override).and_return(create_taken_response)
+      expect(facade).to receive(:get_existing_student_override).twice.and_return(OpenStruct.new(mock_override))
       expect(facade).to receive(:update_assignment_override).with(
         course_id,
         assignment_id,
@@ -396,7 +398,7 @@ describe CanvasFacade do
         mock_date,
         mock_date,
         mock_date
-      )
+      ).and_return(instance_double(Faraday::Response, body: '{}'))
       facade.provision_extension(
         course_id,
         student_id,
@@ -407,14 +409,14 @@ describe CanvasFacade do
 
     it 'creates a new override if the student\'s existing one has multiple other students' do
       mock_override[:student_ids].append(student_id + 1)
-      stubs.post(mock_override_creation_url) { creation_error_response_already_exists }
       mock_override_struct = OpenStruct.new(mock_override)
-      expect(facade).to receive(:get_existing_student_override).and_return(mock_override_struct)
+      allow(facade).to receive(:create_assignment_override).and_return(create_taken_response, create_success_response)
+      expect(facade).to receive(:get_existing_student_override).twice.and_return(mock_override_struct)
       expect(facade).to receive(:remove_student_from_override).with(
         course_id,
         mock_override_struct,
         student_id
-      )
+      ).and_return(instance_double(Faraday::Response, body: '{}'))
       facade.provision_extension(
         course_id,
         student_id,

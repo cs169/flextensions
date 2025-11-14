@@ -10,29 +10,28 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
   # TODO: Spec out that it updates course_to_lms.recent_assignment_sync
   # TODO: Spec out behavior for add/update/delete assignments
   describe '#perform' do
+    let(:canvas_facade_double) { instance_double(CanvasFacade) }
     let(:canvas_assignments) do
       [
-        {
+        build_canvas_assignment(
           'id' => '123',
           'name' => 'Assignment 1',
           'due_at' => '2025-01-15T23:59:00Z',
           'lock_at' => '2025-01-20T23:59:00Z'
-        },
-        {
+        ),
+        build_canvas_assignment(
           'id' => '456',
           'name' => 'Assignment 2',
           'due_at' => '2025-02-15T23:59:00Z',
           'lock_at' => nil
-        }
+        )
       ]
     end
 
     before do
       course.assignments.destroy_all
-
-      allow_any_instance_of(CourseToLms).to receive(:get_all_canvas_assignments)
-        .with(sync_user)
-        .and_return(canvas_assignments)
+      allow(CanvasFacade).to receive(:from_user).and_return(canvas_facade_double)
+      allow(canvas_facade_double).to receive(:get_all_assignments).and_return(canvas_assignments)
     end
 
     it 'creates new assignments from Canvas data' do
@@ -93,7 +92,7 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
     context 'when assignment has base_date field' do
       let(:canvas_assignments) do
         [
-          {
+          build_canvas_assignment(
             'id' => '123',
             'name' => 'Assignment with base_date',
             'due_at' => nil,
@@ -102,7 +101,7 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
               'due_at' => '2025-03-15T23:59:00Z',
               'lock_at' => '2025-03-20T23:59:00Z'
             }
-          }
+          )
         ]
       end
 
@@ -119,9 +118,8 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       let(:student_user) { course.students.first }
 
       before do
-        allow_any_instance_of(CourseToLms).to receive(:get_all_canvas_assignments)
-          .with(any_args) # Accept any arguments
-          .and_return(canvas_assignments)
+        allow(CanvasFacade).to receive(:from_user).and_return(canvas_facade_double)
+        allow(canvas_facade_double).to receive(:get_all_assignments).and_return(canvas_assignments)
       end
 
       it 'can still perform the job' do

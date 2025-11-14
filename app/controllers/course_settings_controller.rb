@@ -17,6 +17,7 @@ class CourseSettingsController < ApplicationController
   \n\nBest regards,
   \n{{course_name}} Staff".freeze
 
+  # rubocop:disable Metrics/AbcSize
   def update
     @side_nav = 'course_settings'
     @course_settings = @course.course_settings || @course.build_course_settings
@@ -42,9 +43,11 @@ class CourseSettingsController < ApplicationController
       end
       redirect_to course_settings_path(@course, tab: params[:tab]), notice: 'Course settings updated successfully.'
     else
-      redirect_to course_settings_path(@course, tab: params[:tab]), alert: 'Failed to update course settings.'
+      flash[:alert] = "Failed to update course settings: #{@course_settings.errors.full_messages.to_sentence}"
+      redirect_to course_settings_path(@course, tab: params[:tab])
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   private
 
@@ -61,6 +64,8 @@ class CourseSettingsController < ApplicationController
       :auto_approve_days,
       :auto_approve_extended_request_days,
       :max_auto_approve,
+      :enable_gradescope,
+      :gradescope_course_url,
       :enable_emails,
       :reply_email,
       :email_subject,

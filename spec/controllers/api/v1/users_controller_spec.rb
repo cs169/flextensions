@@ -30,7 +30,7 @@ module API
           it 'returns an error when email is missing' do
             post :create, params: { email: '' }
 
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.parsed_body['message']).to eq('Failed to create user')
           end
 
@@ -38,7 +38,7 @@ module API
             # Assuming you add email format validation
             post :create, params: { email: 'invalid-email' }
 
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.parsed_body['message']).to eq('Failed to create user')
           end
         end

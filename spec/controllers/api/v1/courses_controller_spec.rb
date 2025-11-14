@@ -23,7 +23,7 @@ module API
             post :create, params: { course_name: existing_course.course_name }
 
             expect(Course.find_by(course_name: existing_course.course_name)).to be_present
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.parsed_body).to eq({ 'message' => 'A course with the same course name already exists.' })
           end
         end
@@ -71,7 +71,7 @@ module API
           it 'returns an error if the user is already associated with the course' do
             post :add_user, params: { course_id: test_course.id, user_id: test_user.id, role: 'student' }
             post :add_user, params: { course_id: test_course.id, user_id: test_user.id, role: 'student' }
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
             expect(response.parsed_body['error']).to eq('The user is already added to the course.')
           end
         end

@@ -98,7 +98,6 @@ class Request < ApplicationRecord
   end
 
   # Attempt to auto-approve by posting to the LMS.
-  # TODO: (Gradescope) figure out how this method should change.
   def try_auto_approval(_current_user)
     return false unless auto_approval_eligible_for_course?
     return false unless eligible_for_auto_approval?
@@ -107,7 +106,8 @@ class Request < ApplicationRecord
     approval_user.ensure_fresh_canvas_token!
     return false if approval_user.canvas_credentials.blank?
 
-    auto_approve(CanvasFacade.for_user(approval_user))
+    lms_facade_from_user = assignment.lms_facade.from_user(approval_user)
+    auto_approve(lms_facade_from_user)
   end
 
   def auto_approval_eligible_for_course?
@@ -132,30 +132,72 @@ class Request < ApplicationRecord
     auto_approved_count < max_approvals
   end
 
-  def auto_approve(canvas_facade)
+  def auto_approve(lms_facade_from_user)
     return false unless eligible_for_auto_approval?
 
     system_user = SystemUserService.ensure_auto_approval_user_exists
     return false unless system_user
 
     # Reuse the regular approve method but mark as auto-approved afterward
-    result = approve(canvas_facade, system_user)
+    result = approve(lms_facade_from_user, system_user)
     update(auto_approved: true) if result
     result
   end
 
-  # TODO: This is what should take in a LmsFacade
-  # These functions should be methods on the facade, rather than a request.
-  def approve(canvas_facade, processed_user_id)
-    existing_override = existing_override(canvas_facade)
+  # TODO: This code was most recently refactored using ChatGPT.
+  # It does correctly handle both Canvas and Gradescope, but the design
+  # is bad. Botth Facades should implement a common interface for extension provisioning.
+  def approve(lms_facade, processed_user_id)
+    begin
+      # Handle Canvas-style facades which expose overrides APIs
+      if lms_facade.respond_to?(:get_assignment_overrides)
+        overrides_response = lms_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
+        overrides = JSON.parse(overrides_response.body) rescue []
 
-    delete_override(canvas_facade, existing_override['id']) if existing_override
+        existing = overrides.find do |ov|
+          (ov['student_ids'] || ov[:student_ids]).map(&:to_s).include?(user.canvas_uid.to_s)
+        end
 
-    response = create_override(canvas_facade)
-    return false unless response.success?
+        if existing
+          # delete the existing override first
+          lms_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, existing['id'])
+        end
 
-    assignment_override = JSON.parse(response.body)
-    update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: assignment_override['id'])
+        create_response = lms_facade.create_assignment_override(
+          course.canvas_id,
+          assignment.external_assignment_id,
+          [ user.canvas_uid ],
+          "Extension for #{user.name}",
+          requested_due_date.iso8601,
+          nil,
+          nil
+        )
+
+        return false unless create_response&.success?
+
+        body = JSON.parse(create_response.body) rescue {}
+        external_id = body['id'] || body[:id]
+
+      # Handle other LMS facades that may provide a provision_extension helper
+      elsif lms_facade.respond_to?(:provision_extension)
+        override_obj = lms_facade.provision_extension(
+          course.canvas_id,
+          user.canvas_uid.to_i,
+          assignment.external_assignment_id,
+          requested_due_date.iso8601
+        )
+        external_id = override_obj&.id
+      else
+        # Unknown facade API
+        raise 'Unsupported LMS facade provided to Request#approve'
+      end
+
+    rescue => e
+      Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
+      return false
+    end
+
+    update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: external_id)
     send_email_response if course.course_settings&.enable_emails
     true
   end
@@ -167,8 +209,26 @@ class Request < ApplicationRecord
     true
   end
 
-  # app/models/request.rb
-  def send_email_response
+  # Based on this request, set the right 3 assignment dates
+  # Always keep the assignment release date the same
+  # Calculate the delta from the original due date to the requested due date
+  # Set the due date to the requested due date
+  # If the current (approval) time is beyond the requested due date,
+  #   then extend the requested due date by the delta with a max of 3 days
+  # If the flag EXTEND_LATE_DUE_DATE is set, then set the late due date to
+  #   the delta beyond the requested due date, otherwise keep it the same
+  # If the flag EXTEND_LATE_DUE_DATE is not set, ensure that the late due date
+  #   is at least as late as the requested due date
+  def calculate_new_assignment_dates
+    {
+      release_date: assignment_release_date,
+      due_date: requested_due_date,
+      late_due_date: late_due_date,
+      message: approval_message
+    }
+  end
+
+def send_email_response
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
@@ -217,25 +277,6 @@ class Request < ApplicationRecord
   end
 
   private
-
-  def existing_override(canvas_facade)
-    overrides_response = canvas_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
-    return nil unless overrides_response.success?
-
-    overrides = JSON.parse(overrides_response.body)
-    overrides.find { |override| override['student_ids'].map(&:to_i).include?(user.canvas_uid.to_i) }
-  end
-
-  def delete_override(canvas_facade, override_id)
-    canvas_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, override_id)
-  end
-
-  def create_override(canvas_facade)
-    canvas_facade.create_assignment_override(
-      course.canvas_id, assignment.external_assignment_id, [ user.canvas_uid ], "Extension for #{user.name}",
-      requested_due_date.iso8601, nil, nil
-    )
-  end
 
   def build_slack_message(type, link)
     case type

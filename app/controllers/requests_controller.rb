@@ -1,6 +1,9 @@
 require 'csv'
 
+# We really should get a handle on this.
+# rubocop:disable Metrics/ClassLength
 class RequestsController < ApplicationController
+  # Consider moving export, approve/reject to a separate controller?
   before_action :authenticate_user, except: [ :export ]
   before_action :set_course_role_from_settings, except: [ :export ]
   before_action :authenticate_course, except: [ :export ]
@@ -34,14 +37,15 @@ class RequestsController < ApplicationController
 
   def new
     @side_nav = 'form'
-    course_to_lms = @course.course_to_lms(1)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+    # course_to_lms = @course.course_to_lms(1)
+    course_to_lmss = @course.all_linked_lmss.pluck(:id)
+    return redirect_to courses_path, alert: 'No Canvas LMS data found for this course.' unless course_to_lmss.any?
 
     if @role == 'instructor'
-      prepare_instructor_new_request(course_to_lms)
+      prepare_instructor_new_request(course_to_lmss)
       render :new_for_student and return
     elsif @role == 'student'
-      redirected = prepare_student_new_request(course_to_lms)
+      redirected = prepare_student_new_request(course_to_lmss)
       return if redirected
 
       render :new and return
@@ -54,10 +58,10 @@ class RequestsController < ApplicationController
     @side_nav = 'form'
     return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.' unless @role == 'instructor'
 
-    course_to_lms = @course.course_to_lms(1)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lms
+    course_to_lmss = @course.all_linked_lmss.pluck(:id)
+    return redirect_to courses_path, alert: 'No Canvas LMS data found for this course.' unless course_to_lmss.any?
 
-    @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    @assignments = Assignment.enabled_for_course(course_to_lmss).order(:name)
     @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
     @request = @course.requests.new
   end
@@ -100,7 +104,7 @@ class RequestsController < ApplicationController
     if @request.save
       handle_successful_student_request(student)
     else
-      prepare_instructor_new_request(@course.course_to_lms(1))
+      prepare_instructor_new_request(@course.course_to_lms(1).id)
       flash.now[:alert] = 'There was a problem submitting the request.'
       render :new_for_student
     end
@@ -130,7 +134,9 @@ class RequestsController < ApplicationController
   end
 
   def approve
-    if @request.approve(CanvasFacade.new(@user.lms_credentials.first.token), @user)
+    @assignment = Assignment.find_by(id: @request.assignment_id)
+    lms_facade = @assignment.lms_facade
+    if @request.approve(lms_facade.from_user(@user), @user)
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
     else
       redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
@@ -222,14 +228,14 @@ class RequestsController < ApplicationController
     redirect_to result[:redirect_to], alert: result[:alert] if result != true
   end
 
-  def prepare_instructor_new_request(course_to_lms)
+  def prepare_instructor_new_request(course_to_lms_ids)
     @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)
     @request = @course.requests.new
-    @assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+    @assignments = Assignment.enabled_for_course(course_to_lms_ids).order(:name)
   end
 
-  def prepare_student_new_request(course_to_lms)
-    all_assignments = Assignment.enabled_for_course(course_to_lms.id).order(:name)
+  def prepare_student_new_request(course_to_lms_ids)
+    all_assignments = Assignment.enabled_for_course(course_to_lms_ids).order(:name)
     @assignments = all_assignments.reject { |assignment| assignment.has_pending_request_for_user?(@user, @course) }
     @has_pending = all_assignments.size != @assignments.size
     @selected_assignment = Assignment.find_by(id: params[:assignment_id]) if params[:assignment_id]
@@ -252,3 +258,4 @@ class RequestsController < ApplicationController
     redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
   end
 end
+# rubocop:enable Metrics/ClassLength

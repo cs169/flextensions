@@ -6,7 +6,7 @@ namespace :v1 do
     put 'add_user/:user_id', action: :add_user
     resources :lmss, only: [:create, :destroy, :index] do
       resources :assignments, only: [:create, :destroy, :index] do
-        resources :extensions, only: [:create, :destroy, :index]
+        resources :requests, only: [:create, :destroy, :index]
       end
     end
   end

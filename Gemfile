@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '~> 3.3.7'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 7.2'
+gem 'rails', '~> 7.2.3'
 
 # Use postgres for all env dbs
 gem 'pg'
@@ -44,6 +44,7 @@ gem 'json'
 
 # Used to make http requests.
 gem 'faraday'
+gem 'faraday-cookie_jar'
 
 # Used to allow dot notation of hashes.
 gem 'ostruct'

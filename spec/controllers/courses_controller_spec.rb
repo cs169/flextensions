@@ -5,6 +5,7 @@ RSpec.describe CoursesController, type: :controller do
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '456', course_code: 'TST101') }
   let(:course_to_lms) { CourseToLms.create!(course: course, external_course_id: '456', lms_id: 1) }
   let(:student_course) { Course.create!(course_name: 'Student Course', canvas_id: '789', course_code: 'STU101') }
+  let(:course_settings) { CourseSettings.create!(course: course, enable_extensions: true) }
 
   before do
     session[:user_id] = user.canvas_uid
@@ -40,6 +41,8 @@ RSpec.describe CoursesController, type: :controller do
       end
 
       it 'renders the shared role-based view with student template' do
+        # TODO: Refactor initial data setup to use factories
+        course_settings
         get :show, params: { id: course.id }
         expect(response).to render_template('courses/student_show')
       end

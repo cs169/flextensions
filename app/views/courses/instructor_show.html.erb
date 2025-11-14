@@ -7,7 +7,7 @@
       <%= render "shared/extension_status_warning", course: @course %>
 
       <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="assignments-table">
+        <table class="table table-bordered table-striped datatable" id="assignments-table">
           <thead>
             <tr class="table-info">
               <th style="min-width: 280px;">Assignment</th>
@@ -23,9 +23,7 @@
                 <td class="">
                   <div class="d-flex justify-content-between align-items-center">
                     <span><%= assignment.name %></span>
-                    <a href="<%= "#{ENV.fetch('CANVAS_URL', '')}/courses/#{@course.canvas_id}/assignments/#{assignment.external_assignment_id}" %>" target="_blank" class="text-nowrap ms-2">
-                      bCourses <i class="fas fa-up-right-from-square"></i>
-                    </a>
+                    <%= assignment_link_for(assignment, @course) %>
                   </div>
                 </td>
                 <td class="text-center"><%= assignment.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %></td>

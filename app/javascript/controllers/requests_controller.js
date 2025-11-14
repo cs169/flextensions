@@ -37,7 +37,7 @@ export default class extends Controller {
                                         text: 'All Requests',
                                         className: 'dropdown-item',
                                         action: function () {
-                                            const url = `https://flextensions-sandbox-bbbb505fb40a.herokuapp.com/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
+                                            const url = `https://${window.location.host}/courses/${courseId}/requests/export.csv?readonly_api_token=${readonlyToken}`;
                                             const formula = `=IMPORTDATA("${url}")`;
                                             navigator.clipboard.writeText(formula);
                                         }
