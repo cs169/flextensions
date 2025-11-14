@@ -24,7 +24,7 @@ class CoursesController < ApplicationController
 
     if @role == 'student'
       course_settings = @course.course_settings
-      return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' if !course_settings&.enable_extensions
+      return redirect_to courses_path, alert: 'Extensions are not enabled for this course.' unless course_settings&.enable_extensions
 
       @assignments = @course.enabled_assignments
     else
