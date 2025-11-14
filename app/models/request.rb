@@ -144,42 +144,11 @@ class Request < ApplicationRecord
     result
   end
 
-  # TODO: This code was most recently refactored using ChatGPT.
-  # It does correctly handle both Canvas and Gradescope, but the design
-  # is bad. Botth Facades should implement a common interface for extension provisioning.
+  # TODO: All of these code should really be moved to each LMS' facade class
   def approve(lms_facade, processed_user_id)
     begin
-      # Handle Canvas-style facades which expose overrides APIs
-      if lms_facade.respond_to?(:get_assignment_overrides)
-        overrides_response = lms_facade.get_assignment_overrides(course.canvas_id, assignment.external_assignment_id)
-        overrides = JSON.parse(overrides_response.body) rescue []
-
-        existing = overrides.find do |ov|
-          (ov['student_ids'] || ov[:student_ids]).map(&:to_s).include?(user.canvas_uid.to_s)
-        end
-
-        if existing
-          # delete the existing override first
-          lms_facade.delete_assignment_override(course.canvas_id, assignment.external_assignment_id, existing['id'])
-        end
-
-        create_response = lms_facade.create_assignment_override(
-          course.canvas_id,
-          assignment.external_assignment_id,
-          [ user.canvas_uid ],
-          "Extension for #{user.name}",
-          requested_due_date.iso8601,
-          nil,
-          nil
-        )
-
-        return false unless create_response&.success?
-
-        body = JSON.parse(create_response.body) rescue {}
-        external_id = body['id'] || body[:id]
-
       # Handle other LMS facades that may provide a provision_extension helper
-      elsif lms_facade.respond_to?(:provision_extension)
+      if lms_facade.respond_to?(:provision_extension)
         override_obj = lms_facade.provision_extension(
           course.canvas_id,
           user.canvas_uid.to_i,
@@ -194,6 +163,8 @@ class Request < ApplicationRecord
 
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
+      self.errors.add(:base, 'Failed to provision extension in LMS.')
+      self.errors.add(:base, e.message)
       return false
     end
 
