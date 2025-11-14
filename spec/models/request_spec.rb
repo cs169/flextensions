@@ -424,99 +424,55 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#approve' do
-    let(:canvas_facade) { instance_double(CanvasFacade) }
-    let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [].to_json) }
-    let(:create_response) { instance_double(Faraday::Response, success?: true, body: { 'id' => 'override-1' }.to_json) }
+    let(:lms_facade) { instance_double(CanvasFacade) }
+    let(:provisioned_override) { instance_double(Lmss::Canvas::Override, id: 'override-1') }
 
     before do
-      allow(canvas_facade).to receive_messages(get_assignment_overrides: overrides_response, create_assignment_override: create_response)
+      allow(lms_facade).to receive(:provision_extension).and_return(provisioned_override)
     end
 
-    it 'creates an override in Canvas' do
-      expect(canvas_facade).to receive(:create_assignment_override).with(
+    it 'provisions an extension through the LMS facade' do
+      request.approve(lms_facade, instructor)
+
+      expect(lms_facade).to have_received(:provision_extension).with(
         course.canvas_id,
+        user.canvas_uid.to_i,
         assignment.external_assignment_id,
-        [ user.canvas_uid ],
-        "Extension for #{user.name}",
-        request.requested_due_date.iso8601,
-        nil,
-        nil
+        request.requested_due_date.iso8601
       )
-
-      request.approve(canvas_facade, instructor)
     end
 
-    it 'updates the request status to approved' do
-      request.approve(canvas_facade, instructor)
+    it 'marks the request as approved and records metadata' do
+      expect(request.approve(lms_facade, instructor)).to eq(true)
+
       expect(request.status).to eq('approved')
-    end
-
-    it 'sets the last_processed_by_user_id' do
-      request.approve(canvas_facade, instructor)
       expect(request.last_processed_by_user_id).to eq(instructor.id)
-    end
-
-    it 'sets the external_extension_id' do
-      request.approve(canvas_facade, instructor)
       expect(request.external_extension_id).to eq('override-1')
     end
 
-    context 'when an existing override exists' do
-      let(:existing_override) { { 'id' => 'existing-override', 'student_ids' => [ user.canvas_uid.to_s ] } }
-      let(:overrides_response) { instance_double(Faraday::Response, success?: true, body: [ existing_override ].to_json) }
+    it 'allows nil overrides but still approves the request' do
+      allow(lms_facade).to receive(:provision_extension).and_return(nil)
 
-      before do
-        allow(canvas_facade).to receive(:delete_assignment_override).and_return(true)
-      end
-
-      it 'deletes the existing override first' do
-        expect(canvas_facade).to receive(:delete_assignment_override).with(
-          course.canvas_id,
-          assignment.external_assignment_id,
-          'existing-override'
-        )
-
-        request.approve(canvas_facade, instructor)
-      end
+      expect(request.approve(lms_facade, instructor)).to eq(true)
+      expect(request.external_extension_id).to be_nil
+      expect(request.status).to eq('approved')
     end
 
-    context 'when creating the override fails' do
-      let(:create_response) { instance_double(Faraday::Response, success?: false) }
+    it 'adds an error and returns false when provisioning fails' do
+      allow(lms_facade).to receive(:provision_extension).and_raise(StandardError.new('boom'))
 
-      it 'returns false' do
-        expect(request.approve(canvas_facade, instructor)).to be false
-      end
-
-      it 'does not update the request status' do
-        request.approve(canvas_facade, instructor)
-        expect(request.status).not_to eq('approved')
-      end
+      expect(request.approve(lms_facade, instructor)).to eq(false)
+      expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
+      expect(request.errors[:base]).to include('boom')
+      expect(request.status).to eq('pending')
     end
 
-    context 'when facade implements provision_extension' do
-      let(:provisioned_override) { OpenStruct.new(id: 'prov-1') }
-      let(:provision_only_facade_class) do
-        Class.new do
-          def initialize(result)
-            @result = result
-          end
+    it 'returns false and records an error when facade does not support provisioning' do
+      unsupported_facade = Object.new
 
-          def provision_extension(course_id, student_id, assignment_id, new_due_date)
-            @result
-          end
-        end
-      end
-
-      let(:prov_facade) do
-        provision_only_facade_class.new(provisioned_override)
-      end
-
-      it 'falls back to provision_extension and sets external_extension_id' do
-        request.approve(prov_facade, instructor)
-        expect(request.external_extension_id).to eq('prov-1')
-        expect(request.status).to eq('approved')
-        expect(request.last_processed_by_user_id).to eq(instructor.id)
-      end
+      expect(request.approve(unsupported_facade, instructor)).to eq(false)
+      expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
+      expect(request.errors[:base]).to include('Unsupported LMS facade provided to Request#approve')
     end
   end
 

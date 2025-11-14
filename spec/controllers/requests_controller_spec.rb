@@ -83,6 +83,9 @@ RSpec.describe RequestsController, type: :controller do
     end
 
     context 'with auto-approval enabled' do
+      let(:canvas_facade_double) { instance_double(CanvasFacade) }
+      let(:override_double) { instance_double(Lmss::Canvas::Override, id: 'override-1') }
+
       before do
         course.course_settings.update!(
           enable_extensions: true,
@@ -92,13 +95,9 @@ RSpec.describe RequestsController, type: :controller do
 
         assignment.update(due_date: 1.day.from_now)
 
-        # Mock Canvas facade
-        allow_any_instance_of(CanvasFacade).to receive(:get_assignment_overrides).and_return(
-          instance_double(Faraday::Response, success?: true, body: [].to_json)
-        )
-        allow_any_instance_of(CanvasFacade).to receive(:create_assignment_override).and_return(
-          instance_double(Faraday::Response, success?: true, body: { id: 'override-1' }.to_json)
-        )
+        allow(SystemUserService).to receive(:ensure_auto_approval_user_exists).and_return(instructor)
+        allow(CanvasFacade).to receive(:from_user).and_return(canvas_facade_double)
+        allow(canvas_facade_double).to receive(:provision_extension).and_return(override_double)
       end
 
       it 'auto-approves eligible requests' do
@@ -171,13 +170,7 @@ RSpec.describe RequestsController, type: :controller do
           auto_approved: true
         )
 
-        # Mock the process_created_request method
-        allow_any_instance_of(Request).to receive(:process_created_request).and_return(
-          {
-            redirect_to: course_request_path(course, 1),
-            notice: 'Your extension request has been submitted.'
-          }
-        )
+        allow_any_instance_of(Request).to receive(:process_created_request).and_call_original
 
         post :create, params: {
           course_id: course.id,
@@ -189,7 +182,8 @@ RSpec.describe RequestsController, type: :controller do
           }
         }
 
-        expect(response).to redirect_to(course_request_path(course, 1))
+        created_request = Request.order(:created_at).last
+        expect(response).to redirect_to(course_request_path(course, created_request))
         expect(flash[:notice]).to match(/submitted/)
       end
     end
