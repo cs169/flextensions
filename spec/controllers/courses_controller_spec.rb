@@ -41,6 +41,8 @@ RSpec.describe CoursesController, type: :controller do
       end
 
       it 'renders the shared role-based view with student template' do
+        # TODO: Refactor initial data setup to use factories
+        course.reload
         get :show, params: { id: course.id }
         expect(response).to render_template('courses/student_show')
       end
