@@ -443,7 +443,7 @@ RSpec.describe Request, type: :model do
     end
 
     it 'marks the request as approved and records metadata' do
-      expect(request.approve(lms_facade, instructor)).to eq(true)
+      expect(request.approve(lms_facade, instructor)).to be(true)
 
       expect(request.status).to eq('approved')
       expect(request.last_processed_by_user_id).to eq(instructor.id)
@@ -453,7 +453,7 @@ RSpec.describe Request, type: :model do
     it 'allows nil overrides but still approves the request' do
       allow(lms_facade).to receive(:provision_extension).and_return(nil)
 
-      expect(request.approve(lms_facade, instructor)).to eq(true)
+      expect(request.approve(lms_facade, instructor)).to be(true)
       expect(request.external_extension_id).to be_nil
       expect(request.status).to eq('approved')
     end
@@ -461,7 +461,7 @@ RSpec.describe Request, type: :model do
     it 'adds an error and returns false when provisioning fails' do
       allow(lms_facade).to receive(:provision_extension).and_raise(StandardError.new('boom'))
 
-      expect(request.approve(lms_facade, instructor)).to eq(false)
+      expect(request.approve(lms_facade, instructor)).to be(false)
       expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
       expect(request.errors[:base]).to include('boom')
       expect(request.status).to eq('pending')
@@ -470,7 +470,7 @@ RSpec.describe Request, type: :model do
     it 'returns false and records an error when facade does not support provisioning' do
       unsupported_facade = Object.new
 
-      expect(request.approve(unsupported_facade, instructor)).to eq(false)
+      expect(request.approve(unsupported_facade, instructor)).to be(false)
       expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
       expect(request.errors[:base]).to include('Unsupported LMS facade provided to Request#approve')
     end
