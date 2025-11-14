@@ -495,7 +495,21 @@ RSpec.describe Request, type: :model do
 
     context 'when facade implements provision_extension' do
       let(:provisioned_override) { OpenStruct.new(id: 'prov-1') }
-      let(:prov_facade) { double('LmsFacade', provision_extension: provisioned_override) }
+      let(:provision_only_facade_class) do
+        Class.new do
+          def initialize(result)
+            @result = result
+          end
+
+          def provision_extension(course_id, student_id, assignment_id, new_due_date)
+            @result
+          end
+        end
+      end
+
+      let(:prov_facade) do
+        provision_only_facade_class.new(provisioned_override)
+      end
 
       it 'falls back to provision_extension and sets external_extension_id' do
         request.approve(prov_facade, instructor)
