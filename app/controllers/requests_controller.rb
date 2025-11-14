@@ -39,7 +39,7 @@ class RequestsController < ApplicationController
     @side_nav = 'form'
     # course_to_lms = @course.course_to_lms(1)
     course_to_lmss = @course.all_linked_lmss.pluck(:id)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lmss.any?
+    return redirect_to courses_path, alert: 'No Canvas LMS data found for this course.' unless course_to_lmss.any?
 
     if @role == 'instructor'
       prepare_instructor_new_request(course_to_lmss)
@@ -59,7 +59,7 @@ class RequestsController < ApplicationController
     return redirect_to course_requests_path(@course), alert: 'You do not have permission to access this page.' unless @role == 'instructor'
 
     course_to_lmss = @course.all_linked_lmss.pluck(:id)
-    return redirect_to courses_path, alert: 'No LMS data found for this course.' unless course_to_lmss.any?
+    return redirect_to courses_path, alert: 'No Canvas LMS data found for this course.' unless course_to_lmss.any?
 
     @assignments = Assignment.enabled_for_course(course_to_lmss).order(:name)
     @students = User.joins(:user_to_courses).where(user_to_courses: { course_id: @course.id, role: 'student' }).order(:name)

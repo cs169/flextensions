@@ -35,6 +35,9 @@ class Course < ApplicationRecord
   validates :course_name, presence: true
   # validate :ensure_course_settings
 
+  # Always load the LMS integrations
+  default_scope { includes(:course_to_lmss) }
+
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
@@ -42,6 +45,18 @@ class Course < ApplicationRecord
 
   def all_linked_lmss
     CourseToLms.where(course_id: id)
+  end
+
+  def has_canvas_linked?
+    course_to_lms(1).present?
+  end
+
+  def assignments
+    Assignment.where(course_to_lms: course_to_lmss).order(:name)
+  end
+
+  def enabled_assignments
+    assignments.where(enabled: true)
   end
 
   # TODO: Replace this with staff_role?(user) or student_role?(user)
