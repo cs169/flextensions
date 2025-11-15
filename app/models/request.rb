@@ -147,20 +147,24 @@ class Request < ApplicationRecord
   # TODO: All of these code should really be moved to each LMS' facade class
   def approve(lms_facade, processed_user_id)
     begin
-      # Handle other LMS facades that may provide a provision_extension helper
-      if lms_facade.respond_to?(:provision_extension)
-        override_obj = lms_facade.provision_extension(
+      case lms_facade
+      when CanvasFacade
+        override = lms_facade.provision_extension(
           course.canvas_id,
           user.canvas_uid.to_i,
           assignment.external_assignment_id,
-          requested_due_date.iso8601
+          requested_due_date.iso8601,
+          nil
         )
-        external_id = override_obj&.id
-      else
-        # Unknown facade API
-        raise 'Unsupported LMS facade provided to Request#approve'
+      when GradescopeFacade
+        override = lms_facade.provision_extension(
+          course.gradescope_id,
+          user.email,  # use email as identifier for Gradescope
+          assignment.external_assignment_id,
+          requested_due_date.iso8601,
+          nil
+        )
       end
-
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
       self.errors.add(:base, 'Failed to provision extension in LMS.')
