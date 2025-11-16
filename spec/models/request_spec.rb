@@ -424,7 +424,7 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#approve' do
-    let(:lms_facade) { instance_double(CanvasFacade) }
+    let(:lms_facade) { CanvasFacade.new('fake_token') }
     let(:provisioned_override) { instance_double(Lmss::Canvas::Override, id: 'override-1') }
 
     before do
@@ -472,7 +472,45 @@ RSpec.describe Request, type: :model do
 
       expect(request.approve(unsupported_facade, instructor)).to be(false)
       expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
-      expect(request.errors[:base]).to include('Unsupported LMS facade provided to Request#approve')
+      expect(request.errors[:base].join(' ')).to include('Unsupported LMS Facade: Object')
+    end
+
+    context 'with Gradescope facade' do
+      let(:gradescope_facade) { GradescopeFacade.new }
+      let(:gs_override) { instance_double(Lmss::Gradescope::Override, id: 'gs-override-1') }
+
+      before do
+        # Link the course to Gradescope so course.gradescope_id is present
+        CourseToLms.create!(course: course, lms_id: GRADESCOPE_LMS_ID, external_course_id: 'gs-course-123')
+        allow(gradescope_facade).to receive(:provision_extension).and_return(gs_override)
+      end
+
+      it 'provisions an extension through Gradescope with email identifier' do
+        request.approve(gradescope_facade, instructor)
+
+        expect(gradescope_facade).to have_received(:provision_extension).with(
+          course.gradescope_id,
+          user.email,
+          assignment.external_assignment_id,
+          request.requested_due_date.iso8601
+        )
+      end
+
+      it 'marks the request as approved and records Gradescope metadata' do
+        expect(request.approve(gradescope_facade, instructor)).to be(true)
+
+        expect(request.status).to eq('approved')
+        expect(request.last_processed_by_user_id).to eq(instructor.id)
+        expect(request.external_extension_id).to eq('gs-override-1')
+      end
+
+      it 'allows nil override but still approves for Gradescope' do
+        allow(gradescope_facade).to receive(:provision_extension).and_return(nil)
+
+        expect(request.approve(gradescope_facade, instructor)).to be(true)
+        expect(request.external_extension_id).to be_nil
+        expect(request.status).to eq('approved')
+      end
     end
   end
 

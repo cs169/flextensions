@@ -1,7 +1,8 @@
 module Lmss
   module Gradescope
     class Override < BaseOverride
-      attr_reader :id
+      attr_reader :id, :student_id, :override_release_date,
+                  :override_due_date, :override_late_due_date
 
       def initialize(data)
         @id = parse_id(data['deletePath'])

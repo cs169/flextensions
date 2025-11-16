@@ -85,7 +85,9 @@ module Lmss
       private
 
       def handle_response(response)
-        case response.status
+        status = response.status
+
+        case status
         when 200..299
           response.body
         when 401, 403
@@ -93,7 +95,7 @@ module Lmss
         when 404
           raise Lmss::Gradescope::NotFoundError, 'Resource not found'
         else
-          raise Lmss::Gradescope::RequestError, "Request failed: #{response.code}"
+          raise Lmss::Gradescope::RequestError, "Request failed: #{status}"
         end
       end
     end
