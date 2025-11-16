@@ -154,6 +154,8 @@ class Request < ApplicationRecord
       when GradescopeFacade
         course_id = course.gradescope_id
         user_id = user.email
+      else
+        raise "Unsupported LMS Facade: #{lms_facade.class.name}"
       end
       override = lms_facade.provision_extension(
         course_id,
@@ -171,7 +173,7 @@ class Request < ApplicationRecord
     update(
       status: 'approved',
       last_processed_by_user_id: processed_user_id.id,
-      external_extension_id: override.id)
+      external_extension_id: override&.id)
     send_email_response if course.course_settings&.enable_emails
     true
   end

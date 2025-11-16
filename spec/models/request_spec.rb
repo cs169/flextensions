@@ -424,7 +424,7 @@ RSpec.describe Request, type: :model do
   end
 
   describe '#approve' do
-    let(:lms_facade) { instance_double(CanvasFacade) }
+    let(:lms_facade) { CanvasFacade.new('fake_token') }
     let(:provisioned_override) { instance_double(Lmss::Canvas::Override, id: 'override-1') }
 
     before do
@@ -472,7 +472,7 @@ RSpec.describe Request, type: :model do
 
       expect(request.approve(unsupported_facade, instructor)).to be(false)
       expect(request.errors[:base]).to include('Failed to provision extension in LMS.')
-      expect(request.errors[:base]).to include('Unsupported LMS facade provided to Request#approve')
+      expect(request.errors[:base].join(' ')).to include('Unsupported LMS Facade: Object')
     end
   end
 
