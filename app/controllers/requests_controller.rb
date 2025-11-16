@@ -139,7 +139,8 @@ class RequestsController < ApplicationController
     if @request.approve(lms_facade.from_user(@user), @user)
       redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to approve the request.'
+      flash[:alert] = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
+      redirect_to course_requests_path(@course)
     end
   end
 

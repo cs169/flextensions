@@ -149,22 +149,18 @@ class Request < ApplicationRecord
     begin
       case lms_facade
       when CanvasFacade
-        override = lms_facade.provision_extension(
-          course.canvas_id,
-          user.canvas_uid.to_i,
-          assignment.external_assignment_id,
-          requested_due_date.iso8601,
-          nil
-        )
+        course_id = course.canvas_id
+        user_id = user.canvas_uid.to_i
       when GradescopeFacade
-        override = lms_facade.provision_extension(
-          course.gradescope_id,
-          user.email,  # use email as identifier for Gradescope
-          assignment.external_assignment_id,
-          requested_due_date.iso8601,
-          nil
-        )
+        course_id = course.gradescope_id
+        user_id = user.email
       end
+      override = lms_facade.provision_extension(
+        course_id,
+        user_id,
+        assignment.external_assignment_id,
+        requested_due_date.iso8601
+      )
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
       self.errors.add(:base, 'Failed to provision extension in LMS.')
@@ -172,7 +168,10 @@ class Request < ApplicationRecord
       return false
     end
 
-    update(status: 'approved', last_processed_by_user_id: processed_user_id.id, external_extension_id: external_id)
+    update(
+      status: 'approved',
+      last_processed_by_user_id: processed_user_id.id,
+      external_extension_id: override.id)
     send_email_response if course.course_settings&.enable_emails
     true
   end

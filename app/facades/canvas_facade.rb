@@ -332,8 +332,10 @@ class CanvasFacade < LmsFacade
     end
 
     curr_override = fetch_existing_override(course_id, student_id, assignment_id)
-    handle_response = handle_override_logic(course_id, curr_override, student_id, assignment_id, override_title,
-new_due_date)
+    handle_response = handle_override_logic(
+      course_id, curr_override, student_id, assignment_id, override_title,
+      new_due_date
+    )
     Lmss::Canvas::Override.new(parse_create_response(handle_response))
   end
 
