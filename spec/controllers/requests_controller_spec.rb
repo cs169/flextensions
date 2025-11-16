@@ -83,7 +83,7 @@ RSpec.describe RequestsController, type: :controller do
     end
 
     context 'with auto-approval enabled' do
-      let(:canvas_facade_double) { instance_double(CanvasFacade) }
+      let(:canvas_facade_instance) { CanvasFacade.new('fake_token') }
       let(:override_double) { instance_double(Lmss::Canvas::Override, id: 'override-1') }
 
       before do
@@ -96,8 +96,8 @@ RSpec.describe RequestsController, type: :controller do
         assignment.update(due_date: 1.day.from_now)
 
         allow(SystemUserService).to receive(:ensure_auto_approval_user_exists).and_return(instructor)
-        allow(CanvasFacade).to receive(:from_user).and_return(canvas_facade_double)
-        allow(canvas_facade_double).to receive(:provision_extension).and_return(override_double)
+        allow(CanvasFacade).to receive(:from_user).and_return(canvas_facade_instance)
+        allow(canvas_facade_instance).to receive(:provision_extension).and_return(override_double)
       end
 
       it 'auto-approves eligible requests' do
