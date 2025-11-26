@@ -104,7 +104,7 @@ class GradescopeFacade < LmsFacade
 
       student_data = students_data['students'].find { |s| s['email'] == student_email }
       unless student_data
-        Rails.logger.error "Failed to fetch assignment extensions: No response for student #{student_email}"
+        Rails.logger.error "Failed to fetch assignment extensions: Student #{student_email} not found"
         return nil
       end
       student_id = student_data['id']

@@ -1,7 +1,8 @@
 require 'faraday'
 require 'faraday-cookie_jar'
-
 require 'nokogiri'
+
+require_relative 'error'
 
 module Lmss
   module Gradescope
@@ -91,11 +92,11 @@ module Lmss
         when 200..299
           response.body
         when 401, 403
-          raise Lmss::Gradescope::AuthenticationError, 'Authentication required'
+          raise AuthenticationErrors, 'Authentication required'
         when 404
-          raise Lmss::Gradescope::NotFoundError, 'Resource not found'
+          raise NotFoundError, 'Resource not found'
         else
-          raise Lmss::Gradescope::RequestError, "Request failed: #{status}"
+          raise RequestError, "Request failed: #{status}"
         end
       end
     end
