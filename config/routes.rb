@@ -9,11 +9,18 @@ Rails.application.routes.draw do
   # end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  root "home#index"
+
+  get '/help', to: redirect('https://berkeley-cdss.github.io/flextensions/')
 
   get 'status/health_check', to: 'status#health_check'
   get 'status/version', to: 'status#version'
 
-  root "home#index"
+  # Authentication routes
+  match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
+  get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
+  get '/logout', to: 'session#logout', as: :logout
+
   get '/courses', to: 'courses#index', as: 'courses'
   get '/courses/new', to: 'courses#new', as: :new_course
   get '/courses/:id', to: 'courses#show', as: :course
@@ -54,11 +61,6 @@ Rails.application.routes.draw do
       patch :toggle_enabled
     end
   end
-
-  # Authentication routes
-  match "/auth/:provider/callback", to: "session#omniauth_callback", as: :omniauth_callback, via: [:get, :post]
-  get "/auth/failure", to: "session#omniauth_failure", as: "omniauth_failure"
-  get '/logout', to: 'session#logout', as: :logout
 
   namespace :api do
     draw('api/v1')
