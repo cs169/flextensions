@@ -104,27 +104,31 @@
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_gradescope]', false %>
-                                        <%= check_box_tag 'course_settings[enable_gradescope]', 
-                                                         true, 
-                                                         @course.course_settings&.enable_gradescope, 
-                                                         class: 'form-check-input', 
+                                        <%= check_box_tag 'course_settings[enable_gradescope]',
+                                                         true,
+                                                         @course.course_settings&.enable_gradescope,
+                                                         class: 'form-check-input',
                                                          id: 'enable-gradescope' %>
                                         <label class="form-check-label" for="enable-gradescope">Link Gradescope course</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row border-bottom pb-3">
                                     <label for="gradescope-course-url" class="col-sm-4 col-form-label">Course's Gradescope URL</label>
                                     <div class="col-sm-8">
-                                        <%= url_field_tag 'course_settings[gradescope_course_url]', 
-                                                          @course.course_settings&.gradescope_course_url, 
-                                                          class: 'form-control', 
-                                                          id: 'gradescope-course-url', 
+                                        <%= url_field_tag 'course_settings[gradescope_course_url]',
+                                                          @course.course_settings&.gradescope_course_url,
+                                                          class: 'form-control',
+                                                          id: 'gradescope-course-url',
                                                           placeholder: 'https://www.gradescope.com/courses/123456',
                                                           data: { course_settings_target: "gradescopeField" },
                                                           disabled: !@course.course_settings&.enable_gradescope,
                                                           pattern: 'https://(www\.)?gradescope\.com/courses/\d+/?',
                                                           title: 'Must be a valid Gradescope course URL (e.g. https://www.gradescope.com/courses/123456)' %>
+                                            <small class="text-muted">
+                                            Please invite the user <code>gradescope-bot@berkeley.edu</code> as a TA to your Gradescope course for integration to work.
+                                        </small>
+
                                     </div>
                                 </div>
 
