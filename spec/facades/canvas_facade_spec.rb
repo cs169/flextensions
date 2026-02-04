@@ -361,6 +361,38 @@ describe CanvasFacade do
       expect(result).to be_a(Lmss::Canvas::Override)
     end
 
+    it 'uses the due date for lock_at when late due date is not provided' do
+      expect(facade).to receive(:create_assignment_override).with(
+        course_id, assignment_id, [ student_id ],
+        "#{student_id} extended to #{mock_date}",
+        mock_date, mock_date, mock_date
+      ).and_return(create_success_response)
+
+      facade.provision_extension(
+        course_id,
+        student_id,
+        assignment_id,
+        mock_date
+      )
+    end
+
+    it 'uses the late due date for lock_at when provided' do
+      late_due_date = '2002-03-20T16:00:00Z'
+      expect(facade).to receive(:create_assignment_override).with(
+        course_id, assignment_id, [ student_id ],
+        "#{student_id} extended to #{mock_date}",
+        mock_date, mock_date, late_due_date
+      ).and_return(create_success_response)
+
+      facade.provision_extension(
+        course_id,
+        student_id,
+        assignment_id,
+        mock_date,
+        late_due_date
+      )
+    end
+
     it 'throws a pipeline error if the creation response body is improperly formatted' do
       allow(facade).to receive(:create_assignment_override).and_return(create_invalid_json_response)
       expect do
@@ -404,6 +436,29 @@ describe CanvasFacade do
         student_id,
         assignment_id,
         mock_date
+      )
+    end
+
+    it 'passes late due date to update when updating existing override' do
+      late_due_date = '2002-03-20T16:00:00Z'
+      allow(facade).to receive(:create_assignment_override).and_return(create_taken_response)
+      expect(facade).to receive(:get_existing_student_override).twice.and_return(OpenStruct.new(mock_override))
+      expect(facade).to receive(:update_assignment_override).with(
+        course_id,
+        assignment_id,
+        mock_override[:id],
+        mock_override[:student_ids],
+        "#{student_id} extended to #{mock_date}",
+        mock_date,
+        mock_date,
+        late_due_date
+      ).and_return(instance_double(Faraday::Response, body: '{}'))
+      facade.provision_extension(
+        course_id,
+        student_id,
+        assignment_id,
+        mock_date,
+        late_due_date
       )
     end
 

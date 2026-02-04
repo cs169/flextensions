@@ -145,6 +145,22 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3 border-bottom pb-3">
+                                    <div class="form-check form-switch">
+                                        <%= hidden_field_tag 'course_settings[extend_late_due_date]', false %>
+                                        <%= check_box_tag 'course_settings[extend_late_due_date]',
+                                                         true,
+                                                         @course.course_settings&.extend_late_due_date.nil? ? true : @course.course_settings&.extend_late_due_date,
+                                                         class: 'form-check-input',
+                                                         id: 'extend-late-due-date' %>
+                                        <label class="form-check-label" for="extend-late-due-date">Extend Late Due Date Automatically</label>
+                                    </div>
+                                    <small class="text-muted">
+                                        When enabled, the late due date (if present) will be shifted by the same amount as the extension.
+                                        When disabled, the new late due date will be set to the later of the original late due date and the extended due date.
+                                    </small>
+                                </div>
+
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_emails]', false %>

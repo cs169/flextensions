@@ -165,11 +165,14 @@ class Request < ApplicationRecord
       else
         raise "Unsupported LMS Facade: #{lms_facade.class.name}"
       end
+
+      new_late_due_date = calculate_new_late_due_date
       override = lms_facade.provision_extension(
         course_id,
         user_id,
         assignment.external_assignment_id,
-        requested_due_date.iso8601
+        requested_due_date.iso8601,
+        new_late_due_date&.iso8601
       )
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
@@ -184,6 +187,30 @@ class Request < ApplicationRecord
       external_extension_id: override&.id)
     send_email_response if course.course_settings&.enable_emails
     true
+  end
+
+  # Calculates the new late due date for an extension based on course settings.
+  # Returns nil if the assignment has no late due date.
+  # If extend_late_due_date setting is true (default), shifts the late due date
+  # by the same delta as the extension.
+  # If extend_late_due_date setting is false, returns the later of the original
+  # late due date and the new extended due date.
+  def calculate_new_late_due_date
+    original_late_due_date = assignment.late_due_date
+    return nil if original_late_due_date.blank?
+
+    extend_late_due_date = course.course_settings&.extend_late_due_date
+    # Default to true if setting is nil (for backwards compatibility)
+    extend_late_due_date = true if extend_late_due_date.nil?
+
+    if extend_late_due_date
+      # Shift the late due date by the same delta as the extension
+      extension_delta = requested_due_date - assignment.due_date
+      original_late_due_date + extension_delta
+    else
+      # Return the later of the original late due date and the new extended due date
+      [ original_late_due_date, requested_due_date ].max
+    end
   end
 
   def reject(processed_user_id)

@@ -540,14 +540,30 @@ RSpec.describe Request, type: :model do
       allow(lms_facade).to receive(:provision_extension).and_return(provisioned_override)
     end
 
-    it 'provisions an extension through the LMS facade' do
+    it 'provisions an extension through the LMS facade with late due date' do
+      allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
       request.approve(lms_facade, instructor)
 
       expect(lms_facade).to have_received(:provision_extension).with(
         course.canvas_id,
         user.canvas_uid.to_i,
         assignment.external_assignment_id,
-        request.requested_due_date.iso8601
+        request.requested_due_date.iso8601,
+        nil
+      )
+    end
+
+    it 'passes calculated late due date to the LMS facade' do
+      late_due_date = 5.days.from_now
+      allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
+      request.approve(lms_facade, instructor)
+
+      expect(lms_facade).to have_received(:provision_extension).with(
+        course.canvas_id,
+        user.canvas_uid.to_i,
+        assignment.external_assignment_id,
+        request.requested_due_date.iso8601,
+        late_due_date.iso8601
       )
     end
 
@@ -594,18 +610,35 @@ RSpec.describe Request, type: :model do
         allow(gradescope_facade).to receive(:provision_extension).and_return(gs_override)
       end
 
-      it 'provisions an extension through Gradescope with email identifier' do
+      it 'provisions an extension through Gradescope with email identifier and late due date' do
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
         request.approve(gradescope_facade, instructor)
 
         expect(gradescope_facade).to have_received(:provision_extension).with(
           course.gradescope_id,
           user.email,
           assignment.external_assignment_id,
-          request.requested_due_date.iso8601
+          request.requested_due_date.iso8601,
+          nil
+        )
+      end
+
+      it 'passes calculated late due date to Gradescope facade' do
+        late_due_date = 5.days.from_now
+        allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
+        request.approve(gradescope_facade, instructor)
+
+        expect(gradescope_facade).to have_received(:provision_extension).with(
+          course.gradescope_id,
+          user.email,
+          assignment.external_assignment_id,
+          request.requested_due_date.iso8601,
+          late_due_date.iso8601
         )
       end
 
       it 'marks the request as approved and records Gradescope metadata' do
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
         expect(request.approve(gradescope_facade, instructor)).to be(true)
 
         expect(request.status).to eq('approved')
@@ -615,6 +648,7 @@ RSpec.describe Request, type: :model do
 
       it 'allows nil override but still approves for Gradescope' do
         allow(gradescope_facade).to receive(:provision_extension).and_return(nil)
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
 
         expect(request.approve(gradescope_facade, instructor)).to be(true)
         expect(request.external_extension_id).to be_nil
@@ -632,6 +666,139 @@ RSpec.describe Request, type: :model do
     it 'sets the last_processed_by_user_id' do
       request.reject(instructor)
       expect(request.last_processed_by_user_id).to eq(instructor.id)
+    end
+  end
+
+  describe '#calculate_new_late_due_date' do
+    let(:original_due_date) { Time.zone.parse('2025-01-15 23:59:00') }
+    let(:original_late_due_date) { Time.zone.parse('2025-01-17 23:59:00') }
+    let(:requested_due_date) { Time.zone.parse('2025-01-18 23:59:00') }
+
+    let(:assignment_with_late_due_date) do
+      Assignment.create!(
+        name: 'Assignment with Late Due Date',
+        course_to_lms_id: course.course_to_lms(1).id,
+        external_assignment_id: 'ext2',
+        enabled: true,
+        due_date: original_due_date,
+        late_due_date: original_late_due_date
+      )
+    end
+
+    let(:assignment_without_late_due_date) do
+      Assignment.create!(
+        name: 'Assignment without Late Due Date',
+        course_to_lms_id: course.course_to_lms(1).id,
+        external_assignment_id: 'ext3',
+        enabled: true,
+        due_date: original_due_date,
+        late_due_date: nil
+      )
+    end
+
+    let(:request_with_late_due_date) do
+      described_class.create!(
+        user: user,
+        course: course,
+        assignment: assignment_with_late_due_date,
+        reason: 'Need more time',
+        requested_due_date: requested_due_date
+      )
+    end
+
+    let(:request_without_late_due_date) do
+      described_class.create!(
+        user: user,
+        course: course,
+        assignment: assignment_without_late_due_date,
+        reason: 'Need more time',
+        requested_due_date: requested_due_date
+      )
+    end
+
+    context 'when assignment has no late due date' do
+      it 'returns nil' do
+        expect(request_without_late_due_date.calculate_new_late_due_date).to be_nil
+      end
+    end
+
+    context 'when extend_late_due_date setting is true (default)' do
+      before do
+        CourseSettings.create!(
+          course: course,
+          enable_extensions: true,
+          extend_late_due_date: true
+        )
+      end
+
+      it 'shifts the late due date by the same delta as the extension' do
+        # Original due date: Jan 15, Late due date: Jan 17 (2 days later)
+        # Extension delta: Jan 18 - Jan 15 = 3 days
+        # New late due date: Jan 17 + 3 days = Jan 20
+        result = request_with_late_due_date.calculate_new_late_due_date
+        expected = Time.zone.parse('2025-01-20 23:59:00')
+        expect(result).to be_within(1.second).of(expected)
+      end
+    end
+
+    context 'when extend_late_due_date setting is false' do
+      before do
+        CourseSettings.create!(
+          course: course,
+          enable_extensions: true,
+          extend_late_due_date: false
+        )
+      end
+
+      context 'when original late due date is later than extended due date' do
+        let(:requested_due_date) { Time.zone.parse('2025-01-16 23:59:00') }
+
+        it 'returns the original late due date' do
+          # Extended due date (Jan 16) is before late due date (Jan 17)
+          # So return the original late due date
+          result = request_with_late_due_date.calculate_new_late_due_date
+          expect(result).to eq(original_late_due_date)
+        end
+      end
+
+      context 'when extended due date is later than original late due date' do
+        let(:requested_due_date) { Time.zone.parse('2025-01-20 23:59:00') }
+
+        it 'returns the extended due date' do
+          # Extended due date (Jan 20) is after late due date (Jan 17)
+          # So return the extended due date
+          result = request_with_late_due_date.calculate_new_late_due_date
+          expect(result).to eq(requested_due_date)
+        end
+      end
+    end
+
+    context 'when extend_late_due_date setting is nil (defaults to true)' do
+      before do
+        # Create settings without explicitly setting extend_late_due_date
+        # This simulates existing courses before the migration
+        cs = CourseSettings.create!(
+          course: course,
+          enable_extensions: true
+        )
+        # Manually set to nil to simulate pre-migration state
+        cs.update_column(:extend_late_due_date, nil)
+      end
+
+      it 'defaults to shifting the late due date by the extension delta' do
+        result = request_with_late_due_date.calculate_new_late_due_date
+        expected = Time.zone.parse('2025-01-20 23:59:00')
+        expect(result).to be_within(1.second).of(expected)
+      end
+    end
+
+    context 'when course has no course settings' do
+      it 'defaults to shifting the late due date (extend_late_due_date = true behavior)' do
+        # No course settings means nil, which defaults to true
+        result = request_with_late_due_date.calculate_new_late_due_date
+        expected = Time.zone.parse('2025-01-20 23:59:00')
+        expect(result).to be_within(1.second).of(expected)
+      end
     end
   end
 

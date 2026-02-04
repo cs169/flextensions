@@ -66,6 +66,7 @@ class CourseSettingsController < ApplicationController
       :max_auto_approve,
       :enable_gradescope,
       :gradescope_course_url,
+      :extend_late_due_date,
       :enable_emails,
       :reply_email,
       :email_subject,

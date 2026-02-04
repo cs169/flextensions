@@ -163,4 +163,38 @@ RSpec.describe CourseSettings, type: :model do
       expect(course_settings.extract_gradescope_course_id(url)).to eq('456789')
     end
   end
+
+  describe 'extend_late_due_date setting' do
+    it 'defaults to true for new course settings' do
+      new_course = create(:course, canvas_id: 'canvas_new', course_name: 'New Course', course_code: 'NEW101')
+      new_settings = CourseSettings.create!(course: new_course)
+      expect(new_settings.extend_late_due_date).to be true
+    end
+
+    it 'can be set to false' do
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be false
+    end
+
+    it 'can be toggled from true to false' do
+      course_settings.extend_late_due_date = true
+      course_settings.save!
+      expect(course_settings.extend_late_due_date).to be true
+
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be false
+    end
+
+    it 'can be toggled from false to true' do
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.extend_late_due_date).to be false
+
+      course_settings.extend_late_due_date = true
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be true
+    end
+  end
 end
