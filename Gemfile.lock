@@ -110,7 +110,7 @@ GEM
       safely_block (>= 0.4)
     bootsnap (1.21.1)
       msgpack (~> 1.2)
-    bootstrap (5.3.5)
+    bootstrap (5.3.8)
       popper_js (>= 2.11.8, < 3)
     brakeman (7.1.2)
       racc
@@ -607,7 +607,7 @@ DEPENDENCIES
   axe-core-rspec
   blazer
   bootsnap
-  bootstrap (~> 5.3.3)
+  bootstrap (~> 5.3.8)
   brakeman
   capybara-screenshot
   codeclimate-test-reporter
