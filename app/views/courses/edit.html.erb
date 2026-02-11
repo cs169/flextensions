@@ -126,8 +126,21 @@
                                                           pattern: 'https://(www\.)?gradescope\.com/courses/\d+/?',
                                                           title: 'Must be a valid Gradescope course URL (e.g. https://www.gradescope.com/courses/123456)' %>
                                             <small class="text-muted">
-                                            Please invite the user <code>gradescope-bot@berkeley.edu</code> as a TA to your Gradescope course for integration to work.
-                                        </small>
+                                                Please invite the user <code class="js-copytext">gradescope-bot@berkeley.edu</code>
+                                                <button class="btn btn-sm btn-link p-0 ms-2" data-action="click->course-settings#copyToClipboard"title="Copy to clipboard"><i class="fas fa-clipboard"></i></button> as a TA to your Gradescope course for integration to work.
+                                            </small>
+                                            <script>
+                                              document.querySelectorAll('.js-copytext').forEach(el => {
+                                                el.closest('small').querySelector('[data-action*="copyToClipboard"]')?.addEventListener('click', function(e) {
+                                                  e.preventDefault();
+                                                  navigator.clipboard.writeText(el.textContent);
+                                                  this.innerHTML = '<i class="fas fa-check"></i>';
+                                                  setTimeout(() => {
+                                                    this.innerHTML = '<i class="fas fa-clipboard"></i>';
+                                                  }, 2000);
+                                                });
+                                              });
+                                            </script>
 
                                     </div>
                                 </div>
