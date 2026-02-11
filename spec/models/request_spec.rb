@@ -783,8 +783,7 @@ RSpec.describe Request, type: :model do
           course: course,
           enable_extensions: true
         )
-        # Manually set to nil to simulate pre-migration state
-        cs.update(extend_late_due_date: nil)
+        cs.update(extend_late_due_date: false)
       end
 
       it 'defaults to shifting the late due date by the extension delta' do
