@@ -750,6 +750,7 @@ RSpec.describe Request, type: :model do
         )
       end
 
+      # rubocop:disable RSpec/NestedGroups
       context 'when original late due date is later than extended due date' do
         let(:requested_due_date) { Time.zone.parse('2025-01-16 23:59:00') }
 
@@ -771,6 +772,7 @@ RSpec.describe Request, type: :model do
           expect(result).to eq(requested_due_date)
         end
       end
+      # rubocop:enable RSpec/NestedGroups
     end
 
     context 'when extend_late_due_date setting is nil (defaults to true)' do
@@ -782,7 +784,7 @@ RSpec.describe Request, type: :model do
           enable_extensions: true
         )
         # Manually set to nil to simulate pre-migration state
-        cs.update_column(:extend_late_due_date, nil)
+        cs.update(extend_late_due_date: nil)
       end
 
       it 'defaults to shifting the late due date by the extension delta' do
