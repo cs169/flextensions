@@ -36,7 +36,6 @@
                 <%= hidden_field_tag :course_id, @course.id %>
                 <%= hidden_field_tag :tab, params[:tab] || 'general' %>
                 <div class="tab-content" id="courses-tabContent">
-                    <!-- General Settings Card -->
                     <div class="tab-pane fade <%= params[:tab] == 'email' ? '' : 'show active' %>" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light">
@@ -87,7 +86,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3 row border-bottom pb-3">
+                                <div class="mb-3 row pb-3">
                                     <label for="max-auto-approve" class="col-sm-4 col-form-label">Maximum requests to auto approve</label>
                                     <div class="col-sm-8">
                                         <%= number_field_tag 'course_settings[max_auto_approve]',
@@ -99,6 +98,23 @@
                                                            placeholder: 'Number' %>
                                         <small class="text-muted">This limit applies per student per course. Set to zero for no limit on auto-approved requests.</small>
                                     </div>
+                                </div>
+
+
+                                <div class="mb-3 border-bottom pb-3">
+                                    <div class="form-check form-switch">
+                                        <%= hidden_field_tag 'course_settings[extend_late_due_date]', false %>
+                                        <%= check_box_tag 'course_settings[extend_late_due_date]',
+                                                         true,
+                                                         @course.course_settings&.extend_late_due_date.nil? ? true : @course.course_settings&.extend_late_due_date,
+                                                         class: 'form-check-input',
+                                                         id: 'extend-late-due-date' %>
+                                        <label class="form-check-label" for="extend-late-due-date">Extend Late Due Date Automatically</label>
+                                    </div>
+                                    <small class="text-muted">
+                                        When enabled, the late due date (if present) will be shifted by the same amount as the extension.
+                                        When disabled, the new late due date will be set to the later of the original late due date and the extended due date.
+                                    </small>
                                 </div>
 
                                 <div class="mb-3">
@@ -143,22 +159,6 @@
                                             </script>
 
                                     </div>
-                                </div>
-
-                                <div class="mb-3 border-bottom pb-3">
-                                    <div class="form-check form-switch">
-                                        <%= hidden_field_tag 'course_settings[extend_late_due_date]', false %>
-                                        <%= check_box_tag 'course_settings[extend_late_due_date]',
-                                                         true,
-                                                         @course.course_settings&.extend_late_due_date.nil? ? true : @course.course_settings&.extend_late_due_date,
-                                                         class: 'form-check-input',
-                                                         id: 'extend-late-due-date' %>
-                                        <label class="form-check-label" for="extend-late-due-date">Extend Late Due Date Automatically</label>
-                                    </div>
-                                    <small class="text-muted">
-                                        When enabled, the late due date (if present) will be shifted by the same amount as the extension.
-                                        When disabled, the new late due date will be set to the later of the original late due date and the extended due date.
-                                    </small>
                                 </div>
 
                                 <div class="mb-3">
