@@ -361,11 +361,11 @@ describe CanvasFacade do
       expect(result).to be_a(Lmss::Canvas::Override)
     end
 
-    it 'uses the due date for lock_at when late due date is not provided' do
+    it 'passes nil for close_date (lock_at) when late due date is not provided' do
       expect(facade).to receive(:create_assignment_override).with(
         course_id, assignment_id, [ student_id ],
         "#{student_id} extended to #{mock_date}",
-        mock_date, mock_date, mock_date
+        mock_date, mock_date, nil
       ).and_return(create_success_response)
 
       facade.provision_extension(
@@ -376,12 +376,12 @@ describe CanvasFacade do
       )
     end
 
-    it 'uses the late due date for lock_at when provided' do
-      late_due_date = '2002-03-20T16:00:00Z'
+    it 'uses the close_date (late due date) for lock_at when provided' do
+      close_date = '2002-03-20T16:00:00Z'
       expect(facade).to receive(:create_assignment_override).with(
         course_id, assignment_id, [ student_id ],
         "#{student_id} extended to #{mock_date}",
-        mock_date, mock_date, late_due_date
+        mock_date, mock_date, close_date
       ).and_return(create_success_response)
 
       facade.provision_extension(
@@ -389,7 +389,7 @@ describe CanvasFacade do
         student_id,
         assignment_id,
         mock_date,
-        late_due_date
+        close_date
       )
     end
 
@@ -429,7 +429,7 @@ describe CanvasFacade do
         "#{student_id} extended to #{mock_date}",
         mock_date,
         mock_date,
-        mock_date
+        nil
       ).and_return(instance_double(Faraday::Response, body: '{}'))
       facade.provision_extension(
         course_id,
@@ -439,8 +439,8 @@ describe CanvasFacade do
       )
     end
 
-    it 'passes late due date to update when updating existing override' do
-      late_due_date = '2002-03-20T16:00:00Z'
+    it 'passes close_date to update when updating existing override' do
+      close_date = '2002-03-20T16:00:00Z'
       allow(facade).to receive(:create_assignment_override).and_return(create_taken_response)
       expect(facade).to receive(:get_existing_student_override).twice.and_return(OpenStruct.new(mock_override))
       expect(facade).to receive(:update_assignment_override).with(
@@ -451,14 +451,14 @@ describe CanvasFacade do
         "#{student_id} extended to #{mock_date}",
         mock_date,
         mock_date,
-        late_due_date
+        close_date
       ).and_return(instance_double(Faraday::Response, body: '{}'))
       facade.provision_extension(
         course_id,
         student_id,
         assignment_id,
         mock_date,
-        late_due_date
+        close_date
       )
     end
 

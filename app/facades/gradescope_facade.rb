@@ -87,7 +87,7 @@ class GradescopeFacade < LmsFacade
   # @param   [String] email of student to provision the extension for.
   # @param   [String] assignmentId the assignment the extension should be provisioned for.
   # @param   [String] newDueDate the date the assignment should be due.
-  # @param   [String] newLateDueDate the hard due date (optional, defaults to newDueDate).
+  # @param   [String] newLateDueDate the late due date (optional, nil means no late due date set).
   # @return  [Lmss::Gradescope::BaseExtension] the extension that was provisioned.
   def provision_extension(course_id, student_email, assignment_id, new_due_date, new_late_due_date = nil)
     ensure_authenticated!
@@ -124,12 +124,13 @@ class GradescopeFacade < LmsFacade
           'type' => 'absolute',
           'value' => new_due_date
         }
-        # Use the late due date for hard_due_date (Gradescope API field) if provided, otherwise fall back to the due date
-        late_due_date = new_late_due_date || new_due_date
-        request_payload['override']['settings']['hard_due_date'] = {
-          'type' => 'absolute',
-          'value' => late_due_date
-        }
+        # Only set hard_due_date (late due date) if explicitly provided
+        if new_late_due_date
+          request_payload['override']['settings']['hard_due_date'] = {
+            'type' => 'absolute',
+            'value' => new_late_due_date
+          }
+        end
       end
 
       @gradescope_conn.post(

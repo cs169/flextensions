@@ -313,11 +313,11 @@ class CanvasFacade < LmsFacade
   # @param   [Integer] studentId the student to provisoin the extension for.
   # @param   [Integer] assignmentId the assignment the extension should be provisioned for.
   # @param   [String]  newDueDate the date the assignment should be due.
-  # @param   [String]  newLateDueDate the close date for submissions (optional, defaults to newDueDate).
+  # @param   [String]  new_close_date the close date for submissions (optional, nil means no close date set).
   # @return  [Lmss::Canvas::Override] the override that acts as the extension.
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
-  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_late_due_date = nil)
+  def provision_extension(course_id, student_id, assignment_id, new_due_date, new_close_date = nil)
     # get existing_overrides for an assignment
     student_override = get_existing_student_override(course_id, student_id, assignment_id)
     if !student_override.nil?
@@ -327,7 +327,7 @@ class CanvasFacade < LmsFacade
     # create new override
     override_title = "#{student_id} extended to #{new_due_date}"
     create_response = create_assignment_override(
-      course_id, assignment_id, [ student_id ], override_title, new_due_date, get_current_formatted_time, close_date
+      course_id, assignment_id, [ student_id ], override_title, new_due_date, get_current_formatted_time, new_close_date
     )
 
     decoded_response = parse_create_response(create_response)
@@ -338,7 +338,7 @@ class CanvasFacade < LmsFacade
     curr_override = fetch_existing_override(course_id, student_id, assignment_id)
     handle_response = handle_override_logic(
       course_id, curr_override, student_id, assignment_id, override_title,
-      new_due_date, close_date
+      new_due_date, new_close_date
     )
     Lmss::Canvas::Override.new(parse_create_response(handle_response))
   end
@@ -459,18 +459,18 @@ class CanvasFacade < LmsFacade
   # @param  [Integer] assignmentId the assignmentId to handle the override logic for.
   # @param  [String] overrideTitle the title of the override.
   # @param  [String] newDueDate the new due date for the override.
-  # @param  [String] closeDate the close date for the override (maps to lock_at in Canvas API).
+  # @param  [String] newCloseDate the close date for the override (maps to lock_at in Canvas API, nil means no close date).
   # @return [Faraday::Response] the response from updating or creating the override.
-  def handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate, closeDate)
+  def handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate, newCloseDate)
     if curr_override.student_ids.length == 1
       update_assignment_override(
         courseId, assignmentId, curr_override.id, curr_override.student_ids, overrideTitle, newDueDate,
-        get_current_formatted_time, closeDate
+        get_current_formatted_time, newCloseDate
       )
     else
       remove_student_from_override(courseId, curr_override, studentId)
       create_assignment_override(
-        courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, closeDate
+        courseId, assignmentId, [ studentId ], overrideTitle, newDueDate, get_current_formatted_time, newCloseDate
       )
     end
   end
