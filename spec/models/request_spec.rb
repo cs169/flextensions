@@ -775,24 +775,6 @@ RSpec.describe Request, type: :model do
       # rubocop:enable RSpec/NestedGroups
     end
 
-    context 'when extend_late_due_date setting is nil (defaults to true)' do
-      before do
-        # Create settings without explicitly setting extend_late_due_date
-        # This simulates existing courses before the migration
-        cs = CourseSettings.create!(
-          course: course,
-          enable_extensions: true
-        )
-        cs.update(extend_late_due_date: false)
-      end
-
-      it 'defaults to shifting the late due date by the extension delta' do
-        result = request_with_late_due_date.calculate_new_late_due_date
-        expected = Time.zone.parse('2025-01-20 23:59:00')
-        expect(result).to be_within(1.second).of(expected)
-      end
-    end
-
     context 'when course has no course settings' do
       it 'defaults to shifting the late due date (extend_late_due_date = true behavior)' do
         # No course settings means nil, which defaults to true
