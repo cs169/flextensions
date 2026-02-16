@@ -29,7 +29,8 @@ export default class extends Controller {
 					null, // Name
 					null, // Email
 					null, // Section
-					{ orderDataType: 'role-pre' } // Role column (custom sort)
+					{ orderDataType: 'role-pre' }, // Role column (custom sort)
+					null,
 				],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
