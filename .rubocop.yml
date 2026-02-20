@@ -95,6 +95,11 @@ RSpec:
 RSpec/ExampleLength:
   Max: 40
 
+# Default 3
+# I'm not sure this is good?
+RSpec/NestedGroups:
+  Max: 5
+
 RSpec/MultipleMemoizedHelpers:
   Max: 20
 

@@ -459,7 +459,7 @@ class CanvasFacade < LmsFacade
   # @param  [Integer] assignmentId the assignmentId to handle the override logic for.
   # @param  [String] overrideTitle the title of the override.
   # @param  [String] newDueDate the new due date for the override.
-  # @param  [String] newCloseDate the close date for the override (maps to lock_at in Canvas API, nil means no close date).
+  # @param  [String] newCloseDate the close date for the override (maps to lock_at in Canvas API).
   # @return [Faraday::Response] the response from updating or creating the override.
   def handle_override_logic(courseId, curr_override, studentId, assignmentId, overrideTitle, newDueDate, newCloseDate)
     if curr_override.student_ids.length == 1
