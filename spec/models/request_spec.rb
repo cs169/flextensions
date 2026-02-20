@@ -806,6 +806,7 @@ RSpec.describe Request, type: :model do
           expect(result).to be_within(1.second).of(expected)
         end
       end
+
       context 'when extend_late_due_date setting is false' do
         before do
           CourseSettings.create!(

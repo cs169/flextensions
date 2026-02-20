@@ -58,7 +58,7 @@ class AssignmentDateCalculator
       original_late_due_date + extension_delta
     else
       # Return the later of the original late due date and the new extended due date
-      [original_late_due_date, request.requested_due_date].max
+      [ original_late_due_date, request.requested_due_date ].max
     end
   end
 
