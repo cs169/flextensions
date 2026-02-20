@@ -222,8 +222,8 @@ RSpec.describe AssignmentDateCalculator, type: :service do
             enable_extensions: true
           )
           # Manually set to nil to simulate pre-migration state
-          cs.update_column(:extend_late_due_date, nil)
-
+          # Don't persist the nil value since the column doesn't allow it, but we want to test the behavior of the method when it encounters a nil value
+          cs.extend_late_due_date = nil
           calculator = described_class.new(
             assignment: assignment_with_late_due_date,
             request: request_with_late_due_date,
