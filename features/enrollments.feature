@@ -14,7 +14,8 @@ Feature: Course Enrollments
 
 	@javascript
 	Scenario: Clicking a student name on Enrollments navigates to filtered requests
-		Given I'm logged in as a teacher
+		Given a request exists for student "User 3"
+		And I'm logged in as a teacher
 		When I go to the Course Enrollments page
 		And I click the name link for student "User 3"
 		Then I should be on the "Requests page" with param show_all=true
