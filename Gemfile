@@ -32,9 +32,6 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 
-# Loads environment variables from .env
-gem 'dotenv-rails', groups: [:development, :test]
-
 # Alternative Canvas API. We probably don't need this.
 # Verify instances of `LMS::Canvas`
 gem 'lms-api'
