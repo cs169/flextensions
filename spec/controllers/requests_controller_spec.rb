@@ -51,6 +51,26 @@ RSpec.describe RequestsController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template('requests/instructor_index')
     end
+
+    it 'assigns @search_query from params[:search]' do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: teacher_course, role: 'teacher')
+      FormSetting.create!(course: teacher_course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+
+      get :index, params: { course_id: teacher_course.id, search: '12345', show_all: 'true' }
+
+      expect(assigns(:search_query)).to eq('12345')
+    end
+
+    it 'assigns @search_query as nil when no search param is provided' do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: teacher_course, role: 'teacher')
+      FormSetting.create!(course: teacher_course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+
+      get :index, params: { course_id: teacher_course.id }
+
+      expect(assigns(:search_query)).to be_nil
+    end
   end
 
   describe 'GET #show' do
