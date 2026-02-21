@@ -13,6 +13,7 @@
             <th class="text-center">Student ID</th>
             <th class="text-center">Email</th>
             <th class="text-center">Role</th>
+            <th class="text-center">Approved Extended?</th>
           </tr>
         </thead>
         <tbody>
@@ -38,6 +39,22 @@
               <td class="text-center"><%= enrollment.user.student_id %></td>
               <td class="text-center"><%= enrollment.user.email %></td>
               <td class="text-center"><%= enrollment.role.downcase.capitalize %></td>
+              <td class="justify-content-center align-content-center">
+                <% if enrollment.role.downcase == 'student' %>
+                  <div class="form-check form-switch mx-auto" style="width: 45px;">
+                    <input class="form-check-input" type="checkbox"
+                          role="switch"
+                          id="extended-<%= enrollment.id %>-enabled"
+                          <%= 'checked' if enrollment.allow_extended_requests %>
+                          data-enrollments-target="checkbox"
+                          data-enrollment-id="<%= enrollment.id %>"
+                          data-url="<%= toggle_allow_extended_requests_course_user_to_course_path(@course, enrollment) %>">
+                    <label class="visually-hidden" for="extended-<%= enrollment.id %>-enabled">
+                      Approve extended requests for <%= enrollment.user.name %>
+                    </label>
+                  </div>
+                <% end %>
+              </td>
             </tr>
           <% end %>
         </tbody>

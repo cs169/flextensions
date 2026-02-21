@@ -4,9 +4,14 @@ import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
 
 export default class extends Controller {
+	static targets = ["checkbox"]
 	static values = { courseId: Number }
 
 	connect() {
+		this.checkboxTargets.forEach((checkbox) => {
+			checkbox.addEventListener("change", (event) => this.toggleExtended(event, checkbox))
+		})
+
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
 			DataTable.ext.type.order['role-pre'] = function (data) {
@@ -29,10 +34,47 @@ export default class extends Controller {
 					null, // Name
 					null, // Email
 					null, // Section
-					{ orderDataType: 'role-pre' } // Role column (custom sort)
+					{ orderDataType: 'role-pre' }, // Role column (custom sort)
+					null,
 				],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
+		}
+	}
+
+	async toggleExtended(event, checkbox) {
+		const enrollmentId = checkbox.dataset.enrollmentId;
+		const url = checkbox.dataset.url;
+		const allowExtended = checkbox.checked;
+
+		try {
+			const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+			const response = await fetch(url, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					"X-CSRF-Token": token,
+				},
+				body: JSON.stringify({
+					allow_extended_requests: allowExtended,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				if (data.redirect_to) {
+					window.location.href = data.redirect_to;
+					return;
+				}
+				throw new Error(data.error || 'Error updating enrollment');
+			}
+
+			console.log(`Enrollment ${enrollmentId} allow_extended_requests: ${allowExtended}`);
+		} catch (error) {
+			console.error("Error updating enrollment:", error);
+			checkbox.checked = !allowExtended;
 		}
 	}
 
@@ -40,7 +82,7 @@ export default class extends Controller {
 		const button = event.currentTarget;
 		button.disabled = true;
 		const courseId = this.courseIdValue;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
+		const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
 		fetch(`/courses/${courseId}/sync_enrollments`, {
 		  method: "POST",
 		  headers: {

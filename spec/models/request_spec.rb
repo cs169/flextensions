@@ -269,6 +269,40 @@ RSpec.describe Request, type: :model do
       end
     end
 
+    context 'when student has allow_extended_requests and requests more than auto_approve_days' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: true)
+      end
+
+      it 'returns true when within extended request days' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
+        expect(request.eligible_for_auto_approval?).to be true
+      end
+
+      it 'returns false when exceeding extended request days' do
+        request.update(requested_due_date: assignment.due_date + 8.days)
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+    end
+
+    context 'when student does not have allow_extended_requests' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: false)
+      end
+
+      it 'returns false when exceeding standard auto_approve_days' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+
+      it 'returns true when within standard auto_approve_days' do
+        request.update(requested_due_date: assignment.due_date + 2.days)
+        expect(request.eligible_for_auto_approval?).to be true
+      end
+    end
+
     context 'when max_auto_approve is zero (unlimited)' do
       before do
         course_settings.update(max_auto_approve: 0)
