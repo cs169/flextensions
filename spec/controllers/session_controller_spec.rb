@@ -142,7 +142,7 @@ RSpec.describe SessionController, type: :controller do
       end
 
       # test course for dev login
-      it 'auto-enrolls developer login users in test course' do 
+      it 'auto-enrolls developer login users in test course' do
         test_course = Course.create!(course_code: 'DEV101', course_name: 'Test Course', canvas_id: 'dev-001')
 
         get :omniauth_callback, params: { provider: 'developer' }

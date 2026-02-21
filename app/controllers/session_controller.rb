@@ -52,11 +52,11 @@ class SessionController < ApplicationController
       'email' => auth.info.email
     }
     creds = auth.credentials # an OmniAuth::AuthHash
-    
+
     # dev provider doesnt have real credentials so its stubbed
     expires_at = creds.expires_at || 30.days.from_now.to_i
     refresh_token = creds.refresh_token || 'none'
-    
+
     access_token = OAuth2::AccessToken.new(
       OAuth2::Client.new('', ''), # client never used – stub
       creds.token,
@@ -123,7 +123,7 @@ class SessionController < ApplicationController
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
-    
+
     user
   end
 
