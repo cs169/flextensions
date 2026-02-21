@@ -23,7 +23,9 @@
 		</div>
 		<div class="col-12 text-center">
 			<%= link_to 'Login', '/auth/canvas', class: 'btn btn-primary', id: 'login-button-index' %>
-			<%# <a href="/login" class="btn btn-secondary" id="login-button-index">Login</a> %>
+			<% if Rails.env.development? %>
+				<%= link_to 'Developer Login', '/auth/developer', class: 'btn btn-secondary ms-2', id: 'dev-login-button' %>
+			<% end %>
 		</div>
 	</div>
 </div>
