@@ -66,23 +66,9 @@ if Rails.env.development?
 
   if course_lms
     Assignment.find_or_create_by!(course_to_lms_id: course_lms.id, external_assignment_id: 'dev-hw-1') do |a|
-      a.name = 'Homework 1'
+      a.name = 'Homework'
       a.due_date = 3.days.from_now
       a.late_due_date = 10.days.from_now
-      a.enabled = true
-    end
-
-    Assignment.find_or_create_by!(course_to_lms_id: course_lms.id, external_assignment_id: 'dev-project-1') do |a|
-      a.name = 'Project 1'
-      a.due_date = 7.days.from_now
-      a.late_due_date = 14.days.from_now
-      a.enabled = true
-    end
-
-    Assignment.find_or_create_by!(course_to_lms_id: course_lms.id, external_assignment_id: 'dev-quiz-1') do |a|
-      a.name = 'Quiz 1'
-      a.due_date = 5.days.from_now
-      a.late_due_date = 12.days.from_now
       a.enabled = true
     end
   end

@@ -111,6 +111,61 @@ RSpec.describe SessionController, type: :controller do
     end
   end
 
+  describe 'GET #omniauth_callback (developer provider)' do
+    let(:dev_auth_hash) do
+      OmniAuth::AuthHash.new(
+        provider: 'developer',
+        uid: 'test@example.com',
+        info: OpenStruct.new(name: 'Test Developer', email: 'test@example.com'),
+        credentials: {
+          token: 'dev-token',
+          refresh_token: nil,
+          expires_at: nil
+        }
+      )
+    end
+
+    before do
+      request.env['omniauth.auth'] = dev_auth_hash
+    end
+
+    context 'developer provider login with missing credentials' do
+      it 'handles nil credentials gracefully' do
+        get :omniauth_callback, params: { provider: 'developer' }
+
+        user = User.find_by(canvas_uid: 'test@example.com')
+        expect(user).to be_present
+        expect(user.email).to eq('test@example.com')
+
+        expect(session[:user_id]).to eq('test@example.com')
+        expect(response).to redirect_to(courses_path)
+      end
+
+      # test course for dev login
+      it 'auto-enrolls developer login users in test course' do 
+        test_course = Course.create!(course_code: 'DEV101', course_name: 'Test Course', canvas_id: 'dev-001')
+
+        get :omniauth_callback, params: { provider: 'developer' }
+
+        user = User.find_by(canvas_uid: 'test@example.com')
+        enrollment = UserToCourse.find_by(user_id: user.id, course_id: test_course.id)
+
+        expect(enrollment).to be_present
+        expect(enrollment.role).to eq('student')
+      end
+
+      it 'stores fake refresh token for developer provider' do
+        get :omniauth_callback, params: { provider: 'developer' }
+
+        user = User.find_by(canvas_uid: 'test@example.com')
+        creds = user.lms_credentials.first
+
+        expect(creds.refresh_token).to be_present
+        expect(creds.token).to be_present
+      end
+    end
+  end
+
   describe 'GET #logout' do
     before do
       session[:user_id] = 'test_user_id'
