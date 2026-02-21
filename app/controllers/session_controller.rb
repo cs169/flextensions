@@ -52,15 +52,25 @@ class SessionController < ApplicationController
       'email' => auth.info.email
     }
     creds = auth.credentials # an OmniAuth::AuthHash
+    
+    # dev provider doesnt have real credentials so its stubbed
+    expires_at = creds.expires_at || 30.days.from_now.to_i
+    refresh_token = creds.refresh_token || 'none'
+    
     access_token = OAuth2::AccessToken.new(
       OAuth2::Client.new('', ''), # client never used – stub
       creds.token,
-      refresh_token: creds.refresh_token,
-      expires_at: creds.expires_at
+      refresh_token: refresh_token,
+      expires_at: expires_at
     )
 
     # Persist / update the user just like `create`
-    find_or_create_user(user_data, access_token)
+    user = find_or_create_user(user_data, access_token)
+
+    # Auto-enroll developer login users in test courses
+    if auth.provider == 'developer'
+      ensure_developer_test_enrollments(user)
+    end
 
     redirect_to courses_path, notice: "Logged in! Welcome, #{user_data['name']}!"
   rescue StandardError => e
@@ -77,6 +87,18 @@ class SessionController < ApplicationController
   end
 
   private
+
+  def ensure_developer_test_enrollments(user)
+    # Find the test course
+    test_course = Course.find_by(course_code: 'DEV101')
+
+    # Ensure enrollment in the test course (as student so they can request extensions)
+    if test_course
+      UserToCourse.find_or_create_by!(user_id: user.id, course_id: test_course.id) do |utc|
+        utc.role = 'student'
+      end
+    end
+  end
 
   # TODO: Refactor.
   def find_or_create_user(user_data, auth_token)
@@ -101,6 +123,8 @@ class SessionController < ApplicationController
     # Store user ID in session for authentication
     session[:username] = user.name
     session[:user_id] = user.canvas_uid
+    
+    user
   end
 
   # TODO: Move this to a Canvas API libarary or user service
