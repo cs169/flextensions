@@ -60,6 +60,9 @@ gem 'strong_migrations'
 # Logging Customization
 gem 'lograge'
 
+# Environment variable management
+gem 'dotenv-rails', require: 'dotenv/load'
+
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"
 
