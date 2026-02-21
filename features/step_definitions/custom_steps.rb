@@ -119,6 +119,33 @@ Given(/^I set flash message "(.*)"$/) do |message|
   page.set_rack_session('flash' => { 'notice' => message })
 end
 
+# Toggle "Approved Extended?" checkbox for a student by name
+# And I toggle "Approved Extended?" for "User 3"
+When(/^I toggle "Approved Extended\?" for "([^"]*)"$/) do |user_name|
+  within(:xpath, "//tr[td[contains(., '#{user_name}')]]") do
+    find('input[type="checkbox"]').click
+  end
+  # Wait for the PATCH request to complete
+  sleep 1
+end
+
+# Check that the enrollment's allow_extended_requests is enabled/disabled
+# Then the enrollment for "User 3" should have allow_extended_requests enabled
+Then(/^the enrollment for "([^"]*)" should have allow_extended_requests (enabled|disabled)$/) do |user_name, state|
+  user = User.find_by!(name: user_name)
+  enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
+  expected = (state == 'enabled')
+  expect(enrollment.reload.allow_extended_requests).to eq(expected)
+end
+
+# Set up an enrollment with allow_extended_requests enabled
+# Given the enrollment for "User 3" has allow_extended_requests enabled
+Given(/^the enrollment for "([^"]*)" has allow_extended_requests enabled$/) do |user_name|
+  user = User.find_by!(name: user_name)
+  enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
+  enrollment.update!(allow_extended_requests: true)
+end
+
 # this step is necessary to workaround ajax call to enable assignments
 # And I enable "Homework 1"
 Given(/^I (enable|disable) "([^"]*)"$/) do |action, assignment_name|

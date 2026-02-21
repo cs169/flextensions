@@ -120,7 +120,7 @@ class Request < ApplicationRecord
   def eligible_for_auto_approval?
     return false if course&.course_settings.blank?
     return false unless course.course_settings.enable_extensions?
-    return false if (course.course_settings.auto_approve_days.zero? && course.course_settings.auto_approve_extended_request_days.zero?)
+    return false if course.course_settings.auto_approve_days.zero? && course.course_settings.auto_approve_extended_request_days.zero?
     enrollment = UserToCourse.find_by(user: user, course: course)
     if enrollment&.allow_extended_requests
       max_days = course.course_settings.auto_approve_extended_request_days

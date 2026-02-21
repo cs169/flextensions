@@ -48,7 +48,7 @@ export default class extends Controller {
 		const allowExtended = checkbox.checked;
 
 		try {
-			const token = document.querySelector('meta[name="csrf-token"]').content;
+			const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
 			const response = await fetch(url, {
 				method: "PATCH",
@@ -82,7 +82,7 @@ export default class extends Controller {
 		const button = event.currentTarget;
 		button.disabled = true;
 		const courseId = this.courseIdValue;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
+		const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
 		fetch(`/courses/${courseId}/sync_enrollments`, {
 		  method: "POST",
 		  headers: {

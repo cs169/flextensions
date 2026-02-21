@@ -1,4 +1,5 @@
 class UserToCoursesController < ApplicationController
+  before_action :authenticate_user
   before_action :set_course
 
   def toggle_allow_extended_requests
