@@ -367,7 +367,7 @@ class CanvasFacade < LmsFacade
     end
 
     all_assignment_overrides.each do |override|
-      return override if override&.student_ids.map(&:to_i)&.include?(student_id.to_i)
+      return override if override&.student_ids&.map(&:to_i)&.include?(student_id.to_i)
     end
     nil
   end

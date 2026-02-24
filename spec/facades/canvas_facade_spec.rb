@@ -475,6 +475,24 @@ describe CanvasFacade do
                assignment_id
              )).to be_nil
     end
+
+    it 'skips overrides with nil student_ids' do
+      mock_override_nil_students = mock_override.clone
+      mock_override_nil_students[:student_ids] = nil
+      stubs.get(get_assignment_overrides_url) do
+        [
+          200,
+          {},
+          [ mock_override_nil_students, mock_override ].to_json
+        ]
+      end
+      expect(facade.send(
+               :get_existing_student_override,
+               course_id,
+               student_id,
+               assignment_id
+             ).student_ids[0]).to eq(student_id)
+    end
   end
 
   describe 'get_current_formatted_time' do
