@@ -10,6 +10,14 @@ For a complete list of releases, see the [GitHub Releases page](https://github.c
 
 ---
 
+## February 27, 2026 — Better Late Due Date Support
+
+Auto-extend the late due date by the same amount of time as the original extension when an extension is granted. This setting can be enabled or disabled by instructors.
+
+## November 15, 2025 — Gradescope Integration
+
+Added support for Gradescope.
+
 ## August 16, 2025 — Initial Release
 
 Flextensions launched for the Fall 2025 semester! 🎉
