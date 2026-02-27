@@ -107,7 +107,6 @@ Control when and how requests are automatically approved:
 
 After setting these options, click **Save Settings** to save.
 
-
 ### Extendate Late Due Date Automatically
 
 _This setting is enabled by default._
