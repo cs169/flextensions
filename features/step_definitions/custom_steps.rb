@@ -148,6 +148,26 @@ end
 
 # Stubbing the Deny controller
 # Given I deny the request for "Homework 3"
+# Create a request for a specific student using factory data
+Given(/^a request exists for student "([^"]*)"$/) do |student_name|
+  student = User.find_by(name: student_name)
+  assignment = Assignment.first
+  create(:request, user: student, course: @course, assignment: assignment)
+end
+
+# Click a specific student's name link on the enrollments page
+When(/^I click the name link for student "([^"]*)"$/) do |student_name|
+  within('#enrollments-table') do
+    click_link student_name
+  end
+end
+
+# Verify the DataTable search input has a value (i.e., filter is active)
+Then(/^the requests table search should be filtered$/) do
+  search_input = find('.dt-search input')
+  expect(search_input.value).not_to be_empty
+end
+
 Given(/^I deny the request for "([^"]*)"$/) do |assignment_name|
   request = Request.joins(:assignment)
                    .find_by(assignments: { name: assignment_name }, status: 'pending')
