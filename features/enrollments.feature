@@ -26,3 +26,12 @@ Feature: Course Enrollments
 		When I go to the Course Enrollments page
 		And I toggle "Approved Extended?" for "User 3"
 		Then the enrollment for "User 3" should disallow extended requests
+   
+  @javascript
+	Scenario: Clicking a student name on Enrollments navigates to filtered requests
+		Given a request exists for student "User 3"
+		And I'm logged in as a teacher
+		When I go to the Course Enrollments page
+		And I click the name link for student "User 3"
+		Then I should be on the "Requests page" with param show_all=true
+		And the requests table search should be filtered

@@ -42,6 +42,9 @@ class CanvasFacade < LmsFacade
     'url:GET|/api/v1/courses/:course_id/assignments',
     'url:PUT|/api/v1/courses/:course_id/assignments/overrides',
     'url:POST|/api/v1/courses/:course_id/assignments/overrides',
+    # Assignment Date Extension Details
+    'url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/date_details',
+    'url:GET|/api/v1/courses/:course_id/quizzes/:quiz_id/date_details',
     # Assignments - Basic Info
     'url:GET|/api/v1/courses/:course_id/assignments',
     'url:GET|/api/v1/courses/:course_id/assignments/:id',
