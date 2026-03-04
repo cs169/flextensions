@@ -191,6 +191,26 @@ RSpec.describe Request, type: :model do
         expect(request.auto_approval_eligible_for_course?).to be false
       end
     end
+
+    context 'when auto_approve_days is zero but auto_approve_extended_request_days is positive' do
+      before do
+        course_settings.update(auto_approve_days: 0, auto_approve_extended_request_days: 7)
+      end
+
+      it 'returns true' do
+        expect(request.auto_approval_eligible_for_course?).to be true
+      end
+    end
+
+    context 'when both auto_approve_days and auto_approve_extended_request_days are zero' do
+      before do
+        course_settings.update(auto_approve_days: 0, auto_approve_extended_request_days: 0)
+      end
+
+      it 'returns false' do
+        expect(request.auto_approval_eligible_for_course?).to be false
+      end
+    end
   end
 
   # TODO: Investigate the odd relationship with `course_settings`
@@ -265,6 +285,95 @@ RSpec.describe Request, type: :model do
       end
 
       it 'returns false' do
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+    end
+
+    context 'when student has allow_extended_requests and requests more than auto_approve_days' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: true)
+      end
+
+      it 'returns true when within extended request days' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
+        expect(request.eligible_for_auto_approval?).to be true
+      end
+
+      it 'returns false when exceeding extended request days' do
+        request.update(requested_due_date: assignment.due_date + 8.days)
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+    end
+
+    context 'when student does not have allow_extended_requests' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: false)
+      end
+
+      it 'returns false when exceeding standard auto_approve_days' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+
+      it 'returns true when within standard auto_approve_days' do
+        request.update(requested_due_date: assignment.due_date + 2.days)
+        expect(request.eligible_for_auto_approval?).to be true
+      end
+    end
+
+    context 'when student requests exactly the max extended days' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: true)
+      end
+
+      it 'returns true at the boundary' do
+        request.update(requested_due_date: assignment.due_date + 7.days)
+        expect(request.eligible_for_auto_approval?).to be true
+      end
+    end
+
+    context 'when both auto_approve_days and auto_approve_extended_request_days are zero' do
+      before do
+        course_settings.update(auto_approve_days: 0, auto_approve_extended_request_days: 0)
+      end
+
+      it 'returns false' do
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+    end
+
+    context 'when user has no enrollment record' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
+        UserToCourse.find_by(user: user, course: course).destroy
+      end
+
+      it 'returns false for all requests' do
+        request.update(requested_due_date: assignment.due_date + 2.days)
+        expect(request.eligible_for_auto_approval?).to be false
+      end
+    end
+
+    context 'when extended student hits max_auto_approve limit' do
+      before do
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7, max_auto_approve: 1)
+        UserToCourse.find_by(user: user, course: course).update!(allow_extended_requests: true)
+        described_class.create!(
+          user: user,
+          course: course,
+          assignment: assignment,
+          reason: 'Previous request',
+          requested_due_date: 3.days.from_now,
+          status: 'approved',
+          auto_approved: true
+        )
+      end
+
+      it 'returns false despite being within extended days' do
+        request.update(requested_due_date: assignment.due_date + 5.days)
         expect(request.eligible_for_auto_approval?).to be false
       end
     end
