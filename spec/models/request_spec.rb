@@ -347,17 +347,12 @@ RSpec.describe Request, type: :model do
 
     context 'when user has no enrollment record' do
       before do
-        course_settings
+        course_settings.update(auto_approve_days: 3, auto_approve_extended_request_days: 7)
         UserToCourse.find_by(user: user, course: course).destroy
       end
 
-      it 'falls back to standard auto_approve_days' do
+      it 'returns false for all requests' do
         request.update(requested_due_date: assignment.due_date + 2.days)
-        expect(request.eligible_for_auto_approval?).to be true
-      end
-
-      it 'returns false when exceeding standard auto_approve_days' do
-        request.update(requested_due_date: assignment.due_date + 5.days)
         expect(request.eligible_for_auto_approval?).to be false
       end
     end
