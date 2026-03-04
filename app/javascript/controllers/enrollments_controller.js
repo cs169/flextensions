@@ -35,7 +35,7 @@ export default class extends Controller {
 					null, // Email
 					null, // Section
 					{ orderDataType: 'role-pre' }, // Role column (custom sort)
-					null,
+					null, // Extended Requests?
 				],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
@@ -82,8 +82,7 @@ export default class extends Controller {
 		const button = event.currentTarget;
 		button.disabled = true;
 		const courseId = this.courseIdValue;
-		const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
-		fetch(`/courses/${courseId}/sync_enrollments`, {
+		const token = document.querySelector('meta[name="csrf-token"]').content;		fetch(`/courses/${courseId}/sync_enrollments`, {
 		  method: "POST",
 		  headers: {
 			"Content-Type": "application/json",

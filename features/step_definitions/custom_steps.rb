@@ -130,17 +130,17 @@ When(/^I toggle "Approved Extended\?" for "([^"]*)"$/) do |user_name|
 end
 
 # Check that the enrollment's allow_extended_requests is enabled/disabled
-# Then the enrollment for "User 3" should have allow_extended_requests enabled
-Then(/^the enrollment for "([^"]*)" should have allow_extended_requests (enabled|disabled)$/) do |user_name, state|
+# Then the enrollment for "User 3" should allow/disallow extended requests
+Then(/^the enrollment for "([^"]*)" should (allow|disallow) extended requests$/) do |user_name, state|
   user = User.find_by!(name: user_name)
   enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
-  expected = (state == 'enabled')
+  expected = (state == 'allow')
   expect(enrollment.reload.allow_extended_requests).to eq(expected)
 end
 
 # Set up an enrollment with allow_extended_requests enabled
-# Given the enrollment for "User 3" has allow_extended_requests enabled
-Given(/^the enrollment for "([^"]*)" has allow_extended_requests enabled$/) do |user_name|
+# Given the enrollment for "User 3" allows extended requests
+Given(/^the enrollment for "([^"]*)" allows extended requests$/) do |user_name|
   user = User.find_by!(name: user_name)
   enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
   enrollment.update!(allow_extended_requests: true)

@@ -110,11 +110,14 @@ class Request < ApplicationRecord
     auto_approve(lms_facade_from_user)
   end
 
+  def auto_approval_days_positive?
+    course.course_settings.auto_approve_days.positive? || course.course_settings.auto_approve_extended_request_days.positive?
+  end
+
   def auto_approval_eligible_for_course?
     return false if course&.course_settings.blank?
 
-    course.course_settings.enable_extensions &&
-      (course.course_settings.auto_approve_days.positive? || course.course_settings.auto_approve_extended_request_days.positive?)
+    course.course_settings.enable_extensions && auto_approval_days_positive?
   end
 
   def eligible_for_auto_approval?
@@ -122,7 +125,8 @@ class Request < ApplicationRecord
     return false unless course.course_settings.enable_extensions?
     return false if course.course_settings.auto_approve_days.zero? && course.course_settings.auto_approve_extended_request_days.zero?
     enrollment = UserToCourse.find_by(user: user, course: course)
-    if enrollment&.allow_extended_requests
+    return false if enrollment.nil?
+    if enrollment.allow_extended_requests
       max_days = course.course_settings.auto_approve_extended_request_days
     else
       max_days = course.course_settings.auto_approve_days

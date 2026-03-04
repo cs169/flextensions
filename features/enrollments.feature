@@ -17,12 +17,12 @@ Feature: Course Enrollments
 		Given I'm logged in as a teacher
 		When I go to the Course Enrollments page
 		And I toggle "Approved Extended?" for "User 3"
-		Then the enrollment for "User 3" should have allow_extended_requests enabled
+		Then the enrollment for "User 3" should allow extended requests
 
 	@javascript
 	Scenario: Instructor toggles "Approved Extended?" off for a student
 		Given I'm logged in as a teacher
-		And the enrollment for "User 3" has allow_extended_requests enabled
+		And the enrollment for "User 3" allows extended requests
 		When I go to the Course Enrollments page
 		And I toggle "Approved Extended?" for "User 3"
-		Then the enrollment for "User 3" should have allow_extended_requests disabled
+		Then the enrollment for "User 3" should disallow extended requests
