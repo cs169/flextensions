@@ -137,18 +137,33 @@ class RequestsController < ApplicationController
     @assignment = Assignment.find_by(id: @request.assignment_id)
     lms_facade = @assignment.lms_facade
     if @request.approve(lms_facade.from_user(@user), @user)
-      redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
+      notice = 'Request approved and extension created successfully in Canvas.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), notice: notice }
+        format.json { render json: { success: true, message: notice, new_status: 'approved', pending_count: @course.requests.where(status: 'pending').count } }
+      end
     else
-      flash[:alert] = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
-      redirect_to course_requests_path(@course)
+      alert = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
+      respond_to do |format|
+        format.html { flash[:alert] = alert; redirect_to course_requests_path(@course) }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_entity }
+      end
     end
   end
 
   def reject
     if @request.reject(@user)
-      redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
+      notice = 'Request denied successfully.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), notice: notice }
+        format.json { render json: { success: true, message: notice, new_status: 'denied', pending_count: @course.requests.where(status: 'pending').count } }
+      end
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
+      alert = 'Failed to deny the request.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), alert: alert }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_entity }
+      end
     end
   end
 

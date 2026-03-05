@@ -7,7 +7,7 @@
 
       <div class="row justify-content-between mb-2">
         <div class="col-6 align-content-center">
-          <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger"><%= @requests.select { |request| request.status == 'pending' }.count %></span> pending requests</p>
+          <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger" data-requests-target="pendingBadge"><%= @requests.select { |request| request.status == 'pending' }.count %></span> pending requests</p>
         </div>
         <div class="col-6 text-end">
           <% if params[:show_all] == "true" %>
@@ -23,6 +23,7 @@
                id="requests-table"
                data-controller="requests"
                data-search-query="<%= @search_query %>"
+               data-show-all="<%= params[:show_all] == 'true' ? 'true' : 'false' %>"
                data-readonly-token="<%= @course.readonly_api_token %>"
                data-course-id="<%= @course.id %>">
           <thead>
@@ -84,8 +85,18 @@
                   <%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
                   <% if request.status == 'pending' %>
                     <div class="btn-group d-inline-flex">
-                      <%= button_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
-                      <%= button_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
+                      <button type="button"
+                              class="btn btn-sm btn-success ms-1"
+                              data-action="click->requests#approve"
+                              data-url="<%= approve_course_request_path(@course, request, format: :json) %>">
+                        Approve
+                      </button>
+                      <button type="button"
+                              class="btn btn-sm btn-danger ms-1"
+                              data-action="click->requests#reject"
+                              data-url="<%= reject_course_request_path(@course, request, format: :json) %>">
+                        Reject
+                      </button>
                     </div>
                   <% end %>
                 </td>
