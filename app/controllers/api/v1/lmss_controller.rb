@@ -40,7 +40,7 @@ module API
         if course_to_lms.save
           render json: course_to_lms, status: :created
         else
-          render json: course_to_lms.errors, status: :unprocessable_entity
+          render json: course_to_lms.errors, status: :unprocessable_content
         end
       end
 
