@@ -46,6 +46,10 @@ class UserToCourse < ApplicationRecord
     role == 'student'
   end
 
+  def teacher?
+    role == 'teacher'
+  end
+
   def self.roles
     [ 'student' ] + UserToCourse.staff_roles
   end

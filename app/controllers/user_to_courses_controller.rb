@@ -1,21 +1,49 @@
 class UserToCoursesController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_course
+  before_action :set_enrollment
+  before_action :authorize_instructor!
 
   def toggle_allow_extended_requests
-    @enrollment = @course.user_to_courses.find(params[:id])
-
-    unless @role == 'instructor'
-      Rails.logger.error "Role #{@role} does not have permission to toggle allow_extended_requests"
-      flash.now[:alert] = 'You do not have permission to perform this action.'
-      return render json: { redirect_to: course_path(@course) }, status: :forbidden
-    end
-
     if @enrollment.update(allow_extended_requests: params[:allow_extended_requests])
       render json: { success: true }, status: :ok
     else
-      flash[:alert] = "Failed to update enrollment: #{@enrollment.errors.full_messages.to_sentence}"
-      render json: { redirect_to: course_path(@course) }, status: :unprocessable_entity
+      render json: {
+        success: false,
+        errors: @enrollment.errors.full_messages,
+        redirect_to: courses_path
+      }, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def authenticate_user!
+    user_id = session[:user_id]
+    @current_user = User.find_by(canvas_uid: user_id) if user_id
+    redirect_to root_path unless @current_user
+  end
+
+  def set_course
+    @course = Course.find_by(id: params[:course_id])
+    unless @course
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path
+    end
+  end
+
+  def set_enrollment
+    @enrollment = UserToCourse.find(params[:id])
+  end
+
+  def authorize_instructor!
+    user_to_course = UserToCourse.find_by(user: @current_user, course: @course)
+    unless user_to_course&.teacher?
+      render json: {
+        success: false,
+        error: 'Forbidden',
+        redirect_to: courses_path
+      }, status: :forbidden
     end
   end
 end
