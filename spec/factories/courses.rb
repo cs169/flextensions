@@ -20,6 +20,7 @@ FactoryBot.define do
     sequence(:course_name) { |n| "Course #{n}" }
     sequence(:canvas_id, &:to_s)
     sequence(:course_code) { |n| "COURSE#{n}" }
+    semester { 'Spring 2026' }
 
     after(:create) do |course|
       lms = Lms.find_by(id: 1) || create(:lms, id: 1, lms_name: 'Canvas')
