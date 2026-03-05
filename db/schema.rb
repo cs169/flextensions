@@ -11,6 +11,8 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
+  create_schema "hypershield"
+  
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -102,6 +104,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
     t.boolean "enable_slack_webhook_url"
     t.boolean "enable_gradescope", default: false
     t.string "gradescope_course_url"
+    t.boolean "extend_late_due_date", default: true, null: false
     t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 

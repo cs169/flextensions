@@ -12,6 +12,7 @@
 #  enable_extensions                  :boolean          default(FALSE)
 #  enable_gradescope                  :boolean          default(FALSE)
 #  enable_slack_webhook_url           :boolean
+#  extend_late_due_date               :boolean          default(TRUE), not null
 #  gradescope_course_url              :string
 #  max_auto_approve                   :integer          default(0)
 #  reply_email                        :string

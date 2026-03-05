@@ -107,6 +107,27 @@ Control when and how requests are automatically approved:
 
 After setting these options, click **Save Settings** to save.
 
+### Extendate Late Due Date Automatically
+
+_This setting is enabled by default._
+
+When enabled, the late due date will be automatically extended by the same amount of time as the original extension when an extension is granted. This setting can be toggled on or off by instructors.
+
+If you use "Slip Days" or otherwise accept late submissions you can enable this, so students who go beyond their extnded due date will have the option to submit late work until the late due date.
+
+You may wish to disable this if you do not want students to have the option to submit late work, or if you set the late due date to a very distant date (e.g., end of semester) and do not want it to be extended further.
+
+If you do not set late due dates (assignment close date in Canvas), this setting will have no effect.
+
+## Gradescope Integration
+
+If you use Gradescope for grading, you can integrate it with Flextensions to automatically sync extension data.
+
+* You must invite the user `gradescope-bot@berkeley.edu` as a TA (or Reader) in your Gradescope course to enable this integration.
+* Paste the URL of your Gradescope course into the **Gradescope Course URL** field in the Settings tab.
+* Click **Save Settings** to enable the integration.
+* Sync assignments to pull in the latest data from Gradescope.
+
 ## Course Email Settings
 
 The **Email Settings** section (under Settings) controls how students receive notifications about their extension requests.

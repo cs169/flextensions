@@ -110,20 +110,30 @@ class Request < ApplicationRecord
     auto_approve(lms_facade_from_user)
   end
 
+  def auto_approval_days_positive?
+    course.course_settings.auto_approve_days.positive? || course.course_settings.auto_approve_extended_request_days.positive?
+  end
+
   def auto_approval_eligible_for_course?
     return false if course&.course_settings.blank?
 
-    course.course_settings.enable_extensions &&
-      course.course_settings.auto_approve_days.positive?
+    course.course_settings.enable_extensions && auto_approval_days_positive?
   end
 
   def eligible_for_auto_approval?
     return false if course&.course_settings.blank?
     return false unless course.course_settings.enable_extensions?
-    return false if course.course_settings.auto_approve_days.zero?
+    return false if course.course_settings.auto_approve_days.zero? && course.course_settings.auto_approve_extended_request_days.zero?
+    enrollment = UserToCourse.find_by(user: user, course: course)
+    return false if enrollment.nil?
+    if enrollment.allow_extended_requests
+      max_days = course.course_settings.auto_approve_extended_request_days
+    else
+      max_days = course.course_settings.auto_approve_days
+    end
 
     days_difference = calculate_days_difference
-    return false if days_difference <= 0 || days_difference > course.course_settings.auto_approve_days
+    return false if days_difference <= 0 || (days_difference > max_days)
 
     max_approvals = course.course_settings.max_auto_approve
     return true if max_approvals.zero? # If max is 0, there's no limit
@@ -157,11 +167,14 @@ class Request < ApplicationRecord
       else
         raise "Unsupported LMS Facade: #{lms_facade.class.name}"
       end
+
+      dates = date_calculator.calculate
       override = lms_facade.provision_extension(
         course_id,
         user_id,
         assignment.external_assignment_id,
-        requested_due_date.iso8601
+        dates[:due_date].iso8601,
+        dates[:late_due_date]&.iso8601
       )
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
@@ -176,6 +189,22 @@ class Request < ApplicationRecord
       external_extension_id: override&.id)
     send_email_response if course.course_settings&.enable_emails
     true
+  end
+
+  # Returns the AssignmentDateCalculator for this request
+  def date_calculator
+    @date_calculator ||= AssignmentDateCalculator.new(
+      assignment: assignment,
+      request: self,
+      course_settings: course.course_settings
+    )
+  end
+
+  # Calculates the new late due date for an extension based on course settings.
+  # Returns nil if the assignment has no late due date.
+  # Delegates to AssignmentDateCalculator for the actual calculation.
+  def calculate_new_late_due_date
+    date_calculator.late_due_date
   end
 
   def reject(processed_user_id)

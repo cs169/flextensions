@@ -6,7 +6,7 @@
 [![RSpec Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rspec.yml) •
 [![Cucumber Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/cucumber.yml) •
 [![Accessibility Tests](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/a11y.yml) •
-[![RuboCop](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml)
+[![RuboCop](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml/badge.svg)](https://github.com/berkeley-cdss/flextensions/actions/workflows/rubocop.yml) • [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17246291.svg)](https://doi.org/10.5281/zenodo.17246291)
 
 ---
 
@@ -74,3 +74,19 @@ Please see `.env.example` for the environment variables that need to be set up f
 ## Canvas Scoped Keys
 
 This deserves brief special mention. You must keep the Canvas API configuration (in Canvas) in sync with the list of scopes defined in the CanvasFacade. If you need to add a new scope, you will need to update the Canvas API configuration in the Canvas Developer Keys section **and will need to coordinate with the bCourses team to ensure the new scope is approved and turned on before deploying it to production**.
+
+## Citing Flextensions
+
+Cite the software itself using the following DOI:
+
+https://doi.org/10.5281/zenodo.17246291
+
+References:
+
+```
+# IEEE
+[1]M. Ball, “Flextensions”. Zenodo, Aug. 20, 2025. doi: 10.5281/zenodo.17246291.
+# APA
+Ball, M., Fox, A., Yan, L., huanger2, Yaman Tarakji, Tashrique Ahmed, Connor, Jerry, Cynthia Xinyi Li, Tianye Meng, Peter Tran, Dana Kim, andypumpkineater, Evan Kandell, dg-ucb, Sepehr Behmanesh, felder, & Zee Babar. (2025). Flextensions. Zenodo.
+https://doi.org/10.5281/zenodo.17246291
+```

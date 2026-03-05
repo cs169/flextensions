@@ -119,6 +119,33 @@ Given(/^I set flash message "(.*)"$/) do |message|
   page.set_rack_session('flash' => { 'notice' => message })
 end
 
+# Toggle "Approved Extended?" checkbox for a student by name
+# And I toggle "Approved Extended?" for "User 3"
+When(/^I toggle "Approved Extended\?" for "([^"]*)"$/) do |user_name|
+  within(:xpath, "//tr[td[contains(., '#{user_name}')]]") do
+    find('input[type="checkbox"]').click
+  end
+  # Wait for the PATCH request to complete
+  sleep 1
+end
+
+# Check that the enrollment's allow_extended_requests is enabled/disabled
+# Then the enrollment for "User 3" should allow/disallow extended requests
+Then(/^the enrollment for "([^"]*)" should (allow|disallow) extended requests$/) do |user_name, state|
+  user = User.find_by!(name: user_name)
+  enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
+  expected = (state == 'allow')
+  expect(enrollment.reload.allow_extended_requests).to eq(expected)
+end
+
+# Set up an enrollment with allow_extended_requests enabled
+# Given the enrollment for "User 3" allows extended requests
+Given(/^the enrollment for "([^"]*)" allows extended requests$/) do |user_name|
+  user = User.find_by!(name: user_name)
+  enrollment = UserToCourse.find_by!(user: user, course: @course, role: 'student')
+  enrollment.update!(allow_extended_requests: true)
+end
+
 # this step is necessary to workaround ajax call to enable assignments
 # And I enable "Homework 1"
 Given(/^I (enable|disable) "([^"]*)"$/) do |action, assignment_name|
@@ -148,6 +175,26 @@ end
 
 # Stubbing the Deny controller
 # Given I deny the request for "Homework 3"
+# Create a request for a specific student using factory data
+Given(/^a request exists for student "([^"]*)"$/) do |student_name|
+  student = User.find_by(name: student_name)
+  assignment = Assignment.first
+  create(:request, user: student, course: @course, assignment: assignment)
+end
+
+# Click a specific student's name link on the enrollments page
+When(/^I click the name link for student "([^"]*)"$/) do |student_name|
+  within('#enrollments-table') do
+    click_link student_name
+  end
+end
+
+# Verify the DataTable search input has a value (i.e., filter is active)
+Then(/^the requests table search should be filtered$/) do
+  search_input = find('.dt-search input')
+  expect(search_input.value).not_to be_empty
+end
+
 Given(/^I deny the request for "([^"]*)"$/) do |assignment_name|
   request = Request.joins(:assignment)
                    .find_by(assignments: { name: assignment_name }, status: 'pending')

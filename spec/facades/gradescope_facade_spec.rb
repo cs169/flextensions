@@ -338,16 +338,12 @@ describe GradescopeFacade do
         facade.provision_extension(course_id, student_email, assignment_id, new_due_date)
       end
 
-      it 'posts extension with correct payload' do
+      it 'posts extension without hard_due_date when late due date is not provided' do
         expected_payload = {
           'override' => {
             'user_id' => student_id,
             'settings' => {
               'due_date' => {
-                'type' => 'absolute',
-                'value' => new_due_date
-              },
-              'hard_due_date' => {
                 'type' => 'absolute',
                 'value' => new_due_date
               }
@@ -360,6 +356,31 @@ describe GradescopeFacade do
           expected_payload
         )
         facade.provision_extension(course_id, student_email, assignment_id, new_due_date)
+      end
+
+      it 'posts extension with hard_due_date when late due date is provided' do
+        late_due_date = '2026-01-05T23:59:59Z'
+        expected_payload = {
+          'override' => {
+            'user_id' => student_id,
+            'settings' => {
+              'due_date' => {
+                'type' => 'absolute',
+                'value' => new_due_date
+              },
+              'hard_due_date' => {
+                'type' => 'absolute',
+                'value' => late_due_date
+              }
+            },
+            'visible' => true
+          }
+        }
+        expect(mock_client).to receive(:post).with(
+          "/courses/#{course_id}/assignments/#{assignment_id}/extensions",
+          expected_payload
+        )
+        facade.provision_extension(course_id, student_email, assignment_id, new_due_date, late_due_date)
       end
 
       it 'verifies extension creation' do

@@ -10,7 +10,7 @@ permalink: /
 
 [**Flextensions**][flextensions] is your one-stop solution to manage and access assignment extensions across all your UC Berkeley courses*. Whether you're course staff or a student, Flextensions streamlines extension workflows and makes extension data easy to access and manage.
 
-_* Well, all of your courses which use bCourses and enable assignment extensions. :)_
+_* Well, all of your courses which use bCourses or Gradescope and enable assignment extensions. :)_
 
 [flextensions]: https://flextensions.berkeley.edu
 
@@ -38,6 +38,8 @@ Flextensions connects directly with bCourses (Canvas) and imports your assignmen
 ---
 
 Are you a developer? Check out the [Developer Documentation](/flextensions/developers/) documention to contribute to Flextensions and the [API Reference](/flextensions/api/) to learn how to integrate Flextensions with your own applications.
+
+Want to know what's new? See the [Updates page](/flextensions/updates/) for recent changes or visit the [GitHub Releases](https://github.com/berkeley-cdss/flextensions/releases) for a full changelog.
 
 ---
 

@@ -1,7 +1,6 @@
 ---
 title: Developing Flextensions
 permalink: /developers/
-published: false
 ---
 
 # Standing Up the Application
