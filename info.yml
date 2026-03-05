@@ -3,7 +3,7 @@ project:
   owner: 'CS169L-23'
   teamId: '02'
   identities:
-    heroku: 'https://sp26-02-flextensions-45eafe44bb33.herokuapp.com'
+    heroku: 'https://sp26-02-flextensions.herokuapp.com'
   members:
     member1:
       name: 'Basim'
