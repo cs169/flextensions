@@ -29,7 +29,7 @@ RSpec.describe RequestsController, type: :controller do
     CourseToLms.create!(course:, lms_id: 1)
 
     user.lms_credentials.create!(
-      lms_name: 'canvas',
+      lms_id: 1,
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
@@ -294,7 +294,7 @@ RSpec.describe RequestsController, type: :controller do
       session[:user_id] = instructor.canvas_uid
       UserToCourse.create!(user: instructor, course: course, role: 'teacher')
       instructor.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'instructor_token',
         refresh_token: 'instructor_refresh',
         expire_time: 1.hour.from_now
@@ -494,7 +494,7 @@ RSpec.describe RequestsController, type: :controller do
 
       # Create credentials for user
       user.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'fake_token',
         refresh_token: 'fake_refresh_token',
         expire_time: 1.hour.from_now

@@ -5,7 +5,6 @@
 #
 #  id               :bigint           not null, primary key
 #  expire_time      :datetime
-#  lms_name         :string
 #  password         :string
 #  refresh_token    :string
 #  token            :string
@@ -13,6 +12,7 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  external_user_id :string
+#  lms_id           :bigint
 #  user_id          :bigint
 #
 # Indexes
@@ -21,6 +21,7 @@
 #
 # Foreign Keys
 #
+#  fk_rails_...  (lms_id => lmss.id)
 #  fk_rails_...  (user_id => users.id)
 #
 require 'rails_helper'
@@ -40,10 +41,11 @@ end
 RSpec.describe LmsCredential, type: :model do
   describe 'Token Encryption' do
     let(:user) { User.create!(email: 'test@example.com') }
+    let!(:lms) { Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true } }
     let!(:credential) do
       described_class.create!(
         user: user,
-        lms_name: 'ExampleLMS',
+        lms_id: lms.id,
         username: 'testuser',
         password: 'testpassword',
         token: 'sensitive_token',

@@ -165,8 +165,8 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
     # Set a default wait time
     Capybara.default_max_wait_time = 3
 
-    create(:lms_credential, user: teacher1, lms_name: 'canvas')
-    create(:lms_credential, user: student1, lms_name: 'canvas')
+    create(:lms_credential, user: teacher1, lms_id: 1)
+    create(:lms_credential, user: student1, lms_id: 1)
 
     stub_request(:get, %r{#{ENV.fetch('CANVAS_URL')}/api/v1/courses/.*})
       .to_return(status: 200, body: [].to_json)

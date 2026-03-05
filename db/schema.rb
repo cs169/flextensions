@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_01_192900) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -159,7 +159,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_01_192900) do
 
   create_table "lms_credentials", force: :cascade do |t|
     t.bigint "user_id"
-    t.string "lms_name"
     t.string "username"
     t.string "password"
     t.string "token"
@@ -168,6 +167,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_01_192900) do
     t.datetime "updated_at", null: false
     t.string "external_user_id"
     t.datetime "expire_time"
+    t.bigint "lms_id"
     t.index ["user_id"], name: "index_lms_credentials_on_user_id"
   end
 
@@ -232,6 +232,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_01_192900) do
   add_foreign_key "extensions", "assignments"
   add_foreign_key "extensions", "users", column: "last_processed_by_id"
   add_foreign_key "form_settings", "courses"
+  add_foreign_key "lms_credentials", "lmss"
   add_foreign_key "lms_credentials", "users"
   add_foreign_key "requests", "assignments"
   add_foreign_key "requests", "courses"
