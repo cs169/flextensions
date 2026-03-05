@@ -36,7 +36,6 @@
                 <%= hidden_field_tag :course_id, @course.id %>
                 <%= hidden_field_tag :tab, params[:tab] || 'general' %>
                 <div class="tab-content" id="courses-tabContent">
-                    <!-- General Settings Card -->
                     <div class="tab-pane fade <%= params[:tab] == 'email' ? '' : 'show active' %>" id="course-default" role="tabpanel" aria-labelledby="course-default-tab" tabindex="0">
                         <div class="card rounded-0 mb-4">
                             <div class="card-header bg-light">
@@ -87,7 +86,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3 row border-bottom pb-3">
+                                <div class="mb-3 row pb-3">
                                     <label for="max-auto-approve" class="col-sm-4 col-form-label">Maximum requests to auto approve</label>
                                     <div class="col-sm-8">
                                         <%= number_field_tag 'course_settings[max_auto_approve]',
@@ -101,30 +100,64 @@
                                     </div>
                                 </div>
 
+
+                                <div class="mb-3 border-bottom pb-3">
+                                    <div class="form-check form-switch">
+                                        <%= hidden_field_tag 'course_settings[extend_late_due_date]', false %>
+                                        <%= check_box_tag 'course_settings[extend_late_due_date]',
+                                                         true,
+                                                         @course.course_settings&.extend_late_due_date.nil? ? true : @course.course_settings&.extend_late_due_date,
+                                                         class: 'form-check-input',
+                                                         id: 'extend-late-due-date' %>
+                                        <label class="form-check-label" for="extend-late-due-date">Extend Late Due Date Automatically</label>
+                                    </div>
+                                    <small class="text-muted">
+                                        When enabled, the late due date (if present) will be shifted by the same amount as the extension.
+                                        When disabled, the new late due date will be set to the later of the original late due date and the extended due date.
+                                    </small>
+                                </div>
+
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <%= hidden_field_tag 'course_settings[enable_gradescope]', false %>
-                                        <%= check_box_tag 'course_settings[enable_gradescope]', 
-                                                         true, 
-                                                         @course.course_settings&.enable_gradescope, 
-                                                         class: 'form-check-input', 
+                                        <%= check_box_tag 'course_settings[enable_gradescope]',
+                                                         true,
+                                                         @course.course_settings&.enable_gradescope,
+                                                         class: 'form-check-input',
                                                          id: 'enable-gradescope' %>
                                         <label class="form-check-label" for="enable-gradescope">Link Gradescope course</label>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row border-bottom pb-3">
                                     <label for="gradescope-course-url" class="col-sm-4 col-form-label">Course's Gradescope URL</label>
                                     <div class="col-sm-8">
-                                        <%= url_field_tag 'course_settings[gradescope_course_url]', 
-                                                          @course.course_settings&.gradescope_course_url, 
-                                                          class: 'form-control', 
-                                                          id: 'gradescope-course-url', 
+                                        <%= url_field_tag 'course_settings[gradescope_course_url]',
+                                                          @course.course_settings&.gradescope_course_url,
+                                                          class: 'form-control',
+                                                          id: 'gradescope-course-url',
                                                           placeholder: 'https://www.gradescope.com/courses/123456',
                                                           data: { course_settings_target: "gradescopeField" },
                                                           disabled: !@course.course_settings&.enable_gradescope,
                                                           pattern: 'https://(www\.)?gradescope\.com/courses/\d+/?',
                                                           title: 'Must be a valid Gradescope course URL (e.g. https://www.gradescope.com/courses/123456)' %>
+                                            <small class="text-muted">
+                                                Please invite the user <code class="js-copytext"><%= ENV.fetch('GRADESCOPE_EMAIL') { 'gradescope-bot@berkeley.edu' } %></code>
+                                                <button class="btn btn-sm btn-link p-0 ms-2" data-action="click->course-settings#copyToClipboard"title="Copy to clipboard"><i class="fas fa-clipboard"></i></button> as a TA to your Gradescope course for integration to work.
+                                            </small>
+                                            <script>
+                                              document.querySelectorAll('.js-copytext').forEach(el => {
+                                                el.closest('small').querySelector('[data-action*="copyToClipboard"]')?.addEventListener('click', function(e) {
+                                                  e.preventDefault();
+                                                  navigator.clipboard.writeText(el.textContent);
+                                                  this.innerHTML = '<i class="fas fa-check"></i>';
+                                                  setTimeout(() => {
+                                                    this.innerHTML = '<i class="fas fa-clipboard"></i>';
+                                                  }, 2000);
+                                                });
+                                              });
+                                            </script>
+
                                     </div>
                                 </div>
 

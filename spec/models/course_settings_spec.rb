@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: course_settings
+#
+#  id                                 :bigint           not null, primary key
+#  auto_approve_days                  :integer          default(0)
+#  auto_approve_extended_request_days :integer          default(0)
+#  email_subject                      :string           default("Extension Request Status: {{status}} - {{course_code}}")
+#  email_template                     :text             default("Dear {{student_name}},\n\nYour extension request for {{assignment_name}} in {{course_name}} ({{course_code}}) has been {{status}}.\n\nExtension Details:\n- Original Due Date: {{original_due_date}}\n- New Due Date: {{new_due_date}}\n- Extension Days: {{extension_days}}\n\nIf you have any questions, please contact the course staff.\n\nBest regards,\n{{course_name}} Staff")
+#  enable_emails                      :boolean          default(FALSE)
+#  enable_extensions                  :boolean          default(FALSE)
+#  enable_gradescope                  :boolean          default(FALSE)
+#  enable_slack_webhook_url           :boolean
+#  extend_late_due_date               :boolean          default(TRUE), not null
+#  gradescope_course_url              :string
+#  max_auto_approve                   :integer          default(0)
+#  reply_email                        :string
+#  slack_webhook_url                  :string
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#  course_id                          :bigint           not null
+#
+# Indexes
+#
+#  index_course_settings_on_course_id  (course_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (course_id => courses.id)
+#
 require 'rails_helper'
 
 RSpec.describe CourseSettings, type: :model do
@@ -161,6 +191,40 @@ RSpec.describe CourseSettings, type: :model do
     it 'extracts course ID from URL with trailing slash' do
       url = 'https://www.gradescope.com/courses/456789/'
       expect(course_settings.extract_gradescope_course_id(url)).to eq('456789')
+    end
+  end
+
+  describe 'extend_late_due_date setting' do
+    it 'defaults to true for new course settings' do
+      new_course = create(:course, canvas_id: 'canvas_new', course_name: 'New Course', course_code: 'NEW101')
+      new_settings = described_class.create!(course: new_course)
+      expect(new_settings.extend_late_due_date).to be true
+    end
+
+    it 'can be set to false' do
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be false
+    end
+
+    it 'can be toggled from true to false' do
+      course_settings.extend_late_due_date = true
+      course_settings.save!
+      expect(course_settings.extend_late_due_date).to be true
+
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be false
+    end
+
+    it 'can be toggled from false to true' do
+      course_settings.extend_late_due_date = false
+      course_settings.save!
+      expect(course_settings.extend_late_due_date).to be false
+
+      course_settings.extend_late_due_date = true
+      course_settings.save!
+      expect(course_settings.reload.extend_late_due_date).to be true
     end
   end
 end

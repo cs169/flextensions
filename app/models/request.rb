@@ -167,11 +167,14 @@ class Request < ApplicationRecord
       else
         raise "Unsupported LMS Facade: #{lms_facade.class.name}"
       end
+
+      dates = date_calculator.calculate
       override = lms_facade.provision_extension(
         course_id,
         user_id,
         assignment.external_assignment_id,
-        requested_due_date.iso8601
+        dates[:due_date].iso8601,
+        dates[:late_due_date]&.iso8601
       )
     rescue => e
       Rails.logger.error "Error during LMS extension provisioning: #{e.message}"
@@ -186,6 +189,22 @@ class Request < ApplicationRecord
       external_extension_id: override&.id)
     send_email_response if course.course_settings&.enable_emails
     true
+  end
+
+  # Returns the AssignmentDateCalculator for this request
+  def date_calculator
+    @date_calculator ||= AssignmentDateCalculator.new(
+      assignment: assignment,
+      request: self,
+      course_settings: course.course_settings
+    )
+  end
+
+  # Calculates the new late due date for an extension based on course settings.
+  # Returns nil if the assignment has no late due date.
+  # Delegates to AssignmentDateCalculator for the actual calculation.
+  def calculate_new_late_due_date
+    date_calculator.late_due_date
   end
 
   def reject(processed_user_id)

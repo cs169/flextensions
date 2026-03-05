@@ -10,6 +10,10 @@ capybara-*.html
 *.orig
 rerun.txt
 pickle-email-*.html
+# All Heroku dumps.
+*.dump
+# GenAI stuff
+.claude
 
 # Ignore all logfiles and tempfiles.
 /log/*
