@@ -1,0 +1,32 @@
+project:
+  name: 'Flextensions'
+  owner: 'CS169L-23'
+  teamId: '02'
+  identities:
+    heroku: 'https://sp26-02-flextensions-45eafe44bb33.herokuapp.com'
+  members:
+    member1:
+      name: 'Basim'
+      surname: 'AlHarbi'
+      githubUsername: 'ba88im'
+      herokuEmail: 'basimalharbi@berkeley.edu'
+    member2:
+      name: 'Igor'
+      surname: 'Moyzeson'
+      githubUsername: 'Shklalom'
+      herokuEmail: 'igormoyzeson@berkeley.edu'
+    member3:
+      name: 'Noah'
+      surname: 'Nizamian'
+      githubUsername: 'noahnizamian'
+      herokuEmail: 'nizamian@berkeley.edu'
+    member4:
+      name: 'Alexander'
+      surname: 'Stepanov'
+      githubUsername: 'alxstx'
+      herokuEmail: 'alexander.stepanov@berkeley.edu'
+    member5:
+      name: 'Anthony'
+      surname: 'Dam'
+      githubUsername: 'gobears01'
+      herokuEmail: 'anthonydam@berkeley.edu'
