@@ -319,12 +319,13 @@ class RequestsController < ApplicationController
     processed_count = processed_ids.size
     failed_count = failed_ids.size
     action_label = action == :approve ? 'approved' : 'denied'
-    message = if failed_count.zero?
-                "#{processed_count} request#{'s' unless processed_count == 1} #{action_label} successfully."
-              else
-                "#{processed_count} request#{'s' unless processed_count == 1} #{action_label}. "\
-                "#{failed_count} failed."
-              end
+    message =
+      if failed_count.zero?
+        "#{processed_count} request#{'s' unless processed_count == 1} #{action_label} successfully."
+      else
+        "#{processed_count} request#{'s' unless processed_count == 1} #{action_label}. "\
+          "#{failed_count} failed."
+      end
 
     render_mass_action_response(
       success: processed_count.positive?,

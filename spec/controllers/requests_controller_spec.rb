@@ -414,7 +414,7 @@ RSpec.describe RequestsController, type: :controller do
       )
 
       fake_lms_user_facade = instance_double(CanvasFacade)
-      fake_lms_facade = instance_double(CanvasFacade, from_user: fake_lms_user_facade)
+      fake_lms_facade = class_double(CanvasFacade, from_user: fake_lms_user_facade)
       allow_any_instance_of(Assignment).to receive(:lms_facade).and_return(fake_lms_facade)
       allow_any_instance_of(Request).to receive(:approve) do |request_record, _lms_user_facade, processed_user|
         request_record.update!(status: 'approved', last_processed_by_user_id: processed_user.id)
@@ -428,11 +428,11 @@ RSpec.describe RequestsController, type: :controller do
         request_ids: [ pending_request_one.id, pending_request_two.id ]
       }, format: :json
 
-      payload = JSON.parse(response.body)
+      payload = response.parsed_body
       expect(response).to have_http_status(:ok)
       expect(payload['success']).to be(true)
       expect(payload['new_status']).to eq('approved')
-      expect(payload['processed_ids']).to match_array([ pending_request_one.id, pending_request_two.id ])
+      expect(payload['processed_ids']).to contain_exactly(pending_request_one.id, pending_request_two.id)
       expect(pending_request_one.reload.status).to eq('approved')
       expect(pending_request_two.reload.status).to eq('approved')
     end
@@ -440,7 +440,7 @@ RSpec.describe RequestsController, type: :controller do
     it 'returns an error when no request IDs are provided' do
       post :mass_approve, params: { course_id: course.id, request_ids: [] }, format: :json
 
-      payload = JSON.parse(response.body)
+      payload = response.parsed_body
       expect(response).to have_http_status(:unprocessable_entity)
       expect(payload['success']).to be(false)
       expect(payload['message']).to match(/select at least one/i)
@@ -480,11 +480,11 @@ RSpec.describe RequestsController, type: :controller do
         request_ids: [ pending_request_one.id, pending_request_two.id ]
       }, format: :json
 
-      payload = JSON.parse(response.body)
+      payload = response.parsed_body
       expect(response).to have_http_status(:ok)
       expect(payload['success']).to be(true)
       expect(payload['new_status']).to eq('denied')
-      expect(payload['processed_ids']).to match_array([ pending_request_one.id, pending_request_two.id ])
+      expect(payload['processed_ids']).to contain_exactly(pending_request_one.id, pending_request_two.id)
       expect(pending_request_one.reload.status).to eq('denied')
       expect(pending_request_two.reload.status).to eq('denied')
     end
@@ -498,7 +498,7 @@ RSpec.describe RequestsController, type: :controller do
         request_ids: [ pending_request_one.id, pending_request_two.id ]
       }, format: :json
 
-      payload = JSON.parse(response.body)
+      payload = response.parsed_body
       expect(response).to have_http_status(:unprocessable_entity)
       expect(payload['success']).to be(false)
       expect(payload['message']).to match(/no pending requests/i)
