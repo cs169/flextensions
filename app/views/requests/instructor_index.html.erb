@@ -1,6 +1,13 @@
 <div class="container-fluid mb-5">
   <div class="row">
-    <div class="col-12">
+    <div class="col-12"
+         data-controller="requests"
+         data-search-query="<%= @search_query %>"
+         data-show-all="<%= params[:show_all] == 'true' ? 'true' : 'false' %>"
+         data-readonly-token="<%= @course.readonly_api_token %>"
+         data-course-id="<%= @course.id %>"
+         data-mass-approve-url="<%= mass_approve_course_requests_path(@course, format: :json) %>"
+         data-mass-reject-url="<%= mass_reject_course_requests_path(@course, format: :json) %>">
       <%= render "courses/course_title" %>
       <h1 class="sr-only">Extension Requests</h1>
       <%= render "shared/extension_status_warning", course: @course %>
@@ -19,15 +26,35 @@
       </div>
 
       <% if @requests.any? %>
+        <div class="row mb-2">
+          <div class="col-12 text-end">
+            <button type="button"
+                    class="btn btn-sm btn-success me-2"
+                    disabled
+                    data-requests-target="massApproveButton"
+                    data-action="click->requests#massApprove">
+              Approve Selected
+            </button>
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    disabled
+                    data-requests-target="massRejectButton"
+                    data-action="click->requests#massReject">
+              Reject Selected
+            </button>
+          </div>
+        </div>
         <table class="table table-bordered table-striped datatable"
-               id="requests-table"
-               data-controller="requests"
-               data-search-query="<%= @search_query %>"
-               data-show-all="<%= params[:show_all] == 'true' ? 'true' : 'false' %>"
-               data-readonly-token="<%= @course.readonly_api_token %>"
-               data-course-id="<%= @course.id %>">
+               id="requests-table">
           <thead>
             <tr class="table-info">
+              <th class="text-center align-content-center no-sort" style="min-width: 60px;">
+                <input type="checkbox"
+                       id="select-all-requests"
+                       data-requests-target="selectAllCheckbox"
+                       data-action="change->requests#toggleSelectAll"
+                       aria-label="Select all pending requests">
+              </th>
               <th id="assignment">Assignment</th>
               <th class="text-center align-content-center" id="name">Name</th>
               <th class="text-center align-content-center" id="student-id">Student ID</th>
@@ -42,6 +69,15 @@
           <tbody>
             <% @requests.each do |request| %>
               <tr>
+                <td class="text-center align-content-center">
+                  <% if request.status == 'pending' %>
+                    <input type="checkbox"
+                           data-requests-target="rowCheckbox"
+                           data-request-id="<%= request.id %>"
+                           data-action="change->requests#toggleRowSelection"
+                           aria-label="Select request <%= request.id %> for <%= request.user.try(:name) || 'N/A' %>">
+                  <% end %>
+                </td>
                 <td class="align-content-center"><%= request.assignment ? request.assignment.name : "N/A" %></td>
                 <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
                 <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
