@@ -349,15 +349,27 @@ RSpec.describe RequestsController, type: :controller do
       expect(flash[:notice]).to match(/approved/i)
     end
 
-    # it 'shows error if approval fails' do
-    #   # stub the *same* request to return false here
-    #   allow(request).to receive(:approve).and_return(false)
+    it 'returns JSON success when approving via AJAX' do
+      post :approve, params: { course_id: course.id, id: request.id }, format: :json
 
-    #   post :approve, params: { course_id: course.id, id: request.id }
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('approved')
+      expect(payload['pending_count']).to be_a(Integer)
+      expect(payload['message']).to match(/approved/i)
+    end
 
-    #   expect(response).to redirect_to(course_requests_path(course))
-    #   expect(flash[:alert]).to match(/failed/i)
-    # end
+    it 'returns JSON error when approval fails via AJAX' do
+      allow_any_instance_of(Request).to receive(:approve).and_return(false)
+
+      post :approve, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/failed/i)
+    end
   end
 
   describe 'POST #reject' do
@@ -378,6 +390,28 @@ RSpec.describe RequestsController, type: :controller do
       post :reject, params: { course_id: course.id, id: request.id }
       expect(response).to redirect_to(course_requests_path(course))
       expect(flash[:alert]).to match(/failed/i)
+    end
+
+    it 'returns JSON success when rejecting via AJAX' do
+      post :reject, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('denied')
+      expect(payload['pending_count']).to be_a(Integer)
+      expect(payload['message']).to match(/denied/i)
+    end
+
+    it 'returns JSON error when rejection fails via AJAX' do
+      allow_any_instance_of(Request).to receive(:reject).and_return(false)
+
+      post :reject, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/failed/i)
     end
   end
 
