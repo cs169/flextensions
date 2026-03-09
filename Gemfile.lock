@@ -233,7 +233,8 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.2.1)
-    hashie (5.0.0)
+    hashie (5.1.0)
+      logger
     http-cookie (1.1.0)
       domain_name (~> 0.5)
     httparty (0.24.0)
@@ -258,8 +259,8 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.18.1)
-    json-schema (6.1.0)
+    json (2.19.1)
+    json-schema (6.2.0)
       addressable (~> 2.8)
       bigdecimal (>= 3.1, < 5)
     jwt (3.1.2)
@@ -300,7 +301,7 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.0.4)
+    marcel (1.1.0)
     matrix (0.4.3)
     mcp (0.8.0)
       json-schema (>= 4.1)
@@ -564,7 +565,7 @@ GEM
       memoist3 (~> 1.0.0)
     thor (1.5.0)
     thread_safe (0.3.6)
-    tilt (2.6.0)
+    tilt (2.7.0)
     timecop (0.9.10)
     timeout (0.6.0)
     tsort (0.2.0)
