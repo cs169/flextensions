@@ -196,6 +196,9 @@ export default class extends Controller {
     _handleSingleSuccess(button, data) {
         const tr = button.closest('tr');
         this._applyRowOutcome(tr, data.new_status);
+        if (this.table) {
+            this.table.draw(false);
+        }
         this._updatePendingCount(data.pending_count);
         this._syncSelectionControls();
     }
