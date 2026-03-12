@@ -19,79 +19,85 @@
       </div>
 
       <% if @requests.any? %>
-        <table class="table table-bordered table-striped datatable"
-               id="requests-table"
-               data-controller="requests"
-               data-readonly-token="<%= @course.readonly_api_token %>"
-               data-course-id="<%= @course.id %>">
-          <thead>
-            <tr class="table-info">
-              <th id="assignment">Assignment</th>
-              <th class="text-center align-content-center" id="name">Name</th>
-              <th class="text-center align-content-center" id="student-id">Student ID</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
-              <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
-              <th class="text-center align-content-center" style="min-width: 240px;">Status</th>
-              <th class="text-center align-content-center no-sort" style="min-width: 220px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @requests.each do |request| %>
-              <tr>
-                <td class="align-content-center"><%= request.assignment ? request.assignment.name : "N/A" %></td>
-                <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
-                <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
-                <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
-                  <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                </td>
-                <td class="text-center align-content-center" data-order="<%= request.assignment&.due_date&.iso8601 %>">
-                  <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                </td>
-                <td class="text-center align-content-center" data-order="<%= request.requested_due_date&.iso8601 %>">
-                  <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
-                </td>
-                <td class="text-center align-content-center">
-                  <% if request.assignment&.due_date && request.requested_due_date.present? %>
-                    <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
-                  <% else %>
-                    N/A
-                  <% end %>
-                </td>
-                <td class="text-center align-content-center" data-export="<%= status_export_string(request) %>">
-                  <% case request.status %>
-                    <% when 'pending' %>
-                      <span class="badge text-bg-info">Pending</span>
-                    <% when 'approved' %>
-                      <% if request.auto_approved %>
-                        <span class="badge text-bg-success">Auto Approved</span>
-                      <% else %>
-                        <span class="badge text-bg-success">Approved</span>
-                      <% end %>
-                      on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                      by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
-                    <% when 'denied' %>
-                      <span class="badge text-bg-danger me-3">Denied</span>
-                      on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                      by <%= request.last_processed_by_user&.name || 'Unknown' %>
-                    <% else %>
-                      <span class="badge text-bg-secondary">Unknown</span>
-                  <% end %>
-                </td>
-                <td class="text-center align-content-center">
-                  <%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
-                  <% if request.status == 'pending' %>
-                    <div class="btn-group d-inline-flex">
-                      <%= button_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
-                      <%= button_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
-                    </div>
-                  <% end %>
-                </td>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped datatable"
+                 id="requests-table"
+                 data-controller="requests"
+                 data-readonly-token="<%= @course.readonly_api_token %>"
+                 data-course-id="<%= @course.id %>">
+            <thead>
+              <tr class="table-info">
+                <th class="text-center align-content-center no-sort" style="min-width: 100px;" data-priority="1">Actions</th>
+                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
+                <th class="text-center align-content-center" id="name" data-priority="5">Name</th>
+                <th class="text-center align-content-center" id="student-id" data-priority="9">Student ID</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="7">Requested At</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="8">Original Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="4">Requested Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 90px;" data-priority="6"># of Days</th>
+                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="3">Status</th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% @requests.each do |request| %>
+                <tr>
+                  <td class="text-center align-content-center">
+                    <%= link_to course_request_path(@course, request), class: "btn btn-sm btn-primary", title: "View", aria: { label: "View request" } do %>
+                      <i class="fas fa-arrow-right"></i>
+                    <% end %>
+                    <% if request.status == 'pending' %>
+                      <%= button_to approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1', title: "Approve", form: { "aria-label" => "Approve request" } do %>
+                        <i class="fas fa-check"></i>
+                      <% end %>
+                      <%= button_to reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1', title: "Reject", form: { "aria-label" => "Reject request" } do %>
+                        <i class="fas fa-times"></i>
+                      <% end %>
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center" style="max-width: 200px; word-wrap: break-word;"><%= request.assignment ? request.assignment.name : "N/A" %></td>
+                  <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
+                  <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
+                  <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
+                    <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.assignment&.due_date&.iso8601 %>">
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.requested_due_date&.iso8601 %>">
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center">
+                    <% if request.assignment&.due_date && request.requested_due_date.present? %>
+                      <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
+                    <% else %>
+                      N/A
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center" data-export="<%= status_export_string(request) %>">
+                    <% case request.status %>
+                      <% when 'pending' %>
+                        <span class="badge text-bg-info">Pending</span>
+                      <% when 'approved' %>
+                        <% if request.auto_approved %>
+                          <span class="badge text-bg-success">Auto Approved</span>
+                        <% else %>
+                          <span class="badge text-bg-success">Approved</span>
+                        <% end %>
+                        on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                        by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
+                      <% when 'denied' %>
+                        <span class="badge text-bg-danger me-3">Denied</span>
+                        on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                        by <%= request.last_processed_by_user&.name || 'Unknown' %>
+                      <% else %>
+                        <span class="badge text-bg-secondary">Unknown</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
       <% else %>
         <div class="alert alert-warning">There are no current requests.</div>
       <% end %>

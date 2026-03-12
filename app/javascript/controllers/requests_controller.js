@@ -23,9 +23,9 @@ export default class extends Controller {
                 responsive: true,
                 columnDefs: [
                     { orderable: false, targets: 'no-sort' },
-                    { type: "date", targets: [3, 4, 5] }
+                    { type: "date", targets: [4, 5, 6] }
                 ],
-                order: [[3, "asc"]],
+                order: [[4, "asc"]],
                 layout: {
                     topStart: {
                         buttons: [
