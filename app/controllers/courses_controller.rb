@@ -78,6 +78,7 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @enrollments = @course.user_to_courses.includes(:user)
+    @is_course_admin = @course.user_to_courses.find_by(user: @user)&.course_admin?
   end
 
   def delete

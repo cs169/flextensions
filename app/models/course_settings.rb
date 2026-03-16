@@ -54,6 +54,12 @@ class CourseSettings < ApplicationRecord
   validate :gradescope_url_is_valid, if: :enable_gradescope?
   after_save :create_or_update_gradescope_link
 
+  def automatic_approval_enabled?
+    return false unless enable_extensions?
+
+    auto_approve_days.positive? || auto_approve_extended_request_days.positive?
+  end
+
   def ensure_system_user_for_auto_approval
     # Create the system user if auto-approval is being enabled
     return unless enable_extensions && auto_approve_days.to_i.positive?
