@@ -10,7 +10,7 @@ class UserToCoursesController < ApplicationController
       render json: { success: true }, status: :ok
     else
       flash[:alert] = "Failed to update enrollment: #{@enrollment.errors.full_messages.to_sentence}"
-      render json: { redirect_to: course_path(@course) }, status: :unprocessable_entity
+      render json: { redirect_to: course_path(@course) }, status: :unprocessable_content
     end
   end
 
