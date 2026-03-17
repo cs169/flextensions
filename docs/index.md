@@ -23,6 +23,7 @@ _* Well, all of your courses which use bCourses or Gradescope and enable assignm
 - Grant extensions to students with a few clicks.
 - Monitor extension usage across your course.
 - Automate approving extension requests and email sending
+- Use as an [API](/docs/api/index.html) to integrate with your own tools and systems.
 
 ### [🎓 For Students](/flextensions/students/):
 - View all your granted extensions in one place.
