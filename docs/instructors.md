@@ -99,8 +99,8 @@ Control when and how requests are automatically approved:
 - **Auto-approve within days**
   Automatically approves requests made within the specified number of days before the assignment due date. Leave blank to disable.
 
-<!-- - **Auto-approve within days (DSP)**
-  Applies a similar rule specifically to students with a DSP accommodation flag. -->
+- **Auto-approve within days (Ex)**
+  Applies a similar rule specifically to students with a DSP accommodation flag.
 
 - **Maximum requests to auto-approve**
   Sets a per-student limit on auto-approved requests. Use `0` for no limit.

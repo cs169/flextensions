@@ -42,6 +42,8 @@ Are you a developer? Check out the [Developer Documentation](/flextensions/devel
 
 Want to know what's new? See the [Updates page](/flextensions/updates/) for recent changes or visit the [GitHub Releases](https://github.com/berkeley-cdss/flextensions/releases) for a full changelog.
 
+Interested in the research behind Flextensions? Check out the [Research page](/flextensions/research/).
+
 ---
 
 ## Credits
