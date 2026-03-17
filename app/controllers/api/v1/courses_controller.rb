@@ -10,7 +10,7 @@ module API
       def create
         course_name = params[:course_name]
         if Course.exists?(course_name: course_name)
-          render json: { message: 'A course with the same course name already exists.' }, status: :unprocessable_entity
+          render json: { message: 'A course with the same course name already exists.' }, status: :unprocessable_content
           return
         end
 
@@ -45,7 +45,7 @@ module API
         # Check if the user has been already added to the course
         existing_user_to_course = UserToCourse.find_by(course_id: course_id, user_id: user_id)
         if existing_user_to_course
-          render json: { error: 'The user is already added to the course.' }, status: :unprocessable_entity
+          render json: { error: 'The user is already added to the course.' }, status: :unprocessable_content
           return
         end
 
@@ -65,7 +65,7 @@ module API
           render json: object, status: :created
         else
           flash[:error] = error_message
-          render json: { error: object.errors.full_messages }, status: :unprocessable_entity
+          render json: { error: object.errors.full_messages }, status: :unprocessable_content
         end
       end
     end

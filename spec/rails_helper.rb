@@ -66,7 +66,6 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     Rails.application.load_seed
-    puts "Loaded seeds"
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

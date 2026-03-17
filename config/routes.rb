@@ -45,6 +45,11 @@ Rails.application.routes.draw do
         get :export, defaults: { format: :csv }
       end
     end
+    resources :user_to_courses, only: [] do
+      member do
+        patch :toggle_allow_extended_requests
+      end
+    end
     resource :form_setting, only: [:edit, :update]
   end
   post 'course_settings/update'

@@ -24,7 +24,7 @@ module API
           render json: { message: 'User created successfully', user: new_user }, status: :created
         else
           render json: { message: 'Failed to create user', errors: new_user.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
 
