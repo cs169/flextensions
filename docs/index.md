@@ -48,7 +48,9 @@ Interested in the research behind Flextensions? Check out the [Research page](/f
 
 ## Credits
 
-Flextensions was originally developed by students in [CS169L](https://saasbook.info), during the Spring 2024 and Spring 2025 semesters, as part of the [Software as a Service](https://saasbook.info) course at UC Berkeley.
+Flextensions is currently maintained by [Michael Ball][mball], [Continuing Lecturer in EECS][mb_eecs]. It has been developed by students in [CS169L](https://saasbook.info), during the Spring 2024, 2025 and 2026 semesters, as part of the [Software as a Service](https://saasbook.info) course at UC Berkeley.
+
+The Flextensions project has been generously supported by the [Research, Teaching, and Learning](https://teaching.berkeley.edu) and the [Office of the Vice Provost for Undergraduate Education](https://ue.berkeley.edu) at UC Berkeley through the [Seamless Learning Project](https://berkeley-cdss.github.io/seamless-learning/).
 
 Student developers (in alphabetical order):
 
@@ -63,6 +65,7 @@ Student developers (in alphabetical order):
 * [Yaman Tarakji](https://www.linkedin.com/in/yaman-tarakji-602530196), Spring 2025
 * Zee Babar, Spring 2024
 
-[Michael Ball][mball], Armando Fox, and Lisa Yan are the faculty members who have overseen the development of Flextensions.
+Armando Fox, and Lisa Yan are faculty members who have also overseen the development of Flextensions and make significant contributions to the project.
 
 [mball]: https://mball.co/
+[mb_eecs]: https://www.eecs.berkeley.edu/Faculty/Homepages/mball.html
