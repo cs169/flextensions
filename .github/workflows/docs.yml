@@ -1,0 +1,66 @@
+name: Docs Build
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+  pull_request:
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: docs
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build --baseurl /flextensions
+        env:
+          JEKYLL_ENV: production
+          PAGES_REPO_NWO: berkeley-cds/flextensions
+
+      - name: Check for broken internal links
+        run: |
+          # Verify all internal .html files were generated
+          echo "Generated site files:"
+          find _site -name '*.html' | sort
+          echo ""
+          echo "Checking for broken internal links..."
+          # Extract internal href links and verify they resolve
+          broken=0
+          for file in $(find _site -name '*.html'); do
+            # Extract href values pointing to /flextensions/ paths
+            grep -oP 'href="(/flextensions/[^"]*)"' "$file" 2>/dev/null | while read -r match; do
+              path=$(echo "$match" | grep -oP '"/flextensions/[^"]*"' | tr -d '"')
+              # Convert URL path to file path
+              local_path="_site${path#/flextensions}"
+              # Check if it's a directory (index.html) or file
+              if [ -d "$local_path" ] && [ -f "$local_path/index.html" ]; then
+                continue
+              elif [ -f "$local_path" ]; then
+                continue
+              elif [ -f "${local_path}.html" ]; then
+                continue
+              elif [ -f "${local_path%/}/index.html" ]; then
+                continue
+              else
+                echo "::warning file=$file::Broken link: $path (resolved to $local_path)"
+                broken=1
+              fi
+            done
+          done
+          if [ "$broken" -eq 1 ]; then
+            echo "::warning::Some internal links may be broken. Check warnings above."
+          fi

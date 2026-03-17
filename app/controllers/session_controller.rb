@@ -35,6 +35,7 @@ class SessionController < ApplicationController
 
   def omniauth_callback
     if params[:error].present?
+      Rails.logger.error("OmniAuth callback error: #{params[:error_description] || params[:error]}")
       redirect_to root_path, alert: 'Authentication failed. Please try again.'
       return
     end
