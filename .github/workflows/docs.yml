@@ -29,6 +29,7 @@ jobs:
         run: bundle exec jekyll build --baseurl /flextensions
         env:
           JEKYLL_ENV: production
+          PAGES_REPO_NWO: berkeley-cds/flextensions
 
       - name: Check for broken internal links
         run: |
