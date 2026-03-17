@@ -57,8 +57,8 @@
                          aria-label="Select all pending requests">
                 </th>
                 <th class="text-center align-content-center no-sort" style="min-width: 100px;" data-priority="1">Actions</th>
-                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
                 <th class="text-center align-content-center" id="name" data-priority="5">Name</th>
+                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
                 <th class="text-center align-content-center" id="student-id" data-priority="9">Student ID</th>
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="7">Requested At</th>
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="8">Original Due Date</th>
@@ -106,8 +106,12 @@
                       <% end %>
                     </div>
                   </td>
-                  <td class="text-center align-content-center" style="max-width: 200px; word-wrap: break-word;"><%= request.assignment ? request.assignment.name : "N/A" %></td>
-                  <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
+                  <td class="text-center align-content-center">
+                    <%= link_to request.user.try(:name) || 'N/A', course_request_path(@course, request) %>
+                  </td>
+                  <td class="text-center align-content-center" style="max-width: 200px; word-wrap: break-word;">
+                    <%= link_to request.assignment ? request.assignment.name : "N/A", course_request_path(@course, request) %>
+                  </td>
                   <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
                   <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
                     <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
