@@ -4,6 +4,7 @@ import "datatables.net-responsive";
 import "datatables.net-responsive-bs5";
 
 export default class extends Controller {
+	static targets = ["checkbox"]
 	static values = { courseId: Number }
 
 	connect() {
@@ -25,23 +26,61 @@ export default class extends Controller {
 				responsive: true,
 				pageLength: 500,
 				lengthMenu: [[-1, 25, 50, 100, 500], ["All", 25, 50, 100, 500]],
-				columns: [
-					null, // Name
-					null, // Email
-					null, // Section
-					{ orderDataType: 'role-pre' } // Role column (custom sort)
-				],
+				columns: document.querySelectorAll('#enrollments-table thead th').length === 5
+					? [null, null, null, { orderDataType: 'role-pre' }, null]
+					: [null, null, null, { orderDataType: 'role-pre' }],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
 		}
+	}
+
+	async toggleExtended(event) {
+		const checkbox = event.currentTarget;
+		const url = checkbox.dataset.url;
+		const allowExtended = checkbox.checked;
+
+		try {
+			const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+			const response = await fetch(url, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					"X-CSRF-Token": token,
+				},
+				body: JSON.stringify({
+					allow_extended_requests: allowExtended,
+				}),
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				if (data.redirect_to) {
+					window.location.href = data.redirect_to;
+					return;
+				}
+				throw new Error(data.error || 'Error updating enrollment');
+			}
+
+			const td = checkbox.closest('td');
+			if (td) td.dataset.order = allowExtended ? '1' : '0';
+			this._dispatchFlash('notice', `Extended requests ${allowExtended ? 'enabled' : 'disabled'}.`);
+		} catch (error) {
+			console.error("Error updating enrollment:", error);
+			checkbox.checked = !allowExtended;
+		}
+	}
+
+	_dispatchFlash(type, message) {
+		window.dispatchEvent(new CustomEvent('flash', { detail: { type: type, message: message } }));
 	}
 
 	sync() {
 		const button = event.currentTarget;
 		button.disabled = true;
 		const courseId = this.courseIdValue;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
-		fetch(`/courses/${courseId}/sync_enrollments`, {
+		const token = document.querySelector('meta[name="csrf-token"]').content;		fetch(`/courses/${courseId}/sync_enrollments`, {
 		  method: "POST",
 		  headers: {
 			"Content-Type": "application/json",

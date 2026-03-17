@@ -35,7 +35,7 @@ class SyncUsersFromCanvasJob < ApplicationJob
       Rails.logger.error "Unexpected response from Canvas API: #{canvas_users.inspect}"
       return { added: 0, removed: 0, updated: 0 }
     end
-    current_canvas_user_ids = canvas_users.pluck('id')
+    current_canvas_user_ids = canvas_users.pluck('id').map(&:to_s)
 
     users_added = 0
     users_removed = 0
