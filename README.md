@@ -81,8 +81,6 @@ Cite the software itself using the following DOI:
 
 https://doi.org/10.5281/zenodo.17246291
 
-References:
-
 ```
 # IEEE
 [1]M. Ball, “Flextensions”. Zenodo, Aug. 20, 2025. doi: 10.5281/zenodo.17246291.
