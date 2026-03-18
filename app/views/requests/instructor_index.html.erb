@@ -26,24 +26,6 @@
       </div>
 
       <% if @requests.any? %>
-        <div class="row mb-2">
-          <div class="col-12 text-end">
-            <button type="button"
-                    class="btn btn-sm btn-success me-2"
-                    disabled
-                    data-requests-target="massApproveButton"
-                    data-action="click->requests#massApprove">
-              Approve Selected
-            </button>
-            <button type="button"
-                    class="btn btn-sm btn-danger"
-                    disabled
-                    data-requests-target="massRejectButton"
-                    data-action="click->requests#massReject">
-              Reject Selected
-            </button>
-          </div>
-        </div>
         <div class="table-responsive">
           <table class="table table-bordered table-striped datatable"
                  id="requests-table">
@@ -72,11 +54,16 @@
                 <tr>
                   <td class="text-center align-content-center">
                     <% if request.status == 'pending' %>
-                      <input type="checkbox"
-                             data-requests-target="rowCheckbox"
-                             data-request-id="<%= request.id %>"
-                             data-action="change->requests#toggleRowSelection"
-                             aria-label="Select request <%= request.id %> for <%= request.user.try(:name) || 'N/A' %>">
+                      <div class="form-check form-switch mx-auto" style="width: 45px;">
+                        <input class="form-check-input" type="checkbox"
+                               role="switch"
+                               id="select-request-<%= request.id %>"
+                               data-requests-target="rowCheckbox"
+                               data-request-id="<%= request.id %>"
+                               data-action="change->requests#toggleRowSelection"
+                               aria-label="Select request <%= request.id %> for <%= request.user.try(:name) || 'N/A' %>">
+                        <label class="visually-hidden" for="select-request-<%= request.id %>">Select request for <%= request.user.try(:name) || 'N/A' %></label>
+                      </div>
                     <% end %>
                   </td>
                   <td class="text-center align-content-center">
@@ -153,6 +140,24 @@
               <% end %>
             </tbody>
           </table>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12 text-start">
+            <button type="button"
+                    class="btn btn-sm btn-success me-2"
+                    disabled
+                    data-requests-target="massApproveButton"
+                    data-action="click->requests#massApprove">
+              Approve Selected
+            </button>
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    disabled
+                    data-requests-target="massRejectButton"
+                    data-action="click->requests#massReject">
+              Reject Selected
+            </button>
+          </div>
         </div>
       <% else %>
         <div class="alert alert-warning">There are no current requests.</div>
