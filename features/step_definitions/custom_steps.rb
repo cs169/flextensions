@@ -197,7 +197,7 @@ end
 
 Given(/^a pending request exists$/) do
   student = User.joins(:user_to_courses).find_by(user_to_courses: { course: @course, role: 'student' })
-  assignment = Assignment.find_by(course: @course)
+  assignment = Assignment.first
   @pending_request = create(:request, user: student, course: @course, assignment: assignment)
 end
 

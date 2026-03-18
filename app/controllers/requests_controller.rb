@@ -146,7 +146,7 @@ class RequestsController < ApplicationController
       alert = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
       respond_to do |format|
         format.html { flash[:alert] = alert; redirect_to course_requests_path(@course) }
-        format.json { render json: { success: false, message: alert }, status: :unprocessable_entity }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_content }
       end
     end
   end
@@ -162,7 +162,7 @@ class RequestsController < ApplicationController
       alert = 'Failed to deny the request.'
       respond_to do |format|
         format.html { redirect_to course_requests_path(@course), alert: alert }
-        format.json { render json: { success: false, message: alert }, status: :unprocessable_entity }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_content }
       end
     end
   end
@@ -291,7 +291,7 @@ class RequestsController < ApplicationController
         processed_ids: [],
         failed_ids: [],
         new_status: action == :approve ? 'approved' : 'denied',
-        status: :unprocessable_entity
+        status: :unprocessable_content
       )
     end
 
@@ -304,7 +304,7 @@ class RequestsController < ApplicationController
         processed_ids: [],
         failed_ids: request_ids,
         new_status: action == :approve ? 'approved' : 'denied',
-        status: :unprocessable_entity
+        status: :unprocessable_content
       )
     end
 
@@ -333,7 +333,7 @@ class RequestsController < ApplicationController
       processed_ids: processed_ids,
       failed_ids: failed_ids,
       new_status: action_label,
-      status: processed_count.positive? ? :ok : :unprocessable_entity
+      status: processed_count.positive? ? :ok : :unprocessable_content
     )
   end
 
