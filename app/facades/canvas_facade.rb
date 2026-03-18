@@ -318,6 +318,9 @@ class CanvasFacade < LmsFacade
   # @raises  [FailedPipelineError] if the creation response body could not be parsed.
   # @raises  [NotFoundError]       if the user has an existing override that cannot be located.
   def provision_extension(course_id, student_id, assignment_id, new_due_date, new_late_due_date = nil)
+    # Use the late due date for close_date (lock_at in Canvas API) if provided, otherwise fall back to the due date
+    close_date = new_late_due_date || new_due_date
+
     # get existing_overrides for an assignment
     student_override = get_existing_student_override(course_id, student_id, assignment_id)
     if !student_override.nil?

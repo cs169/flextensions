@@ -556,12 +556,30 @@ RSpec.describe Request, type: :model do
     it 'passes calculated late due date to the LMS facade' do
       late_due_date = 5.days.from_now
       allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
+    it 'provisions an extension through the LMS facade with late due date' do
+      allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
       request.approve(lms_facade, instructor)
 
       expect(lms_facade).to have_received(:provision_extension).with(
         course.canvas_id,
         user.canvas_uid.to_i,
         assignment.external_assignment_id,
+        request.requested_due_date.iso8601,
+        nil
+      )
+    end
+
+    it 'passes calculated late due date to the LMS facade' do
+      late_due_date = 5.days.from_now
+      allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
+      request.approve(lms_facade, instructor)
+
+      expect(lms_facade).to have_received(:provision_extension).with(
+        course.canvas_id,
+        user.canvas_uid.to_i,
+        assignment.external_assignment_id,
+        request.requested_due_date.iso8601,
+        late_due_date.iso8601
         request.requested_due_date.iso8601,
         late_due_date.iso8601
       )
@@ -626,6 +644,22 @@ RSpec.describe Request, type: :model do
       it 'passes calculated late due date to Gradescope facade' do
         late_due_date = 5.days.from_now
         allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
+      it 'provisions an extension through Gradescope with email identifier and late due date' do
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
+        request.approve(gradescope_facade, instructor)
+
+        expect(gradescope_facade).to have_received(:provision_extension).with(
+          course.gradescope_id,
+          user.email,
+          assignment.external_assignment_id,
+          request.requested_due_date.iso8601,
+          nil
+        )
+      end
+
+      it 'passes calculated late due date to Gradescope facade' do
+        late_due_date = 5.days.from_now
+        allow(request).to receive(:calculate_new_late_due_date).and_return(late_due_date)
         request.approve(gradescope_facade, instructor)
 
         expect(gradescope_facade).to have_received(:provision_extension).with(
@@ -634,10 +668,13 @@ RSpec.describe Request, type: :model do
           assignment.external_assignment_id,
           request.requested_due_date.iso8601,
           late_due_date.iso8601
+          request.requested_due_date.iso8601,
+          late_due_date.iso8601
         )
       end
 
       it 'marks the request as approved and records Gradescope metadata' do
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
         allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
         expect(request.approve(gradescope_facade, instructor)).to be(true)
 
@@ -648,6 +685,7 @@ RSpec.describe Request, type: :model do
 
       it 'allows nil override but still approves for Gradescope' do
         allow(gradescope_facade).to receive(:provision_extension).and_return(nil)
+        allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
         allow(request).to receive(:calculate_new_late_due_date).and_return(nil)
 
         expect(request.approve(gradescope_facade, instructor)).to be(true)
@@ -750,7 +788,6 @@ RSpec.describe Request, type: :model do
         )
       end
 
-      # rubocop:disable RSpec/NestedGroups
       context 'when original late due date is later than extended due date' do
         let(:requested_due_date) { Time.zone.parse('2025-01-16 23:59:00') }
 
@@ -772,20 +809,18 @@ RSpec.describe Request, type: :model do
           expect(result).to eq(requested_due_date)
         end
       end
-      # rubocop:enable RSpec/NestedGroups
     end
 
     context 'when extend_late_due_date setting is nil (defaults to true)' do
       before do
         # Create settings without explicitly setting extend_late_due_date
-        # This simulates existing c;';;
-
-        ourses before the migration
+        # This simulates existing courses before the migration
         cs = CourseSettings.create!(
           course: course,
           enable_extensions: true
         )
-        cs.update(extend_late_due_date: false)
+        # Manually set to nil to simulate pre-migration state
+        cs.update_column(:extend_late_due_date, nil)
       end
 
       it 'defaults to shifting the late due date by the extension delta' do
