@@ -77,3 +77,15 @@ Scenario: Teacher sees Request in Requests table
     Then I log in as a teacher
     And I go to the Requests page
     Then I should see "Homework 3"
+
+Scenario: Approve Selected and Reject Selected buttons appear below the requests table
+    Given a pending request exists
+    And I go to the Requests page
+    Then the "Approve Selected" button should appear after the requests table
+    And the "Reject Selected" button should appear after the requests table
+
+Scenario: Clicking the status of a request navigates to the request page
+    Given a pending request exists
+    And I go to the Requests page
+    When I click the status cell for that request
+    Then I should be on the request page for that request
