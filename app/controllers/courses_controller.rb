@@ -77,6 +77,7 @@ class CoursesController < ApplicationController
 
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
+    return render json: { error: 'You do not have permission.' }, status: :forbidden unless @is_course_admin
 
     @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
@@ -114,6 +115,7 @@ class CoursesController < ApplicationController
 
   def determine_user_role
     @role = @course&.user_role(@user)
+    @is_course_admin = @course&.course_admin?(@user) || false
   end
 
   # Filters Canvas API course hashes by their term name
