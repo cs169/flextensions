@@ -105,13 +105,56 @@ RSpec.describe CoursesController, type: :controller do
       end
     end
 
-    it 'syncs enrollments and returns OK' do
-      allow(course).to receive(:sync_all_enrollments_from_canvas)
+    context 'when user is a teacher (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'teacher')
+      end
 
-      post :sync_enrollments, params: { id: course.id }
+      it 'syncs enrollments and returns OK' do
+        allow_any_instance_of(Course).to receive(:sync_all_enrollments_from_canvas)
 
-      expect(response).to have_http_status(:ok)
-      expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+      end
+    end
+
+    context 'when user is a leadta (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'leadta')
+      end
+
+      it 'syncs enrollments and returns OK' do
+        allow_any_instance_of(Course).to receive(:sync_all_enrollments_from_canvas)
+
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+      end
+    end
+
+    context 'when user is a TA (not course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'ta')
+      end
+
+      it 'returns forbidden' do
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body).to eq({ 'error' => 'You do not have permission.' })
+      end
+    end
+
+    context 'when user is a student' do
+      it 'returns forbidden' do
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body).to eq({ 'error' => 'You do not have permission.' })
+      end
     end
   end
 
@@ -227,13 +270,14 @@ RSpec.describe CoursesController, type: :controller do
       # Create LMS credentials so user has a token
       user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
 
-      # Add user as a teacher so they are allowed to view enrollments
-      UserToCourse.create!(user: user, course: course, role: 'teacher')
-
       CourseToLms.create!(course: course, lms_id: 1)
     end
 
-    context 'when user is an instructor' do
+    context 'when user is a teacher (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'teacher')
+      end
+
       it 'renders the enrollments view successfully' do
         get :enrollments, params: { id: course.id }
 
@@ -244,6 +288,38 @@ RSpec.describe CoursesController, type: :controller do
         # Check that the enrollments include the user
         enrollment_user_ids = assigns(:enrollments).map(&:user_id)
         expect(enrollment_user_ids).to include(user.id)
+      end
+
+      it 'sets @is_course_admin to true' do
+        get :enrollments, params: { id: course.id }
+        expect(assigns(:is_course_admin)).to be true
+      end
+    end
+
+    context 'when user is a TA (staff but not course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'ta')
+      end
+
+      it 'renders the enrollments view successfully' do
+        get :enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:enrollments)
+        expect(assigns(:enrollments)).not_to be_nil
+      end
+
+      it 'sets @is_course_admin to false' do
+        get :enrollments, params: { id: course.id }
+        expect(assigns(:is_course_admin)).to be false
+      end
+    end
+
+    context 'when user is a student' do
+      it 'redirects with access denied' do
+        get :enrollments, params: { id: course.id }
+        expect(response).to redirect_to(courses_path)
+        expect(flash[:alert]).to eq('You do not have access to this page.')
       end
     end
   end
