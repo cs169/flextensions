@@ -59,10 +59,8 @@ class Request < ApplicationRecord
   end
 
   # Process a newly created request, including auto-approval check
-  # TODO: This should be APP_HOST or something like:
-  # Rails.application.routes.default_url_options[:host]
   def process_created_request(current_user)
-    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
+    link = request_link
 
     if try_auto_approval(current_user)
       slack_message, result = build_created_slack_and_result(:auto_approved, link)
@@ -77,7 +75,7 @@ class Request < ApplicationRecord
 
   # Handle request update and check for auto-approval
   def process_update(_current_user)
-    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
+    link = request_link
     notify_slack = true
 
     if status == 'pending' && try_auto_approval(_current_user)
@@ -228,7 +226,7 @@ class Request < ApplicationRecord
     }
   end
 
-def send_email_response
+  def send_email_response
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
@@ -320,5 +318,13 @@ def send_email_response
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url)
     Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}. Please check your webhook URL." unless success
+  end
+
+  def request_link
+    base_host = ENV['APP_HOST'].presence || Rails.application.routes.default_url_options[:host].presence
+    return Rails.application.routes.url_helpers.course_request_path(course, id) if base_host.blank?
+
+    normalized_host = base_host.start_with?('http://', 'https://') ? base_host : "https://#{base_host}"
+    "#{normalized_host.chomp('/')}/courses/#{course.id}/requests/#{id}"
   end
 end

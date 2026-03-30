@@ -11,7 +11,7 @@ class RequestsController < ApplicationController
   before_action :check_extensions_enabled_for_students, except: [ :export ]
   before_action :ensure_request_is_pending, only: %i[update approve reject]
   before_action :set_request, only: %i[show edit cancel]
-  before_action :check_instructor_permission, only: %i[approve reject]
+  before_action :check_instructor_permission, only: %i[approve reject mass_approve mass_reject]
 
   def index
     @side_nav = 'requests'
@@ -137,19 +137,42 @@ class RequestsController < ApplicationController
     @assignment = Assignment.find_by(id: @request.assignment_id)
     lms_facade = @assignment.lms_facade
     if @request.approve(lms_facade.from_user(@user), @user)
-      redirect_to course_requests_path(@course), notice: 'Request approved and extension created successfully in Canvas.'
+      notice = 'Request approved and extension created successfully in Canvas.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), notice: notice }
+        format.json { render json: { success: true, message: notice, new_status: 'approved', pending_count: @course.requests.where(status: 'pending').count } }
+      end
     else
-      flash[:alert] = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
-      redirect_to course_requests_path(@course)
+      alert = "Failed to approve the request. #{@request.errors.full_messages.join(', ')}"
+      respond_to do |format|
+        format.html { flash[:alert] = alert; redirect_to course_requests_path(@course) }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_content }
+      end
     end
   end
 
   def reject
     if @request.reject(@user)
-      redirect_to course_requests_path(@course), notice: 'Request denied successfully.'
+      notice = 'Request denied successfully.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), notice: notice }
+        format.json { render json: { success: true, message: notice, new_status: 'denied', pending_count: @course.requests.where(status: 'pending').count } }
+      end
     else
-      redirect_to course_requests_path(@course), alert: 'Failed to deny the request.'
+      alert = 'Failed to deny the request.'
+      respond_to do |format|
+        format.html { redirect_to course_requests_path(@course), alert: alert }
+        format.json { render json: { success: false, message: alert }, status: :unprocessable_content }
+      end
     end
+  end
+
+  def mass_approve
+    process_mass_action(:approve)
+  end
+
+  def mass_reject
+    process_mass_action(:reject)
   end
 
   def export
@@ -257,6 +280,98 @@ class RequestsController < ApplicationController
   def handle_successful_student_request(student)
     result = @request.process_created_request(@user)
     redirect_to result[:redirect_to], notice: "Request created for #{student.name}. #{result[:notice]}"
+  end
+
+  def process_mass_action(action)
+    request_ids = mass_request_ids
+    if request_ids.empty?
+      return render_mass_action_response(
+        success: false,
+        message: 'Please select at least one request.',
+        processed_ids: [],
+        failed_ids: [],
+        new_status: action == :approve ? 'approved' : 'denied',
+        status: :unprocessable_content
+      )
+    end
+
+    requests = @course.requests.where(id: request_ids, status: 'pending').includes(:assignment)
+
+    if requests.empty?
+      return render_mass_action_response(
+        success: false,
+        message: 'No pending requests were found for the selected rows.',
+        processed_ids: [],
+        failed_ids: request_ids,
+        new_status: action == :approve ? 'approved' : 'denied',
+        status: :unprocessable_content
+      )
+    end
+
+    processed_ids = []
+    failed_ids = request_ids - requests.map(&:id)
+
+    requests.each do |request|
+      result = action == :approve ? approve_request_for_mass_action(request) : request.reject(@user)
+      result ? processed_ids << request.id : failed_ids << request.id
+    end
+
+    processed_count = processed_ids.size
+    failed_count = failed_ids.size
+    action_label = action == :approve ? 'approved' : 'denied'
+    message =
+      if failed_count.zero?
+        "#{processed_count} request#{'s' unless processed_count == 1} #{action_label} successfully."
+      else
+        "#{processed_count} request#{'s' unless processed_count == 1} #{action_label}. "\
+          "#{failed_count} failed."
+      end
+
+    render_mass_action_response(
+      success: processed_count.positive?,
+      message: message,
+      processed_ids: processed_ids,
+      failed_ids: failed_ids,
+      new_status: action_label,
+      status: processed_count.positive? ? :ok : :unprocessable_content
+    )
+  end
+
+  def render_mass_action_response(success:, message:, processed_ids:, failed_ids:, new_status:, status:)
+    pending_count = @course.requests.where(status: 'pending').count
+    respond_to do |format|
+      format.html do
+        if success
+          redirect_to course_requests_path(@course), notice: message
+        else
+          redirect_to course_requests_path(@course), alert: message
+        end
+      end
+      format.json do
+        render json: {
+          success: success,
+          message: message,
+          processed_ids: processed_ids,
+          failed_ids: failed_ids,
+          new_status: new_status,
+          pending_count: pending_count
+        }, status: status
+      end
+    end
+  end
+
+  def approve_request_for_mass_action(request)
+    lms_facade = request.assignment&.lms_facade
+    return false unless lms_facade
+
+    request.approve(lms_facade.from_user(@user), @user)
+  rescue StandardError => e
+    Rails.logger.error("Mass approve failed for request #{request.id}: #{e.message}")
+    false
+  end
+
+  def mass_request_ids
+    Array(params[:request_ids]).map(&:to_i).uniq.select(&:positive?)
   end
 end
 # rubocop:enable Metrics/ClassLength

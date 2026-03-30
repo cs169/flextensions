@@ -195,6 +195,29 @@ Then(/^the requests table search should be filtered$/) do
   expect(search_input.value).not_to be_empty
 end
 
+Given(/^a pending request exists$/) do
+  student = User.joins(:user_to_courses).find_by(user_to_courses: { course: @course, role: 'student' })
+  assignment = Assignment.first
+  @pending_request = create(:request, user: student, course: @course, assignment: assignment)
+end
+
+Then(/^the "([^"]*)" button should appear after the requests table$/) do |button_text|
+  table = find('#requests-table')
+  button = find('button', text: button_text)
+  expect(table.native.xpath("following::button[normalize-space(.)='#{button_text}']").any?).to be true
+end
+
+When(/^I click the status cell for that request$/) do
+  within(:xpath, "//tr[td[contains(@data-export, '')]][1]") do
+    find('td:last-child a').click
+  end
+end
+
+Then(/^I should be on the request page for that request$/) do
+  expected_path = "/courses/#{@course.id}/requests/#{@pending_request.id}"
+  expect(page.current_path).to eq(expected_path)
+end
+
 Given(/^I deny the request for "([^"]*)"$/) do |assignment_name|
   request = Request.joins(:assignment)
                    .find_by(assignments: { name: assignment_name }, status: 'pending')
