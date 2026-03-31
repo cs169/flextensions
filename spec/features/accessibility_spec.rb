@@ -177,7 +177,7 @@ RSpec.describe 'Accessibility', :a11y, :js, type: :feature do
       Capybara.reset_sessions!
     rescue Selenium::WebDriver::Error::NoSuchWindowError, Selenium::WebDriver::Error::InvalidSessionIdError,
            Selenium::WebDriver::Error::UnknownError
-      puts 'Browser session problem. Ignore it and proceed.'
+
     end
     WebMock.disable_net_connect!(allow_localhost: true)
   end
