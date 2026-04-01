@@ -201,7 +201,7 @@ RSpec.describe CoursesController, type: :controller do
       it 'filters teacher courses by selected semester' do
         get :new, params: { semester: 'Spring 2026' }
 
-        teacher_names = assigns(:courses_teacher).map { |c| c['name'] }
+        teacher_names = assigns(:courses_teacher).pluck('name')
         expect(teacher_names).to eq([ 'Test Course 101' ])
         expect(teacher_names).not_to include('Test Course 103')
       end
@@ -209,7 +209,7 @@ RSpec.describe CoursesController, type: :controller do
       it 'filters student courses by selected semester' do
         get :new, params: { semester: 'Fall 2025' }
 
-        student_names = assigns(:courses_student).map { |c| c['name'] }
+        student_names = assigns(:courses_student).pluck('name')
         expect(student_names).to eq([ 'Test Course 104' ])
         expect(student_names).not_to include('Test Course 102')
       end
