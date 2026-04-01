@@ -116,24 +116,44 @@ RSpec.describe CoursesController, type: :controller do
   end
 
   describe 'GET #new' do
+    let(:canvas_courses) do
+      [
+        {
+          'id' => '101',
+          'name' => 'Test Course 101',
+          'course_code' => 'TC101',
+          'enrollments' => [ { 'type' => 'teacher' } ],
+          'term' => { 'name' => 'Spring 2026' }
+        },
+        {
+          'id' => '102',
+          'name' => 'Test Course 102',
+          'course_code' => 'TC102',
+          'enrollments' => [ { 'type' => 'student' } ],
+          'term' => { 'name' => 'Spring 2026' }
+        },
+        {
+          'id' => '103',
+          'name' => 'Test Course 103',
+          'course_code' => 'TC103',
+          'enrollments' => [ { 'type' => 'teacher' } ],
+          'term' => { 'name' => 'Fall 2025' }
+        },
+        {
+          'id' => '104',
+          'name' => 'Test Course 104',
+          'course_code' => 'TC104',
+          'enrollments' => [ { 'type' => 'student' } ],
+          'term' => { 'name' => 'Fall 2025' }
+        }
+      ]
+    end
+
     before do
       # Create a fake LMS credential with a token
       user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
 
-      allow(Course).to receive(:fetch_courses).and_return([
-                                                            {
-                                                              'id' => '101',
-                                                              'name' => 'Test Course 101',
-                                                              'course_code' => 'TC101',
-                                                              'enrollments' => [ { 'type' => 'teacher' } ]
-                                                            },
-                                                            {
-                                                              'id' => '102',
-                                                              'name' => 'Test Course 102',
-                                                              'course_code' => 'TC102',
-                                                              'enrollments' => [ { 'type' => 'student' } ]
-                                                            }
-                                                          ])
+      allow(Course).to receive(:fetch_courses).and_return(canvas_courses)
     end
 
     it 'fetches courses and categorizes them into teacher and student courses' do
@@ -161,6 +181,44 @@ RSpec.describe CoursesController, type: :controller do
       get :new
 
       expect(flash[:alert]).to eq('No courses found.')
+    end
+
+    describe 'semester filter' do
+      it 'extracts unique semesters from Canvas courses' do
+        get :new
+
+        expect(assigns(:semesters)).to contain_exactly('Fall 2025', 'Spring 2026')
+      end
+
+      it 'shows all courses when no semester param is provided' do
+        get :new
+
+        expect(assigns(:courses_teacher).size).to eq(2)
+        expect(assigns(:courses_student).size).to eq(2)
+        expect(assigns(:selected_semester)).to be_nil
+      end
+
+      it 'filters teacher courses by selected semester' do
+        get :new, params: { semester: 'Spring 2026' }
+
+        teacher_names = assigns(:courses_teacher).map { |c| c['name'] }
+        expect(teacher_names).to eq([ 'Test Course 101' ])
+        expect(teacher_names).not_to include('Test Course 103')
+      end
+
+      it 'filters student courses by selected semester' do
+        get :new, params: { semester: 'Fall 2025' }
+
+        student_names = assigns(:courses_student).map { |c| c['name'] }
+        expect(student_names).to eq([ 'Test Course 104' ])
+        expect(student_names).not_to include('Test Course 102')
+      end
+
+      it 'assigns the selected semester' do
+        get :new, params: { semester: 'Spring 2026' }
+
+        expect(assigns(:selected_semester)).to eq('Spring 2026')
+      end
     end
   end
 
