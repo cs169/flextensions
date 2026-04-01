@@ -81,3 +81,9 @@ yarn-debug.log*
 /config/credentials/production.key
 
 .DS_Store
+
+# Jekyll docs
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/Gemfile.lock

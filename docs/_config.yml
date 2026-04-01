@@ -1,0 +1,27 @@
+title: Flextensions
+description: Assignment Extension Management for Canvas
+baseurl: /flextensions
+url: https://berkeley-cdss.github.io
+
+# Build settings
+markdown: kramdown
+theme: jekyll-theme-primer
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - .jekyll-cache
+  - _site
+
+# Include the API docs (static HTML)
+include:
+  - api
+
+# Default front matter
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

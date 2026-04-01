@@ -35,6 +35,9 @@ class Course < ApplicationRecord
   validates :course_name, presence: true
   # validate :ensure_course_settings
 
+  # Scopes
+  scope :by_semester, ->(semester) { where(semester: semester) }
+
   # Always load the LMS integrations
   default_scope { includes(:course_to_lmss) }
 
@@ -198,6 +201,8 @@ class Course < ApplicationRecord
     response_data = JSON.parse(response.body)
     course.course_name = response_data['name']
     course.course_code = response_data['course_code']
+    # Semester is sourced from the Canvas term name (e.g. "Spring 2026")
+    course.semester = response_data.dig('term', 'name')
     course.save!
     course
   end

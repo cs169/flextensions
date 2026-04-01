@@ -59,10 +59,8 @@ class Request < ApplicationRecord
   end
 
   # Process a newly created request, including auto-approval check
-  # TODO: This should be APP_HOST or something like:
-  # Rails.application.routes.default_url_options[:host]
   def process_created_request(current_user)
-    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
+    link = request_link
 
     if try_auto_approval(current_user)
       slack_message, result = build_created_slack_and_result(:auto_approved, link)
@@ -77,7 +75,7 @@ class Request < ApplicationRecord
 
   # Handle request update and check for auto-approval
   def process_update(_current_user)
-    link = "#{ENV.fetch('APP_HOST', nil)}/courses/#{course.id}/requests/#{id}"
+    link = request_link
     notify_slack = true
 
     if status == 'pending' && try_auto_approval(_current_user)
@@ -113,17 +111,22 @@ class Request < ApplicationRecord
   def auto_approval_eligible_for_course?
     return false if course&.course_settings.blank?
 
-    course.course_settings.enable_extensions &&
-      course.course_settings.auto_approve_days.positive?
+    course.course_settings.automatic_approval_enabled?
   end
 
   def eligible_for_auto_approval?
-    return false if course&.course_settings.blank?
-    return false unless course.course_settings.enable_extensions?
-    return false if course.course_settings.auto_approve_days.zero?
+    return false unless auto_approval_eligible_for_course?
+
+    enrollment = UserToCourse.find_by(user: user, course: course)
+    return false if enrollment.nil?
+    if enrollment.allow_extended_requests
+      max_days = course.course_settings.auto_approve_extended_request_days
+    else
+      max_days = course.course_settings.auto_approve_days
+    end
 
     days_difference = calculate_days_difference
-    return false if days_difference <= 0 || days_difference > course.course_settings.auto_approve_days
+    return false if days_difference <= 0 || (days_difference > max_days)
 
     max_approvals = course.course_settings.max_auto_approve
     return true if max_approvals.zero? # If max is 0, there's no limit
@@ -223,7 +226,7 @@ class Request < ApplicationRecord
     }
   end
 
-def send_email_response
+  def send_email_response
     return unless course.course_settings&.enable_emails
 
     cs = course.course_settings
@@ -315,5 +318,13 @@ def send_email_response
 
     success = SlackNotifier.notify(slack_message, course.course_settings.slack_webhook_url)
     Rails.logger.error "Failed to send Slack notification for request #{id} in course #{course.id}. Please check your webhook URL." unless success
+  end
+
+  def request_link
+    base_host = ENV['APP_HOST'].presence || Rails.application.routes.default_url_options[:host].presence
+    return Rails.application.routes.url_helpers.course_request_path(course, id) if base_host.blank?
+
+    normalized_host = base_host.start_with?('http://', 'https://') ? base_host : "https://#{base_host}"
+    "#{normalized_host.chomp('/')}/courses/#{course.id}/requests/#{id}"
   end
 end

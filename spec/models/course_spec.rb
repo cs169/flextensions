@@ -105,6 +105,44 @@ RSpec.describe Course, type: :model do
       expect(course.course_name).to eq('Intro to RSpec')
       expect(course.course_code).to eq('RSPEC101')
     end
+
+    it 'stores semester from Canvas term data' do
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: {
+          name: 'Intro to RSpec',
+          course_code: 'RSPEC101',
+          term: { name: 'Spring 2026' }
+        }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to eq('Spring 2026')
+    end
+
+    it 'handles missing term data gracefully' do
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to be_nil
+    end
+
+    it 'updates semester on existing course when Canvas term changes' do
+      described_class.create!(canvas_id: 'canvas_123', course_name: 'Intro to RSpec',
+                              course_code: 'RSPEC101', semester: 'Fall 2025')
+
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: {
+          name: 'Intro to RSpec',
+          course_code: 'RSPEC101',
+          term: { name: 'Spring 2026' }
+        }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to eq('Spring 2026')
+    end
   end
 
   describe '.find_or_create_course_to_lms' do
@@ -138,6 +176,19 @@ end
       end.to change(User, :count).by(CANVAS_USERS.size).and(
         change(UserToCourse, :count).by(CANVAS_USERS.size)
       )
+    end
+  end
+
+  describe '.by_semester' do
+    it 'returns only courses matching the given semester' do
+      spring = described_class.create!(canvas_id: 'c1', course_name: 'Course A', course_code: 'A', semester: 'Spring 2026')
+      fall = described_class.create!(canvas_id: 'c2', course_name: 'Course B', course_code: 'B', semester: 'Fall 2025')
+      described_class.create!(canvas_id: 'c3', course_name: 'Course C', course_code: 'C', semester: nil)
+
+      results = described_class.by_semester('Spring 2026')
+
+      expect(results).to contain_exactly(spring)
+      expect(results).not_to include(fall)
     end
   end
 
