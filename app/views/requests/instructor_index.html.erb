@@ -31,7 +31,7 @@
                  id="requests-table">
             <thead>
               <tr class="table-info">
-                <th class="text-center align-content-center no-sort" style="min-width: 60px;" data-priority="1">
+                <th class="text-center align-content-center no-sort" style="min-width: 60px;" data-priority="10">
                   <input type="checkbox"
                          id="select-all-requests"
                          data-requests-target="selectAllCheckbox"
@@ -39,14 +39,14 @@
                          aria-label="Select all pending requests">
                 </th>
                 <th class="text-center align-content-center no-sort" style="min-width: 100px;" data-priority="1">Actions</th>
-                <th class="text-center align-content-center" id="name" data-priority="5">Name</th>
-                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
+                <th class="text-center align-content-center" id="name" data-priority="3">Name</th>
+                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="1">Assignment</th>
                 <th class="text-center align-content-center" id="student-id" data-priority="9">Student ID</th>
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="7">Requested At</th>
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="8">Original Due Date</th>
-                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="4">Requested Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="5">Requested Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 90px;" data-priority="6"># of Days</th>
-                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="3">Status</th>
+                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="10">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -143,7 +143,7 @@
             </tbody>
           </table>
         </div>
-        <div class="row mt-2">
+        <div class="row mt-2 d-none d-md-block">
           <div class="col-12 text-start">
             <button type="button"
                     class="btn btn-sm btn-success me-2"
