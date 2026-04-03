@@ -77,6 +77,7 @@ class CoursesController < ApplicationController
 
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
+    return render json: { error: 'You do not have permission.' }, status: :forbidden unless @is_course_admin
 
     @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
@@ -87,7 +88,7 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @enrollments = @course.user_to_courses.includes(:user)
-    @is_course_admin = @course.user_to_courses.find_by(user: @user)&.course_admin?
+    @is_course_admin = @course.course_admin?(@user)
   end
 
   def delete
@@ -115,6 +116,12 @@ class CoursesController < ApplicationController
 
   def determine_user_role
     @role = @course&.user_role(@user)
+    @is_course_admin = @course&.course_admin?(@user) || false
+  end
+
+  # Filters Canvas API course hashes by their term name
+  def filter_by_semester(courses, semester)
+    courses.select { |c| c.dig('term', 'name') == semester }
   end
 
   # Filters Canvas API course hashes by their term name

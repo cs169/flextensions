@@ -1,0 +1,28 @@
+project:
+  name: 'Flextensions'
+  owner: 'CS169L-23'
+  teamId: '02'
+  identities: {}
+  notifications:
+    email: 'basimalharbi@berkeley.edu, igormoyzeson@berkeley.edu, nizamian@berkeley.edu, alexander.stepanov@berkeley.edu, anthonydam@berkeley.edu'
+  members:
+    member1:
+      name: 'Basim'
+      surname: 'AlHarbi'
+      githubUsername: 'ba88im'
+    member2:
+      name: 'Igor'
+      surname: 'Moyzeson'
+      githubUsername: 'Shklalom'
+    member3:
+      name: 'Noah'
+      surname: 'Nizamian'
+      githubUsername: 'noahnizamian'
+    member4:
+      name: 'Alexander'
+      surname: 'Stepanov'
+      githubUsername: 'alxstx'
+    member5:
+      name: 'Anthony'
+      surname: 'Dam'
+      githubUsername: 'gobears01'

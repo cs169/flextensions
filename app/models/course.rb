@@ -72,6 +72,10 @@ class Course < ApplicationRecord
     nil
   end
 
+  def course_admin?(user)
+    user_to_courses.where(user_id: user.id).any?(&:course_admin?)
+  end
+
   # TODO: This doesn't make sense actually.
   # A course can be linked to many LMSs.
   # def lms_facade
