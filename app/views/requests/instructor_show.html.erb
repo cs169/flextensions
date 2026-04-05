@@ -117,6 +117,29 @@
 						</div>
 					<% end %>
 
+			<!-- Student Notes -->
+			<% if @student_enrollment.present? %>
+				<div class="mb-4" data-controller="student-notes"
+					data-student-notes-url-value="<%= update_notes_course_user_to_course_path(@course, @student_enrollment) %>">
+					<h3 class="mb-2 h6">Staff Notes for <%= @request.user.name %></h3>
+					<div data-student-notes-target="display">
+						<div class="p-3 bg-light rounded" data-student-notes-target="content">
+							<%= @student_enrollment.notes.present? ? simple_format(@student_enrollment.notes) : content_tag(:span, 'No notes yet.', class: 'text-muted') %>
+						</div>
+						<button class="btn btn-sm btn-outline-secondary mt-2" data-action="student-notes#edit">
+							<i class="fa-solid fa-pen-to-square"></i> Edit Notes
+						</button>
+					</div>
+					<div data-student-notes-target="form" class="d-none">
+						<textarea class="form-control" rows="4" data-student-notes-target="textarea"><%= @student_enrollment.notes %></textarea>
+						<div class="mt-2">
+							<button class="btn btn-sm btn-primary" data-action="student-notes#save">Save</button>
+							<button class="btn btn-sm btn-secondary" data-action="student-notes#cancel">Cancel</button>
+						</div>
+					</div>
+				</div>
+			<% end %>
+
 			<!-- Display Buttons -->
 			<div class="d-flex justify-content-center mt-4">
 			  <% if @request.status == 'pending' %>

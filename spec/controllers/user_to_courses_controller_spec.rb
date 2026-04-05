@@ -144,4 +144,88 @@ RSpec.describe UserToCoursesController, type: :controller do
       end
     end
   end
+
+  describe 'PATCH #update_notes' do
+    context 'when user is an instructor' do
+      before do
+        UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+        student_enrollment
+        session[:user_id] = instructor.canvas_uid
+        instructor.lms_credentials.create!(
+          lms_name: 'canvas',
+          token: 'fake_token',
+          refresh_token: 'fake_refresh_token',
+          expire_time: 1.hour.from_now
+        )
+      end
+
+      it 'successfully saves notes' do
+        patch :update_notes, params: {
+          course_id: course.id,
+          id: student_enrollment.id,
+          notes: 'Student has DSP accommodations for extra time.'
+        }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body['success']).to be true
+        expect(student_enrollment.reload.notes).to eq('Student has DSP accommodations for extra time.')
+      end
+
+      it 'successfully clears notes' do
+        student_enrollment.update!(notes: 'Old notes')
+
+        patch :update_notes, params: {
+          course_id: course.id,
+          id: student_enrollment.id,
+          notes: ''
+        }
+
+        expect(response).to have_http_status(:ok)
+        expect(student_enrollment.reload.notes).to eq('')
+      end
+
+      it 'returns the saved notes in the response' do
+        patch :update_notes, params: {
+          course_id: course.id,
+          id: student_enrollment.id,
+          notes: 'OKed 3-day extensions for all assignments.'
+        }
+
+        expect(response.parsed_body['notes']).to eq('OKed 3-day extensions for all assignments.')
+      end
+    end
+
+    context 'when user is a student' do
+      before do
+        student_enrollment
+        session[:user_id] = student_user.canvas_uid
+        student_user.lms_credentials.create!(
+          lms_name: 'canvas',
+          token: 'fake_token',
+          refresh_token: 'fake_refresh_token',
+          expire_time: 1.hour.from_now
+        )
+      end
+
+      it 'returns forbidden status' do
+        patch :update_notes, params: {
+          course_id: course.id,
+          id: student_enrollment.id,
+          notes: 'Should not be allowed'
+        }
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not update the notes' do
+        patch :update_notes, params: {
+          course_id: course.id,
+          id: student_enrollment.id,
+          notes: 'Should not be allowed'
+        }
+
+        expect(student_enrollment.reload.notes).to be_nil
+      end
+    end
+  end
 end

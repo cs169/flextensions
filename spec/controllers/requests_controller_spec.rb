@@ -78,6 +78,26 @@ RSpec.describe RequestsController, type: :controller do
       get :show, params: { course_id: course.id, id: request.id }
       expect(response).to render_template('requests/student_show')
     end
+
+    it 'assigns @student_enrollment for instructor view' do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+      instructor.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'fake_token',
+        refresh_token: 'fake_refresh_token',
+        expire_time: 1.hour.from_now
+      )
+
+      get :show, params: { course_id: course.id, id: request.id }
+      expect(assigns(:student_enrollment)).to be_present
+      expect(assigns(:student_enrollment).user).to eq(user)
+    end
+
+    it 'does not assign @student_enrollment for student view' do
+      get :show, params: { course_id: course.id, id: request.id }
+      expect(assigns(:student_enrollment)).to be_nil
+    end
   end
 
   describe 'GET #new' do
