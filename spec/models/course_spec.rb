@@ -41,7 +41,7 @@ RSpec.describe Course, type: :model do
       course = described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'TEST101')
       user = User.create!(email: 'test@example.com', canvas_uid: '123')
       user.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'valid_token',
         refresh_token: 'refresh_token',
         expire_time: 1.hour.from_now

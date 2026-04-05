@@ -38,9 +38,8 @@ class User < ApplicationRecord
   has_many :user_to_courses
   has_many :courses, through: :user_to_courses
 
-  # TODO: We should probably use lms_id over lms_name
   def canvas_credentials
-    lms_credentials.find_by(lms_name: 'canvas')
+    lms_credentials.find_by(lms_id: 1)
   end
 
   def token_expired?

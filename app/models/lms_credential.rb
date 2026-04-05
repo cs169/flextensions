@@ -26,10 +26,11 @@
 class LmsCredential < ApplicationRecord
   # Belongs to a User
   belongs_to :user
+  belongs_to :lms, optional: true
 
   # Encryption for tokens
   encrypts :token, :refresh_token
 
   # LMS must exist
-  validates :lms_name, presence: true
+  validates :lms_id, presence: true
 end

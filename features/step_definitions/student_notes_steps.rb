@@ -1,5 +1,5 @@
-# Click "Show" link for a request by assignment name
-When(/^I click "Show" for the request for "([^"]*)"$/) do |assignment_name|
+# Navigate to the request show page for a given assignment
+When(/^I view the request for "([^"]*)"$/) do |assignment_name|
   request = Request.joins(:assignment).find_by(assignments: { name: assignment_name })
   raise "No request found for assignment #{assignment_name}" unless request
 

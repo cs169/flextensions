@@ -13,7 +13,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         student_enrollment
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -68,7 +68,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         student_enrollment
         session[:user_id] = student_user.canvas_uid
         student_user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -102,7 +102,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         student_enrollment
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -126,7 +126,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         UserToCourse.create!(user: instructor, course: course, role: 'teacher')
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -152,7 +152,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         student_enrollment
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -200,7 +200,7 @@ RSpec.describe UserToCoursesController, type: :controller do
         student_enrollment
         session[:user_id] = student_user.canvas_uid
         student_user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now

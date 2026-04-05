@@ -11,7 +11,7 @@ RSpec.describe CoursesController, type: :controller do
     session[:user_id] = user.canvas_uid
     UserToCourse.create!(user: user, course: course, role: 'student')
     user.lms_credentials.create!(
-      lms_name: 'canvas',
+      lms_id: 1,
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
@@ -118,7 +118,7 @@ RSpec.describe CoursesController, type: :controller do
   describe 'GET #new' do
     before do
       # Create a fake LMS credential with a token
-      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+      user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
       allow(Course).to receive(:fetch_courses).and_return([
                                                             {
@@ -167,7 +167,7 @@ RSpec.describe CoursesController, type: :controller do
   describe 'GET #enrollments' do
     before do
       # Create LMS credentials so user has a token
-      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+      user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
       # Add user as a teacher so they are allowed to view enrollments
       UserToCourse.create!(user: user, course: course, role: 'teacher')
