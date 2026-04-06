@@ -1,12 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["emailField", "tab", "gradescopeField", "slackWebhookField"];
+  static targets = ["emailField", "tab", "gradescopeField", "slackWebhookField", "pendingNotificationEmail"];
 
   connect() {
     this.toggleEmailFields();
     this.toggleSlackWebhookField();
     this.toggleGradescopeFields();
+    this.togglePendingNotificationEmail();
 
     const gradescopeToggle = document.getElementById('enable-gradescope');
     if (gradescopeToggle) {
@@ -50,6 +51,15 @@ export default class extends Controller {
 
     if (slackToggle && slackWebhookField) {
       slackWebhookField.disabled = !slackToggle.checked;
+    }
+  }
+
+  togglePendingNotificationEmail() {
+    const frequencySelect = document.getElementById('pending-notification-frequency');
+    const emailField = document.getElementById('pending-notification-email');
+
+    if (frequencySelect && emailField) {
+      emailField.disabled = !frequencySelect.value;
     }
   }
 
