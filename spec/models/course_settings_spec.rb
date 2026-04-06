@@ -177,6 +177,108 @@ RSpec.describe CourseSettings, type: :model do
     end
   end
 
+  describe 'pending notification validations' do
+    context 'pending_notification_frequency' do
+      it 'accepts nil' do
+        course_settings.pending_notification_frequency = nil
+        expect(course_settings).to be_valid
+      end
+
+      it 'accepts "daily"' do
+        course_settings.pending_notification_frequency = 'daily'
+        course_settings.pending_notification_email = 'test@example.com'
+        expect(course_settings).to be_valid
+      end
+
+      it 'accepts "weekly"' do
+        course_settings.pending_notification_frequency = 'weekly'
+        course_settings.pending_notification_email = 'test@example.com'
+        expect(course_settings).to be_valid
+      end
+
+      it 'rejects "monthly"' do
+        course_settings.pending_notification_frequency = 'monthly'
+        course_settings.pending_notification_email = 'test@example.com'
+        expect(course_settings).not_to be_valid
+        expect(course_settings.errors[:pending_notification_frequency]).to be_present
+      end
+    end
+
+    context 'pending_notification_email' do
+      it 'is required when frequency is set' do
+        course_settings.pending_notification_frequency = 'daily'
+        course_settings.pending_notification_email = nil
+        expect(course_settings).not_to be_valid
+        expect(course_settings.errors[:pending_notification_email]).to be_present
+      end
+
+      it 'validates email format when frequency is set' do
+        course_settings.pending_notification_frequency = 'daily'
+        course_settings.pending_notification_email = 'not-an-email'
+        expect(course_settings).not_to be_valid
+        expect(course_settings.errors[:pending_notification_email]).to be_present
+      end
+
+      it 'accepts a valid email when frequency is set' do
+        course_settings.pending_notification_frequency = 'daily'
+        course_settings.pending_notification_email = 'instructor@berkeley.edu'
+        expect(course_settings).to be_valid
+      end
+
+      it 'is not required when frequency is nil' do
+        course_settings.pending_notification_frequency = nil
+        course_settings.pending_notification_email = nil
+        expect(course_settings).to be_valid
+      end
+    end
+
+    context 'normalization' do
+      it 'normalizes empty string frequency to nil' do
+        course_settings.pending_notification_frequency = ''
+        course_settings.valid?
+        expect(course_settings.pending_notification_frequency).to be_nil
+      end
+
+      it 'normalizes empty string email to nil' do
+        course_settings.pending_notification_email = ''
+        course_settings.valid?
+        expect(course_settings.pending_notification_email).to be_nil
+      end
+
+      it 'clears email when frequency is set to nil on save' do
+        course_settings.pending_notification_frequency = 'daily'
+        course_settings.pending_notification_email = 'test@example.com'
+        course_settings.save!
+
+        course_settings.pending_notification_frequency = nil
+        course_settings.save!
+        course_settings.reload
+
+        expect(course_settings.pending_notification_email).to be_nil
+      end
+    end
+  end
+
+  describe '.with_pending_notifications' do
+    it 'returns records matching the given frequency with an email set' do
+      course_settings.update!(pending_notification_frequency: 'daily', pending_notification_email: 'a@example.com')
+
+      other_course = create(:course, canvas_id: 'other_123', course_name: 'Other', course_code: 'OTHER101')
+      other_course.course_settings.update!(pending_notification_frequency: 'weekly', pending_notification_email: 'b@example.com')
+
+      results = CourseSettings.with_pending_notifications('daily')
+      expect(results).to include(course_settings)
+      expect(results).not_to include(other_course.course_settings)
+    end
+
+    it 'excludes records with nil email' do
+      course_settings.update_columns(pending_notification_frequency: 'daily', pending_notification_email: nil)
+
+      results = CourseSettings.with_pending_notifications('daily')
+      expect(results).not_to include(course_settings)
+    end
+  end
+
   describe '#extract_gradescope_course_id' do
     it 'extracts course ID from valid URL' do
       url = 'https://www.gradescope.com/courses/123456'
