@@ -51,6 +51,26 @@ RSpec.describe RequestsController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(response).to render_template('requests/instructor_index')
     end
+
+    it 'assigns @search_query from params[:search]' do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: teacher_course, role: 'teacher')
+      FormSetting.create!(course: teacher_course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+
+      get :index, params: { course_id: teacher_course.id, search: '12345', show_all: 'true' }
+
+      expect(assigns(:search_query)).to eq('12345')
+    end
+
+    it 'assigns @search_query as nil when no search param is provided' do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: teacher_course, role: 'teacher')
+      FormSetting.create!(course: teacher_course, documentation_disp: 'hidden', custom_q1_disp: 'hidden', custom_q2_disp: 'hidden')
+
+      get :index, params: { course_id: teacher_course.id }
+
+      expect(assigns(:search_query)).to be_nil
+    end
   end
 
   describe 'GET #show' do
@@ -329,15 +349,27 @@ RSpec.describe RequestsController, type: :controller do
       expect(flash[:notice]).to match(/approved/i)
     end
 
-    # it 'shows error if approval fails' do
-    #   # stub the *same* request to return false here
-    #   allow(request).to receive(:approve).and_return(false)
+    it 'returns JSON success when approving via AJAX' do
+      post :approve, params: { course_id: course.id, id: request.id }, format: :json
 
-    #   post :approve, params: { course_id: course.id, id: request.id }
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('approved')
+      expect(payload['pending_count']).to be_a(Integer)
+      expect(payload['message']).to match(/approved/i)
+    end
 
-    #   expect(response).to redirect_to(course_requests_path(course))
-    #   expect(flash[:alert]).to match(/failed/i)
-    # end
+    it 'returns JSON error when approval fails via AJAX' do
+      allow_any_instance_of(Request).to receive(:approve).and_return(false)
+
+      post :approve, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/failed/i)
+    end
   end
 
   describe 'POST #reject' do
@@ -358,6 +390,152 @@ RSpec.describe RequestsController, type: :controller do
       post :reject, params: { course_id: course.id, id: request.id }
       expect(response).to redirect_to(course_requests_path(course))
       expect(flash[:alert]).to match(/failed/i)
+    end
+
+    it 'returns JSON success when rejecting via AJAX' do
+      post :reject, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('denied')
+      expect(payload['pending_count']).to be_a(Integer)
+      expect(payload['message']).to match(/denied/i)
+    end
+
+    it 'returns JSON error when rejection fails via AJAX' do
+      allow_any_instance_of(Request).to receive(:reject).and_return(false)
+
+      post :reject, params: { course_id: course.id, id: request.id }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/failed/i)
+    end
+  end
+
+  describe 'POST #mass_approve' do
+    let!(:pending_request_one) do
+      Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: 4.days.from_now,
+        status: 'pending'
+      )
+    end
+    let!(:pending_request_two) do
+      Request.create!(
+        user: User.create!(email: 'student2@example.com', canvas_uid: '124', name: 'Student Two'),
+        course: course,
+        assignment: assignment,
+        reason: 'Still need more time',
+        requested_due_date: 5.days.from_now,
+        status: 'pending'
+      )
+    end
+
+    before do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+      instructor.lms_credentials.create!(
+        lms_name: 'canvas',
+        token: 'instructor_token',
+        refresh_token: 'instructor_refresh',
+        expire_time: 1.hour.from_now
+      )
+
+      fake_lms_user_facade = instance_double(CanvasFacade)
+      fake_lms_facade = class_double(CanvasFacade, from_user: fake_lms_user_facade)
+      allow_any_instance_of(Assignment).to receive(:lms_facade).and_return(fake_lms_facade)
+      allow_any_instance_of(Request).to receive(:approve) do |request_record, _lms_user_facade, processed_user|
+        request_record.update!(status: 'approved', last_processed_by_user_id: processed_user.id)
+        true
+      end
+    end
+
+    it 'approves selected requests and returns processed IDs' do
+      post :mass_approve, params: {
+        course_id: course.id,
+        request_ids: [ pending_request_one.id, pending_request_two.id ]
+      }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('approved')
+      expect(payload['processed_ids']).to contain_exactly(pending_request_one.id, pending_request_two.id)
+      expect(pending_request_one.reload.status).to eq('approved')
+      expect(pending_request_two.reload.status).to eq('approved')
+    end
+
+    it 'returns an error when no request IDs are provided' do
+      post :mass_approve, params: { course_id: course.id, request_ids: [] }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/select at least one/i)
+    end
+  end
+
+  describe 'POST #mass_reject' do
+    let!(:pending_request_one) do
+      Request.create!(
+        user: user,
+        course: course,
+        assignment: assignment,
+        reason: 'Need more time',
+        requested_due_date: 4.days.from_now,
+        status: 'pending'
+      )
+    end
+    let!(:pending_request_two) do
+      Request.create!(
+        user: User.create!(email: 'student3@example.com', canvas_uid: '125', name: 'Student Three'),
+        course: course,
+        assignment: assignment,
+        reason: 'Still need more time',
+        requested_due_date: 5.days.from_now,
+        status: 'pending'
+      )
+    end
+
+    before do
+      session[:user_id] = instructor.canvas_uid
+      UserToCourse.create!(user: instructor, course: course, role: 'teacher')
+    end
+
+    it 'rejects selected requests and returns processed IDs' do
+      post :mass_reject, params: {
+        course_id: course.id,
+        request_ids: [ pending_request_one.id, pending_request_two.id ]
+      }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:ok)
+      expect(payload['success']).to be(true)
+      expect(payload['new_status']).to eq('denied')
+      expect(payload['processed_ids']).to contain_exactly(pending_request_one.id, pending_request_two.id)
+      expect(pending_request_one.reload.status).to eq('denied')
+      expect(pending_request_two.reload.status).to eq('denied')
+    end
+
+    it 'returns an error when selected requests are no longer pending' do
+      pending_request_one.update!(status: 'approved')
+      pending_request_two.update!(status: 'denied')
+
+      post :mass_reject, params: {
+        course_id: course.id,
+        request_ids: [ pending_request_one.id, pending_request_two.id ]
+      }, format: :json
+
+      payload = response.parsed_body
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(payload['success']).to be(false)
+      expect(payload['message']).to match(/no pending requests/i)
     end
   end
 
