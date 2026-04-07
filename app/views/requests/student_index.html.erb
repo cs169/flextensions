@@ -14,6 +14,7 @@
                 <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
                 <th class="text-center align-content-center">Status</th>
+                <th class="text-center align-content-center" style="min-width: 198px;">Updated At</th>
                 <th class="text-center align-content-center" style="min-width: 125px;">Actions</th>
                 </tr>
             </thead>
@@ -54,6 +55,11 @@
                         <span class="badge text-bg-danger">Denied</span>
                       <% else %>
                         <span class="badge text-bg-secondary">Unknown</span>
+                      <% end %>
+                    </td>
+                    <td class="text-center align-content-center">
+                      <% if request.status == 'approved' || request.status == 'denied' %>
+                        <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') %>
                       <% end %>
                     </td>
                     <td class="text-center align-content-center">

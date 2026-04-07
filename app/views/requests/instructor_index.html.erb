@@ -46,7 +46,8 @@
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="8">Original Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 198px;" data-priority="4">Requested Due Date</th>
                 <th class="text-center align-content-center" style="min-width: 90px;" data-priority="6"># of Days</th>
-                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="3">Status</th>
+                <th class="text-center align-content-center" style="min-width: 110px;" data-priority="3">Status</th>
+                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="4">Updated At</th>
               </tr>
             </thead>
             <tbody>
@@ -127,15 +128,21 @@
                           <% else %>
                             <span class="badge text-bg-success">Approved</span>
                           <% end %>
-                          on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                          by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
                         <% when 'denied' %>
-                          <span class="badge text-bg-danger me-3">Denied</span>
-                          on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                          by <%= request.last_processed_by_user&.name || 'Unknown' %>
+                          <span class="badge text-bg-danger">Denied</span>
                         <% else %>
                           <span class="badge text-bg-secondary">Unknown</span>
                       <% end %>
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.status == 'pending' ? '' : request.updated_at.iso8601 %>">
+                    <% case request.status %>
+                      <% when 'approved' %>
+                        <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') %>
+                        by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
+                      <% when 'denied' %>
+                        <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') %>
+                        by <%= request.last_processed_by_user&.name || 'Unknown' %>
                     <% end %>
                   </td>
                 </tr>
