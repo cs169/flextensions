@@ -30,6 +30,7 @@ Rails.application.routes.draw do
     member do
       post :sync_assignments
       post :sync_enrollments
+      get :sync_status
       get :enrollments
       delete :delete
     end
@@ -68,4 +69,5 @@ Rails.application.routes.draw do
 
   # This is protected by `require_admin` via blazer.yml
   mount Blazer::Engine, at: "admin/blazer"
+  mount GoodJob::Engine, at: "admin/good_job"
 end
