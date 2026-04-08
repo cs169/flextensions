@@ -70,6 +70,7 @@ gem 'lograge'
 #
 gem 'blazer'
 gem 'hypershield'
+gem 'good_job', '~> 4.0'
 
 #### Frontend related tools
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
