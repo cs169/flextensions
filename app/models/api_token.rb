@@ -39,7 +39,7 @@ class APIToken < ApplicationRecord
   validates :read_write, inclusion: { in: [ true, false ] }
   validate :expires_at_must_be_in_future, on: :create
 
-  before_create :generate_token_digest
+  before_validation :generate_token_digest, on: :create
 
   scope :active, -> { where(revoked_at: nil).where(expires_at: Time.current..) }
   scope :expired, -> { where(expires_at: ..Time.current) }
