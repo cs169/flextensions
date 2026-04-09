@@ -6,9 +6,20 @@ RSpec.describe APIToken, type: :model do
   let(:creator) { User.create!(email: 'creator@example.com', canvas_uid: '101', name: 'Creator') }
 
   describe 'associations' do
-    it { is_expected.to belong_to(:course) }
-    it { is_expected.to belong_to(:user) }
-    it { is_expected.to belong_to(:created_by).class_name('User') }
+    it 'belongs to course' do
+      token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 30.days.from_now)
+      expect(token.course).to eq(course)
+    end
+
+    it 'belongs to user' do
+      token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 30.days.from_now)
+      expect(token.user).to eq(user)
+    end
+
+    it 'belongs to created_by' do
+      token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 30.days.from_now)
+      expect(token.created_by).to eq(creator)
+    end
   end
 
   describe 'validations' do
