@@ -182,8 +182,8 @@ class RequestsController < ApplicationController
     return render plain: 'Course not found', status: :not_found unless course
     return render plain: 'Invalid or missing API token', status: :unauthorized if raw_token.blank?
 
-    # Try new ApiToken system first
-    api_token = ApiToken.find_by_token(raw_token)
+    # Try new APIToken system first
+    api_token = APIToken.lookup_token(raw_token)
     if api_token&.active? && api_token.course_id == course.id
       api_token.touch_last_used!
       return export_csv(course)

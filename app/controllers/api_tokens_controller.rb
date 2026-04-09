@@ -1,4 +1,4 @@
-class ApiTokensController < ApplicationController
+class APITokensController < ApplicationController
   before_action :authenticated!
   before_action :authenticate_user
   before_action :set_course

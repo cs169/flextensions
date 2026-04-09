@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ApiTokensController, type: :controller do
+RSpec.describe APITokensController, type: :controller do
   let(:instructor) { User.create!(canvas_uid: '123', name: 'Instructor', email: 'instructor@example.com') }
   let(:student) { User.create!(canvas_uid: '456', name: 'Student', email: 'student@example.com') }
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: '123') }
@@ -28,7 +28,7 @@ RSpec.describe ApiTokensController, type: :controller do
       end
 
       it 'assigns api_tokens for the course' do
-        token = ApiToken.create!(
+        token = APIToken.create!(
           course: course, user: instructor, created_by: instructor,
           expires_at: 30.days.from_now
         )
@@ -39,7 +39,7 @@ RSpec.describe ApiTokensController, type: :controller do
 
       it 'does not include tokens from other courses' do
         other_course = Course.create!(course_name: 'Other Course', canvas_id: '999')
-        other_token = ApiToken.create!(
+        other_token = APIToken.create!(
           course: other_course, user: instructor, created_by: instructor,
           expires_at: 30.days.from_now
         )
@@ -61,7 +61,7 @@ RSpec.describe ApiTokensController, type: :controller do
 
     describe 'DELETE #destroy' do
       it 'revokes the token and redirects with notice' do
-        token = ApiToken.create!(
+        token = APIToken.create!(
           course: course, user: instructor, created_by: instructor,
           expires_at: 30.days.from_now
         )
@@ -82,7 +82,7 @@ RSpec.describe ApiTokensController, type: :controller do
 
       it 'does not allow revoking tokens from another course' do
         other_course = Course.create!(course_name: 'Other Course', canvas_id: '999')
-        other_token = ApiToken.create!(
+        other_token = APIToken.create!(
           course: other_course, user: instructor, created_by: instructor,
           expires_at: 30.days.from_now
         )
@@ -116,7 +116,7 @@ RSpec.describe ApiTokensController, type: :controller do
     end
 
     it 'denies access to destroy' do
-      token = ApiToken.create!(
+      token = APIToken.create!(
         course: course, user: instructor, created_by: instructor,
         expires_at: 30.days.from_now
       )

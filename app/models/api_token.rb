@@ -27,7 +27,7 @@
 #  fk_rails_...  (created_by_id => users.id)
 #  fk_rails_...  (user_id => users.id)
 #
-class ApiToken < ApplicationRecord
+class APIToken < ApplicationRecord
   belongs_to :course
   belongs_to :user
   belongs_to :created_by, class_name: 'User'
@@ -77,14 +77,14 @@ class ApiToken < ApplicationRecord
     Digest::SHA256.hexdigest(raw_token)
   end
 
-  def self.find_by_token(raw_token)
+  def self.lookup_token(raw_token)
     return nil if raw_token.blank?
 
     find_by(token_digest: digest(raw_token))
   end
 
   def self.authenticate(raw_token)
-    token = find_by_token(raw_token)
+    token = lookup_token(raw_token)
     return nil unless token&.active?
 
     token.touch_last_used!

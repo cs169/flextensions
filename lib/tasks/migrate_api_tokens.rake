@@ -8,14 +8,14 @@ namespace :api_tokens do
     skipped = 0
 
     courses.find_each do |course|
-      digest = ApiToken.digest(course.readonly_api_token)
+      digest = APIToken.digest(course.readonly_api_token)
 
-      if ApiToken.exists?(token_digest: digest)
+      if APIToken.exists?(token_digest: digest)
         skipped += 1
         next
       end
 
-      ApiToken.create!(
+      APIToken.create!(
         course: course,
         user: system_user,
         created_by: system_user,

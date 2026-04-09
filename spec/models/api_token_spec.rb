@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ApiToken, type: :model do
+RSpec.describe APIToken, type: :model do
   let(:course) { Course.create!(course_name: 'Test Course', canvas_id: 'canvas_1') }
   let(:user) { User.create!(email: 'user@example.com', canvas_uid: '100', name: 'Test User') }
   let(:creator) { User.create!(email: 'creator@example.com', canvas_uid: '101', name: 'Creator') }
@@ -143,20 +143,20 @@ RSpec.describe ApiToken, type: :model do
   end
 
   describe 'class methods' do
-    describe '.find_by_token' do
+    describe '.lookup_token' do
       it 'finds token by raw value' do
         token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 30.days.from_now)
-        found = described_class.find_by_token(token.raw_token)
+        found = described_class.lookup_token(token.raw_token)
         expect(found).to eq(token)
       end
 
       it 'returns nil for invalid token' do
-        expect(described_class.find_by_token('nonexistent')).to be_nil
+        expect(described_class.lookup_token('nonexistent')).to be_nil
       end
 
       it 'returns nil for blank token' do
-        expect(described_class.find_by_token('')).to be_nil
-        expect(described_class.find_by_token(nil)).to be_nil
+        expect(described_class.lookup_token('')).to be_nil
+        expect(described_class.lookup_token(nil)).to be_nil
       end
     end
 
