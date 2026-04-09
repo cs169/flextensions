@@ -41,6 +41,12 @@
 				active: @side_nav == 'edit' %>
 
 			<%= render 'layouts/components/sidebar_menu_item',
+				path: course_api_tokens_path(@course.id),
+				icon: 'fas fa-key',
+				text: 'API Tokens',
+				active: @side_nav == 'api_tokens' %>
+
+			<%= render 'layouts/components/sidebar_menu_item',
 				path: edit_course_form_setting_path(@course.id),
 				icon: 'fas fa-file-alt',
 				text: 'Form',

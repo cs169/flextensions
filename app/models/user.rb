@@ -30,6 +30,9 @@ class User < ApplicationRecord
 
   # Associations
   has_many :lms_credentials, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
+  has_many :created_api_tokens, class_name: 'ApiToken', foreign_key: 'created_by_id',
+                                inverse_of: :created_by, dependent: :nullify
 
   # Relationship with Extension
   has_many :extensions

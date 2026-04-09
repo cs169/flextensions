@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       end
     end
     resource :form_setting, only: [:edit, :update]
+    resources :api_tokens, only: [:index, :destroy]
   end
   post 'course_settings/update'
 

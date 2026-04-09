@@ -177,18 +177,36 @@ class RequestsController < ApplicationController
 
   def export
     course = Course.find_by(id: params[:course_id])
-    token = params[:readonly_api_token]
+    raw_token = params[:readonly_api_token] || params[:api_token]
 
-    return render plain: 'Invalid or missing API token', status: :unauthorized unless course && ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, token.to_s)
+    return render plain: 'Course not found', status: :not_found unless course
+    return render plain: 'Invalid or missing API token', status: :unauthorized if raw_token.blank?
 
+    # Try new ApiToken system first
+    api_token = ApiToken.find_by_raw_token(raw_token)
+    if api_token&.active? && api_token.course_id == course.id
+      api_token.touch_last_used!
+      return export_csv(course)
+    end
+
+    # Fall back to legacy readonly_api_token for backward compatibility
+    if course.readonly_api_token.present? &&
+       ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, raw_token.to_s)
+      return export_csv(course)
+    end
+
+    render plain: 'Invalid or missing API token', status: :unauthorized
+  end
+
+  private
+
+  def export_csv(course)
     requests = course.requests.includes(:assignment, :user)
     requests = requests.where(status: params[:status]) if params[:status].present?
 
     csv_data = Request.to_csv(requests)
     send_data csv_data, filename: 'requests.csv', type: 'text/csv'
   end
-
-  private
 
   def set_request
     @side_nav = 'requests'

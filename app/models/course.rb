@@ -28,6 +28,7 @@ class Course < ApplicationRecord
   has_one :form_setting, dependent: :destroy
   has_one :course_settings, dependent: :destroy
   has_many :requests, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
 
   has_many :users, through: :user_to_courses
 
