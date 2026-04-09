@@ -41,8 +41,8 @@ class ApiToken < ApplicationRecord
 
   before_create :generate_token_digest
 
-  scope :active, -> { where(revoked_at: nil).where('expires_at > ?', Time.current) }
-  scope :expired, -> { where('expires_at <= ?', Time.current) }
+  scope :active, -> { where(revoked_at: nil).where(expires_at: Time.current..) }
+  scope :expired, -> { where(expires_at: ..Time.current) }
   scope :revoked, -> { where.not(revoked_at: nil) }
 
   def active?
@@ -62,7 +62,7 @@ class ApiToken < ApplicationRecord
   end
 
   def touch_last_used!
-    update_column(:last_used_at, Time.current)
+    update!(last_used_at: Time.current)
   end
 
   def course_role
@@ -77,14 +77,14 @@ class ApiToken < ApplicationRecord
     Digest::SHA256.hexdigest(raw_token)
   end
 
-  def self.find_by_raw_token(raw_token)
+  def self.find_by_token(raw_token)
     return nil if raw_token.blank?
 
     find_by(token_digest: digest(raw_token))
   end
 
   def self.authenticate(raw_token)
-    token = find_by_raw_token(raw_token)
+    token = find_by_token(raw_token)
     return nil unless token&.active?
 
     token.touch_last_used!

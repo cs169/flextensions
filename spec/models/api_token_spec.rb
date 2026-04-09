@@ -30,7 +30,7 @@ RSpec.describe ApiToken, type: :model do
     it 'allows expires_at in the past on update (for already-expired tokens)' do
       token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 2.days.from_now)
       # Simulate time passing by updating directly
-      token.update_column(:expires_at, 1.day.ago)
+      token.update!(expires_at: 1.day.ago)
       token.reload
       # Updating a different field should still be valid
       token.revoked_at = Time.current
@@ -73,7 +73,7 @@ RSpec.describe ApiToken, type: :model do
     end
     let!(:expired_token) do
       t = described_class.create!(course: course, user: user, created_by: creator, expires_at: 2.days.from_now)
-      t.update_column(:expires_at, 1.day.ago)
+      t.update!(expires_at: 1.day.ago)
       t
     end
     let!(:revoked_token) do
@@ -106,7 +106,7 @@ RSpec.describe ApiToken, type: :model do
       end
 
       it 'returns false for expired token' do
-        token.update_column(:expires_at, 1.day.ago)
+        token.update!(expires_at: 1.day.ago)
         expect(token.reload.active?).to be false
       end
 
@@ -118,7 +118,7 @@ RSpec.describe ApiToken, type: :model do
 
     describe '#revoke!' do
       it 'sets revoked_at' do
-        expect { token.revoke! }.to change { token.revoked_at }.from(nil)
+        expect { token.revoke! }.to change(token, :revoked_at).from(nil)
         expect(token.revoked_at).to be_within(1.second).of(Time.current)
       end
     end
@@ -143,20 +143,20 @@ RSpec.describe ApiToken, type: :model do
   end
 
   describe 'class methods' do
-    describe '.find_by_raw_token' do
+    describe '.find_by_token' do
       it 'finds token by raw value' do
         token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 30.days.from_now)
-        found = described_class.find_by_raw_token(token.raw_token)
+        found = described_class.find_by_token(token.raw_token)
         expect(found).to eq(token)
       end
 
       it 'returns nil for invalid token' do
-        expect(described_class.find_by_raw_token('nonexistent')).to be_nil
+        expect(described_class.find_by_token('nonexistent')).to be_nil
       end
 
       it 'returns nil for blank token' do
-        expect(described_class.find_by_raw_token('')).to be_nil
-        expect(described_class.find_by_raw_token(nil)).to be_nil
+        expect(described_class.find_by_token('')).to be_nil
+        expect(described_class.find_by_token(nil)).to be_nil
       end
     end
 
@@ -171,7 +171,7 @@ RSpec.describe ApiToken, type: :model do
       it 'returns nil for expired token' do
         token = described_class.create!(course: course, user: user, created_by: creator, expires_at: 2.days.from_now)
         raw = token.raw_token
-        token.update_column(:expires_at, 1.day.ago)
+        token.update!(expires_at: 1.day.ago)
         expect(described_class.authenticate(raw)).to be_nil
       end
 
