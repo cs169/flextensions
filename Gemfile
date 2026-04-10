@@ -33,7 +33,7 @@ gem 'tzinfo-data', platforms: %i[windows jruby]
 gem 'bootsnap', require: false
 
 # Loads environment variables from .env (local dev/test only, not Heroku)
-gem 'dotenv-rails', groups: [:development, :test]
+gem 'dotenv-rails', groups: [ :development, :test ]
 
 # Alternative Canvas API. We probably don't need this.
 # Verify instances of `LMS::Canvas`

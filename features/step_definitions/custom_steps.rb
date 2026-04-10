@@ -229,12 +229,23 @@ end
 
 # When I click the "Sync Enrollments" button
 When(/^I click the "([^"]*)" button$/) do |label|
+  # csrf_meta_tags renders nothing when allow_forgery_protection = false (test env).
+  # Inject a placeholder token so JS fetch handlers don't throw before disabling the button.
+  page.execute_script(<<~JS)
+    if (!document.querySelector('meta[name="csrf-token"]')) {
+      const m = document.createElement('meta');
+      m.name = 'csrf-token';
+      m.content = 'test-csrf-token';
+      document.head.appendChild(m);
+    }
+  JS
   click_button(label)
 end
 
 # Then the "Sync Enrollments" button should be disabled
-Then(/^the "([^"]*)" button should be disabled$/) do |label|
-  expect(page).to have_button(label, disabled: true)
+# When sync starts, the label changes to "Syncing..." so we check for that text + disabled
+Then(/^the "([^"]*)" button should be disabled$/) do |_label|
+  expect(page).to have_button("Syncing...", disabled: true)
 end
 
 # Then I should see a loading spinner

@@ -81,7 +81,7 @@ export default class extends Controller {
 		const label = this.syncLabelTarget;
 		const spinner = this.syncSpinnerTarget;
 		const courseId = this.courseIdValue;
-		const token = document.querySelector('meta[name="csrf-token"]').content;
+		const token = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
 		button.disabled = true;
 		label.textContent = "Syncing...";
