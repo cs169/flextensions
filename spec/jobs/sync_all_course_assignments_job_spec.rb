@@ -133,11 +133,12 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
 
   describe '#sync_assignment' do
     let(:job) { described_class.new }
-    before { Assignment.where(course_to_lms: course_to_lms).destroy_all }
     let(:lms_assignment) do
       build_canvas_assignment('id' => 'a123', 'name' => 'HW1', 'due_at' => '2025-06-01T23:59:00Z', 'lock_at' => nil)
     end
     let(:results) { { added_assignments: 0, updated_assignments: 0, unchanged_assignments: 0 } }
+
+    before { Assignment.where(course_to_lms: course_to_lms).destroy_all }
 
     it 'creates a new assignment' do
       expect {
