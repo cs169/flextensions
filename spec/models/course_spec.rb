@@ -132,12 +132,9 @@ end
       allow(user).to receive(:ensure_fresh_canvas_token!).and_return('fake_token')
     end
 
-    it 'creates user and user_to_course record' do
-      expect do
-        course.sync_users_from_canvas(user.id, 'student')
-      end.to change(User, :count).by(CANVAS_USERS.size).and(
-        change(UserToCourse, :count).by(CANVAS_USERS.size)
-      )
+    it 'enqueues SyncUsersFromCanvasJob with the correct arguments' do
+      expect(SyncUsersFromCanvasJob).to receive(:perform_later).with(course.id, user.id, 'student')
+      course.sync_users_from_canvas(user.id, 'student')
     end
   end
 
