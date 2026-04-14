@@ -69,5 +69,6 @@ Rails.application.routes.draw do
 
   # This is protected by `require_admin` via blazer.yml
   mount Blazer::Engine, at: "admin/blazer"
+  # This is protected by `require_admin` via good_job.rb before action
   mount GoodJob::Engine, at: "admin/good_job"
 end
