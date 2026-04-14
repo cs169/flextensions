@@ -6,6 +6,7 @@
 #  course_code        :string
 #  course_name        :string
 #  readonly_api_token :string
+#  semester           :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  canvas_id          :string
