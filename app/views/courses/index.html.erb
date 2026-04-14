@@ -1,12 +1,11 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-12">
-            
             <div class="row">
                 <%= render "layouts/components/flash" %>
-				<div class="col-12">
-					<h1 class="mb-4">Courses Dashboard</h1>
-				</div>
+                <div class="col-12">
+                    <h1 class="mb-4">Courses Dashboard</h1>
+                </div>
             </div>
         </div>
 
@@ -18,7 +17,7 @@
             </p>
 
             <table class="table table-bordered table-striped" id="assignments-table">
-                <thead class="table-info">
+                <thead class="table-blue-medium">
                     <tr>
                         <th>Name</th>
                         <th>Course</th>
@@ -27,8 +26,8 @@
                 </thead>
                 <tbody>
                     <% @teacher_courses_by_semester.each do |semester, user_to_courses| %>
-                        <tr>
-                            <td colspan="3" class="table-secondary fw-bold"><%= semester || "Unknown Semester" %></td>
+                        <tr class="table-blue-light">
+                            <td colspan="3" class="fw-bold"><%= semester || "Unknown Semester" %></td>
                         </tr>
                         <% user_to_courses.each do |user_to_course| %>
                             <tr>
@@ -55,7 +54,7 @@
 
             <% if @student_courses.any? %>
             <table class="table table-bordered table-striped" id="student-assignments-table">
-                <thead class="table-info">
+                <thead class="table-blue-medium">
                     <tr>
                         <th>Name</th>
                         <th>Course</th>
@@ -63,8 +62,8 @@
                 </thead>
                 <tbody>
                     <% @student_courses_by_semester.each do |semester, user_to_courses| %>
-                        <tr>
-                            <td colspan="2" class="table-secondary fw-bold"><%= semester || "Unknown Semester" %></td>
+                        <tr class="table-blue-light">
+                            <td colspan="2" class="fw-bold"><%= semester || "Unknown Semester" %></td>
                         </tr>
                         <% user_to_courses.each do |user_to_course| %>
                             <tr>
