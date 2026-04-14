@@ -15,13 +15,12 @@ pin "bootstrap", to: "bootstrap.min.js", preload: true
 pin "@popperjs/core", to: "popper.js", preload: true
 pin "jquery" # @3.7.1
 pin "color-modes"
-
-pin "datatables.net", to: "datatables-net.js"
-pin "datatables.net-bs5", to: "datatables-net-bs5.js"
-pin "datatables.net-responsive", to: "datatables-net-responsive.js"
-pin "datatables.net-responsive-bs5", to: "datatables-net-responsive-bs5.js"
-pin "datatables.net-buttons", to: "datatables-net-buttons.js"
-pin "datatables.net-buttons-bs5", to: "datatables-net-buttons-bs5.js"
-pin "datatables.net-buttons/js/buttons.html5.min.js", to: "datatables-net-buttons--js--buttons.html5.min.js.js"
-pin "datatables.net-buttons/js/buttons.print.min.js", to: "datatables-net-buttons--js--buttons.print.min.js.js"
-pin "datatables.net-buttons/js/buttons.colVis.min.js", to: "datatables-net-buttons--js--buttons.colVis.min.js.js"
+pin "datatables.net" # @2.3.1
+pin "datatables.net-bs5" # @2.3.1
+pin "datatables.net-responsive-bs5" # @3.0.4
+pin "datatables.net-responsive" # @3.0.4
+pin "datatables.net-buttons" # @3.2.3
+pin "datatables.net-buttons-bs5" # @3.2.3
+pin "datatables.net-buttons/js/buttons.html5.min.js", to: "datatables.net-buttons--js--buttons.html5.min.js.js" # @3.2.3
+pin "datatables.net-buttons/js/buttons.print.min.js", to: "datatables.net-buttons--js--buttons.print.min.js.js" # @3.2.3
+pin "datatables.net-buttons/js/buttons.colVis.min.js", to: "datatables.net-buttons--js--buttons.colVis.min.js.js" # @3.2.3
