@@ -195,7 +195,7 @@ class CanvasFacade < LmsFacade
   # @param  [Integer] courseId the course id to look up.
   # @return [Faraday::Response] information about the requested course.
   def get_course(courseId)
-    @canvas_conn.get("courses/#{courseId}")
+    @canvas_conn.get("courses/#{courseId}", { 'include[]': 'term' })
   end
 
   ##
