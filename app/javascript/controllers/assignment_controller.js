@@ -76,7 +76,7 @@ export default class extends Controller {
     spinner.classList.remove("d-none");
 
     try {
-      const statusBefore = await fetch(`/courses/${courseId}/sync_status`).then(r => r.json());
+      const statusBefore = await this._fetchJson(`/courses/${courseId}/sync_status`);
       const beforeTs = statusBefore.assignments_synced_at;
 
       const response = await fetch(`/courses/${courseId}/sync_assignments`, {

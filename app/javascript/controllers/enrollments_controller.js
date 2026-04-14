@@ -112,7 +112,7 @@ export default class extends Controller {
 		}
 	}
 
-	async _pollUntilDone(courseId, key, beforeTs, intervalMs = 2000, timeoutMs = 60000) {
+	async _pollUntilDone(courseId, key, beforeTs, intervalMs = 1000, timeoutMs = 60000) {
 		const deadline = Date.now() + timeoutMs;
 		while (Date.now() < deadline) {
 			await new Promise(resolve => setTimeout(resolve, intervalMs));
