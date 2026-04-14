@@ -26,12 +26,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% @teacher_courses.each do |user_to_course| %>
+                    <% @teacher_courses_by_semester.each do |semester, user_to_courses| %>
                         <tr>
-                            <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
-                            <td><%= user_to_course.course.course_code %></td>
-                            <td><%= user_to_course.role.capitalize %></td>
+                            <td colspan="3" class="table-secondary fw-bold"><%= semester || "Unknown Semester" %></td>
                         </tr>
+                        <% user_to_courses.each do |user_to_course| %>
+                            <tr>
+                                <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %> </a></td>
+                                <td><%= user_to_course.course.course_code %></td>
+                                <td><%= user_to_course.role.capitalize %></td>
+                            </tr>
+                        <% end %>
                     <% end %>
                 </tbody>
             </table>
@@ -54,24 +59,19 @@
                     <tr>
                         <th>Name</th>
                         <th>Course</th>
-                        <th>Term</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% @student_courses.each do |user_to_course| %>
+                    <% @student_courses_by_semester.each do |semester, user_to_courses| %>
                         <tr>
-                            <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
-                            <td><%= user_to_course.course.course_code %></td>
-                            <td>
-                              <% month = user_to_course.course.created_at.month %>
-                              <% year = user_to_course.course.created_at.year %>
-                              <%= case month
-                                  when 1..5 then "Spring #{year}"
-                                  when 6..7 then "Summer #{year}"
-                                  when 8..12 then "Fall #{year}"
-                                  end %>
-                            </td>
+                            <td colspan="2" class="table-secondary fw-bold"><%= semester || "Unknown Semester" %></td>
                         </tr>
+                        <% user_to_courses.each do |user_to_course| %>
+                            <tr>
+                                <td><a href="/courses/<%= user_to_course.course.id %>"> <%= user_to_course.course.course_name %></a></td>
+                                <td><%= user_to_course.course.course_code %></td>
+                            </tr>
+                        <% end %>
                     <% end %>
                 </tbody>
             </table>

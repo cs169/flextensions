@@ -28,6 +28,42 @@ RSpec.describe CoursesController, type: :controller do
       get :index
       expect(response).to render_template(:index)
     end
+
+    context 'semester grouping' do
+      let(:spring_course) { Course.create!(course_name: 'Spring Course', canvas_id: 'sp1', course_code: 'SP101', semester: 'Spring 2026') }
+      let(:fall_course) { Course.create!(course_name: 'Fall Course', canvas_id: 'fa1', course_code: 'FA101', semester: 'Fall 2025') }
+
+      before do
+        UserToCourse.create!(user: user, course: spring_course, role: 'teacher')
+        UserToCourse.create!(user: user, course: fall_course, role: 'teacher')
+      end
+
+      it 'groups teacher courses by semester, most-recent-first' do
+        get :index
+
+        grouped = assigns(:teacher_courses_by_semester)
+        semesters = grouped.map(&:first)
+        expect(semesters).to eq(['Spring 2026', 'Fall 2025'])
+      end
+
+      it 'groups student courses by semester, most-recent-first' do
+        # Disable extensions on the default course so it doesn't appear
+        CourseSettings.create!(course: course, enable_extensions: false)
+
+        spring_student = Course.create!(course_name: 'Student Spring', canvas_id: 'ss1', course_code: 'SS101', semester: 'Spring 2026')
+        fall_student = Course.create!(course_name: 'Student Fall', canvas_id: 'sf1', course_code: 'SF101', semester: 'Fall 2025')
+        CourseSettings.create!(course: spring_student, enable_extensions: true)
+        CourseSettings.create!(course: fall_student, enable_extensions: true)
+        UserToCourse.create!(user: user, course: spring_student, role: 'student')
+        UserToCourse.create!(user: user, course: fall_student, role: 'student')
+
+        get :index
+
+        grouped = assigns(:student_courses_by_semester)
+        semesters = grouped.map(&:first)
+        expect(semesters).to eq(['Spring 2026', 'Fall 2025'])
+      end
+    end
   end
 
   describe 'GET #show' do
