@@ -471,6 +471,33 @@ a.btn-outline-danger.disable:hover {
 //  BS-type table-responsive
 
 
+// Column visibility dropdown - checkmarks for visible columns
+.dt-button-collection {
+  .dt-button {
+    text-align: left !important;
+    padding-left: 2.2em !important;
+    position: relative;
+
+    &.active,
+    &.dt-button-active {
+      background-color: transparent !important;
+      color: var(--bs-dropdown-link-color, inherit) !important;
+
+      &:hover {
+        background-color: var(--bs-dropdown-link-hover-bg) !important;
+        color: var(--bs-dropdown-link-hover-color) !important;
+      }
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0.75em;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
 // Request Table desktop
 @media (min-width: 768px) {
   #requests-table #assignment {
