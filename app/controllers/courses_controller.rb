@@ -130,7 +130,7 @@ class CoursesController < ApplicationController
   def group_by_semester(user_to_courses)
     grouped = user_to_courses.group_by { |utc| utc.course.semester }
     sorted_semesters = Course.sort_semesters(grouped.keys)
-    sorted_semesters.map { |semester| [semester, grouped[semester]] }
+    sorted_semesters.map { |semester| [ semester, grouped[semester] ] }
   end
 
   # Filters Canvas API course hashes by their term name

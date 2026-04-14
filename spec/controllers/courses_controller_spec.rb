@@ -43,7 +43,7 @@ RSpec.describe CoursesController, type: :controller do
 
         grouped = assigns(:teacher_courses_by_semester)
         semesters = grouped.map(&:first)
-        expect(semesters).to eq(['Spring 2026', 'Fall 2025'])
+        expect(semesters).to eq([ 'Spring 2026', 'Fall 2025' ])
       end
 
       it 'groups student courses by semester, most-recent-first' do
@@ -61,7 +61,7 @@ RSpec.describe CoursesController, type: :controller do
 
         grouped = assigns(:student_courses_by_semester)
         semesters = grouped.map(&:first)
-        expect(semesters).to eq(['Spring 2026', 'Fall 2025'])
+        expect(semesters).to eq([ 'Spring 2026', 'Fall 2025' ])
       end
     end
   end

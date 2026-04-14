@@ -195,33 +195,33 @@ end
 
   describe '.semester_sort_key' do
     it 'returns [year, season_order] for a valid semester' do
-      expect(described_class.semester_sort_key('Spring 2026')).to eq([2026, 1])
-      expect(described_class.semester_sort_key('Fall 2025')).to eq([2025, 3])
-      expect(described_class.semester_sort_key('Summer 2026')).to eq([2026, 2])
-      expect(described_class.semester_sort_key('Winter 2026')).to eq([2026, 0])
+      expect(described_class.semester_sort_key('Spring 2026')).to eq([ 2026, 1 ])
+      expect(described_class.semester_sort_key('Fall 2025')).to eq([ 2025, 3 ])
+      expect(described_class.semester_sort_key('Summer 2026')).to eq([ 2026, 2 ])
+      expect(described_class.semester_sort_key('Winter 2026')).to eq([ 2026, 0 ])
     end
 
     it 'returns [-1, -1] for nil or blank' do
-      expect(described_class.semester_sort_key(nil)).to eq([-1, -1])
-      expect(described_class.semester_sort_key('')).to eq([-1, -1])
+      expect(described_class.semester_sort_key(nil)).to eq([ -1, -1 ])
+      expect(described_class.semester_sort_key('')).to eq([ -1, -1 ])
     end
   end
 
   describe '.sort_semesters' do
     it 'sorts semesters most-recent-first' do
-      semesters = ['Spring 2025', 'Fall 2026', 'Summer 2026', 'Winter 2025', 'Fall 2025', 'Spring 2026']
-      expected = ['Fall 2026', 'Summer 2026', 'Spring 2026', 'Fall 2025', 'Spring 2025', 'Winter 2025']
+      semesters = [ 'Spring 2025', 'Fall 2026', 'Summer 2026', 'Winter 2025', 'Fall 2025', 'Spring 2026' ]
+      expected = [ 'Fall 2026', 'Summer 2026', 'Spring 2026', 'Fall 2025', 'Spring 2025', 'Winter 2025' ]
       expect(described_class.sort_semesters(semesters)).to eq(expected)
     end
 
     it 'places nil semesters at the end' do
-      semesters = ['Spring 2026', nil]
+      semesters = [ 'Spring 2026', nil ]
       result = described_class.sort_semesters(semesters)
-      expect(result).to eq(['Spring 2026', nil])
+      expect(result).to eq([ 'Spring 2026', nil ])
     end
 
     it 'handles a single semester' do
-      expect(described_class.sort_semesters(['Fall 2025'])).to eq(['Fall 2025'])
+      expect(described_class.sort_semesters([ 'Fall 2025' ])).to eq([ 'Fall 2025' ])
     end
 
     it 'handles empty array' do
@@ -229,8 +229,8 @@ end
     end
 
     it 'orders all four seasons within the same year correctly' do
-      semesters = ['Winter 2026', 'Spring 2026', 'Summer 2026', 'Fall 2026']
-      expected = ['Fall 2026', 'Summer 2026', 'Spring 2026', 'Winter 2026']
+      semesters = [ 'Winter 2026', 'Spring 2026', 'Summer 2026', 'Fall 2026' ]
+      expected = [ 'Fall 2026', 'Summer 2026', 'Spring 2026', 'Winter 2026' ]
       expect(described_class.sort_semesters(semesters)).to eq(expected)
     end
   end
