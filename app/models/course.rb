@@ -49,7 +49,7 @@ class Course < ApplicationRecord
   # Returns a numeric sort key for a semester string (e.g. "Spring 2026").
   # Higher values = more recent. Suitable for descending sort.
   def self.semester_sort_key(semester)
-    return [ -1, -1 ] unless semester.present?
+    return [ -1, -1 ] if semester.blank?
 
     parts = semester.split
     season = parts[0]
