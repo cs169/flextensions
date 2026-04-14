@@ -38,12 +38,21 @@ class CoursesController < ApplicationController
     @courses = Course.fetch_courses(token)
     flash[:alert] = 'No courses found.' if @courses.empty?
 
+    # Collect unique semester names from Canvas term data for the filter dropdown
+    @semesters = @courses.filter_map { |c| c.dig('term', 'name') }.uniq.sort
+    @selected_semester = params[:semester]
+
     teacher_enrollment_types = %w[teacher ta]
     # TODO: Add spec for when a course is created, but the user is not enrolled in it.
     # TODO: Why do some courses have empty enrollments?
     existing_canvas_ids = @user.courses.pluck(:canvas_id)
     @courses_teacher = filter_courses(@courses, teacher_enrollment_types, existing_canvas_ids)
     @courses_student = filter_courses(@courses, [ 'student' ], existing_canvas_ids)
+
+    if @selected_semester.present?
+      @courses_teacher = filter_by_semester(@courses_teacher, @selected_semester)
+      @courses_student = filter_by_semester(@courses_student, @selected_semester)
+    end
   end
 
   def edit
@@ -68,6 +77,7 @@ class CoursesController < ApplicationController
 
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
+    return render json: { error: 'You do not have permission.' }, status: :forbidden unless @is_course_admin
 
     @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
@@ -78,7 +88,7 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @enrollments = @course.user_to_courses.includes(:user)
-    @is_course_admin = @course.user_to_courses.find_by(user: @user)&.course_admin?
+    @is_course_admin = @course.course_admin?(@user)
   end
 
   def delete
@@ -106,6 +116,17 @@ class CoursesController < ApplicationController
 
   def determine_user_role
     @role = @course&.user_role(@user)
+    @is_course_admin = @course&.course_admin?(@user) || false
+  end
+
+  # Filters Canvas API course hashes by their term name
+  def filter_by_semester(courses, semester)
+    courses.select { |c| c.dig('term', 'name') == semester }
+  end
+
+  # Filters Canvas API course hashes by their term name
+  def filter_by_semester(courses, semester)
+    courses.select { |c| c.dig('term', 'name') == semester }
   end
 
   # TODO: This should be moved to the Canvas Facade
