@@ -17,8 +17,6 @@ export default class extends Controller {
 
         if (!DataTable.isDataTable('#requests-table')) {
             const searchQuery = this.element.dataset.searchQuery;
-            const readonlyToken = this.element.dataset.readonlyToken;
-            const courseId = this.element.dataset.courseId;
             const controller = this;
 
             this.table = new DataTable('#requests-table', {
