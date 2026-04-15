@@ -28,8 +28,8 @@
         <div class="table-responsive">
           <table class="table table-bordered table-striped datatable flextensions-table"
                  id="requests-table">
-            <thead>
-              <tr class="bg-blue-medium text-white">
+            <thead class="table-blue-medium text-white">
+              <tr>
                 <th class="text-center align-content-center no-sort" style="min-width: 60px;" data-priority="1">
                   <input type="checkbox"
                          id="select-all-requests"
@@ -37,15 +37,15 @@
                          data-action="change->requests#toggleSelectAll"
                          aria-label="Select all pending requests">
                 </th>
-                <th class="no-sort" style="min-width: 100px;" data-priority="1">Actions</th>
+                <th style="width: 10ch;" data-priority="1" class="no-sort">Actions</th>
                 <th id="name" data-priority="5">Name</th>
                 <th id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
-                <th id="student-id" data-priority="9">Student ID</th>
-                <th style="min-width: 198px;" data-priority="7">Requested At</th>
-                <th style="min-width: 198px;" data-priority="8">Original Due Date</th>
-                <th style="min-width: 198px;" data-priority="4">Requested Due Date</th>
-                <th style="min-width: 90px;" data-priority="6"># of Days</th>
-                <th style="min-width: 200px;" data-priority="3">Status</th>
+                <th style="width: 10ch;" data-priority="9" class="no-sort" >Student ID</th>
+                <th style="width: 32ch;" data-priority="7">Requested At</th>
+                <th style="width: 32ch;" data-priority="8">Original Due Date</th>
+                <th style="width: 32ch;" data-priority="4">Requested Due Date</th>
+                <th style="width: 14ch;" data-priority="6"># of Days</th>
+                <th style="min-width: 16ch;" data-priority="3">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -67,20 +67,20 @@
                   </td>
                   <td class="text-center align-content-center" style="width: 12ch">
                     <% if request.status == 'pending' %>
-                      <div class="d-flex flex-column align-items-center gap-1 request-actions">
+                      <div class="gap-1 request-actions">
                         <button type="button"
-                                class="btn btn-sm btn-success"
-                                data-action="click->requests#approve"
-                                data-url="<%= approve_course_request_path(@course, request, format: :json) %>"
-                                aria-label="Approve <%= request.user.try(:name) || 'N/A' %> <%= request.assignment&.name || 'N/A' %>">
-                          <i class="fas fa-check"></i>
+                          class="btn btn-sm btn-success"
+                          data-action="click->requests#approve"
+                          data-url="<%= approve_course_request_path(@course, request, format: :json) %>"
+                          aria-label="Approve <%= text_label_for(request) %>">
+                          <i class="fas fa-fw fa-check"></i>
                         </button>
                         <button type="button"
-                                class="btn btn-sm btn-danger"
-                                data-action="click->requests#reject"
-                                data-url="<%= reject_course_request_path(@course, request, format: :json) %>"
-                                aria-label="Deny <%= request.user.try(:name) || 'N/A' %> <%= request.assignment&.name || 'N/A' %>">
-                          <i class="fas fa-times"></i>
+                          class="btn btn-sm btn-danger"
+                          data-action="click->requests#reject"
+                          data-url="<%= reject_course_request_path(@course, request, format: :json) %>"
+                          aria-label="Deny <%= text_label_for(request) %>">
+                          <i class="fas fa-fw fa-times"></i>
                         </button>
                       </div>
                     <% else %>
