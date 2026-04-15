@@ -66,69 +66,6 @@ export default class extends Controller {
                                 }
                             }
                         ]
-                    },
-                    bottom2Start: {
-                        buttons: [
-                            {
-                                extend: 'collection',
-                                text: 'Copy Google Sheets Import to Clipboard',
-                                buttons: [
-                                    {
-                                        text: 'All Requests',
-                                        className: 'dropdown-item',
-                                        action: function () {
-                                            const url = `${window.location.origin}/courses/${courseId}/requests/export.csv?readonly_api_token=${encodeURIComponent(readonlyToken)}`;
-                                            const formula = `=IMPORTDATA("${url}")`;
-                                            navigator.clipboard.writeText(formula);
-                                        }
-                                    },
-                                    {
-                                        text: 'Pending Requests',
-                                        className: 'dropdown-item',
-                                        action: function () {
-                                            const url = `${window.location.origin}/courses/${courseId}/requests/export.csv?readonly_api_token=${encodeURIComponent(readonlyToken)}&status=pending`;
-                                            const formula = `=IMPORTDATA("${url}")`;
-                                            navigator.clipboard.writeText(formula);
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                extend: 'copy',
-                                text: 'Copy Table to Clipboard',
-                                title: null,
-                                messageTop: null,
-                                messageBottom: null,
-                                info: false,
-                                exportOptions: {
-                                    columns: ':visible:not(.no-sort)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
-                                                return node.getAttribute('data-export');
-                                            }
-                                            return data;
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                extend: 'csv',
-                                text: 'Export as CSV',
-                                filename: 'extension-requests',
-                                exportOptions: {
-                                    columns: ':visible:not(.no-sort)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
-                                                return node.getAttribute('data-export');
-                                            }
-                                            return data;
-                                        }
-                                    }
-                                }
-                            }
-                        ]
                     }
                 }
             });

@@ -1,3 +1,28 @@
+.flextensions-table,
+.flextensions-table.dataTable {
+  // Common table headings for all tables
+  thead {
+    th,
+    th.dt-type-numeric, table.dataTable th.dt-type-date, table.dataTable td.dt-type-numeric, table.dataTable td.dt-type-date {
+      text-align: center;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+  }
+
+  tbody {
+    td {
+      vertical-align: middle;
+    }
+  }
+}
+
+// For the requests table, we want to make the action buttons exactly the same size
+// regardless of the icon used.
+.action-btn i {
+  width: 12.5px;
+}
+
 .bd-placeholder-img {
 	font-size: 1.125rem;
 	text-anchor: middle;
