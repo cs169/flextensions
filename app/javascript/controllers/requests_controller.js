@@ -17,8 +17,7 @@ export default class extends Controller {
 
         if (!DataTable.isDataTable('#requests-table')) {
             const searchQuery = this.element.dataset.searchQuery;
-            const readonlyToken = this.element.dataset.readonlyToken;
-            const courseId = this.element.dataset.courseId;
+            const controller = this;
 
             this.table = new DataTable('#requests-table', {
                 paging: true,
@@ -28,73 +27,43 @@ export default class extends Controller {
                 responsive: true,
                 columnDefs: [
                     { orderable: false, targets: 'no-sort' },
-                    { type: "date", targets: [5, 6, 7] }
+                    { type: "date", targets: [5, 6, 7] },
+                    { visible: false, targets: [0] }
                 ],
                 order: [[5, "asc"]],
                 layout: {
                     topStart: {
                         buttons: [
                             {
-                                extend: 'collection',
-                                text: 'Copy Google Sheets Import to Clipboard',
-                                buttons: [
-                                    {
-                                        text: 'All Requests',
-                                        className: 'dropdown-item',
-                                        action: function () {
-                                            const url = `${window.location.origin}/courses/${courseId}/requests/export.csv?readonly_api_token=${encodeURIComponent(readonlyToken)}`;
-                                            const formula = `=IMPORTDATA("${url}")`;
-                                            navigator.clipboard.writeText(formula);
-                                        }
-                                    },
-                                    {
-                                        text: 'Pending Requests',
-                                        className: 'dropdown-item',
-                                        action: function () {
-                                            const url = `${window.location.origin}/courses/${courseId}/requests/export.csv?readonly_api_token=${encodeURIComponent(readonlyToken)}&status=pending`;
-                                            const formula = `=IMPORTDATA("${url}")`;
-                                            navigator.clipboard.writeText(formula);
-                                        }
-                                    }
-                                ]
+                                extend: 'colvis',
+                                text: '<i class="fas fa-columns me-1"></i>Columns',
+                                columns: ':not(.no-sort)'
                             },
                             {
-                                extend: 'copy',
-                                text: 'Copy Table to Clipboard',
-                                title: null,
-                                messageTop: null,
-                                messageBottom: null,
-                                info: false,
-                                exportOptions: {
-                                    columns: ':visible:not(.no-sort)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
-                                                return node.getAttribute('data-export');
-                                            }
-                                            return data;
-                                        }
+                                text: '<i class="fas fa-edit me-1"></i>Batch Edit',
+                                action: function (e, dt, node, config) {
+                                    const col = dt.column(0);
+                                    const willShow = !col.visible();
+                                    col.visible(willShow);
+
+                                    const batchActions = controller.element.querySelector('.batch-actions');
+                                    if (batchActions) {
+                                        batchActions.classList.toggle('d-none', !willShow);
                                     }
-                                }
-                            },
-                            {
-                                extend: 'csv',
-                                text: 'Export as CSV',
-                                filename: 'extension-requests',
-                                exportOptions: {
-                                    columns: ':visible:not(.no-sort)',
-                                    format: {
-                                        body: function (data, row, column, node) {
-                                            if (node && node.hasAttribute && node.hasAttribute('data-export')) {
-                                                return node.getAttribute('data-export');
-                                            }
-                                            return data;
-                                        }
+
+                                    if (!willShow) {
+                                        controller._selectableCheckboxes().forEach((cb) => { cb.checked = false; });
+                                        controller._syncSelectionControls();
                                     }
+
+                                    const btnEl = node.nodeType === 1 ? node : (node[0] || node);
+                                    btnEl.classList.toggle('active', willShow);
+                                    btnEl.innerHTML = willShow
+                                        ? '<i class="fas fa-times me-1"></i>Exit Batch Edit'
+                                        : '<i class="fas fa-edit me-1"></i>Batch Edit';
                                 }
-                            },
-                            'colvis'
-                        ],
+                            }
+                        ]
                     }
                 }
             });
@@ -137,8 +106,8 @@ export default class extends Controller {
 
     async _submitSingleAction(button) {
         const url = button.dataset.url;
-        const btnGroup = button.closest('.btn-group');
-        const allBtns = btnGroup ? btnGroup.querySelectorAll('button') : [button];
+        const container = button.closest('.request-actions');
+        const allBtns = container ? container.querySelectorAll('button') : [button];
         allBtns.forEach((btn) => { btn.disabled = true; });
 
         try {
@@ -235,8 +204,8 @@ export default class extends Controller {
                 statusTd.innerHTML = `<span class="badge ${badgeClass}">${label}</span>`;
             }
 
-            const btnGroup = tr.querySelector('.btn-group');
-            if (btnGroup) btnGroup.remove();
+            const requestActions = tr.querySelector('.request-actions');
+            if (requestActions) requestActions.remove();
 
             const checkbox = tr.querySelector('input[data-request-id]');
             if (checkbox) {

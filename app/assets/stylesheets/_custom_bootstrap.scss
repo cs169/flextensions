@@ -1,3 +1,28 @@
+.flextensions-table,
+.flextensions-table.dataTable {
+  // Common table headings for all tables
+  thead {
+    th,
+    th.dt-type-numeric, table.dataTable th.dt-type-date, table.dataTable td.dt-type-numeric, table.dataTable td.dt-type-date {
+      text-align: center;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+  }
+
+  tbody {
+    td {
+      vertical-align: middle;
+    }
+  }
+}
+
+// For the requests table, we want to make the action buttons exactly the same size
+// regardless of the icon used.
+.action-btn i {
+  width: 12.5px;
+}
+
 .bd-placeholder-img {
 	font-size: 1.125rem;
 	text-anchor: middle;
@@ -471,6 +496,33 @@ a.btn-outline-danger.disable:hover {
 // }
 // //  BS-type table-responsive
 
+
+// Column visibility dropdown - checkmarks for visible columns
+.dt-button-collection {
+  .dt-button {
+    text-align: left !important;
+    padding-left: 2.2em !important;
+    position: relative;
+
+    &.active,
+    &.dt-button-active {
+      background-color: transparent !important;
+      color: var(--bs-dropdown-link-color, inherit) !important;
+
+      &:hover {
+        background-color: var(--bs-dropdown-link-hover-bg) !important;
+        color: var(--bs-dropdown-link-hover-color) !important;
+      }
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0.75em;
+        font-weight: bold;
+      }
+    }
+  }
+}
 
 // Request Table desktop
 @media (min-width: 768px) {
