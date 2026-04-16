@@ -241,8 +241,8 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    hypershield (0.5.1)
-      activerecord (>= 7.1)
+    hypershield (0.6.0)
+      activerecord (>= 7.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
