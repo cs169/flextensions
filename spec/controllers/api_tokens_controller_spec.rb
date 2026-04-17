@@ -29,7 +29,7 @@ RSpec.describe APITokensController, type: :controller do
 
       it 'assigns api_tokens for the course' do
         token = APIToken.create!(
-          course: course, user: instructor, created_by: instructor,
+          course: course, user: instructor,
           expires_at: 30.days.from_now
         )
 
@@ -40,17 +40,12 @@ RSpec.describe APITokensController, type: :controller do
       it 'does not include tokens from other courses' do
         other_course = Course.create!(course_name: 'Other Course', canvas_id: '999')
         other_token = APIToken.create!(
-          course: other_course, user: instructor, created_by: instructor,
+          course: other_course, user: instructor,
           expires_at: 30.days.from_now
         )
 
         get :index, params: { course_id: course.id }
         expect(assigns(:api_tokens)).not_to include(other_token)
-      end
-
-      it 'sets @side_nav to api_tokens' do
-        get :index, params: { course_id: course.id }
-        expect(assigns(:side_nav)).to eq('api_tokens')
       end
 
       it 'sets @pending_requests_count' do
@@ -62,7 +57,7 @@ RSpec.describe APITokensController, type: :controller do
     describe 'DELETE #destroy' do
       it 'revokes the token and redirects with notice' do
         token = APIToken.create!(
-          course: course, user: instructor, created_by: instructor,
+          course: course, user: instructor,
           expires_at: 30.days.from_now
         )
 
@@ -83,7 +78,7 @@ RSpec.describe APITokensController, type: :controller do
       it 'does not allow revoking tokens from another course' do
         other_course = Course.create!(course_name: 'Other Course', canvas_id: '999')
         other_token = APIToken.create!(
-          course: other_course, user: instructor, created_by: instructor,
+          course: other_course, user: instructor,
           expires_at: 30.days.from_now
         )
 
@@ -117,7 +112,7 @@ RSpec.describe APITokensController, type: :controller do
 
     it 'denies access to destroy' do
       token = APIToken.create!(
-        course: course, user: instructor, created_by: instructor,
+        course: course, user: instructor,
         expires_at: 30.days.from_now
       )
 

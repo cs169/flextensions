@@ -2,12 +2,11 @@ FactoryBot.define do
   factory :api_token do
     association :course
     association :user
-    association :created_by, factory: :user
-    read_write { false }
+    read_only { true }
     expires_at { 30.days.from_now }
 
     trait :read_write do
-      read_write { true }
+      read_only { false }
     end
 
     trait :expired do

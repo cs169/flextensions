@@ -18,9 +18,8 @@ namespace :api_tokens do
       APIToken.create!(
         course: course,
         user: system_user,
-        created_by: system_user,
         token_digest: digest,
-        read_write: false,
+        read_only: true,
         expires_at: 1.year.from_now
       )
       migrated += 1

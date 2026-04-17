@@ -5,38 +5,34 @@
 #  id            :bigint           not null, primary key
 #  expires_at    :datetime         not null
 #  last_used_at  :datetime
-#  read_write    :boolean          default(FALSE), not null
+#  read_only     :boolean          default(TRUE), not null
 #  revoked_at    :datetime
 #  token_digest  :string           not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  course_id     :bigint           not null
-#  created_by_id :bigint           not null
 #  user_id       :bigint           not null
 #
 # Indexes
 #
 #  index_api_tokens_on_course_id     (course_id)
-#  index_api_tokens_on_created_by_id (created_by_id)
 #  index_api_tokens_on_token_digest  (token_digest) UNIQUE
 #  index_api_tokens_on_user_id       (user_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (course_id => courses.id)
-#  fk_rails_...  (created_by_id => users.id)
 #  fk_rails_...  (user_id => users.id)
 #
 class APIToken < ApplicationRecord
   belongs_to :course
   belongs_to :user
-  belongs_to :created_by, class_name: 'User'
 
   attr_accessor :raw_token
 
   validates :token_digest, presence: true, uniqueness: true
   validates :expires_at, presence: true
-  validates :read_write, inclusion: { in: [ true, false ] }
+  validates :read_only, inclusion: { in: [ true, false ] }
   validate :expires_at_must_be_in_future, on: :create
 
   before_validation :generate_token_digest, on: :create

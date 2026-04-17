@@ -175,6 +175,11 @@ class RequestsController < ApplicationController
     process_mass_action(:reject)
   end
 
+  # April 2026 - Migrated `courses.readonly_api_token` values into the new `api_tokens` table.
+  # The `readonly_api_token` query parameter is still accepted as an alias for `api_token` so
+  # previously distributed CSV/Sheets URLs keep working.
+  # Dec 2026 (or later): It is safe to remove the deprecated `readonly_api_token` query
+  # parameter and this comment.
   def export
     course = Course.find_by(id: params[:course_id])
     raw_token = params[:readonly_api_token] || params[:api_token]
@@ -182,20 +187,11 @@ class RequestsController < ApplicationController
     return render plain: 'Course not found', status: :not_found unless course
     return render plain: 'Invalid or missing API token', status: :unauthorized if raw_token.blank?
 
-    # Try new APIToken system first
     api_token = APIToken.lookup_token(raw_token)
-    if api_token&.active? && api_token.course_id == course.id
-      api_token.touch_last_used!
-      return export_csv(course)
-    end
+    return render plain: 'Invalid or missing API token', status: :unauthorized unless api_token&.active? && api_token.course_id == course.id
 
-    # Fall back to legacy readonly_api_token for backward compatibility
-    if course.readonly_api_token.present? &&
-       ActiveSupport::SecurityUtils.secure_compare(course.readonly_api_token, raw_token.to_s)
-      return export_csv(course)
-    end
-
-    render plain: 'Invalid or missing API token', status: :unauthorized
+    api_token.touch_last_used!
+    export_csv(course)
   end
 
   private

@@ -6,8 +6,7 @@ class APITokensController < ApplicationController
   before_action :set_pending_request_count
 
   def index
-    @side_nav = 'api_tokens'
-    @api_tokens = @course.api_tokens.includes(:user, :created_by).order(created_at: :desc)
+    @api_tokens = @course.api_tokens.includes(:user).order(created_at: :desc)
   end
 
   def destroy

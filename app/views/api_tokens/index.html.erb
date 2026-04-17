@@ -13,66 +13,64 @@
             API tokens allow external services to access course data. Each token is scoped to this course and linked to a specific user.
           </div>
 
-          <% if @api_tokens.any? %>
-            <div class="table-responsive">
-              <table class="table table-bordered table-striped">
-                <thead>
-                  <tr class="table-info">
-                    <th class="text-center align-content-center">Token</th>
-                    <th class="text-center align-content-center">User</th>
-                    <th class="text-center align-content-center">Role</th>
-                    <th class="text-center align-content-center">Permission</th>
-                    <th class="text-center align-content-center">Expires</th>
-                    <th class="text-center align-content-center">Last Used</th>
-                    <th class="text-center align-content-center">Created By</th>
-                    <th class="text-center align-content-center">Actions</th>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr class="table-info">
+                  <th class="text-center align-content-center">Token</th>
+                  <th class="text-center align-content-center">User</th>
+                  <th class="text-center align-content-center">Role</th>
+                  <th class="text-center align-content-center">Permission</th>
+                  <th class="text-center align-content-center">Expires</th>
+                  <th class="text-center align-content-center">Last Used</th>
+                  <th class="text-center align-content-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @api_tokens.each do |token| %>
+                  <tr class="<%= 'table-warning' if token.revoked? || token.expired? %>">
+                    <td class="text-center align-content-center">
+                      <code><%= token.token_digest.first(8) %>...</code>
+                    </td>
+                    <td class="text-center align-content-center"><%= token.user.name %></td>
+                    <td class="text-center align-content-center"><%= token.course_role&.capitalize || 'N/A' %></td>
+                    <td class="text-center align-content-center">
+                      <% if token.read_only? %>
+                        <span class="badge text-bg-secondary">Read Only</span>
+                      <% else %>
+                        <span class="badge text-bg-warning">Read + Write</span>
+                      <% end %>
+                    </td>
+                    <td class="text-center align-content-center">
+                      <% if token.expired? %>
+                        <span class="badge text-bg-danger">Expired</span>
+                      <% else %>
+                        <%= token.expires_at.strftime('%b %d, %Y') %>
+                      <% end %>
+                    </td>
+                    <td class="text-center align-content-center">
+                      <%= token.last_used_at ? token.last_used_at.strftime('%b %d, %Y %H:%M') : 'Never' %>
+                    </td>
+                    <td class="text-center align-content-center">
+                      <% if token.revoked? %>
+                        <span class="badge text-bg-dark">Revoked</span>
+                      <% elsif token.active? %>
+                        <%= button_to 'Revoke',
+                                      course_api_token_path(@course, token),
+                                      method: :delete,
+                                      class: 'btn btn-sm btn-outline-danger',
+                                      data: { confirm: 'Are you sure you want to revoke this token? This cannot be undone.' } %>
+                      <% else %>
+                        <span class="badge text-bg-dark">Expired</span>
+                      <% end %>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  <% @api_tokens.each do |token| %>
-                    <tr class="<%= 'table-warning' if token.revoked? || token.expired? %>">
-                      <td class="text-center align-content-center">
-                        <code><%= token.token_digest.first(8) %>...</code>
-                      </td>
-                      <td class="text-center align-content-center"><%= token.user.name %></td>
-                      <td class="text-center align-content-center"><%= token.course_role&.capitalize || 'N/A' %></td>
-                      <td class="text-center align-content-center">
-                        <% if token.read_write? %>
-                          <span class="badge text-bg-warning">Read + Write</span>
-                        <% else %>
-                          <span class="badge text-bg-secondary">Read Only</span>
-                        <% end %>
-                      </td>
-                      <td class="text-center align-content-center">
-                        <% if token.expired? %>
-                          <span class="badge text-bg-danger">Expired</span>
-                        <% else %>
-                          <%= token.expires_at.strftime('%b %d, %Y') %>
-                        <% end %>
-                      </td>
-                      <td class="text-center align-content-center">
-                        <%= token.last_used_at ? token.last_used_at.strftime('%b %d, %Y %H:%M') : 'Never' %>
-                      </td>
-                      <td class="text-center align-content-center"><%= token.created_by.name %></td>
-                      <td class="text-center align-content-center">
-                        <% if token.revoked? %>
-                          <span class="badge text-bg-dark">Revoked</span>
-                        <% elsif token.active? %>
-                          <%= button_to 'Revoke',
-                                        course_api_token_path(@course, token),
-                                        method: :delete,
-                                        class: 'btn btn-sm btn-outline-danger',
-                                        data: { confirm: 'Are you sure you want to revoke this token? This cannot be undone.' } %>
-                        <% else %>
-                          <span class="badge text-bg-dark">Expired</span>
-                        <% end %>
-                      </td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          <% else %>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <% if @api_tokens.empty? %>
             <p class="text-muted mb-0">No API tokens have been created for this course.</p>
           <% end %>
         </div>

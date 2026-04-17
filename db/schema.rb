@@ -24,16 +24,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_000001) do
   create_table "api_tokens", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.bigint "user_id", null: false
-    t.bigint "created_by_id", null: false
     t.string "token_digest", null: false
-    t.boolean "read_write", default: false, null: false
+    t.boolean "read_only", default: true, null: false
     t.datetime "expires_at", null: false
     t.datetime "last_used_at"
     t.datetime "revoked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_api_tokens_on_course_id"
-    t.index ["created_by_id"], name: "index_api_tokens_on_created_by_id"
     t.index ["token_digest"], name: "index_api_tokens_on_token_digest", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
@@ -247,7 +245,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_000001) do
 
   add_foreign_key "api_tokens", "courses"
   add_foreign_key "api_tokens", "users"
-  add_foreign_key "api_tokens", "users", column: "created_by_id"
   add_foreign_key "assignments", "course_to_lmss"
   add_foreign_key "course_settings", "courses"
   add_foreign_key "course_to_lmss", "courses"
