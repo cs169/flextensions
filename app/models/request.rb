@@ -50,6 +50,19 @@ class Request < ApplicationRecord
     where(user: user, course: course, status: 'approved', auto_approved: true)
   }
 
+  # Returns { user_id => total_approved_late_days } for all users in a course
+  # only the widest approved extension is counted.
+  def self.total_approved_late_days_by_user(course)
+    rows = where(course: course, status: 'approved')
+      .joins(:assignment)
+      .group(:user_id, :assignment_id)
+      .pluck(:user_id, Arel.sql('MAX(requested_due_date::date - assignments.due_date::date)'))
+
+    rows.each_with_object(Hash.new(0)) do |(user_id, max_days), totals|
+      totals[user_id] += max_days
+    end
+  end
+
   # Class methods
   def self.merge_date_and_time!(request_params)
     return unless request_params[:requested_due_date].present? && request_params[:due_time].present?
