@@ -142,6 +142,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_01_000001) do
     t.string "canvas_id"
     t.string "course_code"
     t.string "readonly_api_token"
+    t.string "semester"
     t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
     t.index ["readonly_api_token"], name: "index_courses_on_readonly_api_token", unique: true
   end

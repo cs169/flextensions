@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
-ruby '~> 3.3.7'
+ruby '~> 3.3'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 7.2.3'
+gem 'rails', '~> 7.2.3.1'
 
 # Use postgres for all env dbs
 gem 'pg'
@@ -59,6 +59,9 @@ gem 'strong_migrations'
 
 # Logging Customization
 gem 'lograge'
+
+# Environment variable management
+gem 'dotenv-rails', require: 'dotenv/load'
 
 # Use Active Storage for file uploads [https://guides.rubyonrails.org/active_storage_overview.html]
 # gem "activestorage", "~> 7.0.0"

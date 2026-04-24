@@ -6,6 +6,7 @@
 #  course_code        :string
 #  course_name        :string
 #  readonly_api_token :string
+#  semester           :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  canvas_id          :string
@@ -36,8 +37,31 @@ class Course < ApplicationRecord
   validates :course_name, presence: true
   # validate :ensure_course_settings
 
+  # Scopes
+  scope :by_semester, ->(semester) { where(semester: semester) }
+
   # Always load the LMS integrations
   default_scope { includes(:course_to_lmss) }
+
+  # Semester ordering: most-recent-first.
+  # Within the same year: Fall > Summer > Spring > Winter (furthest out to most recent).
+  SEMESTER_SEASON_ORDER = { 'Fall' => 3, 'Summer' => 2, 'Spring' => 1, 'Winter' => 0 }.freeze
+
+  # Returns a numeric sort key for a semester string (e.g. "Spring 2026").
+  # Higher values = more recent. Suitable for descending sort.
+  def self.semester_sort_key(semester)
+    return [ -1, -1 ] if semester.blank?
+
+    parts = semester.split
+    season = parts[0]
+    year = parts[1].to_i
+    [ year, SEMESTER_SEASON_ORDER.fetch(season, -1) ]
+  end
+
+  # Sorts an array of semester strings most-recent-first.
+  def self.sort_semesters(semesters)
+    semesters.sort_by { |s| semester_sort_key(s) }.reverse
+  end
 
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
@@ -68,6 +92,10 @@ class Course < ApplicationRecord
     return 'student' if roles.include?('student')
 
     nil
+  end
+
+  def course_admin?(user)
+    user_to_courses.where(user_id: user.id).any?(&:course_admin?)
   end
 
   # TODO: This doesn't make sense actually.
@@ -199,6 +227,8 @@ class Course < ApplicationRecord
     response_data = JSON.parse(response.body)
     course.course_name = response_data['name']
     course.course_code = response_data['course_code']
+    # Semester is sourced from the Canvas term name (e.g. "Spring 2026")
+    course.semester = response_data.dig('term', 'name')
     course.save!
     course
   end
