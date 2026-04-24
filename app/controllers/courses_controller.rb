@@ -5,14 +5,20 @@ class CoursesController < ApplicationController
   before_action :determine_user_role
 
   def index
-    @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
+    teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
+    @teacher_courses_by_semester = group_by_semester(teacher_courses)
 
     # Only show courses to students if extensions are enabled at the course level
     student_courses = UserToCourse.includes(course: :course_settings).where(user: @user, role: 'student')
-    @student_courses = student_courses.select do |utc|
+    visible_student_courses = student_courses.select do |utc|
       course_settings = utc.course.course_settings
       course_settings.nil? || course_settings.enable_extensions
     end
+    @student_courses_by_semester = group_by_semester(visible_student_courses)
+
+    # Keep flat lists for conditional checks in the view
+    @teacher_courses = teacher_courses
+    @student_courses = visible_student_courses
   end
 
   def show
@@ -119,12 +125,14 @@ class CoursesController < ApplicationController
     @is_course_admin = @course&.course_admin?(@user) || false
   end
 
-  # Filters Canvas API course hashes by their term name
-  def filter_by_semester(courses, semester)
-    courses.select { |c| c.dig('term', 'name') == semester }
+  # Groups UserToCourse records by their course's semester, sorted most-recent-first.
+  # Returns an array of [semester_name, [user_to_courses]] pairs.
+  def group_by_semester(user_to_courses)
+    grouped = user_to_courses.group_by { |utc| utc.course.semester }
+    sorted_semesters = Course.sort_semesters(grouped.keys)
+    sorted_semesters.map { |semester| [ semester, grouped[semester] ] }
   end
 
-  # Filters Canvas API course hashes by their term name
   def filter_by_semester(courses, semester)
     courses.select { |c| c.dig('term', 'name') == semester }
   end
