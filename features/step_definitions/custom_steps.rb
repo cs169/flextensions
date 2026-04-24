@@ -14,6 +14,11 @@ Given(/^a course exists$/) do
   end
 end
 
+Given(/^I am logged in as an admin$/) do
+  user = create(:admin, email: 'admin@berkeley.edu', canvas_uid: 'canvas_uid_admin')
+  page.set_rack_session(user_id: user.canvas_uid, username: user.name)
+end
+
 Given(/^(?:I am|I'm|I) (?:logged|log) in as a (teacher|ta|student)$/i) do |role|
   emails = {
     'teacher' => 'user1@berkeley.edu',
