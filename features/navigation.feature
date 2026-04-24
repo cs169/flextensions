@@ -40,3 +40,19 @@ Feature: Navigation
     And I should see "Login with bCourses" in the navbar
     And I should not see "Offerings" in the navbar
     And I should not see "Logout" in the navbar
+
+  Scenario: Admin user sees admin tools in navbar dropdown
+    Given a course exists
+    And I am logged in as an admin
+    And I am on the "Courses page"
+    Then I should see "Admin Tools" in the navbar dropdown
+    And I should see "Dashboards" in the navbar dropdown
+    And I should see "Background Jobs" in the navbar dropdown
+
+  Scenario: Non-admin user does not see admin tools in navbar dropdown
+    Given a course exists
+    And I am logged in as a teacher
+    And I am on the "Courses page"
+    Then I should not see "Admin Tools" in the navbar dropdown
+    And I should not see "Dashboards" in the navbar dropdown
+    And I should not see "Background Jobs" in the navbar dropdown

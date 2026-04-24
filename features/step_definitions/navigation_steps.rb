@@ -14,6 +14,18 @@ Then(/^I should not see "(.*?)" in the navbar$/) do |text|
   end
 end
 
+Then(/^I should see "(.*?)" in the navbar dropdown$/) do |text|
+  within('#user-dropdown-menu') do
+    expect(page).to have_content(text)
+  end
+end
+
+Then(/^I should not see "(.*?)" in the navbar dropdown$/) do |text|
+  within('#user-dropdown-menu') do
+    expect(page).not_to have_content(text)
+  end
+end
+
 When(/^I navigate to any page other than the "(.*?)"$/) do |excluded_page|
   # Currently included home and courses page
   case excluded_page
