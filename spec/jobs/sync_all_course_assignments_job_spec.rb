@@ -221,7 +221,6 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       expect(results[:added_assignments]).to eq(0)
       expect(results[:updated_assignments]).to eq(1)
       expect(results[:unchanged_assignments]).to eq(0)
-
     end
 
     it 'increments unchanged_assignments when nothing changed' do
