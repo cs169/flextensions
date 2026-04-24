@@ -15,13 +15,13 @@ Then(/^I should not see "(.*?)" in the navbar$/) do |text|
 end
 
 Then(/^I should see "(.*?)" in the navbar dropdown$/) do |text|
-  within('nav .dropdown-menu') do
+  within('#user-dropdown-menu') do
     expect(page).to have_content(text)
   end
 end
 
 Then(/^I should not see "(.*?)" in the navbar dropdown$/) do |text|
-  within('nav .dropdown-menu') do
+  within('#user-dropdown-menu') do
     expect(page).not_to have_content(text)
   end
 end
