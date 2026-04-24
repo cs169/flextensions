@@ -143,7 +143,6 @@ class CoursesController < ApplicationController
     sorted_semesters.map { |semester| [ semester, grouped[semester] ] }
   end
 
-  # Filters Canvas API course hashes by their term name
   def filter_by_semester(courses, semester)
     courses.select { |c| c.dig('term', 'name') == semester }
   end
