@@ -133,6 +133,10 @@ class CoursesController < ApplicationController
     sorted_semesters.map { |semester| [ semester, grouped[semester] ] }
   end
 
+  def filter_by_semester(courses, semester)
+    courses.select { |c| c.dig('term', 'name') == semester }
+  end
+
   # TODO: This should be moved to the Canvas Facade
   def filter_courses(courses, roles, exclude_ids = [])
     missing_enrollments = courses.select { |course| course['enrollments'].blank? }
