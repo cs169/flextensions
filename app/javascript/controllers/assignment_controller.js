@@ -80,9 +80,19 @@ export default class extends Controller {
 
       if (!response.ok) throw new Error("Failed to update assignments.");
 
-      document.querySelectorAll(".assignment-enabled-switch").forEach((cb) => {
-        cb.checked = enabled;
-      });
+      const dt = DataTable.isDataTable('#assignments-table')
+        ? new DataTable('#assignments-table')
+        : null;
+      if (dt) {
+        dt.rows().nodes().each((node) => {
+          const cb = node.querySelector('.assignment-enabled-switch');
+          if (cb) cb.checked = enabled;
+        });
+      } else {
+        document.querySelectorAll(".assignment-enabled-switch").forEach((cb) => {
+          cb.checked = enabled;
+        });
+      }
     } catch (error) {
       flash("alert", error.message || "An error occurred.");
     }
