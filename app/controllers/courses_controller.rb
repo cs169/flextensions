@@ -85,7 +85,7 @@ class CoursesController < ApplicationController
 
     enabled = ActiveModel::Type::Boolean.new.cast(params[:enabled])
     Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
-              .update_all(enabled: enabled)
+              .each { |a| a.update!(enabled: enabled) }
     render json: { success: true }, status: :ok
   end
 
