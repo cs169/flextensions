@@ -6,7 +6,7 @@ import "datatables.net-responsive-bs5";
 // Connects to data-controller="assignment"
 export default class extends Controller {
   static targets = ["checkbox"]
-  static values = { courseId: Number }
+  static values = { courseId: Number, bulkUrl: String }
 
   connect() {
     this.checkboxTargets.forEach((checkbox) => {
@@ -62,6 +62,42 @@ export default class extends Controller {
       console.error("Error updating assignment:", error);
       checkbox.checked = !enabled; // rollback checkbox if error
     }
+  }
+
+  async bulkUpdate(enabled) {
+    const url = this.bulkUrlValue;
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({ enabled }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update assignments.");
+
+      document.querySelectorAll(".assignment-enabled-switch").forEach((cb) => {
+        cb.checked = enabled;
+      });
+    } catch (error) {
+      flash("alert", error.message || "An error occurred.");
+    }
+  }
+
+  enableAll(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
+    this.bulkUpdate(true).finally(() => { button.disabled = false; });
+  }
+
+  disableAll(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
+    this.bulkUpdate(false).finally(() => { button.disabled = false; });
   }
 
   sync(event) {

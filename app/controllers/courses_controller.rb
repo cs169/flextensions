@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments delete]
+  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments bulk_update_assignments enrollments delete]
   before_action :set_pending_request_count
   before_action :determine_user_role
 
@@ -77,6 +77,16 @@ class CoursesController < ApplicationController
 
     @course.sync_assignments(@user)
     render json: { message: 'Assignments synced successfully.' }, status: :ok
+  end
+
+  def bulk_update_assignments
+    return render json: { error: 'Course not found.' }, status: :not_found unless @course
+    return render json: { error: 'You do not have permission.' }, status: :forbidden unless @role == 'instructor'
+
+    enabled = ActiveModel::Type::Boolean.new.cast(params[:enabled])
+    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
+              .update_all(enabled: enabled)
+    render json: { success: true }, status: :ok
   end
 
   def sync_enrollments
