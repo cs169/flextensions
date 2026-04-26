@@ -65,7 +65,7 @@ class CourseSettings < ApplicationRecord
 
   scope :with_pending_notifications, ->(frequency) {
     where(pending_notification_frequency: frequency)
-    .where.not(pending_notification_email: [nil, ''])
+    .where.not(pending_notification_email: [ nil, '' ])
   }
 
   def automatic_approval_enabled?

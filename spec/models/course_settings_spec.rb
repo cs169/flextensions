@@ -266,15 +266,15 @@ RSpec.describe CourseSettings, type: :model do
       other_course = create(:course, canvas_id: 'other_123', course_name: 'Other', course_code: 'OTHER101')
       other_course.course_settings.update!(pending_notification_frequency: 'weekly', pending_notification_email: 'b@example.com')
 
-      results = CourseSettings.with_pending_notifications('daily')
+      results = described_class.with_pending_notifications('daily')
       expect(results).to include(course_settings)
       expect(results).not_to include(other_course.course_settings)
     end
 
     it 'excludes records with nil email' do
-      course_settings.update_columns(pending_notification_frequency: 'daily', pending_notification_email: nil)
+      course_settings.update_columns(pending_notification_frequency: 'daily', pending_notification_email: nil) # rubocop:disable Rails/SkipsModelValidations
 
-      results = CourseSettings.with_pending_notifications('daily')
+      results = described_class.with_pending_notifications('daily')
       expect(results).not_to include(course_settings)
     end
   end

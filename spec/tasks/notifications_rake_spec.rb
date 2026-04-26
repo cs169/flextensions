@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'rake'
 
-RSpec.describe 'notifications:send_pending_digests' do
+RSpec.describe 'notifications:send_pending_digests' do # rubocop:disable RSpec/DescribeClass
   before(:all) do
     Rails.application.load_tasks
   end

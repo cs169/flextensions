@@ -32,7 +32,7 @@ RSpec.describe PendingRequestsNotificationJob, type: :job do
       expect { described_class.perform_now('daily') }.to change { ActionMailer::Base.deliveries.count }.by(1)
 
       mail = ActionMailer::Base.deliveries.last
-      expect(mail.to).to eq(['prof@example.com'])
+      expect(mail.to).to eq([ 'prof@example.com' ])
       expect(mail.subject).to include('1 Pending Extension Request')
       expect(mail.subject).to include('CS101')
       expect(mail.body.encoded).to include("http://localhost:3000/courses/#{course.id}/requests")
