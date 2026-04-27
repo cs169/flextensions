@@ -43,7 +43,7 @@ RSpec.describe LmsCredential, type: :model do
     let!(:credential) do
       described_class.create!(
         user: user,
-        lms_name: 'ExampleLMS',
+        lms_id: 1,
         username: 'testuser',
         password: 'testpassword',
         token: 'sensitive_token',

@@ -32,7 +32,7 @@ RSpec.describe User, type: :model do
     context 'when the token is still valid' do
       before do
         user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'valid_token',
           refresh_token: 'refresh_token',
           expire_time: 1.hour.from_now
@@ -47,7 +47,7 @@ RSpec.describe User, type: :model do
     context 'when the token is expired' do
       before do
         user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'expired_token',
           refresh_token: 'refresh_token',
           expire_time: 1.hour.ago
@@ -65,7 +65,7 @@ RSpec.describe User, type: :model do
 
     it 'returns the correct credentials for a user' do
       user.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'valid_token',
         refresh_token: 'refresh_token',
         expire_time: 1.hour.from_now
@@ -82,7 +82,7 @@ RSpec.describe User, type: :model do
     context 'when token does not expire soon' do
       before do
         user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'valid_token',
           refresh_token: 'refresh_token',
           expire_time: 1.hour.from_now
@@ -97,7 +97,7 @@ RSpec.describe User, type: :model do
     context 'when token expires soon and is refreshed' do
       let(:credential) do
         user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'stale_token',
           refresh_token: 'refresh_token',
           expire_time: 5.minutes.from_now

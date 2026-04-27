@@ -7,7 +7,7 @@ RSpec.describe CourseSettingsController, type: :controller do
 
   before do
     instructor.lms_credentials.create!(
-      lms_name: 'canvas',
+      lms_id: 1,
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
@@ -190,7 +190,7 @@ RSpec.describe CourseSettingsController, type: :controller do
     before do
       session[:user_id] = student.canvas_uid
       student.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'student_token',
         refresh_token: 'student_refresh_token',
         expire_time: 1.hour.from_now
