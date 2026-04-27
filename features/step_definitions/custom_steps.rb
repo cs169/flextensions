@@ -14,6 +14,11 @@ Given(/^a course exists$/) do
   end
 end
 
+Given(/^I am logged in as an admin$/) do
+  user = create(:admin, email: 'admin@berkeley.edu', canvas_uid: 'canvas_uid_admin')
+  page.set_rack_session(user_id: user.canvas_uid, username: user.name)
+end
+
 Given(/^(?:I am|I'm|I) (?:logged|log) in as a (teacher|ta|student)$/i) do |role|
   emails = {
     'teacher' => 'user1@berkeley.edu',
@@ -216,6 +221,41 @@ end
 Then(/^I should be on the request page for that request$/) do
   expected_path = "/courses/#{@course.id}/requests/#{@pending_request.id}"
   expect(page.current_path).to eq(expected_path)
+end
+
+###################
+#    SYNC UI      #
+###################
+
+# Then I should see a "Sync Enrollments" button
+Then(/^I should see a "([^"]*)" button$/) do |label|
+  expect(page).to have_button(label)
+end
+
+# When I click the "Sync Enrollments" button
+When(/^I click the "([^"]*)" button$/) do |label|
+  # csrf_meta_tags renders nothing when allow_forgery_protection = false (test env).
+  # Inject a placeholder token so JS fetch handlers don't throw before disabling the button.
+  page.execute_script(<<~JS)
+    if (!document.querySelector('meta[name="csrf-token"]')) {
+      const m = document.createElement('meta');
+      m.name = 'csrf-token';
+      m.content = 'test-csrf-token';
+      document.head.appendChild(m);
+    }
+  JS
+  click_button(label)
+end
+
+# Then the "Sync Enrollments" button should be disabled
+# When sync starts, the label changes to "Syncing..." so we check for that text + disabled
+Then(/^the "([^"]*)" button should be disabled$/) do |_label|
+  expect(page).to have_button("Syncing...", disabled: true)
+end
+
+# Then I should see a loading spinner
+Then(/^I should see a loading spinner$/) do
+  expect(page).to have_css('.spinner-border:not(.d-none)', visible: true)
 end
 
 Given(/^I deny the request for "([^"]*)"$/) do |assignment_name|

@@ -64,8 +64,10 @@
           Disable All Assignments
         </button>
         <button class="btn btn-info"
-                data-action="click->assignment#sync">
-          Sync Assignments
+                data-action="click->assignment#sync"
+                data-assignment-target="syncBtn">
+          <span data-assignment-target="syncLabel">Sync Assignments</span>
+          <span data-assignment-target="syncSpinner" class="spinner-border spinner-border-sm ms-1 d-none" role="status" aria-hidden="true"></span>
         </button>
       </div>
     </div>

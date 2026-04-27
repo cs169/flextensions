@@ -66,6 +66,11 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
+  # Disable GoodJob's in-process worker so enqueued jobs do not execute during tests.
+  # Without this, GoodJob runs jobs in background threads, causing sync operations to
+  # complete before Capybara can observe transient UI states (spinner, disabled button).
+  config.good_job.execution_mode = :external
+
   # Set up default encryption keys for the test environment
   config.active_record.encryption.primary_key = 'test-primary-key-1234567890abcdef'
   config.active_record.encryption.deterministic_key = 'test-deterministic-key-1234567890abcdef'

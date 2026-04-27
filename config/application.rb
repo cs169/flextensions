@@ -40,6 +40,7 @@ module Flextensions
     config.active_record.default_timezone = :utc
     config.time_zone = 'Pacific Time (US & Canada)'
     config.generators.system_tests = nil
+    config.active_job.queue_adapter = :good_job
 
     # We do not require the master key and insetad use environment variables
     # Review .env.example for required variables.

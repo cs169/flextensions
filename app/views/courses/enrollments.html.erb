@@ -82,8 +82,10 @@
           <button class="btn btn-info"
                   data-controller="enrollments"
                   data-action="click->enrollments#sync"
-                  data-enrollments-course-id-value="<%= @course.id %>">
-            Sync Enrollments
+                  data-enrollments-course-id-value="<%= @course.id %>"
+                  data-enrollments-target="syncBtn">
+            <span data-enrollments-target="syncLabel">Sync Enrollments</span>
+            <span data-enrollments-target="syncSpinner" class="spinner-border spinner-border-sm ms-1 d-none" role="status" aria-hidden="true"></span>
           </button>
         </div>
       <% end %>

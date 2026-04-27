@@ -25,7 +25,7 @@ Rails.application.configure do
     config.lograge.custom_payload do |controller|
       {
         request_id: controller.request.uuid,
-        user_id: controller.current_user.try(:id)
+        user_id: controller.is_a?(ApplicationController) ? controller.current_user.try(:id) : nil
       }
     end
 
