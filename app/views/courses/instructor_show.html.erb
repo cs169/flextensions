@@ -49,11 +49,22 @@
           </tbody>
         </table>
       </div>
-      <div class="text-center">
+      <div class="text-center d-flex justify-content-center gap-2 flex-wrap"
+           data-controller="assignment"
+           data-assignment-course-id-value="<%= @course.id %>"
+           data-assignment-bulk-url-value="<%= bulk_update_enabled_assignments_path %>"
+           data-assignment-role-value="<%= @role %>"
+           data-assignment-user-id-value="<%= @user.id %>">
+        <button class="btn btn-success"
+                data-action="click->assignment#enableAll">
+          Enable All Assignments
+        </button>
+        <button class="btn btn-outline-secondary"
+                data-action="click->assignment#disableAll">
+          Disable All Assignments
+        </button>
         <button class="btn btn-info"
-                data-controller="assignment"
-                data-action="click->assignment#sync"
-                data-assignment-course-id-value="<%= @course.id %>">
+                data-action="click->assignment#sync">
           Sync Assignments
         </button>
       </div>
