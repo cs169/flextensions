@@ -139,7 +139,7 @@ class SessionController < ApplicationController
       )
     else
       user.lms_credentials.create!(
-        lms_id: 1,
+        lms_name: 'canvas',
         token: token.token,
         refresh_token: token.refresh_token,
         expire_time: Time.zone.at(token.expires_at)

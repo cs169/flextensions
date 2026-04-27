@@ -22,7 +22,7 @@ RSpec.describe TokenRefreshable, type: :controller do
   let(:user) do
     User.create!(email: 'test@example.com', canvas_uid: '123').tap do |u|
       u.lms_credentials.create!(
-        lms_id: 1,
+        lms_name: 'canvas',
         token: 'valid_token',
         refresh_token: 'refresh_token',
         expire_time: 10.minutes.from_now

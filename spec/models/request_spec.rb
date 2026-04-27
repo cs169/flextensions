@@ -71,7 +71,7 @@ RSpec.describe Request, type: :model do
   before do
     UserToCourse.create!(user: user, course: course, role: 'student')
     user.lms_credentials.create!(
-      lms_id: 1,
+      lms_name: 'canvas',
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
