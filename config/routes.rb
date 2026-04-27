@@ -60,6 +60,9 @@ Rails.application.routes.draw do
     member do
       patch :toggle_enabled
     end
+    collection do
+      patch :bulk_update_enabled
+    end
   end
 
   namespace :api do
