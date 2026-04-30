@@ -56,7 +56,7 @@ class Request < ApplicationRecord
     rows = where(course: course, status: 'approved')
       .joins(:assignment)
       .group(:user_id, :assignment_id)
-      .pluck(:user_id, Arel.sql('MAX(requested_due_date::date - assignments.due_date::date)'))
+      .pluck(:user_id, Arel.sql('GREATEST(0, MAX(requested_due_date::date - assignments.due_date::date))'))
 
     rows.each_with_object(Hash.new(0)) do |(user_id, max_days), totals|
       totals[user_id] += max_days
