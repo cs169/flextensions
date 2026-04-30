@@ -5,14 +5,20 @@ class CoursesController < ApplicationController
   before_action :determine_user_role
 
   def index
-    @teacher_courses = UserToCourse.includes(:course).where(user: @user, role: %w[teacher ta])
+    teacher_courses = UserToCourse.includes(:course).where(user: @user, role: UserToCourse.staff_roles)
+    @teacher_courses_by_semester = group_by_semester(teacher_courses)
 
     # Only show courses to students if extensions are enabled at the course level
     student_courses = UserToCourse.includes(course: :course_settings).where(user: @user, role: 'student')
-    @student_courses = student_courses.select do |utc|
+    visible_student_courses = student_courses.select do |utc|
       course_settings = utc.course.course_settings
       course_settings.nil? || course_settings.enable_extensions
     end
+    @student_courses_by_semester = group_by_semester(visible_student_courses)
+
+    # Keep flat lists for conditional checks in the view
+    @teacher_courses = teacher_courses
+    @student_courses = visible_student_courses
   end
 
   def show
@@ -38,12 +44,19 @@ class CoursesController < ApplicationController
     @courses = Course.fetch_courses(token)
     flash[:alert] = 'No courses found.' if @courses.empty?
 
-    teacher_enrollment_types = %w[teacher ta]
+    @semesters = @courses.filter_map { |c| c.dig('term', 'name') }.uniq.sort
+    @selected_semester = params[:semester]
+
     # TODO: Add spec for when a course is created, but the user is not enrolled in it.
     # TODO: Why do some courses have empty enrollments?
     existing_canvas_ids = @user.courses.pluck(:canvas_id)
-    @courses_teacher = filter_courses(@courses, teacher_enrollment_types, existing_canvas_ids)
-    @courses_student = filter_courses(@courses, [ 'student' ], existing_canvas_ids)
+    @courses_teacher = filter_courses(@courses, UserToCourse.staff_roles, existing_canvas_ids)
+    @courses_student = filter_courses(@courses, [ UserToCourse::STUDENT_ROLE ], existing_canvas_ids)
+
+    if @selected_semester.present?
+      @courses_teacher = filter_by_semester(@courses_teacher, @selected_semester)
+      @courses_student = filter_by_semester(@courses_student, @selected_semester)
+    end
   end
 
   def edit
@@ -53,7 +66,7 @@ class CoursesController < ApplicationController
 
   def create
     token = @user.lms_credentials.first.token
-    filter_courses(Course.fetch_courses(token), %w[teacher ta])
+    filter_courses(Course.fetch_courses(token), UserToCourse.staff_roles)
       .select { |c| params[:courses]&.include?(c['id'].to_s) }
       .each { |course_api| Course.create_or_update_from_canvas(course_api, token, @user) }
     redirect_to courses_path, notice: 'Selected courses and their assignments have been imported successfully.'
@@ -68,6 +81,7 @@ class CoursesController < ApplicationController
 
   def sync_enrollments
     return render json: { error: 'Course not found.' }, status: :not_found unless @course
+    return render json: { error: 'You do not have permission.' }, status: :forbidden unless @is_course_admin
 
     @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
@@ -78,7 +92,7 @@ class CoursesController < ApplicationController
     return redirect_to courses_path, alert: 'You do not have access to this page.' unless @role == 'instructor'
 
     @enrollments = @course.user_to_courses.includes(:user)
-    @is_course_admin = @course.user_to_courses.find_by(user: @user)&.course_admin?
+    @is_course_admin = @course.course_admin?(@user)
   end
 
   def delete
@@ -106,6 +120,19 @@ class CoursesController < ApplicationController
 
   def determine_user_role
     @role = @course&.user_role(@user)
+    @is_course_admin = @course&.course_admin?(@user) || false
+  end
+
+  # Groups UserToCourse records by their course's semester, sorted most-recent-first.
+  # Returns an array of [semester_name, [user_to_courses]] pairs.
+  def group_by_semester(user_to_courses)
+    grouped = user_to_courses.group_by { |utc| utc.course.semester }
+    sorted_semesters = Course.sort_semesters(grouped.keys)
+    sorted_semesters.map { |semester| [ semester, grouped[semester] ] }
+  end
+
+  def filter_by_semester(courses, semester)
+    courses.select { |c| c.dig('term', 'name') == semester }
   end
 
   # TODO: This should be moved to the Canvas Facade
@@ -116,7 +143,9 @@ class CoursesController < ApplicationController
     courses = courses - missing_enrollments - courses.select { |course| exclude_ids.include?(course['id'].to_s) }
     return [] if courses.empty?
 
-    courses.select { |course| course['enrollments'].any? { |e| roles.include?(e['type']) } }
+    courses.select do |course|
+      course['enrollments'].any? { |enrollment| roles.include?(UserToCourse.role_from_canvas_enrollment(enrollment)) }
+    end
   end
 
   def course_data_for_sync

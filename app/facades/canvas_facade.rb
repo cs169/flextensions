@@ -1,4 +1,5 @@
 require 'date'
+require 'cgi'
 require 'faraday'
 require 'json'
 require 'ostruct'
@@ -8,6 +9,9 @@ class CanvasFacade < LmsFacade
   class CanvasAPIError < LmsFacade::LmsAPIError; end
 
   CANVAS_URL = ENV.fetch('CANVAS_URL', nil)
+  CANVAS_CUSTOM_COURSE_ROLES = {
+    UserToCourse::LEAD_TA_ROLE => 'Lead TA'
+  }.freeze
 
   # Canvas instances can scope the flextensions developer key.
   # There must be one scope for each endpoint we can use.
@@ -161,10 +165,10 @@ class CanvasFacade < LmsFacade
     # sigh, manually construct query string until we tweak Faraday middleware
     # to include :url_encoded, then use `'enrollment_type[]' : list_or_string`
     query_string = 'per_page=100'
-    query_string += "&enrollment_type[]=#{role}" if role.is_a?(String) && role.present?
+    query_string += "&#{role_query_param(role)}" if role.is_a?(String) && role.present?
 
     if role.is_a?(Array) && role.present? # rubocop:disable Style/IfUnlessModifier
-      query_string += role.map { |r| "&enrollment_type[]=#{r}" }.join
+      query_string += role.map { |r| "&#{role_query_param(r)}" }.join
     end
 
     depaginate_response(@canvas_conn.get("courses/#{course.canvas_id}/users?#{query_string}"))
@@ -189,13 +193,24 @@ class CanvasFacade < LmsFacade
     teacher_courses + ta_courses
   end
 
+  def role_query_param(role)
+    normalized_role = UserToCourse.normalize_role(role)
+    canvas_course_role = CANVAS_CUSTOM_COURSE_ROLES[normalized_role]
+
+    if canvas_course_role
+      "enrollment_role=#{CGI.escape(canvas_course_role)}"
+    else
+      "enrollment_type[]=#{CGI.escape(normalized_role)}"
+    end
+  end
+
   ##
   # Gets a specified course that the authorized user has access to.
   #
   # @param  [Integer] courseId the course id to look up.
   # @return [Faraday::Response] information about the requested course.
   def get_course(courseId)
-    @canvas_conn.get("courses/#{courseId}")
+    @canvas_conn.get("courses/#{courseId}", { 'include[]': 'term' })
   end
 
   ##

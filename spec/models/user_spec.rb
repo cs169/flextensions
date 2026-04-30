@@ -31,6 +31,7 @@ RSpec.describe User, type: :model do
 
     context 'when the token is still valid' do
       before do
+        Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true }
         user.lms_credentials.create!(
           lms_id: 1,
           token: 'valid_token',
@@ -46,6 +47,7 @@ RSpec.describe User, type: :model do
 
     context 'when the token is expired' do
       before do
+        Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true }
         user.lms_credentials.create!(
           lms_id: 1,
           token: 'expired_token',
@@ -64,6 +66,7 @@ RSpec.describe User, type: :model do
     let(:user) { described_class.create!(email: 'test@example.com', canvas_uid: '123') }
 
     it 'returns the correct credentials for a user' do
+      Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true }
       user.lms_credentials.create!(
         lms_id: 1,
         token: 'valid_token',
@@ -81,6 +84,7 @@ RSpec.describe User, type: :model do
 
     context 'when token does not expire soon' do
       before do
+        Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true }
         user.lms_credentials.create!(
           lms_id: 1,
           token: 'valid_token',
@@ -96,6 +100,7 @@ RSpec.describe User, type: :model do
 
     context 'when token expires soon and is refreshed' do
       let(:credential) do
+        Lms.find_or_create_by(id: 1) { |lms| lms.lms_name = 'Canvas'; lms.use_auth_token = true }
         user.lms_credentials.create!(
           lms_id: 1,
           token: 'stale_token',

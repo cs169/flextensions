@@ -14,6 +14,7 @@ RSpec.describe ApplicationController, type: :controller do
 
   let(:user) do
     User.create!(email: 'test@example.com', canvas_uid: '123').tap do |u|
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       u.lms_credentials.create!(
         lms_id: 1,
         token: 'valid_token',

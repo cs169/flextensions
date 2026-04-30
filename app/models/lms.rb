@@ -3,8 +3,8 @@
 # Table name: lmss
 #
 #  id             :bigint           not null, primary key
-#  lms_name       :string
 #  lms_base_url   :string
+#  lms_name       :string
 #  use_auth_token :boolean
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
@@ -17,23 +17,28 @@ class Lms < ApplicationRecord
   # Relationship with Assignment
   has_many :assignments
 
+  # Relationship with LmsCredential
+  has_many :lms_credentials, dependent: :destroy
+
   # Singleton instances for each LMS
   def self.CANVAS_LMS
-    @canvas_lms ||= find_or_create_by(
+    @canvas_lms ||= find_by(id: 1) || find_or_create_by!(
       id: 1,
-      lms_name: 'Canvas',
-      lms_base_url: ENV.fetch('CANVAS_URL', ''),
-      use_auth_token: true
-    )
+      lms_name: 'Canvas'
+    ) do |lms|
+      lms.lms_base_url = ENV.fetch('CANVAS_URL', '')
+      lms.use_auth_token = true
+    end
   end
 
   def self.GRADESCOPE_LMS
-    @gradescope_lms ||= find_or_create_by(
+    @gradescope_lms ||= find_by(id: 2) || find_or_create_by!(
       id: 2,
-      lms_name: 'Gradescope',
-      lms_base_url: 'https://www.gradescope.com',
-      use_auth_token: false
-    )
+      lms_name: 'Gradescope'
+    ) do |lms|
+      lms.lms_base_url = 'https://www.gradescope.com'
+      lms.use_auth_token = false
+    end
   end
 
   # Map a linked LMS to the appropriate API facade which can be used to post extension requests

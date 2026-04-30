@@ -70,6 +70,7 @@ RSpec.describe Request, type: :model do
 
   before do
     UserToCourse.create!(user: user, course: course, role: 'student')
+    create(:lms)
     user.lms_credentials.create!(
       lms_id: 1,
       token: 'fake_token',

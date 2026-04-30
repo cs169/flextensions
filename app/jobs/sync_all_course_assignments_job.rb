@@ -47,8 +47,10 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
 
     # Use shared LmsAssignment to populate Assignment
     assignment.name = lms_assignment.name
-    assignment.due_date = lms_assignment.due_date
-    assignment.late_due_date = lms_assignment.late_due_date
+    unless preserve_existing_dates?(assignment, lms_assignment)
+      assignment.due_date = lms_assignment.due_date
+      assignment.late_due_date = lms_assignment.late_due_date
+    end
     assignment.external_assignment_id = lms_assignment.id
 
     if assignment.new_record?
@@ -59,5 +61,15 @@ class SyncAllCourseAssignmentsJob < ApplicationJob
       results[:unchanged_assignments] += 1
     end
     assignment.save!
+  end
+
+  private
+
+  def preserve_existing_dates?(assignment, lms_assignment)
+    return false if assignment.new_record?
+    return false unless lms_assignment.is_a?(Lmss::Canvas::Assignment)
+    return false if lms_assignment.base_date_present?
+
+    assignment.due_date.present? || assignment.late_due_date.present?
   end
 end

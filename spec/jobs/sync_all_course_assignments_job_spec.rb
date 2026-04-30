@@ -114,6 +114,43 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
       end
     end
 
+    context 'when Canvas omits base_date metadata' do
+      let(:canvas_assignments) do
+        [
+          Lmss::Canvas::Assignment.new(
+            'id' => '123',
+            'name' => 'Assignment 1',
+            'due_at' => '2025-01-30T23:59:00Z',
+            'lock_at' => '2025-02-05T23:59:00Z',
+            'base_date' => nil
+          )
+        ]
+      end
+
+      it 'preserves existing due dates for Canvas assignments' do
+        existing_assignment = create(:assignment,
+          course_to_lms: course_to_lms,
+          external_assignment_id: '123',
+          due_date: DateTime.parse('2025-01-15T23:59:00Z'),
+          late_due_date: DateTime.parse('2025-01-20T23:59:00Z')
+        )
+
+        described_class.perform_now(course_to_lms.id, sync_user.id)
+
+        existing_assignment.reload
+        expect(existing_assignment.due_date).to eq(DateTime.parse('2025-01-15T23:59:00Z'))
+        expect(existing_assignment.late_due_date).to eq(DateTime.parse('2025-01-20T23:59:00Z'))
+      end
+
+      it 'still sets dates for newly imported assignments' do
+        described_class.perform_now(course_to_lms.id, sync_user.id)
+
+        assignment = Assignment.find_by(external_assignment_id: '123')
+        expect(assignment.due_date).to eq(DateTime.parse('2025-01-30T23:59:00Z'))
+        expect(assignment.late_due_date).to eq(DateTime.parse('2025-02-05T23:59:00Z'))
+      end
+    end
+
     context 'when sync_user is not staff' do
       let(:student_user) { course.students.first }
 
@@ -130,20 +167,68 @@ RSpec.describe SyncAllCourseAssignmentsJob, type: :job do
     end
   end
 
+  describe '#sync_assignment' do
+    let(:job) { described_class.new }
+    let(:results) do
+      {
+        added_assignments: 0,
+        updated_assignments: 0,
+        unchanged_assignments: 0,
+        deleted_assignments: 0
+      }
+    end
 
-  # THIS MUST BE REWRITTEN
-  # This was moved from Course.sync_assignment
-  # It is now a helper method within the job.
-  describe '.sync_assignment' do
-    it 'creates or updates an assignment' do
-      pending 'moved from course_spec and should be rewritten'
-      assignment_data = { 'id' => 'a123', 'name' => 'HW1', 'due_at' => 1.day.from_now.to_s }
+    it 'creates a new assignment and updates results' do
+      target_course_to_lms = course_to_lms
+
+      lms_assignment = build_canvas_assignment(
+        'id' => 'a123',
+        'name' => 'HW1',
+        'due_at' => '2025-01-15T23:59:00Z',
+        'lock_at' => '2025-01-20T23:59:00Z'
+      )
+
       expect do
-        described_class.sync_assignment(course_to_lms, assignment_data)
-      end.to change(Assignment, :count).by(1)
+        job.send(:sync_assignment, target_course_to_lms, lms_assignment, results)
+      end.to change { Assignment.where(course_to_lms_id: target_course_to_lms.id).count }.by(1)
 
-      assignment = Assignment.last
+      assignment = Assignment.find_by(course_to_lms_id: target_course_to_lms.id, external_assignment_id: 'a123')
       expect(assignment.name).to eq('HW1')
+      expect(assignment.due_date).to eq(DateTime.parse('2025-01-15T23:59:00Z'))
+      expect(assignment.late_due_date).to eq(DateTime.parse('2025-01-20T23:59:00Z'))
+      expect(results[:added_assignments]).to eq(1)
+      expect(results[:updated_assignments]).to eq(0)
+      expect(results[:unchanged_assignments]).to eq(0)
+    end
+
+    it 'updates an existing assignment and updates results' do
+      target_course_to_lms = course_to_lms
+
+      existing_assignment = create(:assignment,
+        course_to_lms: target_course_to_lms,
+        external_assignment_id: 'a123',
+        name: 'Old HW Name',
+        due_date: DateTime.parse('2025-01-10T23:59:00Z')
+      )
+
+      lms_assignment = build_canvas_assignment(
+        'id' => 'a123',
+        'name' => 'HW1 Updated',
+        'due_at' => '2025-01-25T23:59:00Z',
+        'lock_at' => nil
+      )
+
+      expect do
+        job.send(:sync_assignment, target_course_to_lms, lms_assignment, results)
+      end.not_to change { Assignment.where(course_to_lms_id: target_course_to_lms.id).count }
+
+      existing_assignment.reload
+      expect(existing_assignment.name).to eq('HW1 Updated')
+      expect(existing_assignment.due_date).to eq(DateTime.parse('2025-01-25T23:59:00Z'))
+      expect(existing_assignment.late_due_date).to be_nil
+      expect(results[:added_assignments]).to eq(0)
+      expect(results[:updated_assignments]).to eq(1)
+      expect(results[:unchanged_assignments]).to eq(0)
     end
   end
 

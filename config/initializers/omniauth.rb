@@ -26,7 +26,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
           client_options: {
             site: ENV['CANVAS_URL'],
             authorize_url: "/login/oauth2/auth?scope=#{encoded_scopes}"
-          }
+          },
+          redirect_uri: "#{ENV['CANVAS_REDIRECT_URI']}/auth/canvas/callback"
 end
 
 # OmniAuth.config.before_request_phase do |env|

@@ -6,6 +6,7 @@
 #  course_code        :string
 #  course_name        :string
 #  readonly_api_token :string
+#  semester           :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  canvas_id          :string
@@ -40,6 +41,7 @@ RSpec.describe Course, type: :model do
     it 'returns the correct user for auto approval' do
       course = described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'TEST101')
       user = User.create!(email: 'test@example.com', canvas_uid: '123')
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       user.lms_credentials.create!(
         lms_id: 1,
         token: 'valid_token',
@@ -50,6 +52,16 @@ RSpec.describe Course, type: :model do
 
       staff_user = course.staff_user_for_auto_approval
       expect(staff_user).to eq(user)
+    end
+  end
+
+  describe '#user_role' do
+    it 'treats leadta enrollments as instructors' do
+      course = described_class.create!(canvas_id: 'canvas_leadta', course_name: 'Test', course_code: 'TEST101')
+      user = User.create!(email: 'leadta@example.com', canvas_uid: 'leadta_123')
+      UserToCourse.create!(user: user, course: course, role: 'leadta')
+
+      expect(course.user_role(user)).to eq('instructor')
     end
   end
 
@@ -105,6 +117,44 @@ RSpec.describe Course, type: :model do
       expect(course.course_name).to eq('Intro to RSpec')
       expect(course.course_code).to eq('RSPEC101')
     end
+
+    it 'stores semester from Canvas term data' do
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: {
+          name: 'Intro to RSpec',
+          course_code: 'RSPEC101',
+          term: { name: 'Spring 2026' }
+        }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to eq('Spring 2026')
+    end
+
+    it 'handles missing term data gracefully' do
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: { name: 'Intro to RSpec', course_code: 'RSPEC101' }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to be_nil
+    end
+
+    it 'updates semester on existing course when Canvas term changes' do
+      described_class.create!(canvas_id: 'canvas_123', course_name: 'Intro to RSpec',
+                              course_code: 'RSPEC101', semester: 'Fall 2025')
+
+      stub_request(:get, %r{api/v1/courses/canvas_123})
+        .to_return(status: 200, body: {
+          name: 'Intro to RSpec',
+          course_code: 'RSPEC101',
+          term: { name: 'Spring 2026' }
+        }.to_json)
+
+      course = described_class.find_or_create_course(course_data, token)
+
+      expect(course.semester).to eq('Spring 2026')
+    end
   end
 
   describe '.find_or_create_course_to_lms' do
@@ -138,6 +188,71 @@ end
       end.to change(User, :count).by(CANVAS_USERS.size).and(
         change(UserToCourse, :count).by(CANVAS_USERS.size)
       )
+    end
+  end
+
+  describe '.by_semester' do
+    it 'returns only courses matching the given semester' do
+      spring = described_class.create!(canvas_id: 'c1', course_name: 'Course A', course_code: 'A', semester: 'Spring 2026')
+      fall = described_class.create!(canvas_id: 'c2', course_name: 'Course B', course_code: 'B', semester: 'Fall 2025')
+      described_class.create!(canvas_id: 'c3', course_name: 'Course C', course_code: 'C', semester: nil)
+
+      results = described_class.by_semester('Spring 2026')
+
+      expect(results).to contain_exactly(spring)
+      expect(results).not_to include(fall)
+    end
+  end
+
+  describe '.semester_sort_key' do
+    it 'returns [year, season_order] for a valid semester' do
+      expect(described_class.semester_sort_key('Spring 2026')).to eq([ 2026, 1 ])
+      expect(described_class.semester_sort_key('Fall 2025')).to eq([ 2025, 3 ])
+      expect(described_class.semester_sort_key('Summer 2026')).to eq([ 2026, 2 ])
+      expect(described_class.semester_sort_key('Winter 2026')).to eq([ 2026, 0 ])
+    end
+
+    it 'returns [-1, -1] for nil or blank' do
+      expect(described_class.semester_sort_key(nil)).to eq([ -1, -1 ])
+      expect(described_class.semester_sort_key('')).to eq([ -1, -1 ])
+    end
+  end
+
+  describe '.sort_semesters' do
+    it 'sorts semesters most-recent-first' do
+      semesters = [ 'Spring 2025', 'Fall 2026', 'Summer 2026', 'Winter 2025', 'Fall 2025', 'Spring 2026' ]
+      expected = [ 'Fall 2026', 'Summer 2026', 'Spring 2026', 'Fall 2025', 'Spring 2025', 'Winter 2025' ]
+      expect(described_class.sort_semesters(semesters)).to eq(expected)
+    end
+
+    it 'places nil semesters at the end' do
+      semesters = [ 'Spring 2026', nil ]
+      result = described_class.sort_semesters(semesters)
+      expect(result).to eq([ 'Spring 2026', nil ])
+    end
+
+    it 'handles a single semester' do
+      expect(described_class.sort_semesters([ 'Fall 2025' ])).to eq([ 'Fall 2025' ])
+    end
+
+    it 'handles empty array' do
+      expect(described_class.sort_semesters([])).to eq([])
+    end
+
+    it 'orders all four seasons within the same year correctly' do
+      semesters = [ 'Winter 2026', 'Spring 2026', 'Summer 2026', 'Fall 2026' ]
+      expected = [ 'Fall 2026', 'Summer 2026', 'Spring 2026', 'Winter 2026' ]
+      expect(described_class.sort_semesters(semesters)).to eq(expected)
+    end
+  end
+
+  describe '#sync_all_enrollments_from_canvas' do
+    let!(:course) { described_class.create!(canvas_id: 'canvas_all_roles', course_name: 'User Sync', course_code: 'USYNC') }
+
+    it 'syncs every supported internal role, including leadta' do
+      expect(SyncUsersFromCanvasJob).to receive(:perform_now).with(course.id, 999, %w[student teacher ta leadta])
+
+      course.sync_all_enrollments_from_canvas(999)
     end
   end
 

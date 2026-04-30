@@ -1,16 +1,18 @@
 class UserToCoursesController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_course
-  before_action :ensure_course_admin
+  before_action :set_enrollment
+  before_action :authorize_instructor!
 
   def toggle_allow_extended_requests
-    @enrollment = @course.user_to_courses.find(params[:id])
-
     if @enrollment.update(allow_extended_requests: params[:allow_extended_requests])
       render json: { success: true }, status: :ok
     else
-      flash[:alert] = "Failed to update enrollment: #{@enrollment.errors.full_messages.to_sentence}"
-      render json: { redirect_to: course_path(@course) }, status: :unprocessable_content
+      render json: {
+        success: false,
+        errors: @enrollment.errors.full_messages,
+        redirect_to: courses_path
+      }, status: :unprocessable_content
     end
   end
 
@@ -26,10 +28,32 @@ class UserToCoursesController < ApplicationController
 
   private
 
-  def ensure_course_admin
-    enrollment = @course.user_to_courses.find_by(user: @user)
-    return if enrollment&.course_admin?
+  def authenticate_user!
+    user_id = session[:user_id]
+    @current_user = User.find_by(canvas_uid: user_id) if user_id
+    redirect_to root_path unless @current_user
+  end
 
-    render json: { error: 'You must be an instructor or Lead TA.', redirect_to: course_path(@course) }, status: :forbidden
+  def set_course
+    @course = Course.find_by(id: params[:course_id])
+    unless @course
+      flash[:alert] = 'Course not found.'
+      redirect_to courses_path
+    end
+  end
+
+  def set_enrollment
+    @enrollment = UserToCourse.find(params[:id])
+  end
+
+  def authorize_instructor!
+    user_to_course = UserToCourse.find_by(user: @current_user, course: @course)
+    unless user_to_course&.course_admin?
+      render json: {
+        success: false,
+        error: 'Forbidden',
+        redirect_to: courses_path
+      }, status: :forbidden
+    end
   end
 end

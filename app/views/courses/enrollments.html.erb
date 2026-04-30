@@ -41,7 +41,7 @@
                     <%= enrollment.user.name %> <i class="fas fa-arrow-right"></i>
                   <% end %>
                 </span>
-                <% if enrollment.student? %>
+                <% if @is_course_admin && enrollment.student? %>
                   <span>
                     <%= link_to new_course_request_path(@course, "request[user_id]": enrollment.user.id), title: "Create request for this student" do %>
                       <i class="fas fa-plus-circle"></i>
@@ -51,7 +51,7 @@
               </td>
               <td class="text-center"><%= enrollment.user.student_id %></td>
               <td class="text-center"><%= enrollment.user.email %></td>
-              <td class="text-center"><%= enrollment.role.downcase.capitalize %></td>
+              <td class="text-center"><%= enrollment.display_role %></td>
               <% if @is_course_admin %>
                 <td class="justify-content-center align-content-center"
                     data-order="<%= enrollment.allow_extended_requests ? 1 : 0 %>">
@@ -77,14 +77,16 @@
         </tbody>
       </table>
 
-      <div class="text-center mt-4">
-        <button class="btn btn-info"
-                data-controller="enrollments"
-                data-action="click->enrollments#sync"
-                data-enrollments-course-id-value="<%= @course.id %>">
-          Sync Enrollments
-        </button>
-      </div>
+      <% if @is_course_admin %>
+        <div class="text-center mt-4">
+          <button class="btn btn-info"
+                  data-controller="enrollments"
+                  data-action="click->enrollments#sync"
+                  data-enrollments-course-id-value="<%= @course.id %>">
+            Sync Enrollments
+          </button>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>
