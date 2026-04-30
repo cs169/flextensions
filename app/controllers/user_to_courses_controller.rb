@@ -12,7 +12,7 @@ class UserToCoursesController < ApplicationController
         success: false,
         errors: @enrollment.errors.full_messages,
         redirect_to: courses_path
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 

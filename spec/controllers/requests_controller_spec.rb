@@ -438,10 +438,11 @@ RSpec.describe RequestsController, type: :controller do
     end
 
     before do
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       session[:user_id] = instructor.canvas_uid
       UserToCourse.create!(user: instructor, course: course, role: 'teacher')
       instructor.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'instructor_token',
         refresh_token: 'instructor_refresh',
         expire_time: 1.hour.from_now
