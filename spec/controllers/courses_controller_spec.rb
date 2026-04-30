@@ -341,6 +341,9 @@ RSpec.describe CoursesController, type: :controller do
       Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
+      # Add user as a teacher so they are allowed to view enrollments
+      UserToCourse.create!(user: user, course: course, role: 'teacher')
+
       CourseToLms.create!(course: course, lms_id: 1)
     end
 
@@ -369,6 +372,7 @@ RSpec.describe CoursesController, type: :controller do
 
     context 'when user is a TA (staff but not course admin)' do
       before do
+        UserToCourse.where(user: user, course: course).destroy_all
         UserToCourse.create!(user: user, course: course, role: 'ta')
       end
 
@@ -387,6 +391,10 @@ RSpec.describe CoursesController, type: :controller do
     end
 
     context 'when user is a student' do
+      before do
+        UserToCourse.where(user: user, course: course, role: 'teacher').destroy_all
+      end
+
       it 'redirects with access denied' do
         get :enrollments, params: { id: course.id }
         expect(response).to redirect_to(courses_path)

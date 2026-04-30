@@ -16,6 +16,14 @@ class UserToCoursesController < ApplicationController
     end
   end
 
+  def update_notes
+    if @enrollment.update(notes: params[:notes])
+      render json: { success: true, notes: @enrollment.notes }, status: :ok
+    else
+      render json: { success: false, error: @enrollment.errors.full_messages.to_sentence }, status: :unprocessable_content
+    end
+  end
+
   private
 
   def authenticate_user!
@@ -33,7 +41,7 @@ class UserToCoursesController < ApplicationController
   end
 
   def set_enrollment
-    @enrollment = UserToCourse.find(params[:id])
+    @enrollment = @course.user_to_courses.find(params[:id])
   end
 
   def authorize_instructor!

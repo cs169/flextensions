@@ -216,6 +216,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_06_175234) do
     t.datetime "updated_at", null: false
     t.boolean "removed", default: false, null: false
     t.boolean "allow_extended_requests", default: false, null: false
+    t.text "notes"
     t.index ["course_id"], name: "index_user_to_courses_on_course_id"
     t.index ["user_id"], name: "index_user_to_courses_on_user_id"
   end
