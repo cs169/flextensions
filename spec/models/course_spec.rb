@@ -247,7 +247,7 @@ end
     let!(:course) { described_class.create!(canvas_id: 'canvas_all_roles', course_name: 'User Sync', course_code: 'USYNC') }
 
     it 'syncs every supported internal role, including leadta' do
-      expect(SyncUsersFromCanvasJob).to receive(:perform_now).with(course.id, 999, %w[student teacher ta leadta])
+      expect(SyncUsersFromCanvasJob).to receive(:perform_later).with(course.id, 999, %w[student teacher ta leadta])
 
       course.sync_all_enrollments_from_canvas(999)
     end
