@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
-ruby '~> 3.3.7'
+ruby '~> 3.3'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 7.2.3'
+gem 'rails', '~> 7.2.3.1'
 
 # Use postgres for all env dbs
 gem 'pg'

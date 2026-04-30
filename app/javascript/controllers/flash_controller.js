@@ -29,16 +29,27 @@ export default class extends Controller {
       : type === "alert"  ? "alert-danger"
       :                     "alert-info"
 
-    // wrap in a full-width row if you want
-    const wrapper = document.createElement("div")
-    wrapper.className = "col-12"
-    wrapper.innerHTML = `
-      <div class="alert ${bsClass} alert-dismissible fade show" role="alert">
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    `
-    container.appendChild(wrapper)
+    const render = () => {
+      container.innerHTML = ''
+      const wrapper = document.createElement("div")
+      wrapper.className = "col-12"
+      wrapper.innerHTML = `
+        <div class="alert ${bsClass} alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `
+      container.appendChild(wrapper)
+      container.style.opacity = '1'
+    }
+
+    if (container.innerHTML.trim()) {
+      container.style.transition = 'opacity 0.15s'
+      container.style.opacity = '0'
+      setTimeout(render, 150)
+    } else {
+      render()
+    }
   }
 }
 

@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_06_175234) do
   create_schema "hypershield"
-  
+
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,6 +106,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
     t.boolean "enable_gradescope", default: false
     t.string "gradescope_course_url"
     t.boolean "extend_late_due_date", default: true, null: false
+    t.string "pending_notification_frequency"
+    t.string "pending_notification_email"
     t.index ["course_id"], name: "index_course_settings_on_course_id"
   end
 
@@ -127,6 +130,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_04_000001) do
     t.string "canvas_id"
     t.string "course_code"
     t.string "readonly_api_token"
+    t.string "semester"
     t.index ["canvas_id"], name: "index_courses_on_canvas_id", unique: true
     t.index ["readonly_api_token"], name: "index_courses_on_readonly_api_token", unique: true
   end

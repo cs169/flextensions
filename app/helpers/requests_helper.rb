@@ -1,4 +1,8 @@
 module RequestsHelper
+  def text_label_for(request)
+    "Request for #{request.user.try(:name) || 'N/A'} - #{request.assignment&.name || 'N/A'}"
+  end
+
   def status_export_string(request)
     case request.status
     when 'pending'

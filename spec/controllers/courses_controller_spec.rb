@@ -29,6 +29,50 @@ RSpec.describe CoursesController, type: :controller do
       get :index
       expect(response).to render_template(:index)
     end
+
+    it 'includes Lead TA enrollments in staff courses' do
+      UserToCourse.create!(user: user, course: student_course, role: 'leadta')
+
+      get :index
+
+      expect(assigns(:teacher_courses).map(&:role)).to include('leadta')
+    end
+
+    context 'semester grouping' do
+      let(:spring_course) { Course.create!(course_name: 'Spring Course', canvas_id: 'sp1', course_code: 'SP101', semester: 'Spring 2026') }
+      let(:fall_course) { Course.create!(course_name: 'Fall Course', canvas_id: 'fa1', course_code: 'FA101', semester: 'Fall 2025') }
+
+      before do
+        UserToCourse.create!(user: user, course: spring_course, role: 'teacher')
+        UserToCourse.create!(user: user, course: fall_course, role: 'teacher')
+      end
+
+      it 'groups teacher courses by semester, most-recent-first' do
+        get :index
+
+        grouped = assigns(:teacher_courses_by_semester)
+        semesters = grouped.map(&:first)
+        expect(semesters).to eq([ 'Spring 2026', 'Fall 2025' ])
+      end
+
+      it 'groups student courses by semester, most-recent-first' do
+        # Disable extensions on the default course so it doesn't appear
+        CourseSettings.create!(course: course, enable_extensions: false)
+
+        spring_student = Course.create!(course_name: 'Student Spring', canvas_id: 'ss1', course_code: 'SS101', semester: 'Spring 2026')
+        fall_student = Course.create!(course_name: 'Student Fall', canvas_id: 'sf1', course_code: 'SF101', semester: 'Fall 2025')
+        CourseSettings.create!(course: spring_student, enable_extensions: true)
+        CourseSettings.create!(course: fall_student, enable_extensions: true)
+        UserToCourse.create!(user: user, course: spring_student, role: 'student')
+        UserToCourse.create!(user: user, course: fall_student, role: 'student')
+
+        get :index
+
+        grouped = assigns(:student_courses_by_semester)
+        semesters = grouped.map(&:first)
+        expect(semesters).to eq([ 'Spring 2026', 'Fall 2025' ])
+      end
+    end
   end
 
   describe 'GET #show' do
@@ -77,6 +121,21 @@ RSpec.describe CoursesController, type: :controller do
       expect(response).to redirect_to(courses_path)
       expect(flash[:notice]).to eq('Selected courses and their assignments have been imported successfully.')
     end
+
+    it 'imports courses where the user is enrolled with the Canvas Lead TA role' do
+      lead_ta_course = {
+        'id' => '999',
+        'name' => 'Lead TA Canvas Course',
+        'course_code' => 'LTA101',
+        'enrollments' => [ { 'type' => 'ta', 'role' => 'Lead TA' } ]
+      }
+      allow(Course).to receive(:fetch_courses).and_return([ lead_ta_course ])
+      allow(Course).to receive(:create_or_update_from_canvas)
+
+      post :create, params: { courses: [ '999' ] }
+
+      expect(Course).to have_received(:create_or_update_from_canvas).with(lead_ta_course, 'fake_token', user)
+    end
   end
 
   describe 'POST #sync_assignments' do
@@ -104,38 +163,109 @@ RSpec.describe CoursesController, type: :controller do
             headers: { 'Authorization' => 'Bearer fake_token' }
           ).to_return(status: 200, body: '[]', headers: {})
       end
+      stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users")
+        .with(
+          query: {
+            'enrollment_role' => 'Lead TA',
+            'per_page' => '100'
+          },
+          headers: { 'Authorization' => 'Bearer fake_token' }
+        ).to_return(status: 200, body: '[]', headers: {})
     end
 
-    it 'syncs enrollments and returns OK' do
-      allow(course).to receive(:sync_all_enrollments_from_canvas)
+    context 'when user is a teacher (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'teacher')
+      end
 
-      post :sync_enrollments, params: { id: course.id }
+      it 'syncs enrollments and returns OK' do
+        allow_any_instance_of(Course).to receive(:sync_all_enrollments_from_canvas)
 
-      expect(response).to have_http_status(:ok)
-      expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+      end
+    end
+
+    context 'when user is a leadta (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'leadta')
+      end
+
+      it 'syncs enrollments and returns OK' do
+        allow_any_instance_of(Course).to receive(:sync_all_enrollments_from_canvas)
+
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ 'message' => 'Users synced successfully.' })
+      end
+    end
+
+    context 'when user is a TA (not course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'ta')
+      end
+
+      it 'returns forbidden' do
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body).to eq({ 'error' => 'You do not have permission.' })
+      end
+    end
+
+    context 'when user is a student' do
+      it 'returns forbidden' do
+        post :sync_enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(response.parsed_body).to eq({ 'error' => 'You do not have permission.' })
+      end
     end
   end
 
   describe 'GET #new' do
+    let(:canvas_courses) do
+      [
+        {
+          'id' => '101',
+          'name' => 'Test Course 101',
+          'course_code' => 'TC101',
+          'enrollments' => [ { 'type' => 'teacher' } ],
+          'term' => { 'name' => 'Spring 2026' }
+        },
+        {
+          'id' => '102',
+          'name' => 'Test Course 102',
+          'course_code' => 'TC102',
+          'enrollments' => [ { 'type' => 'student' } ],
+          'term' => { 'name' => 'Spring 2026' }
+        },
+        {
+          'id' => '103',
+          'name' => 'Test Course 103',
+          'course_code' => 'TC103',
+          'enrollments' => [ { 'type' => 'ta', 'role' => 'Lead TA' } ],
+          'term' => { 'name' => 'Fall 2025' }
+        },
+        {
+          'id' => '104',
+          'name' => 'Test Course 104',
+          'course_code' => 'TC104',
+          'enrollments' => [ { 'type' => 'student' } ],
+          'term' => { 'name' => 'Fall 2025' }
+        }
+      ]
+    end
+
     before do
       # Create a fake LMS credential with a token
       Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
-      allow(Course).to receive(:fetch_courses).and_return([
-                                                            {
-                                                              'id' => '101',
-                                                              'name' => 'Test Course 101',
-                                                              'course_code' => 'TC101',
-                                                              'enrollments' => [ { 'type' => 'teacher' } ]
-                                                            },
-                                                            {
-                                                              'id' => '102',
-                                                              'name' => 'Test Course 102',
-                                                              'course_code' => 'TC102',
-                                                              'enrollments' => [ { 'type' => 'student' } ]
-                                                            }
-                                                          ])
+      allow(Course).to receive(:fetch_courses).and_return(canvas_courses)
     end
 
     it 'fetches courses and categorizes them into teacher and student courses' do
@@ -149,8 +279,9 @@ RSpec.describe CoursesController, type: :controller do
       expect(assigns(:courses_student)).not_to be_empty
 
       # Teacher course should be categorized correctly
-      teacher_course = assigns(:courses_teacher).first
-      expect(teacher_course['enrollments'].first['type']).to eq('teacher')
+      teacher_course_roles = assigns(:courses_teacher).map { |canvas_course| canvas_course['enrollments'].first }
+      expect(teacher_course_roles).to include(hash_including('type' => 'teacher'))
+      expect(teacher_course_roles).to include(hash_including('role' => 'Lead TA'))
 
       # Student course should be categorized correctly
       student_course = assigns(:courses_student).first
@@ -164,6 +295,44 @@ RSpec.describe CoursesController, type: :controller do
 
       expect(flash[:alert]).to eq('No courses found.')
     end
+
+    describe 'semester filter' do
+      it 'extracts unique semesters from Canvas courses' do
+        get :new
+
+        expect(assigns(:semesters)).to contain_exactly('Fall 2025', 'Spring 2026')
+      end
+
+      it 'shows all courses when no semester param is provided' do
+        get :new
+
+        expect(assigns(:courses_teacher).size).to eq(2)
+        expect(assigns(:courses_student).size).to eq(2)
+        expect(assigns(:selected_semester)).to be_nil
+      end
+
+      it 'filters teacher courses by selected semester' do
+        get :new, params: { semester: 'Spring 2026' }
+
+        teacher_names = assigns(:courses_teacher).pluck('name')
+        expect(teacher_names).to eq([ 'Test Course 101' ])
+        expect(teacher_names).not_to include('Test Course 103')
+      end
+
+      it 'filters student courses by selected semester' do
+        get :new, params: { semester: 'Fall 2025' }
+
+        student_names = assigns(:courses_student).pluck('name')
+        expect(student_names).to eq([ 'Test Course 104' ])
+        expect(student_names).not_to include('Test Course 102')
+      end
+
+      it 'assigns the selected semester' do
+        get :new, params: { semester: 'Spring 2026' }
+
+        expect(assigns(:selected_semester)).to eq('Spring 2026')
+      end
+    end
   end
 
   describe 'GET #enrollments' do
@@ -172,13 +341,14 @@ RSpec.describe CoursesController, type: :controller do
       Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
-      # Add user as a teacher so they are allowed to view enrollments
-      UserToCourse.create!(user: user, course: course, role: 'teacher')
-
       CourseToLms.create!(course: course, lms_id: 1)
     end
 
-    context 'when user is an instructor' do
+    context 'when user is a teacher (course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'teacher')
+      end
+
       it 'renders the enrollments view successfully' do
         get :enrollments, params: { id: course.id }
 
@@ -189,6 +359,38 @@ RSpec.describe CoursesController, type: :controller do
         # Check that the enrollments include the user
         enrollment_user_ids = assigns(:enrollments).map(&:user_id)
         expect(enrollment_user_ids).to include(user.id)
+      end
+
+      it 'sets @is_course_admin to true' do
+        get :enrollments, params: { id: course.id }
+        expect(assigns(:is_course_admin)).to be true
+      end
+    end
+
+    context 'when user is a TA (staff but not course admin)' do
+      before do
+        UserToCourse.create!(user: user, course: course, role: 'ta')
+      end
+
+      it 'renders the enrollments view successfully' do
+        get :enrollments, params: { id: course.id }
+
+        expect(response).to have_http_status(:ok)
+        expect(response).to render_template(:enrollments)
+        expect(assigns(:enrollments)).not_to be_nil
+      end
+
+      it 'sets @is_course_admin to false' do
+        get :enrollments, params: { id: course.id }
+        expect(assigns(:is_course_admin)).to be false
+      end
+    end
+
+    context 'when user is a student' do
+      it 'redirects with access denied' do
+        get :enrollments, params: { id: course.id }
+        expect(response).to redirect_to(courses_path)
+        expect(flash[:alert]).to eq('You do not have access to this page.')
       end
     end
   end

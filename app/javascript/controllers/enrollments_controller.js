@@ -8,14 +8,10 @@ export default class extends Controller {
 	static values = { courseId: Number }
 
 	connect() {
-		this.checkboxTargets.forEach((checkbox) => {
-			checkbox.addEventListener("change", (event) => this.toggleExtended(event, checkbox))
-		})
-
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
 			DataTable.ext.type.order['role-pre'] = function (data) {
-				const rolePriority = { teacher: 4, ta: 2, student: 3 };
+				const rolePriority = { teacher: 4, leadta: 3, "lead ta": 3, ta: 2, student: 1 };
 				if (typeof data !== 'string') {
 					data = String(data).trim();
 				}
@@ -30,20 +26,16 @@ export default class extends Controller {
 				responsive: true,
 				pageLength: 500,
 				lengthMenu: [[-1, 25, 50, 100, 500], ["All", 25, 50, 100, 500]],
-				columns: [
-					null, // Name
-					null, // Email
-					null, // Section
-					{ orderDataType: 'role-pre' }, // Role column (custom sort)
-					null, // Extended Requests?
-				],
+				columns: document.querySelectorAll('#enrollments-table thead th').length === 5
+					? [null, null, null, { orderDataType: 'role-pre' }, null]
+					: [null, null, null, { orderDataType: 'role-pre' }],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
 		}
 	}
 
-	async toggleExtended(event, checkbox) {
-		const enrollmentId = checkbox.dataset.enrollmentId;
+	async toggleExtended(event) {
+		const checkbox = event.currentTarget;
 		const url = checkbox.dataset.url;
 		const allowExtended = checkbox.checked;
 
@@ -71,11 +63,17 @@ export default class extends Controller {
 				throw new Error(data.error || 'Error updating enrollment');
 			}
 
-			console.log(`Enrollment ${enrollmentId} allow_extended_requests: ${allowExtended}`);
+			const td = checkbox.closest('td');
+			if (td) td.dataset.order = allowExtended ? '1' : '0';
+			this._dispatchFlash('notice', `Extended requests ${allowExtended ? 'enabled' : 'disabled'}.`);
 		} catch (error) {
 			console.error("Error updating enrollment:", error);
 			checkbox.checked = !allowExtended;
 		}
+	}
+
+	_dispatchFlash(type, message) {
+		window.dispatchEvent(new CustomEvent('flash', { detail: { type: type, message: message } }));
 	}
 
 	sync() {

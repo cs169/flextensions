@@ -31,7 +31,7 @@ module API
         if assignment.save
           render json: assignment, status: :created
         else
-          render json: assignment.errors, status: :unprocessable_entity
+          render json: assignment.errors, status: :unprocessable_content
         end
       end
 

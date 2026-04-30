@@ -21,7 +21,11 @@ class ApplicationController < ActionController::Base
   # TODO: Refactor all auth methods
   helper_method :current_user
   def current_user
-    @current_user ||= User.find_by(canvas_uid: session[:user_id])
+    if defined?(@current_user)
+  @current_user
+    else
+  @current_user = User.find_by(canvas_uid: session[:user_id])
+    end
     # TODO: Remove this line after refactoring all auth methods,
     # and remove other instances of @user in controllers + views
     @user ||= @current_user
@@ -70,7 +74,7 @@ class ApplicationController < ActionController::Base
     # Truncate to 1K characters so we are well short of cookie limits.
     error_message = error.message.truncate(1000)
     flash[:alert] = "An error occurred while communicating with the LMS. Please reach out to flextension@berkeley.edu if you continue to have trouble. Error: #{error_message}"
-    redirect_back(fallback_location: root_path)
+    redirect_back_or_to(root_path)
   end
 
   def set_pending_request_count

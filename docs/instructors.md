@@ -28,7 +28,7 @@ On the **Courses** page, click a blue course name (e.g., **CS 161**, **CS 168**)
 
 ### Syncing Assignments
 
-If you have added new assignments in Canvas, you can click **Sync Assignments** to import the latest assignments from Canvas into Flextensions.
+If you have added new assignments in Canvas (or Gradescope, if configured), you can click **Sync Assignments** to import the latest assignments into Flextensions.
 
 ### Enabling Assignments
 
@@ -83,7 +83,7 @@ The **Enrollments** tab shows all instructors and students currently associated 
 The list will refresh with updated data, including new students and instructors, and will remove users no longer in the course.
 
 > [!NOTE]
-> ⚠️ If if a student is added to the course after you have already imported a course, you will need to sync the course enrollments to ensure they are able to access the Flextensions course.
+> ⚠️ If a student is added to the course after you have already imported a course, you will need to sync the course enrollments to ensure they are able to access the Flextensions course.
 
 ## Filtering Student Requests
 By clicking the name of a student in the **Enrollments** tab, you can filter the requests to only show those made by that student. This is useful for quickly reviewing all requests from a specific student.
@@ -99,21 +99,21 @@ Control when and how requests are automatically approved:
 - **Auto-approve within days**
   Automatically approves requests made within the specified number of days before the assignment due date. Leave blank to disable.
 
-<!-- - **Auto-approve within days (DSP)**
-  Applies a similar rule specifically to students with a DSP accommodation flag. -->
+- **Auto-approve within days (Ex)**
+  Applies a similar rule specifically to students with a DSP accommodation flag.
 
 - **Maximum requests to auto-approve**
   Sets a per-student limit on auto-approved requests. Use `0` for no limit.
 
 After setting these options, click **Save Settings** to save.
 
-### Extendate Late Due Date Automatically
+### Extend Late Due Date Automatically
 
 _This setting is enabled by default._
 
 When enabled, the late due date will be automatically extended by the same amount of time as the original extension when an extension is granted. This setting can be toggled on or off by instructors.
 
-If you use "Slip Days" or otherwise accept late submissions you can enable this, so students who go beyond their extnded due date will have the option to submit late work until the late due date.
+If you use "Slip Days" or otherwise accept late submissions you can enable this, so students who go beyond their extended due date will have the option to submit late work until the late due date.
 
 You may wish to disable this if you do not want students to have the option to submit late work, or if you set the late due date to a very distant date (e.g., end of semester) and do not want it to be extended further.
 
@@ -198,13 +198,13 @@ Once configured, click **Update** at the bottom of the page to save your setting
 
 ---
 
-## [Integration Guide](/integrations)
+## [Integration Guide](/flextensions/integrations/)
 
 Flextensions supports integrations with:
 
 * Slack Webhooks
 * Google Sheets
-* Gradescope (coming soon!)
+* Gradescope
 
 ---
 

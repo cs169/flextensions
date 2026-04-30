@@ -1,13 +1,19 @@
 <div class="container-fluid mb-5">
   <div class="row">
-    <div class="col-12">
+    <div class="col-12"
+         data-controller="requests"
+         data-search-query="<%= @search_query %>"
+         data-show-all="<%= params[:show_all] == 'true' ? 'true' : 'false' %>"
+         data-course-id="<%= @course.id %>"
+         data-mass-approve-url="<%= mass_approve_course_requests_path(@course, format: :json) %>"
+         data-mass-reject-url="<%= mass_reject_course_requests_path(@course, format: :json) %>">
       <%= render "courses/course_title" %>
       <h1 class="sr-only">Extension Requests</h1>
       <%= render "shared/extension_status_warning", course: @course %>
 
       <div class="row justify-content-between mb-2">
         <div class="col-6 align-content-center">
-          <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger"><%= @requests.select { |request| request.status == 'pending' }.count %></span> pending requests</p>
+          <p class="mb-0">There are <span class="badge rounded-pill text-bg-danger" data-requests-target="pendingBadge"><%= @requests.select { |request| request.status == 'pending' }.count %></span> pending requests</p>
         </div>
         <div class="col-6 text-end">
           <% if params[:show_all] == "true" %>
@@ -19,80 +25,184 @@
       </div>
 
       <% if @requests.any? %>
-        <table class="table table-bordered table-striped datatable"
-               id="requests-table"
-               data-controller="requests"
-               data-search-query="<%= @search_query %>"
-               data-readonly-token="<%= @course.readonly_api_token %>"
-               data-course-id="<%= @course.id %>">
-          <thead>
-            <tr class="table-info">
-              <th id="assignment">Assignment</th>
-              <th class="text-center align-content-center" id="name">Name</th>
-              <th class="text-center align-content-center" id="student-id">Student ID</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Requested At</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Original Due Date</th>
-              <th class="text-center align-content-center" style="min-width: 198px;">Requested Due Date</th>
-              <th class="text-center align-content-center" style="min-width: 90px;"># of Days</th>
-              <th class="text-center align-content-center" style="min-width: 240px;">Status</th>
-              <th class="text-center align-content-center no-sort" style="min-width: 220px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @requests.each do |request| %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped datatable flextensions-table"
+                 id="requests-table">
+            <thead class="table-blue-medium text-white">
               <tr>
-                <td class="align-content-center"><%= request.assignment ? request.assignment.name : "N/A" %></td>
-                <td class="text-center align-content-center"><%= request.user.try(:name) || 'N/A' %></td>
-                <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
-                <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
-                  <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                </td>
-                <td class="text-center align-content-center" data-order="<%= request.assignment&.due_date&.iso8601 %>">
-                  <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                </td>
-                <td class="text-center align-content-center" data-order="<%= request.requested_due_date&.iso8601 %>">
-                  <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
-                </td>
-                <td class="text-center align-content-center">
-                  <% if request.assignment&.due_date && request.requested_due_date.present? %>
-                    <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
-                  <% else %>
-                    N/A
-                  <% end %>
-                </td>
-                <td class="text-center align-content-center" data-export="<%= status_export_string(request) %>">
-                  <% case request.status %>
-                    <% when 'pending' %>
-                      <span class="badge text-bg-info">Pending</span>
-                    <% when 'approved' %>
-                      <% if request.auto_approved %>
-                        <span class="badge text-bg-success">Auto Approved</span>
-                      <% else %>
-                        <span class="badge text-bg-success">Approved</span>
-                      <% end %>
-                      on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                      by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
-                    <% when 'denied' %>
-                      <span class="badge text-bg-danger me-3">Denied</span>
-                      on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
-                      by <%= request.last_processed_by_user&.name || 'Unknown' %>
-                    <% else %>
-                      <span class="badge text-bg-secondary">Unknown</span>
-                  <% end %>
-                </td>
-                <td class="text-center align-content-center">
-                  <%= link_to 'View', course_request_path(@course, request), class: "btn btn-sm btn-primary" %>
-                  <% if request.status == 'pending' %>
-                    <div class="btn-group d-inline-flex">
-                      <%= button_to 'Approve', approve_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-success ms-1' %>
-                      <%= button_to 'Reject', reject_course_request_path(@course, request), method: :post, class: 'btn btn-sm btn-danger ms-1' %>
-                    </div>
-                  <% end %>
-                </td>
+                <th class="text-center align-content-center no-sort" style="min-width: 60px;" data-priority="1">
+                  <input type="checkbox"
+                         id="select-all-requests"
+                         data-requests-target="selectAllCheckbox"
+                         data-action="change->requests#toggleSelectAll"
+                         aria-label="Select all pending requests">
+                </th>
+                <th class="text-center align-content-center no-sort" style="min-width: 100px;" data-priority="1">Actions</th>
+                <th class="text-center align-content-center" id="name" data-priority="5">Name</th>
+                <th class="text-center align-content-center" id="assignment" style="min-width: 120px; max-width: 200px;" data-priority="2">Assignment</th>
+                <th class="text-center align-content-center no-sort" id="student-id" data-priority="9">Student ID</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="7">Requested At</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="8">Original Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 198px;" data-priority="4">Requested Due Date</th>
+                <th class="text-center align-content-center" style="min-width: 90px;" data-priority="6"># of Days</th>
+                <th class="text-center align-content-center" style="min-width: 200px;" data-priority="3">Status</th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% @requests.each do |request| %>
+                <tr>
+                  <td>
+                    <% if request.status == 'pending' %>
+                      <div class="form-check form-switch mx-auto" style="width: 45px;">
+                        <input class="form-check-input" type="checkbox"
+                               role="switch"
+                               id="select-request-<%= request.id %>"
+                               data-requests-target="rowCheckbox"
+                               data-request-id="<%= request.id %>"
+                               data-action="change->requests#toggleRowSelection"
+                               aria-label="Select request <%= request.id %> for <%= request.user.try(:name) || 'N/A' %>">
+                        <label class="visually-hidden" for="select-request-<%= request.id %>">Select request for <%= request.user.try(:name) || 'N/A' %></label>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center" style="width: 12ch">
+                    <% if request.status == 'pending' %>
+                      <div class="gap-1 request-actions">
+                        <button type="button"
+                          class="btn btn-sm btn-success"
+                          data-action="click->requests#approve"
+                          data-url="<%= approve_course_request_path(@course, request, format: :json) %>"
+                          aria-label="Approve <%= text_label_for(request) %>">
+                          <i class="fas fa-fw fa-check"></i>
+                        </button>
+                        <button type="button"
+                          class="btn btn-sm btn-danger"
+                          data-action="click->requests#reject"
+                          data-url="<%= reject_course_request_path(@course, request, format: :json) %>"
+                          aria-label="Deny <%= text_label_for(request) %>">
+                          <i class="fas fa-fw fa-times"></i>
+                        </button>
+                      </div>
+                    <% else %>
+                      <%= link_to course_request_path(@course, request), class: "btn btn-sm btn-primary", title: "View", aria: { label: "View request" } do %>
+                        <i class="fas fa-arrow-right"></i>
+                      <% end %>
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center">
+                    <%= link_to request.user.try(:name) || 'N/A', course_request_path(@course, request) %>
+                  </td>
+                  <td class="text-center align-content-center" style="max-width: 200px; word-wrap: break-word;">
+                    <%= link_to request.assignment ? request.assignment.name : "N/A", course_request_path(@course, request) %>
+                  </td>
+                  <td class="text-center align-content-center"><%= request.user.try(:student_id) || 'N/A' %></td>
+                  <td class="text-center align-content-center" data-order="<%= request.created_at.iso8601 %>">
+                    <%= request.created_at&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.assignment&.due_date&.iso8601 %>">
+                    <%= request.assignment&.due_date&.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center" data-order="<%= request.requested_due_date&.iso8601 %>">
+                    <%= request.requested_due_date.present? ? request.requested_due_date.strftime('%a, %b %-d at %-I:%M%P') : 'N/A' %>
+                  </td>
+                  <td class="text-center align-content-center">
+                    <% if request.assignment&.due_date && request.requested_due_date.present? %>
+                      <%= (request.requested_due_date.to_date - request.assignment.due_date.to_date).to_i %>
+                    <% else %>
+                      N/A
+                    <% end %>
+                  </td>
+                  <td class="text-center align-content-center position-relative" data-export="<%= status_export_string(request) %>">
+                    <%= link_to course_request_path(@course, request), class: "stretched-link text-decoration-none text-reset" do %>
+                      <% case request.status %>
+                        <% when 'pending' %>
+                          <span class="badge text-bg-info">Pending</span>
+                        <% when 'approved' %>
+                          <% if request.auto_approved %>
+                            <span class="badge text-bg-success">Auto Approved</span>
+                          <% else %>
+                            <span class="badge text-bg-success">Approved</span>
+                          <% end %>
+                          on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                          by <%= request.auto_approved ? 'Auto Approval System' : request.last_processed_by_user&.name || 'Unknown' %>
+                        <% when 'denied' %>
+                          <span class="badge text-bg-danger me-3">Denied</span>
+                          on <%= request.updated_at.strftime('%a, %b %-d at %-I:%M%P') || 'N/A' %>
+                          by <%= request.last_processed_by_user&.name || 'Unknown' %>
+                        <% else %>
+                          <span class="badge text-bg-secondary">Unknown</span>
+                      <% end %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row mt-2 batch-actions d-none">
+          <div class="col-12 text-start">
+            <button type="button"
+                    class="btn btn-sm btn-success me-2"
+                    disabled
+                    data-requests-target="massApproveButton"
+                    data-action="click->requests#massApprove">
+              Approve Selected
+            </button>
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    disabled
+                    data-requests-target="massRejectButton"
+                    data-action="click->requests#massReject">
+              Reject Selected
+            </button>
+          </div>
+        </div>
+
+        <% export_url = export_course_requests_url(@course, format: :csv, readonly_api_token: @course.readonly_api_token) %>
+
+        <div class="d-flex gap-2 my-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Copy to Google Sheets <i class="fa fa-table"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button class="dropdown-item" type="button"
+                    data-sheets-url="<%= export_url %>">All Requests</button>
+                </li>
+                <li>
+                  <button class="dropdown-item" type="button"
+                    data-sheets-url="<%= export_url %>&status=pending">Pending Requests</button>
+                </li>
+              </ul>
+            </div>
+
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Export CSV <i class="fa fa-file-csv"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="<%= export_url %>">All Requests</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="<%= export_url %>&status=pending">Pending Requests</a>
+                </li>
+              </ul>
+            </div>
+        </div>
+
+        <script>
+          document.querySelectorAll('[data-sheets-url]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const formula = `=IMPORTDATA("${btn.dataset.sheetsUrl}")`;
+              navigator.clipboard.writeText(formula).then(() => {
+                alert("Copied a Google Sheets IMPORT function to the clipboard. Please paste this in your Google sheet and click 'Allow'.\n\nRemember not to share this with anyone outside your course staff.");
+              });
+            });
+          });
+        </script>
       <% else %>
         <div class="alert alert-warning">There are no current requests.</div>
       <% end %>

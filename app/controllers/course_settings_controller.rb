@@ -72,7 +72,9 @@ class CourseSettingsController < ApplicationController
       :email_subject,
       :email_template,
       :enable_slack_webhook_url,
-      :slack_webhook_url
+      :slack_webhook_url,
+      :pending_notification_frequency,
+      :pending_notification_email
     )
   end
 
