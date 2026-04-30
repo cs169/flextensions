@@ -28,6 +28,5 @@ class LmsCredential < ApplicationRecord
   belongs_to :user
   belongs_to :lms
 
-  # Encryption for tokens
   encrypts :token, :refresh_token
 end

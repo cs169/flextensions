@@ -84,8 +84,9 @@ class CoursesController < ApplicationController
     return render json: { error: 'You do not have permission.' }, status: :forbidden unless @role == 'instructor'
 
     enabled = ActiveModel::Type::Boolean.new.cast(params[:enabled])
-    Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
-              .each { |a| a.update!(enabled: enabled) }
+    scope = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
+    scope = scope.where.not(due_date: nil) if enabled
+    scope.update_all(enabled: enabled)
     render json: { success: true }, status: :ok
   end
 
