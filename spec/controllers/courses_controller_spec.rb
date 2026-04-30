@@ -372,6 +372,7 @@ RSpec.describe CoursesController, type: :controller do
 
     context 'when user is a TA (staff but not course admin)' do
       before do
+        UserToCourse.where(user: user, course: course).destroy_all
         UserToCourse.create!(user: user, course: course, role: 'ta')
       end
 
@@ -390,6 +391,10 @@ RSpec.describe CoursesController, type: :controller do
     end
 
     context 'when user is a student' do
+      before do
+        UserToCourse.where(user: user, course: course, role: 'teacher').destroy_all
+      end
+
       it 'redirects with access denied' do
         get :enrollments, params: { id: course.id }
         expect(response).to redirect_to(courses_path)
