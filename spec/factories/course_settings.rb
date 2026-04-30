@@ -36,5 +36,15 @@ FactoryBot.define do
     association :course
     enable_extensions { true }
     auto_approve_days { 0 }
+
+    trait :with_daily_notifications do
+      pending_notification_frequency { 'daily' }
+      pending_notification_email { 'instructor@example.com' }
+    end
+
+    trait :with_weekly_notifications do
+      pending_notification_frequency { 'weekly' }
+      pending_notification_email { 'instructor@example.com' }
+    end
   end
 end

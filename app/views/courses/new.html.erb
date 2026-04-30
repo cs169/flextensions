@@ -46,7 +46,10 @@
                 <td><%= course.dig("term", "name") %></td>
                 <td><%= course["course_code"] %></td>
                 <td><%= course["name"] %></td>
-                <td><%= course['enrollments'].find { |enrollment| %w[teacher ta].include?(enrollment['type']) }['type'].capitalize %></td>
+                <td>
+                  <% staff_enrollment = course['enrollments'].find { |enrollment| UserToCourse.staff_enrollment?(enrollment) } %>
+                  <%= UserToCourse.display_role(UserToCourse.role_from_canvas_enrollment(staff_enrollment)) %>
+                </td>
               </tr>
             <% end %>
           </tbody>

@@ -11,7 +11,7 @@ export default class extends Controller {
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
 			DataTable.ext.type.order['role-pre'] = function (data) {
-				const rolePriority = { teacher: 4, ta: 2, student: 3 };
+				const rolePriority = { teacher: 4, leadta: 3, "lead ta": 3, ta: 2, student: 1 };
 				if (typeof data !== 'string') {
 					data = String(data).trim();
 				}

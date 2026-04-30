@@ -6,6 +6,7 @@
 #  course_code        :string
 #  course_name        :string
 #  readonly_api_token :string
+#  semester           :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  canvas_id          :string
@@ -41,6 +42,26 @@ class Course < ApplicationRecord
   # Always load the LMS integrations
   default_scope { includes(:course_to_lmss) }
 
+  # Semester ordering: most-recent-first.
+  # Within the same year: Fall > Summer > Spring > Winter (furthest out to most recent).
+  SEMESTER_SEASON_ORDER = { 'Fall' => 3, 'Summer' => 2, 'Spring' => 1, 'Winter' => 0 }.freeze
+
+  # Returns a numeric sort key for a semester string (e.g. "Spring 2026").
+  # Higher values = more recent. Suitable for descending sort.
+  def self.semester_sort_key(semester)
+    return [ -1, -1 ] if semester.blank?
+
+    parts = semester.split
+    season = parts[0]
+    year = parts[1].to_i
+    [ year, SEMESTER_SEASON_ORDER.fetch(season, -1) ]
+  end
+
+  # Sorts an array of semester strings most-recent-first.
+  def self.sort_semesters(semesters)
+    semesters.sort_by { |s| semester_sort_key(s) }.reverse
+  end
+
   # Note: This is too close to the association, course_to_lmss
   def course_to_lms(lms_id = 1)
     CourseToLms.find_by(course_id: id, lms_id: lms_id)
@@ -66,8 +87,8 @@ class Course < ApplicationRecord
   # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
-    return 'instructor' if roles.include?('teacher') || roles.include?('ta')
-    return 'student' if roles.include?('student')
+    return 'instructor' if roles.intersect?(UserToCourse.staff_roles)
+    return 'student' if roles.include?(UserToCourse::STUDENT_ROLE)
 
     nil
   end
@@ -97,11 +118,11 @@ class Course < ApplicationRecord
   end
 
   def students
-    user_to_courses.where(role: 'student').map(&:user)
+    user_to_courses.where(role: UserToCourse::STUDENT_ROLE).map(&:user)
   end
 
   def instructors
-    user_to_courses.where(role: 'teacher').map(&:user)
+    user_to_courses.where(role: UserToCourse::TEACHER_ROLE).map(&:user)
   end
 
   def staff_users
@@ -236,7 +257,7 @@ class Course < ApplicationRecord
   end
 
   def sync_all_enrollments_from_canvas(user)
-    sync_users_from_canvas(user, [ 'teacher', 'ta', 'student' ])
+    sync_users_from_canvas(user, UserToCourse.roles)
   end
 
   def regenerate_readonly_api_token_if_blank

@@ -1,23 +1,127 @@
 /*
  * This is a manifest file that'll be compiled into application.css, which will include all the files
  * listed below.
- *
- * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- * // require_tree .
- *= require_self
  */
- $primary: #002676;
- $secondary: #fdb515;
- @import "bootstrap";
- @import "custom_bootstrap";
- @import "font-awesome";
- @import "datatables/dataTables.bootstrap5.css";
+// application.scss
+//
+// Main stylesheet. Uses SCSS @import to control load order.
+// Do NOT use Sprockets require directives (require_tree, require_self)
+// in this file — they bypass SCSS compilation and break variable sharing.
 
-//  @import "datatables/responsive.bootstrap5.css";
+/**
+  * UC Berkeley color palette based on the official brand guidelines:
+  * https://brand.berkeley.edu/colors/
+  * Use this site to double-check accessibile color combinations.
+  * Each color has a corresponding class for background and text,
+  * e.g. .bg-berkeley-blue and .text-berkeley-blue.
+  */
+
+// Primary palette
+$berkeley-blue: #002676;
+$california-gold: #FDB515;
+$white: #FFFFFF;
+
+// Secondary – Dark
+$blue-dark: #010133;
+$gold-dark: #FC9313;
+$green-dark: #00553A;
+$rose-dark: #770747;
+$purple-dark: #431170;
+
+// Secondary – Medium
+$blue-medium: #004AAE;
+$gold-medium: #FFC31B;
+$green-medium: #018943;
+$rose-medium: #E7115E;
+$purple-medium: #8236C7;
+
+// Secondary – Light
+$blue-light: #9FD1FF;
+$gold-light: #FFE88D;
+$green-light: #B3E59A;
+$rose-light: #FFCFE5;
+$purple-light: #D9CEFF;
+
+// Black and grays
+$black: #000000;
+$gray-medium: #808080;
+$gray-light: #F2F2F2;
+
+// Special
+$california-heritage-gold: #C09748;
+
+// Map for class generation
+$colors: (
+  "berkeley-blue": $berkeley-blue,
+  "california-gold": $california-gold,
+  "white": $white,
+  "blue-dark": $blue-dark,
+  "gold-dark": $gold-dark,
+  "green-dark": $green-dark,
+  "rose-dark": $rose-dark,
+  "purple-dark": $purple-dark,
+  "blue-medium": $blue-medium,
+  "gold-medium": $gold-medium,
+  "green-medium": $green-medium,
+  "rose-medium": $rose-medium,
+  "purple-medium": $purple-medium,
+  "blue-light": $blue-light,
+  "gold-light": $gold-light,
+  "green-light": $green-light,
+  "rose-light": $rose-light,
+  "purple-light": $purple-light,
+  "black": $black,
+  "gray-medium": $gray-medium,
+  "gray-light": $gray-light,
+  "california-heritage-gold": $california-heritage-gold,
+);
+
+// Bootstrap overrides and custom styles
+$primary: $berkeley-blue;
+// TODO: This may be a little too bright for some elements, consider using a medium or dark shade instead
+$secondary: $california-gold;
+
+@import "bootstrap";
+@import "custom_bootstrap";
+@import "font-awesome";
+
+@import "datatables/dataTables.bootstrap5.css";
+@import "datatables/responsive.bootstrap5.css";
+
+@each $name, $value in $colors {
+  .bg-#{$name} {
+    background-color: $value;
+  }
+  .text-#{$name} {
+    color: $value;
+  }
+
+  // Generate table classes that set the background, text, and border colors appropriately
+  // These override Bootstrap's default table styles
+  // when applied to a table, thead, tbody, or tfoot element
+  .table-#{$name} {
+    --bs-table-bg: #{$value};
+    --bs-table-color: #{color-contrast($value)};
+    --bs-table-border-color: #{mix(black, $value, 15%)};
+
+    &,
+    > th,
+    > td {
+      --bs-table-bg: #{$value};
+      --bs-table-color: #{color-contrast($value)};
+      --bs-table-border-color: #{mix(black, $value, 15%)};
+    }
+  }
+
+  // Handle thead/tbody/tfoot with the class
+  thead.table-#{$name},
+  tbody.table-#{$name},
+  tfoot.table-#{$name} {
+    > tr > th,
+    > tr > td {
+      --bs-table-bg: #{$value};
+      --bs-table-color: #{color-contrast($value)};
+      --bs-table-border-color: #{mix(black, $value, 15%)};
+    }
+  }
+}
