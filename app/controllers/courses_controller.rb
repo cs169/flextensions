@@ -86,7 +86,7 @@ class CoursesController < ApplicationController
     enabled = ActiveModel::Type::Boolean.new.cast(params[:enabled])
     scope = Assignment.where(course_to_lms_id: CourseToLms.where(course_id: @course.id).select(:id))
     scope = scope.where.not(due_date: nil) if enabled
-    scope.update_all(enabled: enabled)
+    scope.update_all(enabled: enabled) # rubocop:disable Rails/SkipsModelValidations
     render json: { success: true }, status: :ok
   end
 
