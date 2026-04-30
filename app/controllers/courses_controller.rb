@@ -93,6 +93,7 @@ class CoursesController < ApplicationController
 
     @enrollments = @course.user_to_courses.includes(:user)
     @is_course_admin = @course.course_admin?(@user)
+    @approved_late_days = Request.total_approved_late_days_by_user(@course)
   end
 
   def delete

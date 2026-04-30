@@ -26,9 +26,9 @@ export default class extends Controller {
 				responsive: true,
 				pageLength: 500,
 				lengthMenu: [[-1, 25, 50, 100, 500], ["All", 25, 50, 100, 500]],
-				columns: document.querySelectorAll('#enrollments-table thead th').length === 5
-					? [null, null, null, { orderDataType: 'role-pre' }, null]
-					: [null, null, null, { orderDataType: 'role-pre' }],
+				columns: document.querySelectorAll('#enrollments-table thead th').length === 6
+					? [null, null, null, { orderDataType: 'role-pre' }, null, null]
+					: [null, null, null, { orderDataType: 'role-pre' }, null],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
 		}
