@@ -246,14 +246,14 @@ class Course < ApplicationRecord
     return unless lms_links.any?
 
     lms_links.each do |course_to_lms|
-      SyncAllCourseAssignmentsJob.perform_now(course_to_lms.id, sync_user.id)
+      SyncAllCourseAssignmentsJob.perform_later(course_to_lms.id, sync_user.id)
     end
   end
 
   # Fetch users for a course and create/find their User and UserToCourse records
   # TODO: This may need to become a background job
   def sync_users_from_canvas(user, roles = [ 'student' ])
-    SyncUsersFromCanvasJob.perform_now(id, user, roles)
+    SyncUsersFromCanvasJob.perform_later(id, user, roles)
   end
 
   def sync_all_enrollments_from_canvas(user)

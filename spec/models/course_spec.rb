@@ -182,12 +182,9 @@ end
       allow(user).to receive(:ensure_fresh_canvas_token!).and_return('fake_token')
     end
 
-    it 'creates user and user_to_course record' do
-      expect do
-        course.sync_users_from_canvas(user.id, 'student')
-      end.to change(User, :count).by(CANVAS_USERS.size).and(
-        change(UserToCourse, :count).by(CANVAS_USERS.size)
-      )
+    it 'enqueues SyncUsersFromCanvasJob with the correct arguments' do
+      expect(SyncUsersFromCanvasJob).to receive(:perform_later).with(course.id, user.id, 'student')
+      course.sync_users_from_canvas(user.id, 'student')
     end
   end
 
@@ -250,7 +247,7 @@ end
     let!(:course) { described_class.create!(canvas_id: 'canvas_all_roles', course_name: 'User Sync', course_code: 'USYNC') }
 
     it 'syncs every supported internal role, including leadta' do
-      expect(SyncUsersFromCanvasJob).to receive(:perform_now).with(course.id, 999, %w[student teacher ta leadta])
+      expect(SyncUsersFromCanvasJob).to receive(:perform_later).with(course.id, 999, %w[student teacher ta leadta])
 
       course.sync_all_enrollments_from_canvas(999)
     end

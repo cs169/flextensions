@@ -1,6 +1,6 @@
 class CoursesController < ApplicationController
   before_action :authenticate_user
-  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments enrollments delete]
+  before_action :set_course, only: %i[show edit sync_assignments sync_enrollments sync_status enrollments delete]
   before_action :set_pending_request_count
   before_action :determine_user_role
 
@@ -85,6 +85,16 @@ class CoursesController < ApplicationController
 
     @course.sync_all_enrollments_from_canvas(@user.id)
     render json: { message: 'Users synced successfully.' }, status: :ok
+  end
+
+  def sync_status
+    course_to_lms = @course.course_to_lms(1)
+    return render json: { error: 'LMS connection not found.' }, status: :not_found unless course_to_lms
+
+    render json: {
+      roster_synced_at: course_to_lms.recent_roster_sync&.dig('synced_at'),
+      assignments_synced_at: course_to_lms.recent_assignment_sync&.dig('synced_at')
+    }, status: :ok
   end
 
   def enrollments
