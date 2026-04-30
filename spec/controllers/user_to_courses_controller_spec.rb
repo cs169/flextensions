@@ -9,11 +9,12 @@ RSpec.describe UserToCoursesController, type: :controller do
   describe 'PATCH #toggle_allow_extended_requests' do
     context 'when user is an instructor' do
       before do
+        Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
         UserToCourse.create!(user: instructor, course: course, role: 'teacher')
         student_enrollment
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -65,10 +66,11 @@ RSpec.describe UserToCoursesController, type: :controller do
 
     context 'when user is a student' do
       before do
+        Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
         student_enrollment
         session[:user_id] = student_user.canvas_uid
         student_user.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -99,10 +101,11 @@ RSpec.describe UserToCoursesController, type: :controller do
 
     context 'when course does not exist' do
       before do
+        Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
         student_enrollment
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now
@@ -123,10 +126,11 @@ RSpec.describe UserToCoursesController, type: :controller do
 
     context 'when enrollment does not exist' do
       before do
+        Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
         UserToCourse.create!(user: instructor, course: course, role: 'teacher')
         session[:user_id] = instructor.canvas_uid
         instructor.lms_credentials.create!(
-          lms_name: 'canvas',
+          lms_id: 1,
           token: 'fake_token',
           refresh_token: 'fake_refresh_token',
           expire_time: 1.hour.from_now

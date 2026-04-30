@@ -50,7 +50,7 @@ test_extension = Extension.create!({
 
 test_lms_credential = LmsCredential.create!({
   user_id: test_user.id,
-  lms_name: "canvas",
+  lms_id: canvas.id,
   token: "test token",
   external_user_id: "44444",
 })
