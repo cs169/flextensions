@@ -169,6 +169,24 @@ describe CanvasFacade do
     end
   end
 
+  describe '#get_all_course_users' do
+    let(:course) { instance_double(Course, canvas_id: course_id) }
+
+    it 'uses enrollment_type for built-in Canvas roles' do
+      stubs.get("courses/#{course_id}/users?per_page=100&enrollment_type[]=ta") { [ 200, {}, '[]' ] }
+
+      expect(facade.get_all_course_users(course, 'ta')).to eq([])
+      stubs.verify_stubbed_calls
+    end
+
+    it 'uses enrollment_role for the custom Lead TA Canvas role' do
+      stubs.get("courses/#{course_id}/users?per_page=100&enrollment_role=Lead+TA") { [ 200, {}, '[]' ] }
+
+      expect(facade.get_all_course_users(course, 'leadta')).to eq([])
+      stubs.verify_stubbed_calls
+    end
+  end
+
   describe 'get_course' do
     before do
       stubs.get("courses/#{course_id}") { [ 200, {}, '{}' ] }
