@@ -135,14 +135,14 @@ class SessionController < ApplicationController
       user.lms_credentials.first.update(
         token: token.token,
         refresh_token: token.refresh_token,
-        expire_time: Time.zone.at(token.expires_at)
+        expire_time: Time.zone.at(token.expires_at || 30.days.from_now.to_i)
       )
     else
       user.lms_credentials.create!(
         lms_id: Lms.CANVAS_LMS.id,
         token: token.token,
         refresh_token: token.refresh_token,
-        expire_time: Time.zone.at(token.expires_at)
+        expire_time: Time.zone.at(token.expires_at || 30.days.from_now.to_i)
       )
     end
   end

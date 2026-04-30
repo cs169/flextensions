@@ -30,6 +30,7 @@ Rails.application.routes.draw do
     member do
       post :sync_assignments
       post :sync_enrollments
+      patch :bulk_update_assignments
       get :enrollments
       delete :delete
     end
