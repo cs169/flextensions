@@ -49,11 +49,24 @@ class CourseSettings < ApplicationRecord
     {{course_name}} Staff
   LIQUID
 
+  VALID_NOTIFICATION_FREQUENCIES = %w[daily weekly].freeze
+
   belongs_to :course
 
+  before_validation -> { self.pending_notification_frequency = nil if pending_notification_frequency.blank? }
+  before_validation -> { self.pending_notification_email = nil if pending_notification_email.blank? }
   before_save :ensure_system_user_for_auto_approval
+  before_save -> { self.pending_notification_email = nil if pending_notification_frequency.nil? }
   validate :gradescope_url_is_valid, if: :enable_gradescope?
+  validates :pending_notification_frequency, inclusion: { in: VALID_NOTIFICATION_FREQUENCIES }, allow_nil: true
+  validates :pending_notification_email, presence: true, format: { with: /\A[^@\s]+@[^@\s]+\z/ },
+                                         if: -> { pending_notification_frequency.present? }
   after_save :create_or_update_gradescope_link
+
+  scope :with_pending_notifications, ->(frequency) {
+    where(pending_notification_frequency: frequency)
+    .where.not(pending_notification_email: [ nil, '' ])
+  }
 
   def automatic_approval_enabled?
     return false unless enable_extensions?

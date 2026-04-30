@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     resources :user_to_courses, only: [] do
       member do
         patch :toggle_allow_extended_requests
+        patch :update_notes
       end
     end
     resource :form_setting, only: [:edit, :update]

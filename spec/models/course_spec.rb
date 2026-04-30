@@ -41,8 +41,9 @@ RSpec.describe Course, type: :model do
     it 'returns the correct user for auto approval' do
       course = described_class.create!(canvas_id: 'canvas_123', course_name: 'Test', course_code: 'TEST101')
       user = User.create!(email: 'test@example.com', canvas_uid: '123')
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
       user.lms_credentials.create!(
-        lms_name: 'canvas',
+        lms_id: 1,
         token: 'valid_token',
         refresh_token: 'refresh_token',
         expire_time: 1.hour.from_now
@@ -51,6 +52,16 @@ RSpec.describe Course, type: :model do
 
       staff_user = course.staff_user_for_auto_approval
       expect(staff_user).to eq(user)
+    end
+  end
+
+  describe '#user_role' do
+    it 'treats leadta enrollments as instructors' do
+      course = described_class.create!(canvas_id: 'canvas_leadta', course_name: 'Test', course_code: 'TEST101')
+      user = User.create!(email: 'leadta@example.com', canvas_uid: 'leadta_123')
+      UserToCourse.create!(user: user, course: course, role: 'leadta')
+
+      expect(course.user_role(user)).to eq('instructor')
     end
   end
 
@@ -229,6 +240,16 @@ end
       semesters = [ 'Winter 2026', 'Spring 2026', 'Summer 2026', 'Fall 2026' ]
       expected = [ 'Fall 2026', 'Summer 2026', 'Spring 2026', 'Winter 2026' ]
       expect(described_class.sort_semesters(semesters)).to eq(expected)
+    end
+  end
+
+  describe '#sync_all_enrollments_from_canvas' do
+    let!(:course) { described_class.create!(canvas_id: 'canvas_all_roles', course_name: 'User Sync', course_code: 'USYNC') }
+
+    it 'syncs every supported internal role, including leadta' do
+      expect(SyncUsersFromCanvasJob).to receive(:perform_now).with(course.id, 999, %w[student teacher ta leadta])
+
+      course.sync_all_enrollments_from_canvas(999)
     end
   end
 

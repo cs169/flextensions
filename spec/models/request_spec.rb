@@ -70,8 +70,9 @@ RSpec.describe Request, type: :model do
 
   before do
     UserToCourse.create!(user: user, course: course, role: 'student')
+    create(:lms)
     user.lms_credentials.create!(
-      lms_name: 'canvas',
+      lms_id: 1,
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
@@ -920,6 +921,65 @@ RSpec.describe Request, type: :model do
       course_settings.update(enable_emails: false)
       expect(EmailService).not_to receive(:send_email)
       request.send_email_response
+    end
+  end
+
+  describe '.total_approved_late_days_by_user' do
+    let(:assignment2) do
+      Assignment.create!(
+        name: 'Assignment 2',
+        course_to_lms_id: course.course_to_lms(1).id,
+        external_assignment_id: 'ext2',
+        enabled: true,
+        due_date: 5.days.from_now
+      )
+    end
+
+    it 'sums approved days across different assignments' do
+      described_class.create!(user: user, course: course, assignment: assignment,
+                              reason: 'r', status: 'approved',
+                              requested_due_date: assignment.due_date + 2.days)
+      described_class.create!(user: user, course: course, assignment: assignment2,
+                              reason: 'r', status: 'approved',
+                              requested_due_date: assignment2.due_date + 3.days)
+
+      result = described_class.total_approved_late_days_by_user(course)
+      expect(result[user.id]).to eq(5)
+    end
+
+    it 'takes the wider window when multiple requests exist for the same assignment' do
+      described_class.create!(user: user, course: course, assignment: assignment,
+                              reason: 'r', status: 'approved',
+                              requested_due_date: assignment.due_date + 2.days)
+      described_class.create!(user: user, course: course, assignment: assignment,
+                              reason: 'r', status: 'approved',
+                              requested_due_date: assignment.due_date + 5.days)
+
+      result = described_class.total_approved_late_days_by_user(course)
+      expect(result[user.id]).to eq(5)
+    end
+
+    it 'does not count denied requests' do
+      described_class.create!(user: user, course: course, assignment: assignment,
+                              reason: 'r', status: 'denied',
+                              requested_due_date: assignment.due_date + 3.days)
+
+      result = described_class.total_approved_late_days_by_user(course)
+      expect(result[user.id]).to eq(0)
+    end
+
+    it 'does not count pending requests' do
+      described_class.create!(user: user, course: course, assignment: assignment,
+                              reason: 'r', status: 'pending',
+                              requested_due_date: assignment.due_date + 3.days)
+
+      result = described_class.total_approved_late_days_by_user(course)
+      expect(result[user.id]).to eq(0)
+    end
+
+    it 'returns 0 for users with no approved requests' do
+      result = described_class.total_approved_late_days_by_user(course)
+      expect(result[user.id]).to eq(0)
     end
   end
 end

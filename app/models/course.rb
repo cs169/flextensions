@@ -87,8 +87,8 @@ class Course < ApplicationRecord
   # Or is user.staff_role?(course) or user.student_role?(course) better?
   def user_role(user)
     roles = UserToCourse.where(user_id: user.id, course_id: id).pluck(:role)
-    return 'instructor' if roles.include?('teacher') || roles.include?('ta')
-    return 'student' if roles.include?('student')
+    return 'instructor' if roles.intersect?(UserToCourse.staff_roles)
+    return 'student' if roles.include?(UserToCourse::STUDENT_ROLE)
 
     nil
   end
@@ -118,11 +118,11 @@ class Course < ApplicationRecord
   end
 
   def students
-    user_to_courses.where(role: 'student').map(&:user)
+    user_to_courses.where(role: UserToCourse::STUDENT_ROLE).map(&:user)
   end
 
   def instructors
-    user_to_courses.where(role: 'teacher').map(&:user)
+    user_to_courses.where(role: UserToCourse::TEACHER_ROLE).map(&:user)
   end
 
   def staff_users
@@ -257,7 +257,7 @@ class Course < ApplicationRecord
   end
 
   def sync_all_enrollments_from_canvas(user)
-    sync_users_from_canvas(user, [ 'teacher', 'ta', 'student' ])
+    sync_users_from_canvas(user, UserToCourse.roles)
   end
 
   def regenerate_readonly_api_token_if_blank

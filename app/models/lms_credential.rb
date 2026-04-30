@@ -5,7 +5,6 @@
 #
 #  id               :bigint           not null, primary key
 #  expire_time      :datetime
-#  lms_name         :string
 #  password         :string
 #  refresh_token    :string
 #  token            :string
@@ -13,6 +12,7 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  external_user_id :string
+#  lms_id           :bigint
 #  user_id          :bigint
 #
 # Indexes
@@ -21,15 +21,13 @@
 #
 # Foreign Keys
 #
+#  fk_rails_...  (lms_id => lmss.id)
 #  fk_rails_...  (user_id => users.id)
 #
 class LmsCredential < ApplicationRecord
-  # Belongs to a User
   belongs_to :user
+  belongs_to :lms
 
   # Encryption for tokens
   encrypts :token, :refresh_token
-
-  # LMS must exist
-  validates :lms_name, presence: true
 end

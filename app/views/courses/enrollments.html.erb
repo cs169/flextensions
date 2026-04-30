@@ -13,6 +13,7 @@
             <th class="text-center">Student ID</th>
             <th class="text-center">Email</th>
             <th class="text-center">Role</th>
+            <th class="text-center">Approved Days</th>
             <% if @is_course_admin %>
               <th class="text-center">
                 Extended Requests?
@@ -52,6 +53,7 @@
               <td class="text-center"><%= enrollment.user.student_id %></td>
               <td class="text-center"><%= enrollment.user.email %></td>
               <td class="text-center"><%= enrollment.role.downcase.capitalize %></td>
+              <td class="text-center"><%= enrollment.student? ? @approved_late_days.fetch(enrollment.user_id, 0) : '' %></td>
               <% if @is_course_admin %>
                 <td class="justify-content-center align-content-center"
                     data-order="<%= enrollment.allow_extended_requests ? 1 : 0 %>">

@@ -8,10 +8,11 @@ RSpec.describe CoursesController, type: :controller do
   let(:course_settings) { CourseSettings.create!(course: course, enable_extensions: true) }
 
   before do
+    Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
     session[:user_id] = user.canvas_uid
     UserToCourse.create!(user: user, course: course, role: 'student')
     user.lms_credentials.create!(
-      lms_name: 'canvas',
+      lms_id: 1,
       token: 'fake_token',
       refresh_token: 'fake_refresh_token',
       expire_time: 1.hour.from_now
@@ -27,6 +28,14 @@ RSpec.describe CoursesController, type: :controller do
     it 'renders the index template' do
       get :index
       expect(response).to render_template(:index)
+    end
+
+    it 'includes Lead TA enrollments in staff courses' do
+      UserToCourse.create!(user: user, course: student_course, role: 'leadta')
+
+      get :index
+
+      expect(assigns(:teacher_courses).map(&:role)).to include('leadta')
     end
 
     context 'semester grouping' do
@@ -112,6 +121,21 @@ RSpec.describe CoursesController, type: :controller do
       expect(response).to redirect_to(courses_path)
       expect(flash[:notice]).to eq('Selected courses and their assignments have been imported successfully.')
     end
+
+    it 'imports courses where the user is enrolled with the Canvas Lead TA role' do
+      lead_ta_course = {
+        'id' => '999',
+        'name' => 'Lead TA Canvas Course',
+        'course_code' => 'LTA101',
+        'enrollments' => [ { 'type' => 'ta', 'role' => 'Lead TA' } ]
+      }
+      allow(Course).to receive(:fetch_courses).and_return([ lead_ta_course ])
+      allow(Course).to receive(:create_or_update_from_canvas)
+
+      post :create, params: { courses: [ '999' ] }
+
+      expect(Course).to have_received(:create_or_update_from_canvas).with(lead_ta_course, 'fake_token', user)
+    end
   end
 
   describe 'POST #sync_assignments' do
@@ -139,6 +163,14 @@ RSpec.describe CoursesController, type: :controller do
             headers: { 'Authorization' => 'Bearer fake_token' }
           ).to_return(status: 200, body: '[]', headers: {})
       end
+      stub_request(:get, "#{ENV.fetch('CANVAS_URL', nil)}/api/v1/courses/456/users")
+        .with(
+          query: {
+            'enrollment_role' => 'Lead TA',
+            'per_page' => '100'
+          },
+          headers: { 'Authorization' => 'Bearer fake_token' }
+        ).to_return(status: 200, body: '[]', headers: {})
     end
 
     context 'when user is a teacher (course admin)' do
@@ -215,7 +247,7 @@ RSpec.describe CoursesController, type: :controller do
           'id' => '103',
           'name' => 'Test Course 103',
           'course_code' => 'TC103',
-          'enrollments' => [ { 'type' => 'teacher' } ],
+          'enrollments' => [ { 'type' => 'ta', 'role' => 'Lead TA' } ],
           'term' => { 'name' => 'Fall 2025' }
         },
         {
@@ -230,7 +262,8 @@ RSpec.describe CoursesController, type: :controller do
 
     before do
       # Create a fake LMS credential with a token
-      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
+      user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
 
       allow(Course).to receive(:fetch_courses).and_return(canvas_courses)
     end
@@ -246,8 +279,9 @@ RSpec.describe CoursesController, type: :controller do
       expect(assigns(:courses_student)).not_to be_empty
 
       # Teacher course should be categorized correctly
-      teacher_course = assigns(:courses_teacher).first
-      expect(teacher_course['enrollments'].first['type']).to eq('teacher')
+      teacher_course_roles = assigns(:courses_teacher).map { |canvas_course| canvas_course['enrollments'].first }
+      expect(teacher_course_roles).to include(hash_including('type' => 'teacher'))
+      expect(teacher_course_roles).to include(hash_including('role' => 'Lead TA'))
 
       # Student course should be categorized correctly
       student_course = assigns(:courses_student).first
@@ -304,7 +338,11 @@ RSpec.describe CoursesController, type: :controller do
   describe 'GET #enrollments' do
     before do
       # Create LMS credentials so user has a token
-      user.lms_credentials.create!(lms_name: 'canvas', token: 'fake_token', expire_time: 1.hour.from_now)
+      Lms.find_or_create_by(id: 1) { |l| l.lms_name = 'Canvas'; l.use_auth_token = true }
+      user.lms_credentials.create!(lms_id: 1, token: 'fake_token', expire_time: 1.hour.from_now)
+
+      # Add user as a teacher so they are allowed to view enrollments
+      UserToCourse.create!(user: user, course: course, role: 'teacher')
 
       CourseToLms.create!(course: course, lms_id: 1)
     end
@@ -330,10 +368,16 @@ RSpec.describe CoursesController, type: :controller do
         get :enrollments, params: { id: course.id }
         expect(assigns(:is_course_admin)).to be true
       end
+
+      it 'assigns @approved_late_days' do
+        get :enrollments, params: { id: course.id }
+        expect(assigns(:approved_late_days)).to be_a(Hash)
+      end
     end
 
     context 'when user is a TA (staff but not course admin)' do
       before do
+        UserToCourse.where(user: user, course: course).destroy_all
         UserToCourse.create!(user: user, course: course, role: 'ta')
       end
 
@@ -352,6 +396,10 @@ RSpec.describe CoursesController, type: :controller do
     end
 
     context 'when user is a student' do
+      before do
+        UserToCourse.where(user: user, course: course, role: 'teacher').destroy_all
+      end
+
       it 'redirects with access denied' do
         get :enrollments, params: { id: course.id }
         expect(response).to redirect_to(courses_path)

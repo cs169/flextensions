@@ -211,6 +211,34 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3 row border-bottom pb-3">
+                                    <label for="pending-notification-frequency" class="col-sm-4 col-form-label">Pending Request Notifications</label>
+                                    <div class="col-sm-8">
+                                        <%= select_tag 'course_settings[pending_notification_frequency]',
+                                                       options_for_select(
+                                                         [['No notifications', ''], ['Daily', 'daily'], ['Once weekly (Fridays)', 'weekly']],
+                                                         @course.course_settings&.pending_notification_frequency
+                                                       ),
+                                                       class: 'form-select',
+                                                       id: 'pending-notification-frequency',
+                                                       data: { action: 'change->course-settings#togglePendingNotificationEmail' } %>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 row border-bottom pb-3">
+                                    <label for="pending-notification-email" class="col-sm-4 col-form-label">Notification Email</label>
+                                    <div class="col-sm-8">
+                                        <%= email_field_tag 'course_settings[pending_notification_email]',
+                                                          @course.course_settings&.pending_notification_email,
+                                                          class: 'form-control',
+                                                          id: 'pending-notification-email',
+                                                          placeholder: 'instructor@berkeley.edu',
+                                                          data: { course_settings_target: 'pendingNotificationEmail' },
+                                                          disabled: @course.course_settings&.pending_notification_frequency.blank? %>
+                                        <div class="form-text">Weekly notifications are sent on Fridays at 5:00 PM PT.</div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <div class="text-start">
                                         <% if @course.course_settings&.enable_extensions %>

@@ -11,7 +11,7 @@ export default class extends Controller {
 		if (!DataTable.isDataTable('#enrollments-table')) {
 			// Define a custom sorting function for the Role column
 			DataTable.ext.type.order['role-pre'] = function (data) {
-				const rolePriority = { teacher: 4, ta: 2, student: 3 };
+				const rolePriority = { teacher: 4, leadta: 3, "lead ta": 3, ta: 2, student: 1 };
 				if (typeof data !== 'string') {
 					data = String(data).trim();
 				}
@@ -26,9 +26,9 @@ export default class extends Controller {
 				responsive: true,
 				pageLength: 500,
 				lengthMenu: [[-1, 25, 50, 100, 500], ["All", 25, 50, 100, 500]],
-				columns: document.querySelectorAll('#enrollments-table thead th').length === 5
-					? [null, null, null, { orderDataType: 'role-pre' }, null]
-					: [null, null, null, { orderDataType: 'role-pre' }],
+				columns: document.querySelectorAll('#enrollments-table thead th').length === 6
+					? [null, null, null, { orderDataType: 'role-pre' }, null, null]
+					: [null, null, null, { orderDataType: 'role-pre' }, null],
 				order: [[3, 'des'], [0, 'asc']] // Sort Role first, then Name
 			});
 		}
