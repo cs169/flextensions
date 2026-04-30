@@ -38,7 +38,7 @@ class UserToCoursesController < ApplicationController
 
   def authorize_instructor!
     user_to_course = UserToCourse.find_by(user: @current_user, course: @course)
-    unless user_to_course&.teacher?
+    unless user_to_course&.course_admin?
       render json: {
         success: false,
         error: 'Forbidden',
