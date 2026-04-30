@@ -17,8 +17,6 @@ class UserToCoursesController < ApplicationController
   end
 
   def update_notes
-    @enrollment = @course.user_to_courses.find(params[:id])
-
     if @enrollment.update(notes: params[:notes])
       render json: { success: true, notes: @enrollment.notes }, status: :ok
     else
@@ -43,7 +41,7 @@ class UserToCoursesController < ApplicationController
   end
 
   def set_enrollment
-    @enrollment = UserToCourse.find(params[:id])
+    @enrollment = @course.user_to_courses.find(params[:id])
   end
 
   def authorize_instructor!
